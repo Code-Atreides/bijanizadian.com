@@ -126,24 +126,35 @@
   .hero { position: relative; width: 100%; overflow: hidden; min-height: min(100svh, 940px); display: flex; flex-direction: column; align-items: center; }
   .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 70vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
   .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
-  .hero-inner { position: relative; z-index: 2; text-align: center; padding: clamp(120px, 18vh, 168px) 24px 0; display: flex; flex-direction: column; align-items: center; }
+  /* above .hero-art, so the satellite passes behind the buttons the way it does
+     on fomo.family (its buttons carry z-2, the astronaut none) */
+  .hero-inner { position: relative; z-index: 3; text-align: center; padding: 104px 24px 0; display: flex; flex-direction: column; align-items: center; }
   .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
-  /* the wordmark is ~3.1× as wide as it is tall and "/campus" ~3.9×, so ~7× height
-     has to fit inside the viewport minus the 24px gutters */
-  .hero-title svg { height: clamp(44px, 9.6vw, 140px); width: auto; display: block; }
-  .hero-title .slash { font-size: clamp(40px, 8.7vw, 126px); font-weight: 700; letter-spacing: -.045em; }
+  /* capped at fomo.family's own glyph size: its wordmark renders 360 x 115.
+     The lockup is ~3.1× as wide as it is tall and "/campus" ~3.9×, so the floors
+     keep ~7× the height inside the viewport minus the 24px gutters. */
+  .hero-title svg { height: clamp(44px, 8vw, 115px); width: auto; display: block; }
+  .hero-title .slash { font-size: clamp(40px, 7.2vw, 104px); font-weight: 700; letter-spacing: -.045em; }
   .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
-  /* fomo.family: 40px / 1.15em, #EAEDFF, tracking-tighter */
-  .hero h1 { margin-top: 26px; font-size: clamp(26px, 3.1vw, 40px); font-weight: 700; letter-spacing: -.05em; line-height: 1.15; color: var(--lavender); }
-  /* fomo.family: 22px, #D1D8FF at 60%, tracking-tight */
-  .hero .lede { margin-top: 14px; max-width: 80ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); letter-spacing: -.025em; }
-  .hero-cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-  .hero-art { position: relative; z-index: 2; margin-top: -38px; width: min(560px, 82vw); height: auto; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
+  /* fomo.family: 40px / leading-12, #EAEDFF, tracking-tighter. Its wordmark box
+     carries ~22px of slack under the glyph, which this margin stands in for. */
+  .hero h1 { margin-top: 34px; font-size: clamp(26px, 3.1vw, 40px); font-weight: 700; letter-spacing: -.05em; line-height: 1.2; color: var(--lavender); }
+  /* fomo.family: 22px / leading-6, #D1D8FF at 60%, tracking-tight. Body line-height
+     of 1.55 was making this far looser than theirs wherever it wraps. */
+  .hero .lede { margin-top: 10px; max-width: 80ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); line-height: 1.2; letter-spacing: -.025em; }
+  .hero-cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .hero-art { position: relative; z-index: 2; margin-top: -64px; width: min(100%, 470px); height: auto; object-fit: contain; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
   .hero-foot { position: relative; z-index: 2; margin-top: -20px; padding-bottom: 28px; display: flex; gap: 8px 24px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--ink-soft); }
   .hero-foot a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
   .hero-foot a:hover { color: var(--ink); }
   .hero-foot a::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-bright); }
+
+  /* fomo.family's own desktop step (its breakpoint is 800px) */
+  @media (min-width: 800px) {
+    .hero-inner { padding-top: 158px; }
+    .hero-art { height: 520px; width: auto; margin-top: -80px; }
+  }
 
   /* ---------- shared section bits ---------- */
   .section { padding-top: var(--gap-section); }
