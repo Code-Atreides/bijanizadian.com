@@ -24,7 +24,7 @@
  *
  * Item fields: id, label, icon, title, body (HTML), link, linkLabel, extra [{label, href}],
  *              status (small grey text after the title), corner (bottom-right), openOnLoad, menuDesc
- * Built-in icons: notepad, globe, cup, building, form, mail, doc, bin, bell — or pass raw '<svg …>' markup.
+ * Built-in icons: notepad, globe, cup, building, form, mail, doc, bin, bell, art — or pass raw '<svg …>' markup.
  * Options: name, subtitle, mark (letter in the start button), wallpaper ('hill' | any CSS background | false),
  *          startLeft / startRight (item ids or {label, desc, href, icon}), startHeading.
  * mount() returns { open(id), close(id), closeAll(), destroy(), root }.
@@ -141,6 +141,7 @@
 <symbol id="xpd-ic-doc" viewBox="0 0 32 32"><path d="M8 3h11l6 6v20H8z" fill="#fff" stroke="#8a8a8a"/><path d="M19 3v6h6" fill="#e4e4e4" stroke="#8a8a8a"/><path d="M11 15h10M11 19h10M11 23h7" stroke="#bdbdbd" fill="none"/><circle cx="13.5" cy="10.5" r="2" fill="#3c8ff0"/></symbol>\
 <symbol id="xpd-ic-bin" viewBox="0 0 32 32"><path d="M8 9l1.5 19h13L24 9z" fill="url(#xpd-gBin)" stroke="#5c6f8a"/><path d="M12 12l.8 14M16 12v14M20 12l-.8 14" stroke="#5c6f8a" opacity=".45" fill="none"/><ellipse cx="16" cy="9" rx="8.5" ry="2.5" fill="#e4edf9" stroke="#5c6f8a"/></symbol>\
 <symbol id="xpd-ic-bell" viewBox="0 0 32 32"><path d="M16 4.5c-4.5 0-7.5 3.4-7.5 8v5.5L6 22.5h20l-2.5-4.5V12.5c0-4.6-3-8-7.5-8z" fill="url(#xpd-gBell)" stroke="#8a6a1f"/><path d="M13 24.5a3 3 0 0 0 6 0" fill="#d9a460" stroke="#8a6a1f"/><rect x="15" y="2.5" width="2" height="3" rx="1" fill="#8a6a1f"/><circle cx="24" cy="8" r="4" fill="#e63c3c" stroke="#fff" stroke-width="1.2"/></symbol>\
+<symbol id="xpd-ic-art" viewBox="0 0 32 32"><path d="M14 4.5C7.6 4.5 3 8.9 3 14.2c0 3.7 2.9 6 6.2 6 1.8 0 2.5-1 2.5-2.1 0-1-.8-1.6-.8-2.6 0-1.2 1-2 2.3-2H18c4.2 0 7.7-2.5 7.7-5.6C25.7 7.1 20.4 4.5 14 4.5z" fill="#f4f0e5" stroke="#8a7d5a"/><circle cx="8.6" cy="10" r="1.8" fill="#e63c3c"/><circle cx="13" cy="7.4" r="1.8" fill="#3c8ff0"/><circle cx="18.3" cy="7.8" r="1.8" fill="#f5b400"/><circle cx="21.8" cy="11.3" r="1.8" fill="#5fb43c"/><circle cx="10" cy="15.3" r="1.9" fill="#fff" stroke="#8a7d5a"/><path d="M17.6 27.5 24.5 15a1.7 1.7 0 0 1 3 1.7l-6.8 12.6z" fill="#dfe0e2" stroke="#8a8a8a"/><path d="m17.6 27.5 1.2-4 2.8 1.6z" fill="#d9a460" stroke="#8a5a22"/><path d="M18.8 23.5 21.6 25.1" stroke="#8a8a8a"/></symbol>\
 </defs></svg>';
 
   var WALLPAPER = '<svg class="xpd-wall" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>\
