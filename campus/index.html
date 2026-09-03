@@ -116,7 +116,10 @@
 
   /* ---------- nav (sits over the hero, like fomo.family) ---------- */
   .nav { position: absolute; top: 0; left: 0; right: 0; z-index: 30; }
-  .nav-inner { max-width: 1440px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
+  /* fomo.family's header is full-bleed — `flex items-center h-13 pt-3 px-5`, no
+     max-width — so the mark and the buttons sit against the edges rather than
+     inside a centred column */
+  .nav-inner { padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
   .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; text-decoration: none; gap: 8px; }
   .brand svg { height: 24px; width: auto; display: block; }
   .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
