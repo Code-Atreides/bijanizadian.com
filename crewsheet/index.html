@@ -400,73 +400,80 @@
   .role-top {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px 14px;
+    align-items: center;
+    gap: 10px 14px;
   }
   .role-top h3 { font-size: 21px; font-weight: 700; letter-spacing: -0.015em; }
   .role-top .progress { font-size: 13px; font-weight: 600; color: var(--pc); }
-  .assignees {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-    margin-top: 14px;
+
+  /* members — colour-coded name chips on the right of the role header */
+  .members {
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
   }
-  .assignee { position: relative; }
-  .assignee input {
-    width: 100%;
-    font: inherit;
-    font-size: 14.5px;
+  .member {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px 4px 10px;
+    font-size: 12.5px;
     font-weight: 600;
-    padding: 10px 40px 10px 34px;
-    border: 1.5px solid var(--line);
-    border-radius: var(--radius-sm);
-    background: var(--bg-3);
-    color: var(--ink);
-  }
-  .assignee input:focus { outline: none; border-color: var(--pc); background: #1b1a28; }
-  .assignee input::placeholder { font-weight: 400; color: var(--ink-faint); }
-  .assignee .dot {
-    position: absolute;
-    left: 12px; top: 50%;
-    transform: translateY(-50%);
-    width: 10px; height: 10px;
-    border-radius: 50%;
+    color: var(--pc);
     background: var(--pbg);
-    border: 2px solid var(--pc);
-    transition: background .15s ease, box-shadow .2s ease;
+    border: 1px solid transparent;
+    border-radius: 99px;
   }
-  /* filled dot = a name is in the slot */
-  .assignee.is-set .dot { background: var(--pc); box-shadow: 0 0 0 3px var(--pbg); }
-  /* confirm button — appears while editing a slot that has a value */
-  .assignee-ok {
-    position: absolute;
-    right: 7px; top: 50%;
-    width: 23px; height: 23px;
-    display: grid; place-items: center;
+  .member-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pc); flex: none; }
+  .member-name { white-space: nowrap; }
+  .member-x {
     border: none;
-    border-radius: 50%;
-    background: var(--pc);
-    color: #08060f;
+    background: none;
+    color: var(--pc);
+    opacity: .55;
+    font-size: 14px;
+    line-height: 1;
     cursor: pointer;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(-50%) scale(.7);
-    transition: opacity .12s ease, transform .12s ease;
+    padding: 0 3px;
+    border-radius: 50%;
   }
-  .assignee-ok svg {
-    width: 12px; height: 12px;
+  .member-x:hover { opacity: 1; background: rgba(255, 255, 255, .1); }
+  .member-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px 5px 9px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1px dashed var(--line);
+    border-radius: 99px;
+    cursor: pointer;
+  }
+  .member-add svg {
+    width: 15px; height: 15px;
     fill: none; stroke: currentColor;
-    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+    stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
   }
-  .assignee-ok:hover { filter: brightness(1.12); }
-  .assignee.is-set:focus-within .assignee-ok {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(-50%) scale(1);
+  .member-add:hover { color: var(--pc); border-color: var(--pc); }
+  .member-input {
+    width: 132px;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 11px;
+    color: var(--ink);
+    background: var(--bg-3);
+    border: 1px solid var(--pc);
+    border-radius: 99px;
+    outline: none;
   }
-  @keyframes assignee-confirm { from { box-shadow: 0 0 0 0 var(--pc); } to { box-shadow: 0 0 0 9px transparent; } }
-  .assignee.just-confirmed input { animation: assignee-confirm .6s ease-out; }
-  @media (prefers-reduced-motion: reduce) { .assignee.just-confirmed input { animation: none; } }
+  .member-input::placeholder { color: var(--ink-faint); font-weight: 400; }
   .tasks { margin-top: 16px; list-style: none; }
   .task {
     display: flex;
@@ -569,6 +576,7 @@
     .nav-inner { padding: 12px 20px; }
     .wrap { padding: 0 20px 90px; }
     .join-form { flex-direction: column; }
+    .members { margin-left: 0; width: 100%; justify-content: flex-start; }
   }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
@@ -723,17 +731,14 @@
   const PILLARS = [
     {
       id: 'host', cls: 'p-host', name: 'Host',
-      slots: ['Host'],
       starterTasks: ['Build the guest list', 'Send invites + confirm headcount', 'Add your own tasks here']
     },
     {
       id: 'setup', cls: 'p-setup', name: 'Dinner Setup',
-      slots: ['Setup lead', 'Setup #2 (optional)'],
       starterTasks: ['Lock the venue', 'Plan the menu / order food', 'Add your own tasks here']
     },
     {
       id: 'media', cls: 'p-media', name: 'Media',
-      slots: ['Media lead', 'Media #2 (optional)'],
       starterTasks: ['Plan the shot list', 'Capture the night (photo + video)', 'Deliver recap to sponsor']
     }
   ];
@@ -754,7 +759,7 @@
     const s = { rev: 1, meta: { school: '', date: '', sponsor: '' }, pillars: {} };
     PILLARS.forEach(p => {
       s.pillars[p.id] = {
-        assignees: p.slots.map(() => ''),
+        assignees: [],
         tasks: p.starterTasks.map((t, i) => ({ id: p.id + '-' + i, text: t, done: false }))
       };
     });
@@ -905,48 +910,77 @@
       const top = document.createElement('div');
       top.className = 'role-top';
       top.innerHTML = '<h3>' + p.name + '</h3><span class="progress">' + doneCount + ' / ' + ps.tasks.length + ' done</span>';
-      block.appendChild(top);
 
-      const assignees = document.createElement('div');
-      assignees.className = 'assignees';
-      p.slots.forEach((slot, i) => {
-        const wrapEl = document.createElement('div');
-        wrapEl.className = 'assignee' + (ps.assignees[i] ? ' is-set' : '');
+      // members: chips in the pillar colour, pushed to the right of the header
+      const members = (ps.assignees || []).filter(Boolean);
+      const mem = document.createElement('div');
+      mem.className = 'members';
+
+      members.forEach((name, mi) => {
+        const chip = document.createElement('span');
+        chip.className = 'member';
         const dot = document.createElement('span');
-        dot.className = 'dot';
-        const input = document.createElement('input');
-        input.placeholder = slot + ' — name';
-        input.setAttribute('aria-label', p.name + ': ' + slot);
-        input.value = ps.assignees[i] || '';
-
-        const ok = document.createElement('button');
-        ok.type = 'button';
-        ok.tabIndex = -1;
-        ok.className = 'assignee-ok';
-        ok.setAttribute('aria-label', 'Confirm ' + slot + ' name');
-        ok.innerHTML = '<svg viewBox="0 0 14 12" aria-hidden="true"><path d="M1.5 6.6 5 10l7.5-8.5"/></svg>';
-
-        const confirmName = () => {
-          if (!input.value.trim()) return;
-          input.blur();
-          wrapEl.classList.add('just-confirmed');
-          setTimeout(() => wrapEl.classList.remove('just-confirmed'), 650);
-        };
-
-        input.addEventListener('input', () => {
-          ps.assignees[i] = input.value;
-          wrapEl.classList.toggle('is-set', !!input.value.trim());
-          queueSave();
+        dot.className = 'member-dot';
+        const label = document.createElement('span');
+        label.className = 'member-name';
+        label.textContent = name;
+        const x = document.createElement('button');
+        x.type = 'button';
+        x.className = 'member-x';
+        x.textContent = '×';
+        x.setAttribute('aria-label', 'Remove ' + name);
+        x.addEventListener('click', () => {
+          ps.assignees = members.filter((_, k) => k !== mi);
+          queueSave(); render();
         });
-        input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); confirmName(); } });
-        ok.addEventListener('click', confirmName);
-
-        wrapEl.appendChild(dot);
-        wrapEl.appendChild(input);
-        wrapEl.appendChild(ok);
-        assignees.appendChild(wrapEl);
+        chip.appendChild(dot);
+        chip.appendChild(label);
+        chip.appendChild(x);
+        mem.appendChild(chip);
       });
-      block.appendChild(assignees);
+
+      const addWrap = document.createElement('span');
+      addWrap.className = 'member-add-wrap';
+      const memberBtn = document.createElement('button');
+      memberBtn.type = 'button';
+      memberBtn.className = 'member-add';
+      memberBtn.innerHTML =
+        '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="6.5" r="3"/>' +
+        '<path d="M2.5 16.5c0-3 2.4-5 5.5-5s5.5 2 5.5 5"/><path d="M16 4.5v5M13.5 7h5"/></svg>' +
+        '<span>Add member</span>';
+      memberBtn.addEventListener('click', openMemberInput);
+      addWrap.appendChild(memberBtn);
+      mem.appendChild(addWrap);
+
+      function openMemberInput() {
+        addWrap.innerHTML = '';
+        const inp = document.createElement('input');
+        inp.className = 'member-input';
+        inp.placeholder = 'Name';
+        inp.setAttribute('aria-label', 'New ' + p.name + ' member');
+        let done = false;
+        const commit = () => {
+          if (done) return;
+          done = true;
+          const v = inp.value.trim();
+          if (v) { ps.assignees = members.concat([v]); queueSave(); render(); }
+          else { closeMemberInput(); }
+        };
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(); }
+          else if (e.key === 'Escape') { done = true; closeMemberInput(); }
+        });
+        inp.addEventListener('blur', commit);
+        addWrap.appendChild(inp);
+        inp.focus();
+      }
+      function closeMemberInput() {
+        addWrap.innerHTML = '';
+        addWrap.appendChild(memberBtn);
+      }
+
+      top.appendChild(mem);
+      block.appendChild(top);
 
       const list = document.createElement('ul');
       list.className = 'tasks';
