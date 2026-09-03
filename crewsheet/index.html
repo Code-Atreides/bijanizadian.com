@@ -46,6 +46,7 @@
     --wrap: 1180px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 
@@ -243,15 +244,17 @@
     font-size: 16px;
   }
   .meta-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
     margin-top: 30px;
     padding: 22px 24px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--bg-2);
     box-shadow: var(--shadow);
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
   }
   .meta-field label {
     display: block;
@@ -271,9 +274,41 @@
     font-size: 15px;
     padding: 2px 0 5px;
     color: var(--ink);
+    transition: border-bottom-color .15s ease;
   }
   .meta-field input:focus { outline: none; border-bottom-color: var(--accent); }
   .meta-field input::placeholder { color: var(--ink-faint); font-weight: 400; }
+  /* read-only until you hit Edit — reads as plain text */
+  .meta-field input:read-only { border-bottom-color: transparent; cursor: default; }
+  .meta-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .meta-saved { font-size: 12.5px; font-weight: 600; color: var(--ok); }
+  .meta-btn {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  .meta-btn:hover { filter: brightness(1.08); }
+  .meta-btn--ghost {
+    background: var(--surface);
+    color: var(--ink-soft);
+    border-color: var(--line);
+    font-weight: 600;
+  }
+  .meta-btn--ghost:hover { filter: none; color: var(--ink); border-color: var(--accent); }
 
   /* ---------- reference: pillars ---------- */
   .section-head {
@@ -571,7 +606,7 @@
   #app { display: none; }
 
   @media (max-width: 720px) {
-    .pillars, .meta-row { grid-template-columns: 1fr; }
+    .pillars, .meta-grid { grid-template-columns: 1fr; }
     .hero-inner { padding: 40px 20px 32px; }
     .nav-inner { padding: 12px 20px; }
     .wrap { padding: 0 20px 90px; }
@@ -632,17 +667,24 @@
       <h1>Sponsored Dinner<br><span class="accent">Crew Sheet</span></h1>
       <p class="lede">Every dinner runs on the same structure: three pillars, three to five people. Read the structure once, then use the sheet below to put names on roles and get tasks moving. Everything your crew checks off shows up here for everyone.</p>
       <div class="meta-row">
-        <div class="meta-field">
-          <label for="m-school">School / chapter</label>
-          <input id="m-school" data-meta="school" placeholder="Your campus">
+        <div class="meta-grid">
+          <div class="meta-field">
+            <label for="m-school">School / chapter</label>
+            <input id="m-school" data-meta="school" placeholder="Your campus" readonly>
+          </div>
+          <div class="meta-field">
+            <label for="m-date">Dinner date</label>
+            <input id="m-date" data-meta="date" placeholder="TBD" readonly>
+          </div>
+          <div class="meta-field">
+            <label for="m-sponsor">Sponsor</label>
+            <input id="m-sponsor" data-meta="sponsor" placeholder="Who's backing this dinner" readonly>
+          </div>
         </div>
-        <div class="meta-field">
-          <label for="m-date">Dinner date</label>
-          <input id="m-date" data-meta="date" placeholder="TBD">
-        </div>
-        <div class="meta-field">
-          <label for="m-sponsor">Sponsor</label>
-          <input id="m-sponsor" data-meta="sponsor" placeholder="Who's backing this dinner">
+        <div class="meta-actions">
+          <span class="meta-saved" id="meta-saved" hidden>Saved</span>
+          <button type="button" class="meta-btn meta-btn--ghost" id="meta-cancel" hidden>Cancel</button>
+          <button type="button" class="meta-btn meta-btn--ghost" id="meta-edit">Edit details</button>
         </div>
       </div>
     </div>
@@ -813,7 +855,7 @@
     const ref = sheetRef();
     const handler = snapshot => {
       const remote = snapshot.val();
-      if (remote && typeof remote.rev === 'number' && remote.rev > (state.rev || 0) && !editingNow()) {
+      if (remote && typeof remote.rev === 'number' && remote.rev > (state.rev || 0) && !editingNow() && !metaEditing) {
         state = remote;
         render();
         bindMeta();
@@ -867,6 +909,16 @@
       $('join').style.display = 'flex';
       $('join-code').value = '';
       $('join-code').focus();
+    });
+
+    // dinner-details card: edit / save instead of always-on inputs
+    $('meta-edit').addEventListener('click', () => { metaEditing ? saveMeta() : setMetaEditing(true); });
+    $('meta-cancel').addEventListener('click', cancelMeta);
+    metaInputs().forEach(input => {
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); saveMeta(); }
+        else if (e.key === 'Escape') { e.preventDefault(); cancelMeta(); }
+      });
     });
 
     // auto-rejoin last dinner
@@ -1047,12 +1099,55 @@
     });
   }
 
+  // ---------- dinner-details card ----------
+  let metaEditing = false;
+  let metaSnapshot = null;
+  let metaSavedTimer = null;
+
+  function metaInputs() { return Array.prototype.slice.call(document.querySelectorAll('[data-meta]')); }
+
+  function fillMeta() {
+    metaInputs().forEach(input => { input.value = state.meta[input.dataset.meta] || ''; });
+  }
+
+  function setMetaEditing(on) {
+    metaEditing = on;
+    metaInputs().forEach(input => { input.readOnly = !on; });
+    const editBtn = $('meta-edit');
+    editBtn.textContent = on ? 'Save' : 'Edit details';
+    editBtn.classList.toggle('meta-btn--ghost', !on);
+    $('meta-cancel').hidden = !on;
+    if (on) {
+      $('meta-saved').hidden = true;
+      metaSnapshot = {
+        school: state.meta.school || '', date: state.meta.date || '', sponsor: state.meta.sponsor || ''
+      };
+      const first = $('m-school');
+      first.focus();
+      try { first.setSelectionRange(first.value.length, first.value.length); } catch (e) {}
+    }
+  }
+
+  function saveMeta() {
+    metaInputs().forEach(input => { state.meta[input.dataset.meta] = input.value.trim(); });
+    fillMeta();
+    setMetaEditing(false);
+    queueSave();
+    const s = $('meta-saved');
+    s.hidden = false;
+    clearTimeout(metaSavedTimer);
+    metaSavedTimer = setTimeout(() => { s.hidden = true; }, 2200);
+  }
+
+  function cancelMeta() {
+    if (metaSnapshot) Object.assign(state.meta, metaSnapshot);
+    fillMeta();
+    setMetaEditing(false);
+  }
+
+  // called after load and on remote updates — only refreshes values when not mid-edit
   function bindMeta() {
-    document.querySelectorAll('[data-meta]').forEach(input => {
-      const key = input.dataset.meta;
-      input.value = state.meta[key] || '';
-      input.oninput = () => { state.meta[key] = input.value; queueSave(); };
-    });
+    if (!metaEditing) fillMeta();
   }
 
   boot();
