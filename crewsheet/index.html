@@ -417,7 +417,7 @@
     font: inherit;
     font-size: 14.5px;
     font-weight: 600;
-    padding: 10px 12px 10px 34px;
+    padding: 10px 40px 10px 34px;
     border: 1.5px solid var(--line);
     border-radius: var(--radius-sm);
     background: var(--bg-3);
@@ -433,7 +433,40 @@
     border-radius: 50%;
     background: var(--pbg);
     border: 2px solid var(--pc);
+    transition: background .15s ease, box-shadow .2s ease;
   }
+  /* filled dot = a name is in the slot */
+  .assignee.is-set .dot { background: var(--pc); box-shadow: 0 0 0 3px var(--pbg); }
+  /* confirm button — appears while editing a slot that has a value */
+  .assignee-ok {
+    position: absolute;
+    right: 7px; top: 50%;
+    width: 23px; height: 23px;
+    display: grid; place-items: center;
+    border: none;
+    border-radius: 50%;
+    background: var(--pc);
+    color: #08060f;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(.7);
+    transition: opacity .12s ease, transform .12s ease;
+  }
+  .assignee-ok svg {
+    width: 12px; height: 12px;
+    fill: none; stroke: currentColor;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .assignee-ok:hover { filter: brightness(1.12); }
+  .assignee.is-set:focus-within .assignee-ok {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) scale(1);
+  }
+  @keyframes assignee-confirm { from { box-shadow: 0 0 0 0 var(--pc); } to { box-shadow: 0 0 0 9px transparent; } }
+  .assignee.just-confirmed input { animation: assignee-confirm .6s ease-out; }
+  @media (prefers-reduced-motion: reduce) { .assignee.just-confirmed input { animation: none; } }
   .tasks { margin-top: 16px; list-style: none; }
   .task {
     display: flex;
@@ -878,16 +911,39 @@
       assignees.className = 'assignees';
       p.slots.forEach((slot, i) => {
         const wrapEl = document.createElement('div');
-        wrapEl.className = 'assignee';
+        wrapEl.className = 'assignee' + (ps.assignees[i] ? ' is-set' : '');
         const dot = document.createElement('span');
         dot.className = 'dot';
         const input = document.createElement('input');
         input.placeholder = slot + ' — name';
         input.setAttribute('aria-label', p.name + ': ' + slot);
         input.value = ps.assignees[i] || '';
-        input.addEventListener('input', () => { ps.assignees[i] = input.value; queueSave(); });
+
+        const ok = document.createElement('button');
+        ok.type = 'button';
+        ok.tabIndex = -1;
+        ok.className = 'assignee-ok';
+        ok.setAttribute('aria-label', 'Confirm ' + slot + ' name');
+        ok.innerHTML = '<svg viewBox="0 0 14 12" aria-hidden="true"><path d="M1.5 6.6 5 10l7.5-8.5"/></svg>';
+
+        const confirmName = () => {
+          if (!input.value.trim()) return;
+          input.blur();
+          wrapEl.classList.add('just-confirmed');
+          setTimeout(() => wrapEl.classList.remove('just-confirmed'), 650);
+        };
+
+        input.addEventListener('input', () => {
+          ps.assignees[i] = input.value;
+          wrapEl.classList.toggle('is-set', !!input.value.trim());
+          queueSave();
+        });
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); confirmName(); } });
+        ok.addEventListener('click', confirmName);
+
         wrapEl.appendChild(dot);
         wrapEl.appendChild(input);
+        wrapEl.appendChild(ok);
         assignees.appendChild(wrapEl);
       });
       block.appendChild(assignees);
