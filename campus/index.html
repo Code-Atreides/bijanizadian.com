@@ -62,7 +62,10 @@
     --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
     --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
     --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
-    --gap-section: 96px;
+    /* four spacing steps, used everywhere: between sections, from a section
+       head to its first block, between subgroups inside a section, and between
+       siblings in one group */
+    --gap-section: 96px; --gap-head: 40px; --gap-group: 44px; --gap-block: 16px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -148,7 +151,9 @@
   .section-head { max-width: 760px; }
   .section-head h2 { margin-top: 12px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.038em; line-height: 1.12; }
   .section-head h2 .accent { background: linear-gradient(92deg, var(--accent-bright), var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .section-head p { margin-top: 16px; color: var(--ink-soft); font-size: 17px; max-width: 58ch; }
+  /* the eyebrow is a <p> too, so exclude it — otherwise it inherits the lede's
+     size and colour and a 16px top margin that pushes the whole head down */
+  .section-head p:not(.eyebrow) { margin-top: 16px; color: var(--ink-soft); font-size: 17px; max-width: 58ch; }
   .section-head p b { color: var(--ink); font-weight: 600; }
   .section-head .head-cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; }
   .centered { text-align: center; margin-left: auto; margin-right: auto; }
@@ -160,9 +165,9 @@
   /* ---------- greek wars: the program cards ---------- */
   /* the Greek Wars onboard card is the first thing under the section head, so
      the "Go to Greek Wars" jump lands on it rather than on the other portals */
-  .gw-onboard { margin-top: 36px; }
-  .routes-label { margin-top: 34px; display: block; }
-  .routes { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+  .gw-onboard { margin-top: var(--gap-head); }
+  .routes-label { margin-top: var(--gap-group); display: block; }
+  .routes { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
   /* the anchor is the card, so it has to fill its grid cell or the row's bottoms stagger */
   .routes li { display: flex; }
   .route { position: relative; width: 100%; padding: 24px 24px 26px; display: flex; flex-direction: column; gap: 14px; text-decoration: none; overflow: hidden; transition: border-color .15s ease, transform .15s ease; }
@@ -186,25 +191,25 @@
   .route--wide .btn { flex: none; }
 
   /* the two prizes Greek Wars runs at once: one individual, one chapter */
-  .prizes { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; }
+  .prizes { margin-top: var(--gap-block); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; }
   .prizes li { padding: 24px 24px 26px; display: grid; gap: 8px; align-content: start; }
   .prize-who { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
   .prizes p { color: var(--ink-soft); font-size: 15px; }
   /* beats `.prizes p` on specificity, which would otherwise flatten the amount */
   .prizes .prize-amount { font-size: clamp(36px, 4.6vw, 54px); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
   .prizes p b { color: var(--ink); font-weight: 600; }
-  .prize-note { margin-top: 16px; padding: 18px 22px 20px; font-size: 15px; color: var(--ink-soft); }
+  .prize-note { margin-top: var(--gap-block); padding: 18px 22px 20px; font-size: 15px; color: var(--ink-soft); }
   .prize-note b { color: var(--ink); font-weight: 600; }
 
   /* the season: four steps in a strip */
-  .season { margin-top: 16px; padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .season { margin-top: var(--gap-block); padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
   .season li { list-style: none; display: grid; gap: 8px; }
   .season i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
   .season b { font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
   .season small { font-size: 14px; color: var(--ink-soft); }
 
   /* ---------- campus team: the literature grid ---------- */
-  .lit { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+  .lit { margin-top: var(--gap-head); display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
   .lit li { padding: 26px 24px 28px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; }
   .lit-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); margin-bottom: 6px; }
   .lit-icon svg { width: 19px; height: 19px; }
@@ -213,7 +218,7 @@
   .lit small { display: block; margin-top: 8px; font-size: 14px; font-weight: 400; color: var(--ink-soft); letter-spacing: 0; }
 
   /* the longer reading, two columns of prose */
-  .reading { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .reading { margin-top: var(--gap-block); display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .reading .card { padding: 26px 26px 28px; }
   .reading h3 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
   .reading p { color: var(--ink-soft); font-size: 15px; }
@@ -227,7 +232,7 @@
   /* ---------- apply ---------- */
   /* Brand-kit "Brand" gradient: a solid fomo-blue field with one large, diffuse light-blue
      spotlight in the upper third faded to transparent. Type on it is white or pale lavender. */
-  .apply { margin-top: 16px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; padding: 30px 30px 34px; position: relative; overflow: hidden; background: var(--accent); border-color: rgba(234,237,255,.2); color: #fff; }
+  .apply { margin-top: var(--gap-group); display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; padding: 30px 30px 34px; position: relative; overflow: hidden; background: var(--accent); border-color: rgba(234,237,255,.2); color: #fff; }
   .apply::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(780px 400px at 50% -14%, rgba(172,184,249,.6), transparent 68%); }
   .apply > * { position: relative; }
   .apply .eyebrow { color: var(--lavender); }
@@ -270,7 +275,7 @@
 
   /* ---------- closer ---------- */
   /* Brand-kit "Technical & premium" halo: deep indigo, large and diffuse, top-centre. */
-  .closer { position: relative; margin-top: var(--gap-section); text-align: center; padding: 60px 24px 0; }
+  .closer { position: relative; margin-top: 56px; text-align: center; padding: 56px 24px 0; }
   .closer::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(760px 380px at 50% 0%, var(--accent-deep), transparent 72%); }
   .closer > * { position: relative; z-index: 1; }
   .closer-mark { width: 74px; height: 74px; margin: 0 auto; border-radius: 22px; background: var(--bg-2); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
@@ -280,7 +285,7 @@
   .closer .hero-cta { margin-top: 26px; }
 
   /* ---------- footer (fomo.family's three columns) ---------- */
-  .foot { margin-top: var(--gap-section); border-top: 1px solid var(--line); }
+  .foot { margin-top: 64px; border-top: 1px solid var(--line); }
   .foot-inner { max-width: var(--wrap); margin: 0 auto; padding: 44px 24px 40px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
   .foot-brand svg { height: 22px; width: auto; }
   .foot-brand p { margin-top: 12px; font-size: 14px; color: var(--ink-soft); max-width: 30ch; }
@@ -299,7 +304,7 @@
     .foot-inner { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 720px) {
-    :root { --gap-section: 72px; }
+    :root { --gap-section: 72px; --gap-head: 32px; --gap-group: 36px; }
     .routes, .lit, .reading, .apply, .season, .prizes { grid-template-columns: 1fr; }
     .route--wide { flex-direction: column; align-items: flex-start; }
     .nav .btn span { display: none; }
@@ -416,6 +421,13 @@
     </ul>
     <p class="card prize-note">Two titles run at once — <b>your school crowns a chapter, and so does the country.</b> Every chapter gets a champion, and qualifying chapters also pick up fomo perks along the way: trading rewards, events, and more.</p>
 
+    <ol class="card season" aria-label="How Greek Wars works">
+      <li><i>01</i><b>Rally your clan</b><small>Your chapter is your clan. Get everyone on fomo — 80% of actives qualifies you.</small></li>
+      <li><i>02</i><b>Trade together</b><small>Every trade counts. Ranked on raw PnL, not points, not volume, not activity.</small></li>
+      <li><i>03</i><b>Climb the board</b><small>Your school's board and the national one, at the same time.</small></li>
+      <li><i>04</i><b>Win the war</b><small>Your chapter's top trader takes $500. The top chapter in the country takes $10,000.</small></li>
+    </ol>
+
     <p class="kicker routes-label">The rest of the programme</p>
 
     <ul class="routes">
@@ -454,12 +466,6 @@
       </li>
     </ul>
 
-    <ol class="card season" aria-label="How Greek Wars works">
-      <li><i>01</i><b>Rally your clan</b><small>Your chapter is your clan. Get everyone on fomo — 80% of actives qualifies you.</small></li>
-      <li><i>02</i><b>Trade together</b><small>Every trade counts. Ranked on raw PnL, not points, not volume, not activity.</small></li>
-      <li><i>03</i><b>Climb the board</b><small>Your school's board and the national one, at the same time.</small></li>
-      <li><i>04</i><b>Win the war</b><small>Your chapter's top trader takes $500. The top chapter in the country takes $10,000.</small></li>
-    </ol>
   </section>
 
   <!-- ── campus team ────────────────────────────────────────────── -->
