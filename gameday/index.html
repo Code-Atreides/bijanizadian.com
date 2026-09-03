@@ -48,6 +48,9 @@
   a { color: inherit; }
   .num { font-variant-numeric: tabular-nums; }
   .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  /* the sticky nav is ~65px tall — hold anchor targets clear of it so a jump
+     to #how or #board doesn't land with the heading hidden behind the bar */
+  [id] { scroll-margin-top: 88px; }
   .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
   .skip:focus { left: 8px; }
 
@@ -178,7 +181,7 @@
 
   /* ---------- how / slate ---------- */
   .two { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-top: 40px; }
-  .col { padding: 24px 24px 26px; }
+  .col { padding: 24px 24px 26px; display: flex; flex-direction: column; }
   .col h2 { font-size: 22px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 16px; }
   .flow { list-style: none; display: grid; gap: 12px; }
   .flow li { display: grid; grid-template-columns: 40px 1fr; gap: 6px 14px; align-items: start; padding: 12px 0; border-top: 1px solid var(--line-soft); }
@@ -188,13 +191,17 @@
   .flow-name { font-weight: 700; font-size: 15px; }
   .flow-name i { font-style: normal; color: var(--accent-bright); font-size: 12px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
   .flow-blurb { color: var(--ink-soft); font-size: 14px; }
-  .slate { list-style: none; display: grid; gap: 12px; }
+  .slate { list-style: none; display: grid; gap: 12px; margin-bottom: 16px; }
   .slate li { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: baseline; font-size: 14.5px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
   .slate li:last-child { border-bottom: 0; padding-bottom: 0; }
   .when { color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
   .fixture { font-weight: 700; }
   .fixture em { color: var(--ink-faint); font-style: normal; font-weight: 600; padding: 0 5px; }
   .note { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  /* equal-height cards: sit the note on the floor of the taller one rather than
+     leaving a block of dead space under it (collapses to 0 when space is tight,
+     so .slate's margin-bottom keeps the gap on mobile) */
+  .col > .note { margin-top: auto; }
   .note b { color: var(--ink); font-weight: 600; }
 
   /* ---------- good to know ---------- */
