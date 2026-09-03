@@ -105,8 +105,26 @@ feel atmospheric, never shiny or multicoloured.
 
 **Aeonik** (Regular 400 / Medium 500 / Bold 700) is fomo's exclusive typeface,
 for product UI, motion graphics, videos, and wordmarks. Keep on-screen copy
-legible and avoid overly tight line spacing. It is not on Google Fonts;
-**Schibsted Grotesk** is the stand-in used on the web pages here.
+legible and avoid overly tight line spacing.
+
+It is not on Google Fonts. `/campus` serves fomo.family's own woff2 files from
+`campus/fonts/` (`Aeonik-Regular`, `Aeonik-Medium`, `Aeonik-Bold`) and declares
+them with `@font-face`, so that page sets type in the real face. Body copy there
+runs at **Medium 500**, which is what fomo.family sets on `body` — Regular reads
+too light against the same layout. `/crewsheet`, `/gameday`, and `/dinners` still
+use **Schibsted Grotesk**, which stays in the stack everywhere as the fallback.
+
+## Buttons
+
+fomo.family's hero pair, which `/campus` reproduces: a translucent fill behind a
+12px backdrop blur, a `#CBD0EB` hairline at 10%, a 12px radius, and bold 18px
+type in a 200px-wide pill with 12px of vertical padding. No glow — the fill does
+the work.
+
+| Button    | Fill                  | Hover                 |
+| --------- | --------------------- | --------------------- |
+| primary   | `#606AF7` at 50%      | `#606AF7` at 80%      |
+| secondary | white at 12%          | white at 20%          |
 
 ## Product & UI showcases
 

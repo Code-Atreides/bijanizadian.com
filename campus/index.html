@@ -14,6 +14,8 @@
 <link rel="canonical" href="https://bijanizadian.com/campus">
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Bold.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -34,6 +36,13 @@
   Hero art (space-bg / astronaut) is fomo.family's own, copied into /campus.
 -->
 <style>
+  /* Aeonik is fomo's exclusive typeface. These are fomo.family's own woff2 files,
+     self-hosted so the campus page sets type in the real face rather than a
+     stand-in. Schibsted Grotesk stays in the stack as the fallback. */
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
   /* Design language mirrors fomo.family — same token set as /crewsheet, /gameday, /dinners. */
   :root {
     --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
@@ -45,6 +54,11 @@
        pale lavender (type on blue or ink) */
     --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
     --ink-deep: #0B091F; --lavender: #EAEDFF; --mark: #CBD0EB;
+    /* fomo.family's button set: a 50%-opacity indigo fill, white at 12%, and a
+       #CBD0EB hairline at 10% around both */
+    --btn-fill: rgba(96,106,247,.5); --btn-fill-hover: rgba(96,106,247,.8);
+    --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
+    --hairline: rgba(203,208,235,.1);
     --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
     --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
     --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
@@ -58,9 +72,12 @@
   ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
   ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
   body {
-    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    font-family: Aeonik, 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
     background: var(--bg); color: var(--ink); line-height: 1.55;
-    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    /* fomo.family runs body copy at Medium, not Regular */
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
     overflow-x: hidden;
   }
   a { color: inherit; }
@@ -72,21 +89,26 @@
   .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
 
   /* ---------- buttons ---------- */
+  /* fomo.family's own hero buttons: a translucent fill behind a 12px backdrop
+     blur, a #CBD0EB hairline, a 12px radius, and bold 18px type in a 200px pill.
+     No glow — the fill does the work. */
   .btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
-    padding: 13px 22px; border-radius: 12px; text-decoration: none; cursor: pointer;
-    border: 1px solid transparent; transition: filter .12s ease, border-color .12s ease, background .12s ease, transform .12s ease;
+    padding: 11px 20px; border-radius: 12px; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
   }
-  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 14px 34px -14px var(--accent); }
-  .btn--primary:hover { filter: brightness(1.08); }
-  .btn--dark { background: #1b1a24; color: var(--ink); border-color: rgba(203,208,235,.16); }
-  .btn--dark:hover { border-color: var(--accent-bright); background: #22212d; }
-  .btn--ghost { background: var(--surface); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px); }
-  .btn--ghost:hover { border-color: var(--accent-bright); background: var(--surface-2); }
-  .btn--sm { font-size: 13.5px; padding: 9px 15px; border-radius: 10px; }
-  .btn--lg { min-width: 196px; padding: 16px 26px; font-size: 16px; }
-  .btn:disabled { opacity: .55; cursor: default; filter: none; }
+  .btn--primary { background: var(--btn-fill); color: #fff; }
+  .btn--primary:hover { background: var(--btn-fill-hover); }
+  .btn--dark { background: var(--btn-quiet); color: var(--ink); }
+  .btn--dark:hover { background: var(--btn-quiet-hover); }
+  .btn--ghost { background: rgba(255,255,255,.06); color: var(--ink); }
+  .btn--ghost:hover { background: var(--btn-quiet); border-color: rgba(203,208,235,.24); }
+  .btn--sm { font-size: 14px; padding: 8px 14px; border-radius: 10px; }
+  .btn--lg { min-width: 200px; padding: 12px 20px; font-size: 18px; line-height: 1.556; }
+  .btn:disabled { opacity: .55; cursor: default; }
   .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   /* ---------- nav (sits over the hero, like fomo.family) ---------- */
@@ -108,8 +130,10 @@
   .hero-title svg { height: clamp(44px, 9.6vw, 140px); width: auto; display: block; }
   .hero-title .slash { font-size: clamp(40px, 8.7vw, 126px); font-weight: 700; letter-spacing: -.045em; }
   .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
-  .hero h1 { margin-top: 26px; font-size: clamp(28px, 4.6vw, 44px); font-weight: 700; letter-spacing: -.032em; line-height: 1.18; }
-  .hero .lede { margin-top: 12px; max-width: 58ch; color: var(--ink-soft); font-size: clamp(15px, 1.7vw, 19px); }
+  /* fomo.family: 40px / 1.15em, #EAEDFF, tracking-tighter */
+  .hero h1 { margin-top: 26px; font-size: clamp(26px, 3.1vw, 40px); font-weight: 700; letter-spacing: -.05em; line-height: 1.15; color: var(--lavender); }
+  /* fomo.family: 22px, #D1D8FF at 60%, tracking-tight */
+  .hero .lede { margin-top: 14px; max-width: 80ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); letter-spacing: -.025em; }
   .hero-cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
   .hero-art { position: relative; z-index: 2; margin-top: -38px; width: min(560px, 82vw); height: auto; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
