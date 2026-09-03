@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>Game Day — fomo</title>
+<meta name="description" content="School versus school on fomo. While the football teams play, both schools' traders compete on live PnL — and the scoreboard settles at the final whistle.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Game Day — fomo">
+<meta property="og:description" content="School versus school on fomo. While the football teams play, both schools' traders compete on live PnL — and the scoreboard settles at the final whistle.">
+<meta property="og:url" content="https://bijanizadian.com/gameday">
+<link rel="canonical" href="https://bijanizadian.com/gameday">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!--
+  Chapter onboarding still runs on the original registration backend. Every
+  "Onboard your chapter" link below points at ONBOARD_URL — change it in one
+  place (the <base>-less way: search for data-onboard) when it moves.
+-->
+<style>
+  /* Design language mirrors fomo.family — same token set as /crewsheet. */
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    --accent: #516af6; --accent-bright: #8ea0ff; --accent-deep: #221d4b; --accent-t: rgba(81,106,246,.16);
+    --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
+    --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+  body {
+    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  .num { font-variant-numeric: tabular-nums; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
+  .skip:focus { left: 8px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    padding: 11px 18px; border-radius: var(--radius-sm); text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: filter .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 14px 34px -14px var(--accent); }
+  .btn--primary:hover { filter: brightness(1.08); }
+  .btn--ghost { background: var(--surface); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px); }
+  .btn--ghost:hover { border-color: var(--accent-bright); background: var(--surface-2); }
+  .btn--sm { font-size: 13px; padding: 8px 14px; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 30; width: 100%;
+    background: rgba(6,5,16,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner { max-width: var(--wrap); margin: 0 auto; padding: 13px 24px; display: flex; align-items: center; gap: 14px; }
+  .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; }
+  .brand svg { height: 22px; width: auto; display: block; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .nav-tag { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+  .nav-tag b { color: var(--ink); font-weight: 700; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative; width: 100%; overflow: hidden; border-bottom: 1px solid var(--line-soft);
+    background:
+      radial-gradient(900px 440px at 16% -12%, var(--accent-t), transparent 60%),
+      radial-gradient(720px 380px at 92% 0%, rgba(34,29,75,.55), transparent 55%);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45;
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 30%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 46% 68%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.6px 1.6px at 74% 22%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 30% 82%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 88% 58%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.5), transparent);
+  }
+  .hero-inner { position: relative; max-width: var(--wrap); margin: 0 auto; padding: 64px 24px 44px; }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .hero h1 { margin-top: 12px; font-size: clamp(40px, 6.6vw, 76px); font-weight: 700; letter-spacing: -.038em; line-height: 1; max-width: 12ch; }
+  .hero h1 .accent {
+    background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lede { margin-top: 18px; max-width: 58ch; color: var(--ink-soft); font-size: 17px; }
+  .hero .lede b { color: var(--ink); font-weight: 600; }
+  .plain { margin-top: 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .plain li {
+    list-style: none; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+    padding: 14px 16px; border: 1px solid var(--line-soft); border-radius: var(--radius-sm);
+    background: var(--surface); backdrop-filter: blur(6px);
+  }
+  .plain i { font-style: normal; font-size: 12px; font-weight: 800; color: var(--accent-bright); letter-spacing: .04em; padding-top: 2px; }
+  .plain span { font-size: 14.5px; color: var(--ink); font-weight: 500; line-height: 1.4; }
+  .plain span small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 12.5px; font-weight: 400; }
+  .hero-cta { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* ---------- shared card / kicker ---------- */
+  .card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-bright); }
+  .label { font-size: 10.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .chip { display: inline-grid; place-items: center; min-width: 36px; height: 20px; padding: 0 6px; border-radius: 6px; font-size: 9.5px; font-weight: 900; letter-spacing: .05em; color: #fff; }
+
+  /* ---------- scoreboard ---------- */
+  .board { margin-top: 32px; padding: 22px 24px 26px; position: relative; overflow: hidden; }
+  .board::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(600px 220px at 50% -40%, var(--accent-t), transparent 70%); }
+  .board > * { position: relative; }
+  .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; font-size: 12.5px; color: var(--ink-soft); margin-bottom: 22px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--crit); flex: none; animation: pulse 1.6s ease-in-out infinite; box-shadow: 0 0 0 3px rgba(255,98,46,.18); }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .3 } }
+  .clock { font-weight: 800; color: var(--ink); }
+  .sep { opacity: .4; }
+  .demo { margin-left: auto; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
+  .field { display: grid; justify-items: center; gap: 12px; padding-bottom: 24px; margin-bottom: 22px; border-bottom: 1px solid var(--line-soft); }
+  .field-line { display: flex; align-items: center; gap: clamp(14px, 2.4vw, 28px); }
+  .field-line b { font-size: clamp(46px, 7.5vw, 80px); font-weight: 800; letter-spacing: -.045em; line-height: 1; }
+  .field-line em { font-style: normal; color: var(--ink-faint); font-size: clamp(22px, 3vw, 34px); font-weight: 600; }
+  .field .chip { min-width: 50px; height: 26px; border-radius: 8px; font-size: 12px; }
+  .on-fomo { text-align: center; margin-bottom: 14px; }
+  .on-fomo .lc { color: var(--ink-soft); text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 700; }
+  .teams { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 18px; }
+  .team { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .team.is-away { flex-direction: row-reverse; text-align: right; grid-column: 3; }
+  .versus { grid-column: 2; grid-row: 1; font-size: 12px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-faint); }
+  .crest { flex: none; width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center; font-size: 14px; font-weight: 900; letter-spacing: .02em; box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+  .team-body { min-width: 0; }
+  .school { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .traders { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .pnl { margin-left: auto; font-size: clamp(24px, 3.4vw, 40px); font-weight: 800; letter-spacing: -.035em; }
+  .team.is-away .pnl { margin-left: 0; margin-right: auto; }
+  .bar { position: relative; display: flex; height: 12px; border-radius: 999px; overflow: hidden; margin-top: 24px; background: var(--bg-3); }
+  .bar > div { height: 100%; transition: width .6s cubic-bezier(.2,.8,.2,1); }
+  .bar-mark { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 2px; background: var(--bg); opacity: .95; }
+  .lead { text-align: center; margin-top: 12px; font-size: 13.5px; font-weight: 700; }
+  .lead small { display: block; margin-top: 3px; font-size: 12px; font-weight: 500; color: var(--ink-soft); }
+
+  /* ---------- feed + tops ---------- */
+  .split { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 20px; margin-top: 20px; }
+  .panel { padding: 20px 22px; }
+  .panel .kicker { margin-bottom: 14px; }
+  .feed { list-style: none; display: grid; gap: 10px; }
+  .feed li { display: grid; grid-template-columns: 38px auto minmax(0,1fr) auto; align-items: center; gap: 10px; font-size: 13.5px; padding-bottom: 10px; border-bottom: 1px solid var(--line-soft); }
+  .feed li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .feed li.is-new { animation: slidein .35s ease-out; }
+  @keyframes slidein { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: none } }
+  .who { font-weight: 700; }
+  .what { color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .amt { font-weight: 800; }
+  .amt.up { color: var(--ok); }
+  .amt.down { color: var(--crit); }
+  .tops { display: grid; gap: 18px; }
+  .top-school { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 700; }
+  .top-list { list-style: none; display: grid; gap: 8px; margin-top: 10px; }
+  .top-list li { display: grid; grid-template-columns: 18px minmax(0,1fr) auto; gap: 10px; font-size: 13.5px; }
+  .rank { color: var(--ink-faint); font-weight: 600; }
+  .top-who { font-weight: 600; }
+  .top-pnl { color: var(--ok); font-weight: 800; }
+
+  /* ---------- how / slate ---------- */
+  .two { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; margin-top: 40px; }
+  .col { padding: 24px 24px 26px; }
+  .col h2 { font-size: 22px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 16px; }
+  .flow { list-style: none; display: grid; gap: 12px; }
+  .flow li { display: grid; grid-template-columns: 40px 1fr; gap: 6px 14px; align-items: start; padding: 12px 0; border-top: 1px solid var(--line-soft); }
+  .flow li:first-child { border-top: 0; padding-top: 0; }
+  .flow-icon { grid-row: span 2; width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .flow-icon svg { width: 19px; height: 19px; }
+  .flow-name { font-weight: 700; font-size: 15px; }
+  .flow-name i { font-style: normal; color: var(--accent-bright); font-size: 12px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
+  .flow-blurb { color: var(--ink-soft); font-size: 14px; }
+  .slate { list-style: none; display: grid; gap: 12px; }
+  .slate li { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: baseline; font-size: 14.5px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
+  .slate li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .when { color: var(--ink-soft); font-size: 12.5px; font-weight: 600; }
+  .fixture { font-weight: 700; }
+  .fixture em { color: var(--ink-faint); font-style: normal; font-weight: 600; padding: 0 5px; }
+  .note { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  .note b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- good to know ---------- */
+  .know { margin-top: 20px; padding: 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .know > .kicker { grid-column: 1 / -1; margin-bottom: -4px; }
+  .know dt { font-weight: 700; font-size: 14.5px; margin-bottom: 4px; }
+  .know dd { color: var(--ink-soft); font-size: 13.5px; }
+  .know dd.warn { color: var(--warn); }
+
+  /* ---------- closer ---------- */
+  .closer { margin-top: 40px; padding: 30px 28px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; position: relative; overflow: hidden; }
+  .closer::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(520px 200px at 12% 50%, var(--accent-t), transparent 70%); }
+  .closer > * { position: relative; }
+  .closer-mark { width: 62px; height: 62px; border-radius: 18px; background: var(--bg); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+  .closer-mark svg { width: 46px; height: 46px; }
+  .closer h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -.03em; }
+  .closer p { margin-top: 6px; color: var(--ink-soft); font-size: 15px; }
+
+  /* ---------- footer ---------- */
+  .foot { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 12.5px; color: var(--ink-faint); }
+  .foot a { color: var(--ink-soft); text-decoration: none; }
+  .foot a:hover { color: var(--ink); }
+  .foot .spacer { flex: 1; }
+
+  @media (max-width: 900px) {
+    .split, .two, .know { grid-template-columns: 1fr; }
+    .know > .kicker { margin-bottom: 0; }
+  }
+  @media (max-width: 720px) {
+    .hero-inner { padding: 44px 20px 34px; }
+    .nav-inner { padding: 12px 20px; }
+    .wrap { padding: 0 20px 80px; }
+    .plain { grid-template-columns: 1fr; }
+    .teams { grid-template-columns: 1fr; gap: 14px; }
+    .team.is-away { grid-column: 1; flex-direction: row; text-align: left; }
+    .team.is-away .pnl { margin-left: auto; margin-right: 0; }
+    .versus { display: none; }
+    .closer { grid-template-columns: 1fr; text-align: left; }
+    .closer-mark { display: none; }
+    .nav-tag { display: none; }
+  }
+  @media (max-width: 480px) {
+    .nav .btn span { display: none; }
+    .board { padding: 18px 16px 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .dot { animation: none; }
+    .bar > div, .btn { transition: none; }
+    .feed li.is-new { animation: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#board">Skip to the scoreboard</a>
+
+<div class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+        <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+        <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+        <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+        <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+      </svg>
+    </a>
+    <div class="nav-right">
+      <span class="nav-tag">Game Day · <b>Fall 2026</b></span>
+      <a class="btn btn--primary btn--sm" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard <span>your chapter</span> →</a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">Game Day · Fall 2026</p>
+    <h1>There's a second <span class="accent">scoreboard.</span></h1>
+    <p class="lede">While the teams play, both schools trade. Every <b>realised</b> gain and loss on fomo moves your school's line — and it settles at the final whistle, same as the game.</p>
+
+    <ul class="plain" aria-label="In plain terms">
+      <li><i>01</i><span>Two schools play football.<small>Any fixture on the slate.</small></span></li>
+      <li><i>02</i><span>Their students trade on fomo during the game.<small>Everyone from each school is pooled together.</small></span></li>
+      <li><i>03</i><span>The school whose traders finish further ahead wins the day.<small>Decided at the final whistle.</small></span></li>
+    </ul>
+
+    <div class="hero-cta">
+      <a class="btn btn--primary" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter →</a>
+      <a class="btn btn--ghost" href="#how">How it works</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ── scoreboard ─────────────────────────────────────────────── -->
+  <section id="board" class="card board" data-board data-home-pnl="128450" data-away-pnl="121870" data-home-name="Ohio State" data-away-name="Michigan" aria-label="Game Day scoreboard (demo)">
+    <div class="meta">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="clock num" data-clock>Q3 · 8:14</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Ohio Stadium</span>
+      <span class="sep" aria-hidden="true">·</span>
+      <span>Saturday · 12:00 PM ET</span>
+      <span class="demo">Demo · simulated</span>
+    </div>
+
+    <div class="field">
+      <span class="label">On the field</span>
+      <span class="field-line num">
+        <span class="chip" style="background:#bb0000;color:#fff">OSU</span>
+        <b data-score="home">21</b>
+        <em aria-hidden="true">–</em>
+        <b data-score="away">17</b>
+        <span class="chip" style="background:#00274c;color:#ffcb05">MICH</span>
+      </span>
+    </div>
+
+    <p class="label on-fomo">On <span class="lc">fomo</span></p>
+    <div class="teams">
+      <div class="team">
+        <span class="crest" style="background:#bb0000;color:#fff" aria-hidden="true">OSU</span>
+        <div class="team-body">
+          <p class="school">Ohio State</p>
+          <p class="traders num">1,840 trading</p>
+        </div>
+        <p class="pnl num" data-pnl="home">$128,450</p>
+      </div>
+      <div class="versus" aria-hidden="true"><span>vs</span></div>
+      <div class="team is-away">
+        <span class="crest" style="background:#00274c;color:#ffcb05" aria-hidden="true">MICH</span>
+        <div class="team-body">
+          <p class="school">Michigan</p>
+          <p class="traders num">1,615 trading</p>
+        </div>
+        <p class="pnl num" data-pnl="away">$121,870</p>
+      </div>
+    </div>
+
+    <div class="bar" role="img" aria-label="Share of combined profit and loss" data-bar>
+      <div data-bar-home style="background:#bb0000"></div>
+      <div data-bar-away style="background:#00274c"></div>
+      <span class="bar-mark" aria-hidden="true"></span>
+    </div>
+    <p class="lead num" data-lead>Ohio State leads by $6,580<small>Combined realised PnL, both schools</small></p>
+  </section>
+
+  <!-- ── feed + tops ────────────────────────────────────────────── -->
+  <section class="split">
+    <div class="card panel">
+      <p class="kicker">Live trades</p>
+      <ul class="feed" data-feed>
+        <li class="is-home"><span class="chip" style="background:#bb0000">OSU</span><span class="who">@ellieb</span><span class="what">closed SOL</span><span class="amt up num">+$1,240</span></li>
+        <li class="is-away"><span class="chip" style="background:#00274c">MICH</span><span class="who">@maddie.r</span><span class="what">bought BTC</span><span class="amt up num">+$860</span></li>
+        <li class="is-home"><span class="chip" style="background:#bb0000">OSU</span><span class="who">@jchambers</span><span class="what">closed ETH</span><span class="amt down num">-$310</span></li>
+        <li class="is-away"><span class="chip" style="background:#00274c">MICH</span><span class="who">@graceh</span><span class="what">closed SOL</span><span class="amt up num">+$2,105</span></li>
+        <li class="is-home"><span class="chip" style="background:#bb0000">OSU</span><span class="who">@tylerm</span><span class="what">bought DOGE</span><span class="amt up num">+$140</span></li>
+        <li class="is-away"><span class="chip" style="background:#00274c">MICH</span><span class="who">@sloane.k</span><span class="what">closed ETH</span><span class="amt down num">-$95</span></li>
+        <li class="is-home"><span class="chip" style="background:#bb0000">OSU</span><span class="who">@natalia</span><span class="what">closed BTC</span><span class="amt up num">+$3,480</span></li>
+        <li class="is-away"><span class="chip" style="background:#00274c">MICH</span><span class="who">@devonp</span><span class="what">bought SOL</span><span class="amt up num">+$620</span></li>
+      </ul>
+    </div>
+    <div class="card panel">
+      <p class="kicker">Top of each side</p>
+      <div class="tops">
+        <div>
+          <p class="top-school"><span class="chip" style="background:#bb0000">OSU</span> Ohio State</p>
+          <ol class="top-list">
+            <li><span class="rank num">1</span><span class="top-who">@natalia</span><span class="top-pnl num">+$12,480</span></li>
+            <li><span class="rank num">2</span><span class="top-who">@ellieb</span><span class="top-pnl num">+$9,210</span></li>
+            <li><span class="rank num">3</span><span class="top-who">@tylerm</span><span class="top-pnl num">+$6,940</span></li>
+          </ol>
+        </div>
+        <div>
+          <p class="top-school"><span class="chip" style="background:#00274c">MICH</span> Michigan</p>
+          <ol class="top-list">
+            <li><span class="rank num">1</span><span class="top-who">@graceh</span><span class="top-pnl num">+$11,905</span></li>
+            <li><span class="rank num">2</span><span class="top-who">@maddie.r</span><span class="top-pnl num">+$8,760</span></li>
+            <li><span class="rank num">3</span><span class="top-who">@devonp</span><span class="top-pnl num">+$7,120</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── how it works / slate ───────────────────────────────────── -->
+  <section id="how" class="two">
+    <div class="card col">
+      <h2>How game day works</h2>
+      <ul class="flow">
+        <li>
+          <span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
+          <span class="flow-name"><i>01</i>Kickoff</span>
+          <span class="flow-blurb">Both schools' traders are pooled the moment the game starts.</span>
+        </li>
+        <li>
+          <span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9 20V4M14 20v-7M19 20V8"/></svg></span>
+          <span class="flow-name"><i>02</i>Every trade counts</span>
+          <span class="flow-blurb">Each realised gain or loss moves your school's line, live. Open positions don't count until you close them.</span>
+        </li>
+        <li>
+          <span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg></span>
+          <span class="flow-name"><i>03</i>Final whistle</span>
+          <span class="flow-blurb">Higher PnL takes the day. The scoreboard settles when the game does.</span>
+        </li>
+        <li>
+          <span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/><path d="M10 15h4M9 20h6M12 15v5"/></svg></span>
+          <span class="flow-name"><i>04</i>The season</span>
+          <span class="flow-blurb">Wins stack up week after week. One school ends the fall on top.</span>
+        </li>
+      </ul>
+    </div>
+    <div class="card col">
+      <h2>This week's slate</h2>
+      <ul class="slate">
+        <li><span class="when num">Sat 3:30</span><span class="fixture">Alabama <em>v</em> Georgia</span></li>
+        <li><span class="when num">Sat 3:30</span><span class="fixture">Texas <em>v</em> Oklahoma</span></li>
+        <li><span class="when num">Sat 7:00</span><span class="fixture">Auburn <em>v</em> LSU</span></li>
+        <li><span class="when num">Sat 8:00</span><span class="fixture">Florida <em>v</em> Florida State</span></li>
+      </ul>
+      <p class="note">Every fixture runs the same way — <b>the football scoreboard settles the game, this one settles the day.</b></p>
+    </div>
+  </section>
+
+  <!-- ── good to know ───────────────────────────────────────────── -->
+  <dl class="card know">
+    <p class="kicker">Good to know</p>
+    <div><dt>Only realised PnL counts</dt><dd>A trade moves the line when it closes, not while it's open.</dd></div>
+    <div><dt>It settles with the game</dt><dd>Final whistle is final for both scoreboards. No overtime for traders.</dd></div>
+    <div><dt>Wins carry over</dt><dd>Each game-day win counts toward the season standings.</dd></div>
+    <div><dt>This page is a demo</dt><dd class="warn">Simulated trades, no real positions, and no school is competing yet. Tie-break rules will be published before the first live game.</dd></div>
+  </dl>
+
+  <!-- ── closer ─────────────────────────────────────────────────── -->
+  <section class="card closer">
+    <span class="closer-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M36.9747 24.3586C44.1067 24.3587 49.7941 27.9515 52.9484 33.5959C48.7626 38.0418 45.6617 43.7612 44.4679 50.0002C43.2743 56.2391 44.1865 61.9572 46.67 66.4026C41.3555 72.0468 34.2931 75.6408 27.1613 75.6409C18.432 75.6407 11.8659 70.2588 9.46204 62.3196H26.8478C27.4159 62.3193 28.0059 61.8593 28.1691 61.2932L34.6486 38.7043C34.8098 38.1381 34.4815 37.6782 33.9152 37.678H14.1788C19.6213 29.7404 28.2465 24.3588 36.9747 24.3586Z" fill="#EAEDFF"/><path d="M72.3285 24.3586C85.0779 24.3586 93.2156 35.8374 90.5062 49.9993C87.7966 64.1596 75.2646 75.6409 62.515 75.6409C53.7856 75.6408 47.2196 70.2589 44.8158 62.3196H64.1537C64.7218 62.3194 65.3127 61.8594 65.476 61.2932L71.9545 38.7043C72.1157 38.138 71.7876 37.678 71.2211 37.678H49.5316C54.9741 29.7401 63.5999 24.3587 72.3285 24.3586Z" fill="#EAEDFF"/></svg>
+    </span>
+    <div>
+      <h2>Want your school on the board?</h2>
+      <p>It starts with your chapter. Onboard it and your PnL counts.</p>
+    </div>
+    <a class="btn btn--primary" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter →</a>
+  </section>
+
+  <footer class="foot">
+    <span>fomo · Game Day</span>
+    <a href="https://fomo.family" target="_blank" rel="noopener">fomo.family</a>
+    <span class="spacer"></span>
+    <span>Trading involves risk, including loss of principal.</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // Demo-only simulation. If the board ever carries data-live="1" (real
+  // numbers rendered in), this does nothing and the markup stands.
+  var board = document.querySelector('[data-board]');
+  if (!board || board.dataset.live === '1') return;
+
+  var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var homeEl = board.querySelector('[data-pnl="home"]');
+  var awayEl = board.querySelector('[data-pnl="away"]');
+  var barEl = board.querySelector('[data-bar]');
+  var barHome = board.querySelector('[data-bar-home]');
+  var barAway = board.querySelector('[data-bar-away]');
+  var leadEl = board.querySelector('[data-lead]');
+  var clockEl = board.querySelector('[data-clock]');
+  var feed = document.querySelector('[data-feed]');
+
+  var home = parseInt(board.dataset.homePnl, 10) || 0;
+  var away = parseInt(board.dataset.awayPnl, 10) || 0;
+  var homeName = board.dataset.homeName || 'Home';
+  var awayName = board.dataset.awayName || 'Away';
+
+  function money(n) { return '$' + Math.round(n).toLocaleString('en-US'); }
+
+  function paint() {
+    homeEl.textContent = money(home);
+    awayEl.textContent = money(away);
+    var total = Math.max(1, home + away);
+    var share = (home / total) * 100;
+    barHome.style.width = share + '%';
+    barAway.style.width = (100 - share) + '%';
+    var gap = Math.abs(home - away);
+    var text = gap < 1 ? 'Dead level' : (home > away ? homeName : awayName) + ' leads by ' + money(gap);
+    leadEl.firstChild.nodeValue = text;
+    barEl.setAttribute('aria-label', text + ' — ' + Math.round(share) + '% of combined PnL to ' + homeName);
+  }
+
+  paint();
+  if (still) return;
+
+  // Random walk with a slight edge to whoever is behind, so the demo stays
+  // close — a blowout is a boring scoreboard.
+  function step() {
+    var behind = home < away ? 1 : -1;
+    home = Math.max(0, home + (Math.random() - 0.5) * 2600 + behind * 120);
+    away = Math.max(0, away + (Math.random() - 0.5) * 2600 - behind * 120);
+    paint();
+  }
+
+  // Points arrive like points: a field goal or a touchdown, rarely.
+  var scoreEls = { home: board.querySelector('[data-score="home"]'), away: board.querySelector('[data-score="away"]') };
+  var score = { home: parseInt(scoreEls.home.textContent, 10) || 0, away: parseInt(scoreEls.away.textContent, 10) || 0 };
+  function maybeScore() {
+    if (Math.random() > 0.4) return;
+    var side = Math.random() < 0.5 ? 'home' : 'away';
+    score[side] += Math.random() < 0.55 ? 7 : 3;
+    scoreEls[side].textContent = score[side];
+  }
+
+  // The clock only has to look like a clock.
+  var quarter = 3, seconds = 8 * 60 + 14;
+  function tickClock() {
+    seconds -= 1;
+    if (seconds <= 0) { seconds = 15 * 60; quarter = quarter >= 4 ? 1 : quarter + 1; }
+    var m = Math.floor(seconds / 60), s = seconds % 60;
+    clockEl.textContent = 'Q' + quarter + ' · ' + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  // New trades drop in at the top; the oldest falls off the bottom.
+  var HOME = { chip: 'OSU', bg: '#bb0000', names: ['@natalia', '@ellieb', '@tylerm', '@jchambers', '@priya.s', '@marcus_w'] };
+  var AWAY = { chip: 'MICH', bg: '#00274c', names: ['@graceh', '@maddie.r', '@devonp', '@sloane.k', '@omar.b', '@kaylee'] };
+  var ASSETS = ['SOL', 'BTC', 'ETH', 'DOGE', 'AVAX', 'LINK'];
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function newTrade() {
+    if (!feed) return;
+    var side = Math.random() < 0.5 ? HOME : AWAY;
+    var closed = Math.random() < 0.65;
+    var win = Math.random() < 0.7;
+    var amt = Math.round((Math.random() * (closed ? 2800 : 900) + 60) / 5) * 5;
+    var li = document.createElement('li');
+    li.className = 'is-new ' + (side === HOME ? 'is-home' : 'is-away');
+    li.innerHTML =
+      '<span class="chip" style="background:' + side.bg + '">' + side.chip + '</span>' +
+      '<span class="who">' + pick(side.names) + '</span>' +
+      '<span class="what">' + (closed ? 'closed ' : 'bought ') + pick(ASSETS) + '</span>' +
+      '<span class="amt ' + (win ? 'up' : 'down') + ' num">' + (win ? '+' : '-') + money(amt) + '</span>';
+    feed.insertBefore(li, feed.firstElementChild);
+    while (feed.children.length > 8) feed.removeChild(feed.lastElementChild);
+    setTimeout(function () { li.classList.remove('is-new'); }, 400);
+  }
+
+  var timers = [];
+  function start() {
+    if (timers.length) return;
+    timers = [
+      setInterval(step, 1400),
+      setInterval(tickClock, 1000),
+      setInterval(newTrade, 2600),
+      setInterval(maybeScore, 9000)
+    ];
+  }
+  function stop() { timers.forEach(clearInterval); timers = []; }
+
+  // Pause while the tab is hidden — nobody is reading it — and resume on return.
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+  start();
+})();
+</script>
+</body>
+</html>
