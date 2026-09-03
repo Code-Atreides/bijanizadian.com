@@ -150,6 +150,7 @@
   .section-head h2 .accent { background: linear-gradient(92deg, var(--accent-bright), var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .section-head p { margin-top: 16px; color: var(--ink-soft); font-size: 17px; max-width: 58ch; }
   .section-head p b { color: var(--ink); font-weight: 600; }
+  .section-head .head-cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; }
   .centered { text-align: center; margin-left: auto; margin-right: auto; }
   .centered p { margin-left: auto; margin-right: auto; }
   .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -183,6 +184,17 @@
   .route--wide p { margin-top: 3px; }
   .route--wide .route-meta { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
   .route--wide .btn { flex: none; }
+
+  /* the two prizes Greek Wars runs at once: one individual, one chapter */
+  .prizes { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; }
+  .prizes li { padding: 24px 24px 26px; display: grid; gap: 8px; align-content: start; }
+  .prize-who { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .prizes p { color: var(--ink-soft); font-size: 15px; }
+  /* beats `.prizes p` on specificity, which would otherwise flatten the amount */
+  .prizes .prize-amount { font-size: clamp(36px, 4.6vw, 54px); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+  .prizes p b { color: var(--ink); font-weight: 600; }
+  .prize-note { margin-top: 16px; padding: 18px 22px 20px; font-size: 15px; color: var(--ink-soft); }
+  .prize-note b { color: var(--ink); font-weight: 600; }
 
   /* the season: four steps in a strip */
   .season { margin-top: 16px; padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
@@ -282,12 +294,13 @@
   /* ---------- responsive ---------- */
   @media (max-width: 960px) {
     .routes, .lit, .reading { grid-template-columns: 1fr 1fr; }
+    .prizes { grid-template-columns: 1fr 1fr; }
     .season { grid-template-columns: 1fr 1fr; }
     .foot-inner { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 720px) {
     :root { --gap-section: 72px; }
-    .routes, .lit, .reading, .apply, .season { grid-template-columns: 1fr; }
+    .routes, .lit, .reading, .apply, .season, .prizes { grid-template-columns: 1fr; }
     .route--wide { flex-direction: column; align-items: flex-start; }
     .nav .btn span { display: none; }
     .brand span { display: none; }
@@ -307,7 +320,7 @@
 </style>
 </head>
 <body>
-<a class="skip" href="#greekwars">Skip to Greek Wars</a>
+<a class="skip" href="#greekwars">Skip to the programme</a>
 
 <div class="nav">
   <div class="nav-inner">
@@ -321,7 +334,7 @@
       <span>/campus</span>
     </a>
     <div class="nav-right">
-      <a class="btn btn--ghost btn--sm" href="#greekwars">Greek <span>Wars</span></a>
+      <a class="btn btn--ghost btn--sm" href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Greek <span>Wars</span></a>
       <a class="btn btn--ghost btn--sm" href="#team">Campus <span>team</span></a>
       <a class="btn btn--dark btn--sm" href="#apply">Apply</a>
     </div>
@@ -344,7 +357,7 @@
     <h1>where campuses become legends.</h1>
     <p class="lede">Greek Wars, Game Day, and the Dinner Series — the fomo college program, in one place.</p>
     <div class="hero-cta">
-      <a class="btn btn--primary btn--lg" href="#greekwars">Go to Greek Wars</a>
+      <a class="btn btn--primary btn--lg" href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Go to Greek Wars</a>
       <a class="btn btn--dark btn--lg" href="#team">Go to campus team</a>
     </div>
   </div>
@@ -353,6 +366,7 @@
     <img class="hero-art" src="/campus/astronaut-mobile.webp" alt="" aria-hidden="true" width="1080" height="1190" fetchpriority="high">
   </picture>
   <nav class="hero-foot" aria-label="Jump to">
+    <a href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Greek Wars</a>
     <a href="/gameday">Game Day</a>
     <a href="/dinners">Dinner Series</a>
     <a href="/crewsheet">Crew sheet</a>
@@ -368,14 +382,18 @@
     <div class="section-head">
       <p class="eyebrow">Greek Wars · Fall 2026 · Aug 24 – Dec 11</p>
       <h2 id="gw-title">your chapter vs.<br>every <span class="accent">chapter.</span></h2>
-      <p>Every chapter is a clan. Trade all semester, ranked on raw PnL, against every other chapter at your school and every chapter in the country. <b>Every qualifying chapter crowns a champion.</b></p>
+      <p>Every chapter becomes a clan. Trade, rep your chapter, win the war — against every other clan at your school, and every clan in the country. <b>Ranked on raw PnL, not points, not volume, not activity.</b></p>
+      <div class="head-cta">
+        <a class="btn btn--primary" href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Open Greek Wars ↗</a>
+        <a class="btn btn--dark" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter ↗</a>
+      </div>
     </div>
 
     <a class="card route route--wide is-external gw-onboard" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">
       <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8v3c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V8z"/><path d="m9 12 2 2 4-4"/></svg></span>
       <div>
         <h3>Onboard your chapter for Greek Wars</h3>
-        <p>Nothing counts until your chapter is registered. Get <b>80% of your actives</b> on fomo and your chapter qualifies — then its top trader is guaranteed $500.</p>
+        <p>Two conditions, and your chapter qualifies: get <b>80% of your active members</b> onto fomo, and keep it downloaded through the end of the semester.</p>
         <span class="route-meta">
           <span class="pill">$500 guaranteed</span>
           <span class="pill">$10,000 national</span>
@@ -383,6 +401,20 @@
       </div>
       <span class="go">Onboard</span>
     </a>
+
+    <ul class="prizes" aria-label="What Greek Wars pays out">
+      <li class="card">
+        <span class="prize-who">Individual</span>
+        <p class="prize-amount num">$500</p>
+        <p><b>Guaranteed.</b> At the end of the semester the #1 trader in your chapter wins $500 cash. Every participating chapter gets a winner.</p>
+      </li>
+      <li class="card">
+        <span class="prize-who">Chapter</span>
+        <p class="prize-amount num">$10,000+</p>
+        <p><b>And eternal glory.</b> The best trading chapter in the country takes the grand prize.</p>
+      </li>
+    </ul>
+    <p class="card prize-note">Two titles run at once — <b>your school crowns a chapter, and so does the country.</b> Every chapter gets a champion, and qualifying chapters also pick up fomo perks along the way: trading rewards, events, and more.</p>
 
     <p class="kicker routes-label">The rest of the programme</p>
 
