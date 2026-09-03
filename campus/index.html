@@ -81,7 +81,11 @@
     font-weight: 500;
     -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* `hidden` makes body a scroll container, which can stop the sticky
+       switcher sticking; `clip` does the same job without one. The pair is
+       ordered so engines without `clip` keep the old behaviour. */
     overflow-x: hidden;
+    overflow-x: clip;
   }
   a { color: inherit; }
   b, strong { font-weight: 700; }
@@ -176,6 +180,44 @@
   .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
   .kicker { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
   .pill { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; background: var(--accent-t); color: var(--accent-bright); }
+
+  /* ---------- greek wars / campus team switcher ---------- */
+  /* The page carries two long programmes. Only one is shown at a time, and the
+     control sticks to the top so switching never means scrolling back up. */
+  .switch-bar {
+    position: sticky; top: 0; z-index: 20;
+    padding: 16px 0 14px;
+    background: linear-gradient(180deg, var(--bg) 66%, rgba(6,5,16,0));
+  }
+  .switch {
+    position: relative;
+    display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+    gap: 4px; padding: 4px;
+    border: 1px solid var(--hairline); border-radius: 14px;
+    background: rgba(255,255,255,.06);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  /* padding 4 + gap 4 + padding 4 = 12px of chrome across two equal columns */
+  .switch-thumb {
+    position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px;
+    width: calc((100% - 12px) / 2);
+    border-radius: 10px; background: var(--btn-fill);
+    border: 1px solid var(--hairline);
+    transition: transform .28s cubic-bezier(.4, 0, .2, 1);
+  }
+  .switch[data-on="1"] .switch-thumb { transform: translateX(calc(100% + 4px)); }
+  .switch button {
+    position: relative; z-index: 1;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+    padding: 10px 24px; border: 0; border-radius: 10px;
+    background: none; color: var(--ink-soft); cursor: pointer; white-space: nowrap;
+    transition: color .2s ease;
+  }
+  .switch button:hover { color: var(--ink); }
+  .switch button[aria-selected="true"] { color: #fff; }
+  /* the switcher already separates the panels, so they do not need a full
+     section gap above them as well */
+  .section[role="tabpanel"] { padding-top: var(--gap-head); }
 
   /* ---------- greek wars: the program cards ---------- */
   /* the Greek Wars onboard card is the first thing under the section head, so
@@ -335,6 +377,11 @@
     .foot ul { gap: 2px; }
     .foot ul a { display: inline-block; padding: 8px 0; }
   }
+  @media (max-width: 560px) {
+    /* full-bleed so the two options split the screen evenly */
+    .switch { display: grid; width: 100%; }
+    .switch button { padding: 10px 8px; font-size: 14px; }
+  }
   @media (max-width: 480px) {
     .apply { padding: 22px 18px 26px; }
   }
@@ -347,7 +394,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero-art { animation: none; }
-    .btn, .route, .progress i { transition: none; }
+    .btn, .route, .progress i, .switch-thumb, .switch button { transition: none; }
   }
 </style>
 </head>
@@ -409,8 +456,18 @@
 
 <main class="wrap">
 
+  <!-- ── switcher ───────────────────────────────────────────────── -->
+  <!-- Without JS both panels stay in the flow, so the page still reads whole. -->
+  <div class="switch-bar">
+    <div class="switch" id="switch" role="tablist" aria-label="Choose a programme">
+      <span class="switch-thumb" aria-hidden="true"></span>
+      <button type="button" role="tab" id="tab-gw" aria-controls="greekwars" aria-selected="true">Greek Wars</button>
+      <button type="button" role="tab" id="tab-team" aria-controls="team" aria-selected="false">Campus team</button>
+    </div>
+  </div>
+
   <!-- ── greek wars ─────────────────────────────────────────────── -->
-  <section id="greekwars" class="section" aria-labelledby="gw-title">
+  <section id="greekwars" class="section" role="tabpanel" aria-labelledby="tab-gw">
     <div class="section-head">
       <p class="eyebrow">Greek Wars · Fall 2026 · Aug 24 – Dec 11</p>
       <h2 id="gw-title">your chapter vs.<br>every <span class="accent">chapter.</span></h2>
@@ -496,7 +553,7 @@
   </section>
 
   <!-- ── campus team ────────────────────────────────────────────── -->
-  <section id="team" class="section" aria-labelledby="team-title">
+  <section id="team" class="section" role="tabpanel" aria-labelledby="tab-team">
     <div class="section-head centered">
       <p class="eyebrow">Campus team</p>
       <h2 id="team-title">the people who <span class="accent">run it.</span></h2>
@@ -679,6 +736,86 @@
 </footer>
 
 <script>
+(function () {
+  // ---------- programme switcher: one panel at a time, so the page is two
+  // short reads instead of one very long scroll.
+  var strip = document.getElementById('switch');
+  if (!strip) return;
+  var tabs = Array.prototype.slice.call(strip.querySelectorAll('[role="tab"]'));
+  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
+  if (!tabs.length || panels.indexOf(null) > -1) return;
+
+  function select(n, o) {
+    o = o || {};
+    n = Math.max(0, Math.min(tabs.length - 1, n));
+    tabs.forEach(function (t, k) {
+      var on = k === n;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;      // one tab stop for the whole group
+      panels[k].hidden = !on;
+    });
+    strip.dataset.on = n;
+    if (o.focus) tabs[n].focus();
+    if (o.scroll) {
+      // only pull the page if the strip is off-screen or well down it —
+      // switching from a sticky control that is already in view should not jump
+      var top = strip.getBoundingClientRect().top;
+      if (top < 0 || top > window.innerHeight * 0.5) {
+        window.scrollTo({ top: window.scrollY + top - 8, behavior: 'smooth' });
+      }
+    }
+    if (o.hash !== false) { try { history.replaceState(null, '', '#' + panels[n].id); } catch (e) {} }
+  }
+
+  tabs.forEach(function (t, k) {
+    t.addEventListener('click', function () { select(k, { scroll: true }); });
+    t.addEventListener('keydown', function (e) {
+      var n = null;
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = k + 1;
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = k - 1;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = tabs.length - 1;
+      if (n === null) return;
+      e.preventDefault();
+      select((n + tabs.length) % tabs.length, { focus: true, scroll: true });
+    });
+  });
+
+  // Which panel holds a given id? #apply lives inside the campus-team panel, so
+  // a link to it has to open that panel before the browser can scroll to it.
+  function panelFor(id) {
+    if (!id) return -1;
+    var el = document.getElementById(id);
+    if (!el) return -1;
+    for (var k = 0; k < panels.length; k++) { if (panels[k] === el || panels[k].contains(el)) return k; }
+    return -1;
+  }
+
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
+    if (!a) return;
+    var id = a.getAttribute('href').slice(1);
+    var k = panelFor(id);
+    if (k < 0 || !panels[k].hidden) return;   // same panel: let the browser do it
+    e.preventDefault();
+    select(k, { hash: false });
+    var target = document.getElementById(id);
+    requestAnimationFrame(function () {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      try { history.replaceState(null, '', '#' + id); } catch (err) {}
+    });
+  });
+
+  var deep = (location.hash || '').slice(1);
+  var start = panelFor(deep);
+  select(start < 0 ? 0 : start, { hash: false });
+  if (start > 0) {
+    // the panel was hidden when the browser tried to honour the hash
+    var target = document.getElementById(deep);
+    if (target) requestAnimationFrame(function () { target.scrollIntoView({ block: 'start' }); });
+  }
+})();
+
 (function () {
   // ---------- stepped application, saved to the same Firebase project the
   // dinners form uses, under campus/<key>. Rules: write-only from the web.
