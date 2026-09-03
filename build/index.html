@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Request — Bijan Izadian</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18",
+    "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime",
+    "react-dom/client": "https://esm.sh/react-dom@18/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.462.0?external=react"
+  }
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+  // idea-intake.jsx expects a window.storage.{set,get,list} API — back it with the same
+  // Firebase project the crew sheet uses, storing each submission under intake/<key>.
+  var db = firebase.initializeApp({
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  }).database();
+
+  window.storage = {
+    set: function (key, value) {
+      return db.ref('intake/' + key).set(value)
+        .then(function () { return true; })
+        .catch(function (e) { console.error(e); return false; });
+    },
+    list: function (prefix) {
+      return db.ref('intake').get()
+        .then(function (snap) {
+          var val = snap.exists() ? snap.val() : {};
+          return { keys: Object.keys(val).filter(function (k) { return k.indexOf(prefix) === 0; }) };
+        })
+        .catch(function (e) { console.error(e); return { keys: [] }; });
+    },
+    get: function (key) {
+      return db.ref('intake/' + key).get()
+        .then(function (snap) { return snap.exists() ? { value: snap.val() } : null; })
+        .catch(function (e) { console.error(e); return null; });
+    }
+  };
+</script>
+
+<script>
+  // idea-intake.jsx stays the single source of truth — fetch it, transpile the JSX
+  // in-browser with Babel standalone, then mount it as a native ES module.
+  (async function () {
+    var res = await fetch('/idea-intake.jsx');
+    var src = await res.text();
+    var out = Babel.transform(src, { presets: [['react', { runtime: 'automatic' }]], filename: 'idea-intake.jsx' }).code;
+    var blob = new Blob([out], { type: 'text/javascript' });
+    var url = URL.createObjectURL(blob);
+    var mod = await import(url);
+    var React = await import('react');
+    var ReactDOMClient = await import('react-dom/client');
+    ReactDOMClient.createRoot(document.getElementById('root')).render(React.createElement(mod.default));
+  })();
+</script>
+</body>
+</html>

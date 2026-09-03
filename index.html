@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bijan Izadian</title>
+<style>html,body{margin:0;height:100%}#desk{height:100vh}</style>
+</head>
+<body>
+<div id="desk"></div>
+
+<script src="xp-desktop.js"></script>
+<script>
+  XPDesktop.mount('#desk', {
+    name: 'Bijan Izadian',
+    subtitle: 'New York City',
+    mark: 'B',
+    items: [
+      { id: 'about',   label: 'About Bijan',   icon: 'notepad', title: 'About Bijan', menuDesc: 'Who I am', openOnLoad: true,
+        body: '' },
+      { id: 'fomo',    label: 'fomo',          icon: 'bell',    title: 'fomo',
+        link: 'https://fomo.family', linkLabel: 'Open fomo',
+        extra: [{ label: 'Crew sheet', href: '/crewsheet' }],
+        body: '' },
+      { id: 'build',   label: 'Build request', icon: 'form',    title: 'Build request',
+        link: '/build', linkLabel: 'Open the form',
+        body: '<p>Have a web app idea you want built? Send it through the intake form and I\'ll come back with scope, timing, and cost.</p>' },
+      { id: 'resume',  label: 'Resume',        icon: 'doc',     title: 'Resume', menuDesc: 'PDF',
+        link: '/resume.pdf', linkLabel: 'Open resume',
+        body: '<p>One page.</p>' },
+      { id: 'contact', label: 'Contact',       icon: 'mail',    title: 'Contact', menuDesc: 'Email, GitHub, LinkedIn',
+        link: 'mailto:hello@bijanizadian.com', linkLabel: 'Send email',
+        extra: [{ label: 'GitHub', href: 'https://github.com/' }, { label: 'LinkedIn', href: 'https://www.linkedin.com/in/' }],
+        body: '<p>Email is the fastest way to reach me.</p>' },
+      { id: 'bin',     label: 'Recycle Bin',   icon: 'bin',     title: 'Recycle Bin', corner: true,
+        body: '<p>Empty.</p>' }
+    ],
+    startLeft: ['about', 'resume', 'contact', { label: 'GitHub', desc: 'Code', href: 'https://github.com/', icon: 'form' }],
+    startHeading: 'Projects',
+    startRight: ['fomo', 'build']
+  });
+</script>
+</body>
+</html>

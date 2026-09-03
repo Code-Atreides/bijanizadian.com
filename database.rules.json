@@ -1,0 +1,14 @@
+{
+  "rules": {
+    "sheets": {
+      "$code": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "intake": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>Sponsored Dinner — Crew Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Design language mirrors fomo.family — near-black space ground, near-white ink,
+     #516af6 accent, translucent periwinkle surfaces. Aeonik is fomo's real face;
+     Schibsted Grotesk is the closest webfont stand-in. */
+  :root {
+    --bg:        #060510;
+    --bg-2:      #12111a;
+    --bg-3:      #161522;
+    --surface:   rgba(203, 208, 235, 0.06);
+    --surface-2: rgba(203, 208, 235, 0.10);
+
+    --ink:       #f7f7f7;
+    --ink-soft:  #9899a3;
+    --ink-faint: #565a63;
+
+    --line:      #33343d;
+    --line-soft: rgba(203, 208, 235, 0.12);
+
+    --accent:      #516af6;
+    --accent-bright: #8ea0ff;
+    --accent-deep: #221d4b;
+    --accent-t:    rgba(81, 106, 246, 0.16);
+    --logo:        #cbd0eb;
+
+    --ok:   #21c95e;
+    --warn: #ffbf17;
+    --crit: #ff622e;
+
+    --host:     #ffbf17;  --host-bg:  rgba(255, 191, 23, 0.12);
+    --setup:    #21c95e;  --setup-bg: rgba(33, 201, 94, 0.12);
+    --media:    #7d92ff;  --media-bg: rgba(81, 106, 246, 0.16);
+
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+    --wrap: 1180px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  body {
+    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  .accent { color: var(--accent-bright); }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 110px; }
+
+  /* ---------- fomo wordmark ---------- */
+  .brand { display: inline-flex; align-items: center; flex: none; }
+  .brand svg { height: 22px; width: auto; display: block; }
+  .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+
+  /* ---------- join screen ---------- */
+  #join {
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    padding: 32px 24px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(820px 460px at 22% 8%, var(--accent-t), transparent 60%),
+      radial-gradient(680px 420px at 88% 0%, rgba(34, 29, 75, .55), transparent 55%);
+  }
+  #join::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1.4px 1.4px at 18% 24%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 62% 68%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.6px 1.6px at 82% 18%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 38% 82%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 91% 52%, rgba(255,255,255,.5), transparent);
+    opacity: .5;
+    pointer-events: none;
+  }
+  .join-card { max-width: 468px; width: 100%; position: relative; }
+  .join-card h1 {
+    font-size: clamp(36px, 7vw, 56px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+  }
+  .join-card p { margin-top: 14px; color: var(--ink-soft); font-size: 15px; }
+  .join-form { margin-top: 26px; display: flex; gap: 8px; }
+  .join-form input {
+    flex: 1;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 13px 15px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--bg-3);
+    color: var(--ink);
+    text-transform: lowercase;
+    min-width: 0;
+  }
+  .join-form input:focus { outline: none; border-color: var(--accent); background: #1b1a28; }
+  .join-form input::placeholder { font-weight: 400; color: var(--ink-faint); text-transform: none; }
+  .join-form button {
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 13px 22px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 12px 30px -12px var(--accent);
+  }
+  .join-form button:hover { filter: brightness(1.08); }
+  .join-hint { margin-top: 16px; font-size: 13.5px; color: var(--ink-faint); }
+  .join-error { margin-top: 12px; font-size: 14px; color: var(--crit); display: none; }
+
+  /* ---------- top nav (full-bleed) ---------- */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    width: 100%;
+    background: rgba(6, 5, 16, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 13px 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nav-meta {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+  }
+  .code-chip {
+    font-weight: 700;
+    color: var(--accent-bright);
+    background: var(--accent-t);
+    border: 1px solid rgba(126, 146, 255, .35);
+    border-radius: 99px;
+    padding: 3px 12px;
+    letter-spacing: .02em;
+  }
+  .nav-meta .status { color: var(--ink-soft); }
+  .nav-meta button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    border-radius: 99px;
+    cursor: pointer;
+    padding: 5px 12px;
+  }
+  .nav-meta button:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* ---------- hero (full-bleed) ---------- */
+  .hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line-soft);
+    background:
+      radial-gradient(900px 420px at 18% -10%, var(--accent-t), transparent 60%),
+      radial-gradient(720px 380px at 92% 0%, rgba(34, 29, 75, .5), transparent 55%);
+  }
+  .hero::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 30%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 46% 68%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.6px 1.6px at 74% 22%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 30% 82%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 88% 58%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.5), transparent);
+    opacity: .45;
+    pointer-events: none;
+  }
+  .hero-inner {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 62px 24px 44px;
+    position: relative;
+  }
+  .hero-inner h1 {
+    font-size: clamp(40px, 6.4vw, 72px);
+    font-weight: 700;
+    letter-spacing: -0.037em;
+    line-height: 1.01;
+  }
+  .hero-inner h1 .accent {
+    background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-inner .lede {
+    margin-top: 16px;
+    max-width: 60ch;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+  .meta-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 30px;
+    padding: 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-2);
+    box-shadow: var(--shadow);
+  }
+  .meta-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .01em;
+    color: var(--ink-soft);
+    margin-bottom: 5px;
+  }
+  .meta-field input {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid var(--line);
+    background: transparent;
+    font: inherit;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 2px 0 5px;
+    color: var(--ink);
+  }
+  .meta-field input:focus { outline: none; border-bottom-color: var(--accent); }
+  .meta-field input::placeholder { color: var(--ink-faint); font-weight: 400; }
+
+  /* ---------- reference: pillars ---------- */
+  .section-head {
+    margin: 44px 0 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--accent-bright);
+  }
+  .section-title { font-size: 28px; font-weight: 700; letter-spacing: -0.025em; margin-bottom: 6px; color: var(--ink); }
+  .section-sub { color: var(--ink-soft); font-size: 15px; max-width: 62ch; }
+
+  .crew-note {
+    margin-top: 20px;
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    border-left: 3px solid var(--accent);
+    padding: 6px 0 6px 14px;
+  }
+  .crew-note strong { color: var(--ink); }
+
+  .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 26px;
+  }
+  .pillar {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--pc);
+    border-radius: var(--radius);
+    padding: 24px 22px 26px;
+    box-shadow: var(--shadow);
+  }
+  .pillar .count {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--pc);
+    background: var(--pbg);
+    border-radius: 99px;
+    padding: 3px 11px;
+    margin-bottom: 10px;
+  }
+  .pillar h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; }
+  .pillar .mandate { margin-top: 6px; font-size: 14px; color: var(--ink-soft); }
+  .pillar ul { margin-top: 12px; list-style: none; }
+  .pillar li {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    padding: 6px 0;
+    border-top: 1px dashed var(--line-soft);
+  }
+  .pillar li::before { content: "—"; margin-right: 8px; color: var(--pc); }
+  .p-host  { --pc: var(--host);  --pbg: var(--host-bg); }
+  .p-setup { --pc: var(--setup); --pbg: var(--setup-bg); }
+  .p-media { --pc: var(--media); --pbg: var(--media-bg); }
+
+  .arc {
+    margin-top: 22px;
+    padding: 18px 22px;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    align-items: center;
+    box-shadow: var(--shadow);
+  }
+  .arc b { color: var(--ink); font-weight: 600; }
+  .arc .sep { color: var(--accent-bright); }
+
+  .continue-btn {
+    display: block;
+    margin: 30px auto 0;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 15px 30px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 16px 38px -16px var(--accent);
+  }
+  .continue-btn:hover { filter: brightness(1.1); }
+
+  .view-structure-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    background: var(--surface);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .view-structure-btn:hover { border-color: var(--accent); color: var(--ink); }
+
+  .view-hidden { display: none; }
+
+  /* ---------- checklist ---------- */
+  .board { margin-top: 26px; display: grid; gap: 24px; }
+  .role-block {
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--pc);
+    border-radius: var(--radius);
+    padding: 26px;
+    box-shadow: var(--shadow);
+  }
+  .role-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 14px;
+  }
+  .role-top h3 { font-size: 21px; font-weight: 700; letter-spacing: -0.015em; }
+  .role-top .progress { font-size: 13px; font-weight: 600; color: var(--pc); }
+  .assignees {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .assignee { position: relative; }
+  .assignee input {
+    width: 100%;
+    font: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    padding: 10px 12px 10px 34px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--bg-3);
+    color: var(--ink);
+  }
+  .assignee input:focus { outline: none; border-color: var(--pc); background: #1b1a28; }
+  .assignee input::placeholder { font-weight: 400; color: var(--ink-faint); }
+  .assignee .dot {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--pbg);
+    border: 2px solid var(--pc);
+  }
+  .tasks { margin-top: 16px; list-style: none; }
+  .task {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 4px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .task:last-child { border-bottom: 1px solid var(--line-soft); }
+  .task input[type="checkbox"] {
+    appearance: none;
+    width: 20px; height: 20px;
+    flex: none;
+    border: 2px solid var(--ink-faint);
+    border-radius: 5px;
+    cursor: pointer;
+    display: grid;
+    place-content: center;
+    background: var(--bg-3);
+  }
+  .task input[type="checkbox"]:checked { background: var(--pc); border-color: var(--pc); }
+  .task input[type="checkbox"]:checked::after {
+    content: "";
+    width: 10px; height: 6px;
+    border-left: 2.5px solid #08060f;
+    border-bottom: 2.5px solid #08060f;
+    transform: rotate(-45deg) translateY(-1px);
+  }
+  .task input[type="checkbox"]:focus-visible,
+  button:focus-visible, .assignee input:focus-visible, .meta-field input:focus-visible,
+  .task-text:focus-visible, .add-task input:focus-visible, .join-form input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .task-text {
+    flex: 1;
+    font: inherit;
+    font-size: 14.5px;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    padding: 3px 4px;
+    border-radius: 4px;
+    min-width: 0;
+  }
+  .task-text:focus { outline: none; background: var(--bg-3); }
+  .task.done .task-text { color: var(--ink-faint); text-decoration: line-through; }
+  .task-remove {
+    flex: none;
+    border: none;
+    background: none;
+    color: var(--ink-faint);
+    font-size: 17px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
+  }
+  .task-remove:hover { color: var(--crit); background: rgba(255, 98, 46, .12); }
+  .add-task { display: flex; gap: 8px; margin-top: 12px; }
+  .add-task input {
+    flex: 1;
+    font: inherit;
+    font-size: 14.5px;
+    padding: 11px 12px;
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--ink);
+    min-width: 0;
+  }
+  .add-task input:focus { outline: none; border-style: solid; border-color: var(--pc); background: var(--bg-3); }
+  .add-task input::placeholder { color: var(--ink-faint); }
+  .add-task button {
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 11px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--pc);
+    color: #08060f;
+    cursor: pointer;
+  }
+  .add-task button:hover { filter: brightness(1.08); }
+
+  .footer-note {
+    margin-top: 40px;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    border-top: 1px solid var(--line);
+    padding-top: 16px;
+  }
+
+  #app { display: none; }
+
+  @media (max-width: 720px) {
+    .pillars, .meta-row { grid-template-columns: 1fr; }
+    .hero-inner { padding: 40px 20px 32px; }
+    .nav-inner { padding: 12px 20px; }
+    .wrap { padding: 0 20px 90px; }
+    .join-form { flex-direction: column; }
+  }
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<!-- ============ JOIN SCREEN ============ -->
+<div id="join">
+  <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+      <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+      <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+      <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+      <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+    </svg>
+  </a>
+  <div class="join-card">
+    <h1>Sponsored Dinner<br><span class="accent">Crew Sheet</span></h1>
+    <p>One shared sheet per dinner. Enter your dinner code to open it — everyone on your crew who enters the same code sees the same list, live.</p>
+    <div class="join-form">
+      <input id="join-code" placeholder="e.g. nyu-oct12" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Dinner code">
+      <button id="join-btn">Open sheet</button>
+    </div>
+    <p class="join-hint">First one in? Make up a short code (letters, numbers, dashes) and share it with your crew. Anyone with the code can view and edit the sheet.</p>
+    <p class="join-error" id="join-error"></p>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+
+  <div class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+          <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+          <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+          <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+          <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+        </svg>
+      </a>
+      <div class="nav-meta">
+        <span class="code-chip" id="code-chip"></span>
+        <span class="status" id="sync-status">Connecting…</span>
+        <button id="switch-btn" type="button">Switch dinner</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <h1>Sponsored Dinner<br><span class="accent">Crew Sheet</span></h1>
+      <p class="lede">Every dinner runs on the same structure: three pillars, three to five people. Read the structure once, then use the sheet below to put names on roles and get tasks moving. Everything your crew checks off shows up here for everyone.</p>
+      <div class="meta-row">
+        <div class="meta-field">
+          <label for="m-school">School / chapter</label>
+          <input id="m-school" data-meta="school" placeholder="Your campus">
+        </div>
+        <div class="meta-field">
+          <label for="m-date">Dinner date</label>
+          <input id="m-date" data-meta="date" placeholder="TBD">
+        </div>
+        <div class="meta-field">
+          <label for="m-sponsor">Sponsor</label>
+          <input id="m-sponsor" data-meta="sponsor" placeholder="Who's backing this dinner">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+  <div id="structure-view">
+  <p class="section-head">Part one</p>
+  <h2 class="section-title">The structure</h2>
+  <p class="section-sub">One dinner, three pillars. Each pillar has an owner. If a pillar has no name on it, the dinner isn't staffed yet.</p>
+
+  <div class="crew-note"><strong>3–5 people total run one dinner.</strong> Small on purpose — everyone at the table should know exactly what their job is.</div>
+
+  <div class="pillars">
+    <div class="pillar p-host">
+      <span class="count">1 role</span>
+      <h3>Host</h3>
+      <p class="mandate">The face of the dinner. Owns the guest list, the invites, and the room on the night.</p>
+      <ul>
+        <li>Owns who's in the room</li>
+        <li>Point of contact for guests</li>
+        <li>Runs the night itself</li>
+      </ul>
+    </div>
+    <div class="pillar p-setup">
+      <span class="count">1–2 roles</span>
+      <h3>Dinner Setup</h3>
+      <p class="mandate">The logistics. Owns the venue, the food, and everything physically in place before guests arrive.</p>
+      <ul>
+        <li>Owns venue + food</li>
+        <li>Handles budget + vendors</li>
+        <li>Room is ready before doors</li>
+      </ul>
+    </div>
+    <div class="pillar p-media">
+      <span class="count">1–2 roles</span>
+      <h3>Media</h3>
+      <p class="mandate">The record. Documents the whole night so the sponsor sees exactly what they backed.</p>
+      <ul>
+        <li>Owns photo + video capture</li>
+        <li>Owns the sponsor deliverable</li>
+        <li>Nothing happens off-camera</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="arc">
+    <b>Host</b> fills the room <span class="sep">→</span>
+    <b>Setup</b> builds the night <span class="sep">→</span>
+    <b>Media</b> captures it <span class="sep">→</span>
+    the <b>sponsor</b> gets the story.
+  </div>
+
+  <button id="continue-btn" class="continue-btn" type="button">Continue to the working sheet →</button>
+  </div>
+
+  <div id="tasks-view" class="view-hidden">
+  <button id="view-structure-btn" class="view-structure-btn" type="button">← View structure</button>
+
+  <p class="section-head">Part two</p>
+  <h2 class="section-title">The working sheet</h2>
+  <p class="section-sub">Put a name in every role, then break the work into tasks. The starter tasks are placeholders — rewrite them, delete them, add your own. Tap any task to edit it.</p>
+
+  <div class="board" id="board"></div>
+
+  <p class="footer-note">This sheet is shared: anyone with your dinner code sees and edits the same list, and changes sync automatically across laptops and phones.</p>
+  </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  // Fill in databaseURL from Firebase console → Build → Realtime Database once created.
+  const firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+
+  const MY_KEY = 'crew-sheet-me-v1';          // personal: remembers your dinner code
+  const SHEET_PATH = 'sheets';                 // shared: one child per dinner code
+
+  const PILLARS = [
+    {
+      id: 'host', cls: 'p-host', name: 'Host',
+      slots: ['Host'],
+      starterTasks: ['Build the guest list', 'Send invites + confirm headcount', 'Add your own tasks here']
+    },
+    {
+      id: 'setup', cls: 'p-setup', name: 'Dinner Setup',
+      slots: ['Setup lead', 'Setup #2 (optional)'],
+      starterTasks: ['Lock the venue', 'Plan the menu / order food', 'Add your own tasks here']
+    },
+    {
+      id: 'media', cls: 'p-media', name: 'Media',
+      slots: ['Media lead', 'Media #2 (optional)'],
+      starterTasks: ['Plan the shot list', 'Capture the night (photo + video)', 'Deliver recap to sponsor']
+    }
+  ];
+
+  const hasFirebase = firebaseConfig.databaseURL.indexOf('PASTE_') !== 0 && typeof firebase !== 'undefined';
+  const db = hasFirebase ? firebase.initializeApp(firebaseConfig).database() : null;
+  let code = null;
+  let state = null;
+  let saveTimer = null;
+  let pendingSave = false;
+  let unsubscribe = null;
+
+  const $ = id => document.getElementById(id);
+
+  function sheetRef() { return db.ref(SHEET_PATH + '/' + code); }
+
+  function defaultState() {
+    const s = { rev: 1, meta: { school: '', date: '', sponsor: '' }, pillars: {} };
+    PILLARS.forEach(p => {
+      s.pillars[p.id] = {
+        assignees: p.slots.map(() => ''),
+        tasks: p.starterTasks.map((t, i) => ({ id: p.id + '-' + i, text: t, done: false }))
+      };
+    });
+    return s;
+  }
+
+  function normalizeCode(raw) {
+    return (raw || '').toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  }
+
+  function setStatus(msg) { $('sync-status').textContent = msg; }
+
+  // ---------- shared storage ----------
+  async function fetchSheet() {
+    try {
+      const snap = await sheetRef().get();
+      return snap.exists() ? snap.val() : null;
+    } catch (e) { /* not created yet, or offline */ }
+    return null;
+  }
+
+  async function writeSheet() {
+    try {
+      await sheetRef().set(state);
+      setStatus('Synced just now');
+    } catch (e) {
+      setStatus('Couldn’t sync — will retry');
+      pendingSave = true;
+    }
+  }
+
+  function queueSave() {
+    if (!hasFirebase) { setStatus('Preview mode — changes aren’t shared'); return; }
+    setStatus('Saving…');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      state.rev = (state.rev || 0) + 1;
+      pendingSave = false;
+      await writeSheet();
+    }, 500);
+  }
+
+  function editingNow() {
+    const el = document.activeElement;
+    return el && el.tagName === 'INPUT' && el.type !== 'checkbox' && $('app').contains(el);
+  }
+
+  function attachListener() {
+    if (!hasFirebase) return;
+    if (unsubscribe) unsubscribe();
+    const ref = sheetRef();
+    const handler = snapshot => {
+      const remote = snapshot.val();
+      if (remote && typeof remote.rev === 'number' && remote.rev > (state.rev || 0) && !editingNow()) {
+        state = remote;
+        render();
+        bindMeta();
+        setStatus('Updated by your crew');
+      }
+    };
+    ref.on('value', handler);
+    unsubscribe = () => ref.off('value', handler);
+  }
+
+  // ---------- join flow ----------
+  async function openSheet(rawCode) {
+    const c = normalizeCode(rawCode);
+    if (c.length < 3) {
+      const err = $('join-error');
+      err.textContent = 'Code needs at least 3 characters — letters, numbers, dashes.';
+      err.style.display = 'block';
+      return;
+    }
+    code = c;
+
+    if (hasFirebase) {
+      const remote = await fetchSheet();
+      state = remote || defaultState();
+      if (!remote) await writeSheet();
+      try { localStorage.setItem(MY_KEY, JSON.stringify({ code: c })); } catch (e) {}
+    } else {
+      state = defaultState();
+    }
+
+    $('code-chip').textContent = code;
+    $('join').style.display = 'none';
+    $('app').style.display = 'block';
+    setStatus(hasFirebase ? 'Synced' : 'Preview mode — changes aren’t shared');
+    render();
+    bindMeta();
+    showStructure();
+    attachListener();
+  }
+
+  async function boot() {
+    $('join-btn').addEventListener('click', () => openSheet($('join-code').value));
+    $('join-code').addEventListener('keydown', e => { if (e.key === 'Enter') openSheet($('join-code').value); });
+    $('continue-btn').addEventListener('click', showTasks);
+    $('view-structure-btn').addEventListener('click', showStructure);
+    $('switch-btn').addEventListener('click', () => {
+      if (unsubscribe) unsubscribe();
+      try { localStorage.removeItem(MY_KEY); } catch (e) {}
+      code = null; state = null;
+      $('app').style.display = 'none';
+      $('join').style.display = 'flex';
+      $('join-code').value = '';
+      $('join-code').focus();
+    });
+
+    // auto-rejoin last dinner
+    if (hasFirebase) {
+      try {
+        const me = localStorage.getItem(MY_KEY);
+        if (me) {
+          const saved = JSON.parse(me);
+          if (saved && saved.code) { await openSheet(saved.code); return; }
+        }
+      } catch (e) { /* first visit */ }
+    }
+    $('join-code').focus();
+  }
+
+  // ---------- view switching ----------
+  function showStructure() {
+    $('structure-view').classList.remove('view-hidden');
+    $('tasks-view').classList.add('view-hidden');
+    window.scrollTo({ top: 0 });
+  }
+
+  function showTasks() {
+    $('structure-view').classList.add('view-hidden');
+    $('tasks-view').classList.remove('view-hidden');
+    window.scrollTo({ top: 0 });
+  }
+
+  // ---------- render ----------
+  const board = () => $('board');
+
+  function render() {
+    const b = board();
+    b.innerHTML = '';
+    PILLARS.forEach(p => {
+      const ps = state.pillars[p.id];
+      const block = document.createElement('section');
+      block.className = 'role-block ' + p.cls;
+
+      const doneCount = ps.tasks.filter(t => t.done).length;
+      const top = document.createElement('div');
+      top.className = 'role-top';
+      top.innerHTML = '<h3>' + p.name + '</h3><span class="progress">' + doneCount + ' / ' + ps.tasks.length + ' done</span>';
+      block.appendChild(top);
+
+      const assignees = document.createElement('div');
+      assignees.className = 'assignees';
+      p.slots.forEach((slot, i) => {
+        const wrapEl = document.createElement('div');
+        wrapEl.className = 'assignee';
+        const dot = document.createElement('span');
+        dot.className = 'dot';
+        const input = document.createElement('input');
+        input.placeholder = slot + ' — name';
+        input.setAttribute('aria-label', p.name + ': ' + slot);
+        input.value = ps.assignees[i] || '';
+        input.addEventListener('input', () => { ps.assignees[i] = input.value; queueSave(); });
+        wrapEl.appendChild(dot);
+        wrapEl.appendChild(input);
+        assignees.appendChild(wrapEl);
+      });
+      block.appendChild(assignees);
+
+      const list = document.createElement('ul');
+      list.className = 'tasks';
+      ps.tasks.forEach(task => {
+        const li = document.createElement('li');
+        li.className = 'task' + (task.done ? ' done' : '');
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = task.done;
+        cb.setAttribute('aria-label', 'Mark done: ' + task.text);
+        cb.addEventListener('change', () => { task.done = cb.checked; queueSave(); render(); });
+
+        const text = document.createElement('input');
+        text.className = 'task-text';
+        text.value = task.text;
+        text.setAttribute('aria-label', 'Edit task');
+        text.addEventListener('input', () => {
+          task.text = text.value;
+          cb.setAttribute('aria-label', 'Mark done: ' + task.text);
+          queueSave();
+        });
+
+        const rm = document.createElement('button');
+        rm.className = 'task-remove';
+        rm.textContent = '×';
+        rm.setAttribute('aria-label', 'Remove task');
+        rm.addEventListener('click', () => {
+          ps.tasks = ps.tasks.filter(t => t.id !== task.id);
+          queueSave(); render();
+        });
+
+        li.appendChild(cb);
+        li.appendChild(text);
+        li.appendChild(rm);
+        list.appendChild(li);
+      });
+      block.appendChild(list);
+
+      const add = document.createElement('div');
+      add.className = 'add-task';
+      const addInput = document.createElement('input');
+      addInput.placeholder = 'New task for ' + p.name + '…';
+      addInput.setAttribute('aria-label', 'New task for ' + p.name);
+      const addBtn = document.createElement('button');
+      addBtn.textContent = 'Add task';
+      function addTask() {
+        const v = addInput.value.trim();
+        if (!v) return;
+        ps.tasks.push({ id: p.id + '-' + Date.now() + '-' + Math.floor(Math.random() * 999), text: v, done: false });
+        addInput.value = '';
+        queueSave(); render();
+        const blocks = board().querySelectorAll('.role-block');
+        const idx = PILLARS.findIndex(x => x.id === p.id);
+        if (blocks[idx]) blocks[idx].querySelector('.add-task input').focus();
+      }
+      addBtn.addEventListener('click', addTask);
+      addInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+      add.appendChild(addInput);
+      add.appendChild(addBtn);
+      block.appendChild(add);
+
+      b.appendChild(block);
+    });
+  }
+
+  function bindMeta() {
+    document.querySelectorAll('[data-meta]').forEach(input => {
+      const key = input.dataset.meta;
+      input.value = state.meta[key] || '';
+      input.oninput = () => { state.meta[key] = input.value; queueSave(); };
+    });
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
