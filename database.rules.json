@@ -9,6 +9,13 @@
     "intake": {
       ".read": true,
       ".write": true
+    },
+    "dinners": {
+      ".read": false,
+      "$key": {
+        ".write": "!data.exists()",
+        ".validate": "newData.hasChildren(['first_name', 'last_name', 'email', 'phone', 'instagram', 'school', 'city', 'host_type', 'guests', 'why', 'submitted_at']) && newData.child('email').val().length < 200 && newData.child('guests').val().length < 4000 && newData.child('why').val().length < 4000"
+      }
     }
   }
 }

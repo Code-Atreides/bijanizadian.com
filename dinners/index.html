@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>Dinner Series — fomo</title>
+<meta name="description" content="fomo puts $1,200 behind a table of 12. You pick the room and the people, we pick up the check. 20 dinners in Fall 2026 — and $10,000 to the campus that lands hardest.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dinner Series — fomo">
+<meta property="og:description" content="fomo puts $1,200 behind a table of 12. You pick the room and the people, we pick up the check. 20 dinners in Fall 2026.">
+<meta property="og:url" content="https://bijanizadian.com/dinners">
+<link rel="canonical" href="https://bijanizadian.com/dinners">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<style>
+  /* Design language mirrors fomo.family — same token set as /crewsheet and /gameday. */
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    --accent: #516af6; --accent-bright: #8ea0ff; --accent-deep: #221d4b; --accent-t: rgba(81,106,246,.16);
+    --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
+    --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+  body {
+    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  b, strong { font-weight: 700; }
+  .num { font-variant-numeric: tabular-nums; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  /* sticky nav is ~65px — keep anchor targets clear of it */
+  [id] { scroll-margin-top: 88px; }
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
+  .skip:focus { left: 8px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 14px; font-weight: 700; letter-spacing: -.01em;
+    padding: 11px 18px; border-radius: var(--radius-sm); text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: filter .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 14px 34px -14px var(--accent); }
+  .btn--primary:hover { filter: brightness(1.08); }
+  .btn--ghost { background: var(--surface); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px); }
+  .btn--ghost:hover { border-color: var(--accent-bright); background: var(--surface-2); }
+  .btn--sm { font-size: 13px; padding: 8px 14px; }
+  .btn:disabled { opacity: .55; cursor: default; filter: none; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 30; width: 100%;
+    background: rgba(6,5,16,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .nav-inner { max-width: var(--wrap); margin: 0 auto; padding: 13px 24px; display: flex; align-items: center; gap: 12px; }
+  .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; }
+  .brand svg { height: 22px; width: auto; display: block; }
+  .lockup { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .lockup .x {
+    width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; flex: none;
+    background: var(--accent); color: #fff; font-size: 11px; font-weight: 800; line-height: 1;
+  }
+  .lockup .seg { font-size: 15px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative; width: 100%; overflow: hidden; border-bottom: 1px solid var(--line-soft);
+    background:
+      radial-gradient(900px 440px at 16% -12%, var(--accent-t), transparent 60%),
+      radial-gradient(720px 380px at 92% 0%, rgba(34,29,75,.55), transparent 55%);
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .45;
+    background-image:
+      radial-gradient(1.4px 1.4px at 12% 30%, rgba(255,255,255,.7), transparent),
+      radial-gradient(1px 1px at 46% 68%, rgba(255,255,255,.45), transparent),
+      radial-gradient(1.6px 1.6px at 74% 22%, rgba(255,255,255,.6), transparent),
+      radial-gradient(1px 1px at 30% 82%, rgba(255,255,255,.4), transparent),
+      radial-gradient(1px 1px at 88% 58%, rgba(255,255,255,.5), transparent),
+      radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.5), transparent);
+  }
+  .hero-inner { position: relative; max-width: var(--wrap); margin: 0 auto; padding: 60px 24px 44px; display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.95fr); gap: 40px; align-items: start; }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .hero h1 { margin-top: 12px; font-size: clamp(38px, 5.6vw, 66px); font-weight: 700; letter-spacing: -.038em; line-height: 1; }
+  .hero h1 .accent { display: block; background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero .lede { margin-top: 18px; font-size: 19px; font-weight: 600; letter-spacing: -.01em; max-width: 30ch; }
+  .hero .sub { margin-top: 12px; max-width: 52ch; color: var(--ink-soft); font-size: 16px; }
+  .hero .sub b { color: var(--ink); font-weight: 600; }
+  .pillars { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; list-style: none; max-width: 520px; }
+  .pillars li { display: grid; gap: 6px; }
+  .pillar-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .pillar-icon svg { width: 18px; height: 18px; }
+  .pillar-name { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .pillar-blurb { font-size: 13.5px; color: var(--ink-soft); }
+  .hero-cta { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+  /* ---------- shared card / kicker ---------- */
+  .card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-bright); }
+  .pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
+  .ticks { list-style: none; display: grid; gap: 10px; }
+  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14.5px; color: var(--ink-soft); }
+  .ticks li strong { color: var(--ink); }
+  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
+  .note { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  .note a { color: var(--accent-bright); font-weight: 600; }
+  .note b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- seats board (hero right) ---------- */
+  .seats-card { padding: 20px 22px 18px; position: relative; overflow: hidden; }
+  .seats-card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(420px 200px at 50% -20%, var(--accent-t), transparent 70%); }
+  .seats-card > * { position: relative; }
+  .table-art { display: block; width: 150px; height: 150px; margin: -4px auto 10px; }
+  .seats-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+  .seats-head h2 { font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .seats { list-style: none; display: grid; }
+  .seats li { display: grid; grid-template-columns: 24px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; border-top: 1px solid var(--line-soft); font-size: 13.5px; }
+  .seats li:first-child { border-top: 0; }
+  .seat-n { width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center; font-size: 11px; font-weight: 800; background: var(--accent-t); color: var(--accent-bright); }
+  .seat-role { font-weight: 600; }
+  .seat-reach { color: var(--ink-soft); font-size: 12.5px; }
+  .seats li.is-open .seat-n { background: var(--surface); color: var(--ink-faint); }
+  .seats li.is-open .seat-role { color: var(--ink-faint); font-weight: 500; }
+  .seats li.is-you .seat-n { background: var(--accent); color: #fff; }
+  .seats-foot { display: flex; gap: 8px; align-items: start; margin-top: 12px; font-size: 12px; color: var(--ink-faint); }
+  .seats-foot svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+
+  /* ---------- plain terms ---------- */
+  .plain { margin-top: 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; list-style: none; }
+  .plain li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 16px 18px; }
+  .plain i { font-style: normal; font-size: 12px; font-weight: 800; color: var(--accent-bright); letter-spacing: .04em; padding-top: 3px; }
+  .plain span { font-size: 15px; font-weight: 600; line-height: 1.35; }
+  .plain span small { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 13px; font-weight: 400; }
+  .two-parts { margin-top: 12px; padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; border-color: rgba(81,106,246,.35); background: linear-gradient(90deg, var(--accent-t), var(--bg-2) 60%); }
+  .two-parts .kicker { color: var(--accent-bright); }
+  .two-parts p { font-size: 14.5px; color: var(--ink-soft); }
+  .two-parts p b { color: var(--ink); }
+
+  /* ---------- money cards ---------- */
+  .money { margin-top: 28px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .money .card { padding: 24px; display: grid; gap: 16px; }
+  .amount { font-size: clamp(38px, 4.6vw, 54px); font-weight: 800; letter-spacing: -.045em; line-height: 1; }
+  .amount .word { display: block; margin-top: 4px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: var(--accent-bright); }
+  .money-lead { font-size: 16px; font-weight: 600; }
+  .money-body { color: var(--ink-soft); font-size: 14.5px; }
+  .money-body strong { color: var(--ink); }
+  .money h3 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
+  .money .note { margin-top: 0; }
+
+  /* ---------- standings ---------- */
+  .standings { margin-top: 20px; padding: 22px 24px; }
+  .board-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+  .board-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .scroll-x { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 620px; }
+  th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); padding: 0 10px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 11px 10px 11px 0; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  th.r, td.r { text-align: right; padding-right: 0; }
+  .rank { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; font-size: 12px; font-weight: 800; background: var(--surface); color: var(--ink-soft); }
+  .rank-1 { background: var(--warn); color: #08060f; }
+  .rank-2 { background: #cbd0eb; color: #08060f; }
+  .rank-3 { background: #c98b4a; color: #08060f; }
+  .campus { font-weight: 700; }
+  td a { color: var(--accent-bright); text-decoration: none; font-weight: 600; }
+  td a:hover { text-decoration: underline; }
+  .views { font-weight: 800; }
+  .qual { display: inline-flex; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .04em; }
+  .qual.yes { background: rgba(33,201,94,.14); color: var(--ok); }
+  .qual.no { background: var(--surface); color: var(--ink-faint); }
+
+  /* ---------- trio ---------- */
+  .trio { margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .trio .card { padding: 22px 22px 24px; }
+  .trio .kicker { margin-bottom: 14px; }
+  .flow { list-style: none; display: grid; gap: 12px; }
+  .flow li { display: grid; grid-template-columns: 38px 1fr; gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line-soft); }
+  .flow li:first-child { border-top: 0; padding-top: 0; }
+  .flow-icon { grid-row: span 2; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .flow-icon svg { width: 18px; height: 18px; }
+  .flow-name { font-weight: 700; font-size: 14.5px; }
+  .flow-name i { font-style: normal; color: var(--accent-bright); font-size: 11.5px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
+  .flow-blurb { color: var(--ink-soft); font-size: 13.5px; }
+  .ticks-lg li { font-size: 14px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
+  .ticks-lg li:first-child { border-top: 0; padding-top: 0; }
+
+  /* ---------- deliverables ---------- */
+  .deliv-wrap { margin-top: 20px; padding: 24px; }
+  .deliv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 14px; }
+  .deliv-grid h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+  .deliv { list-style: none; display: grid; }
+  .deliv li { display: grid; grid-template-columns: 118px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; }
+  .deliv li:first-child { border-top: 0; padding-top: 0; }
+  .deliv-when { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--accent-bright); padding-top: 3px; }
+  .deliv-what { color: var(--ink-soft); }
+  .deliv-what strong { color: var(--ink); }
+
+  /* ---------- facts ---------- */
+  .facts { margin-top: 20px; padding: 18px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; list-style: none; }
+  .facts li { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
+  .fact-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .fact-icon svg { width: 17px; height: 17px; }
+  .fact-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .fact-value { display: block; font-size: 13.5px; color: var(--ink-soft); margin-top: 2px; }
+
+  /* ---------- application ---------- */
+  .apply { margin-top: 40px; padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 32px; }
+  .apply h2 { margin-top: 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
+  .apply h2 .accent { display: block; color: var(--accent-bright); }
+  .apply .sub { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
+  .apply .ticks { margin-top: 18px; }
+  .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; min-height: 320px; display: flex; flex-direction: column; }
+  .step { border: 0; display: none; }
+  .step.is-on { display: block; }
+  .step-num { display: flex; align-items: center; gap: 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .step-num .opt { color: var(--ink-faint); letter-spacing: .06em; }
+  .step label { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+  .step .help { margin-top: 6px; font-size: 13.5px; color: var(--ink-soft); }
+  .step input, .step select, .step textarea {
+    display: block; width: 100%; margin-top: 14px;
+    font: inherit; font-size: 16px; font-weight: 500; color: var(--ink);
+    background: var(--bg-2); border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px;
+  }
+  .step textarea { min-height: 120px; resize: vertical; }
+  .step input:focus, .step select:focus, .step textarea:focus { outline: none; border-color: var(--accent); }
+  .step input::placeholder, .step textarea::placeholder { color: var(--ink-faint); }
+  .step select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }
+  .step option { background: var(--bg-2); }
+  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
+  .hp { position: absolute; left: -9999px; }
+  .form-controls { margin-top: auto; padding-top: 22px; display: flex; align-items: center; gap: 10px; }
+  .form-controls .hint { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); }
+  kbd { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); }
+  .progress { height: 4px; border-radius: 99px; background: var(--surface); margin-bottom: 20px; overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--accent); width: 10%; transition: width .25s ease; }
+  .done { display: grid; gap: 10px; align-content: center; text-align: left; }
+  .done h3 { font-size: 26px; font-weight: 700; letter-spacing: -.03em; }
+  .done p { color: var(--ink-soft); font-size: 15px; }
+  .done .ok-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(33,201,94,.14); color: var(--ok); margin-bottom: 6px; }
+  .done .ok-mark svg { width: 22px; height: 22px; }
+
+  /* ---------- closer / footer ---------- */
+  .closer { margin-top: 40px; padding: 30px 28px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; position: relative; overflow: hidden; }
+  .closer::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(520px 200px at 12% 50%, var(--accent-t), transparent 70%); }
+  .closer > * { position: relative; }
+  .closer-mark { width: 62px; height: 62px; border-radius: 18px; background: var(--bg); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+  .closer-mark svg { width: 46px; height: 46px; }
+  .closer h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -.03em; }
+  .closer p { margin-top: 6px; color: var(--ink-soft); font-size: 15px; }
+  .foot { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 12.5px; color: var(--ink-faint); }
+  .foot a { color: var(--ink-soft); text-decoration: none; }
+  .foot a:hover { color: var(--ink); }
+  .foot .spacer { flex: 1; }
+
+  @media (max-width: 980px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 28px; }
+    .trio { grid-template-columns: 1fr; }
+    .apply { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .hero-inner { padding: 44px 20px 34px; }
+    .nav-inner { padding: 12px 20px; gap: 8px; }
+    .wrap { padding: 0 20px 80px; }
+    .plain, .money, .deliv-grid, .facts, .pillars { grid-template-columns: 1fr; }
+    .two-parts { grid-template-columns: 1fr; }
+    .closer { grid-template-columns: 1fr; }
+    .closer-mark { display: none; }
+    .lockup .seg--hide { display: none; }
+    .lockup .x--hide { display: none; }
+    .deliv li { grid-template-columns: 1fr; gap: 2px; }
+    .apply { padding: 22px 20px; }
+    .form-panel { padding: 18px; }
+  }
+  @media (max-width: 480px) {
+    .nav .btn span { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn, .progress i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#apply">Skip to the application</a>
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="lockup">
+      <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+          <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+          <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+          <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+          <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+        </svg>
+      </a>
+      <span class="x x--hide" aria-hidden="true">✕</span>
+      <span class="seg seg--hide">college</span>
+      <span class="x" aria-hidden="true">✕</span>
+      <span class="seg">dinfluencer</span>
+    </div>
+    <div class="nav-right">
+      <a class="btn btn--primary btn--sm" href="#apply">Apply <span>to host</span> →</a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div>
+      <p class="eyebrow">Dinner Series · Fall 2026</p>
+      <h1>A table for 12. <span class="accent">We pick up the check.</span></h1>
+      <p class="lede">Gather them. Sit down. Post it. $10,000 to the campus that lands hardest.</p>
+      <p class="sub">fomo travels by word of mouth, and word of mouth happens at dinner — not in a feed. <b>You choose the room and the 11 people at it. We pay for all of it.</b></p>
+      <ul class="pillars">
+        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span><span class="pillar-name">Gather</span><span class="pillar-blurb">You pick the 11 people.</span></li>
+        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span><span class="pillar-name">Sit</span><span class="pillar-blurb">One table, one conversation.</span></li>
+        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></span><span class="pillar-name">Bring</span><span class="pillar-blurb">They bring their people after.</span></li>
+      </ul>
+      <div class="hero-cta">
+        <a class="btn btn--primary" href="#apply">Apply to host →</a>
+        <a class="btn btn--ghost" href="#how">How the night runs</a>
+      </div>
+    </div>
+
+    <aside class="card seats-card" aria-labelledby="seats-title">
+      <!-- the table from above, laid for 12; filled seats match the list below -->
+      <svg class="table-art" viewBox="0 0 260 260" aria-hidden="true">
+        <defs>
+          <radialGradient id="cloth" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#1c1b2e"/><stop offset="1" stop-color="#12111a"/></radialGradient>
+        </defs>
+        <ellipse cx="130" cy="236" rx="92" ry="9" fill="rgba(81,106,246,.10)"/>
+        <circle cx="130" cy="130" r="86" fill="url(#cloth)" stroke="#33343d"/>
+        <circle cx="130" cy="130" r="70" fill="none" stroke="rgba(203,208,235,.08)"/>
+        <g id="seat-on" fill="#516af6"><rect x="118" y="14" width="24" height="10" rx="5" fill="rgba(81,106,246,.55)"/><circle cx="130" cy="58" r="11" fill="#516af6"/><circle cx="130" cy="58" r="4.5" fill="#12111a"/></g>
+        <g id="seat-off"><rect x="118" y="14" width="24" height="10" rx="5" fill="rgba(203,208,235,.14)"/><circle cx="130" cy="58" r="11" fill="#1e1d2b" stroke="#33343d"/><circle cx="130" cy="58" r="4.5" fill="#12111a"/></g>
+        <use href="#seat-on"  transform="rotate(0 130 130)"/>
+        <use href="#seat-on"  transform="rotate(30 130 130)"/>
+        <use href="#seat-on"  transform="rotate(60 130 130)"/>
+        <use href="#seat-on"  transform="rotate(90 130 130)"/>
+        <use href="#seat-on"  transform="rotate(120 130 130)"/>
+        <use href="#seat-on"  transform="rotate(150 130 130)"/>
+        <use href="#seat-off" transform="rotate(180 130 130)"/>
+        <use href="#seat-off" transform="rotate(210 130 130)"/>
+        <use href="#seat-off" transform="rotate(240 130 130)"/>
+        <use href="#seat-off" transform="rotate(270 130 130)"/>
+        <use href="#seat-off" transform="rotate(300 130 130)"/>
+        <use href="#seat-on"  transform="rotate(330 130 130)"/>
+      </svg>
+      <div class="seats-head">
+        <h2 id="seats-title">A table that gets funded</h2>
+        <span class="pill">Sample</span>
+      </div>
+      <ol class="seats">
+        <li><span class="seat-n">1</span><span class="seat-role">Chapter president</span><span class="seat-reach">80 actives</span></li>
+        <li><span class="seat-n">2</span><span class="seat-role">Panhellenic delegate</span><span class="seat-reach">5 chapters</span></li>
+        <li><span class="seat-n">3</span><span class="seat-role">Team captain</span><span class="seat-reach">30 teammates</span></li>
+        <li><span class="seat-n">4</span><span class="seat-role">fomo campus team</span><span class="seat-reach">the campus</span></li>
+        <li><span class="seat-n">5</span><span class="seat-role">Social chair</span><span class="seat-reach">every party</span></li>
+        <li><span class="seat-n">6</span><span class="seat-role">Club founder</span><span class="seat-reach">120 members</span></li>
+        <li class="is-open"><span class="seat-n">7</span><span class="seat-role">Someone you just like</span><span class="seat-reach">—</span></li>
+        <li class="is-open"><span class="seat-n">8</span><span class="seat-role">Someone you just like</span><span class="seat-reach">—</span></li>
+        <li class="is-open"><span class="seat-n">9</span><span class="seat-role">Someone you just like</span><span class="seat-reach">—</span></li>
+        <li class="is-open"><span class="seat-n">10</span><span class="seat-role">Someone you just like</span><span class="seat-reach">—</span></li>
+        <li class="is-open"><span class="seat-n">11</span><span class="seat-role">Someone you just like</span><span class="seat-reach">—</span></li>
+        <li class="is-you"><span class="seat-n">12</span><span class="seat-role">You</span><span class="seat-reach">the host</span></li>
+      </ol>
+      <p class="seats-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span>Illustrative. What decides it is how many seats bring a group with them — not the titles.</span></p>
+    </aside>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ── in plain terms ─────────────────────────────────────────── -->
+  <ul class="plain" aria-label="In plain terms">
+    <li class="card"><i>01</i><span>You host a dinner for 12 people you actually know.<small>Any restaurant, any city we can reach this term.</small></span></li>
+    <li class="card"><i>02</i><span>fomo books it and settles the check — up to $1,200.<small>Nothing out of pocket, no receipts, no reimbursements.</small></span></li>
+    <li class="card"><i>03</i><span>Post the night if you want the prize.<small>Most approved views by the end of Fall 2026 wins $10,000 for the campus.</small></span></li>
+  </ul>
+  <div class="card two-parts">
+    <span class="kicker">Two separate things</span>
+    <p><b>The dinner is covered no matter what.</b> The $10,000 competition is optional — you only enter it by posting and logging the night. Nobody at your table has to download anything for the check to be paid.</p>
+  </div>
+
+  <!-- ── money ─────────────────────────────────────────────────── -->
+  <section class="money" aria-label="What fomo covers and what you can win">
+    <div class="card">
+      <p class="amount num">$1,200<span class="word">Covered.</span></p>
+      <p class="money-lead">You never see a bill.</p>
+      <p class="money-body">fomo books the restaurant and settles the check directly — up to <strong>$1,200 a table</strong>. No reimbursements, no receipts, nothing out of your pocket.</p>
+      <div>
+        <h3>All we ask</h3>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Fill the 12 seats with people you actually know.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Send us a few lines the next day about who came.</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <p class="amount num">$10,000<span class="word">One winner.</span></p>
+      <p class="money-lead">Every campus running a dinner is competing.</p>
+      <p class="money-body">Host your table, post the night, and the views count toward your campus. The campus host with the most approved views at the end of Fall 2026 takes <strong>$10,000</strong>.</p>
+      <div>
+        <h3>To qualify</h3>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Reach <strong>1M approved views</strong> across your posts.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Every post says <strong>fomo paid</strong>. Undisclosed posts are rejected.</span></li>
+        </ul>
+      </div>
+      <p class="note">Claimed views don't count — each post is checked against your insights first, and only the approved number reaches the board. <a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post →</a></p>
+    </div>
+  </section>
+
+  <!-- ── standings ─────────────────────────────────────────────── -->
+  <section class="card standings" aria-labelledby="standings-title">
+    <div class="board-head">
+      <h2 id="standings-title">Campus standings</h2>
+      <span class="pill">Sample</span>
+    </div>
+    <div class="scroll-x">
+      <table>
+        <thead><tr><th>Rank</th><th>Campus</th><th>Host</th><th class="r">Approved views</th><th class="r">Dinners</th><th class="r">Qualified</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank rank-1">1</span></td><td class="campus">University of Alabama</td><td><a href="https://instagram.com/ellieb" target="_blank" rel="noopener">@ellieb</a></td><td class="r views num">2.4M</td><td class="r num">3</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+          <tr><td><span class="rank rank-2">2</span></td><td class="campus">University of Georgia</td><td><a href="https://instagram.com/maddie.r" target="_blank" rel="noopener">@maddie.r</a></td><td class="r views num">1.8M</td><td class="r num">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+          <tr><td><span class="rank rank-3">3</span></td><td class="campus">Syracuse University</td><td><a href="https://instagram.com/gracewrites" target="_blank" rel="noopener">@gracewrites</a></td><td class="r views num">1.1M</td><td class="r num">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+          <tr><td><span class="rank">4</span></td><td class="campus">Texas A&amp;M University</td><td><a href="https://instagram.com/sloane.k" target="_blank" rel="noopener">@sloane.k</a></td><td class="r views num">840K</td><td class="r num">2</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+          <tr><td><span class="rank">5</span></td><td class="campus">Indiana University</td><td><a href="https://instagram.com/jules" target="_blank" rel="noopener">@jules</a></td><td class="r views num">610K</td><td class="r num">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+          <tr><td><span class="rank">6</span></td><td class="campus">University of Miami</td><td><a href="https://instagram.com/nataliaa" target="_blank" rel="noopener">@nataliaa</a></td><td class="r views num">470K</td><td class="r num">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="seats-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span>Illustrative until the first dinners run. Official rules will be linked here before the board goes live.</span></p>
+  </section>
+
+  <!-- ── trio ──────────────────────────────────────────────────── -->
+  <section id="how" class="trio">
+    <div class="card">
+      <p class="kicker">How the night runs</p>
+      <ol class="flow">
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span><span class="flow-name"><i>01</i>Before</span><span class="flow-blurb">You name the room and the people. We book it and cover it.</span></li>
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span><span class="flow-name"><i>02</i>At the table</span><span class="flow-blurb">No deck, no pitch. Someone from fomo comes as a guest.</span></li>
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-7-3.5L5 21z"/></svg></span><span class="flow-name"><i>03</i>After</span><span class="flow-blurb">You tell us who came and what landed. Good tables get asked back.</span></li>
+      </ol>
+      <p class="note">That's the entire run of show. There is no hidden second half where somebody stands up and presents something.</p>
+    </div>
+    <div class="card">
+      <p class="kicker">What we look for</p>
+      <ol class="flow">
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span><span class="flow-name">Seats that carry a room</span><span class="flow-blurb">Half your table should be people who bring others — a chapter officer, a captain, whoever runs the group chat.</span></li>
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span><span class="flow-name">A list you can write today</span><span class="flow-blurb">If you can name all 11 right now, the table is real. If not, it's a plan.</span></li>
+        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></span><span class="flow-name">A host people say yes to</span><span class="flow-blurb">Not follower count. Whether the things you organise actually fill up.</span></li>
+      </ol>
+    </div>
+    <div class="card">
+      <p class="kicker">What this is not</p>
+      <ul class="ticks ticks-lg">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a launch party.</strong> 12 people, one table, one conversation.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a focus group.</strong> Nobody is going to make your friends rate an app.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a script.</strong> Post what you actually thought of the night — that's what travels.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a sales dinner.</strong> No deck, and nobody from fomo at the head of the table.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── deliverables ──────────────────────────────────────────── -->
+  <section class="card deliv-wrap" aria-labelledby="deliv-title">
+    <p class="kicker" id="deliv-title">Deliverables</p>
+    <div class="deliv-grid">
+      <div>
+        <h3>What you deliver</h3>
+        <ol class="deliv">
+          <li><span class="deliv-when">7 days before</span><span class="deliv-what"><strong>The list.</strong> 11 names, confirmed. We book the table to that number, so it has to be real.</span></li>
+          <li><span class="deliv-when">48 hours before</span><span class="deliv-what"><strong>Any changes.</strong> Drop-outs happen and are fine. A table booked for 12 that seats 6 is not.</span></li>
+          <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>A full table.</strong> At least 10 of the 12 seats filled, and everyone 18 or over.</span></li>
+          <li><span class="deliv-when">Within 48 hours</span><span class="deliv-what"><strong>The recap.</strong> A few lines: who came, what landed, what didn't. Not a report — an honest paragraph.</span></li>
+          <li><span class="deliv-when">To compete</span><span class="deliv-what"><strong>Post it, and log it.</strong> Only if you want the prize — the dinner is covered either way. Post the night however you normally would, then submit the link so the views count toward your campus. Every post has to say fomo paid — that one's a rule, not a preference.</span></li>
+        </ol>
+      </div>
+      <div>
+        <h3>What fomo delivers</h3>
+        <ol class="deliv">
+          <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>The booking.</strong> We find and reserve the restaurant, or take yours if you already have one.</span></li>
+          <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>Something to forward.</strong> A confirmation you can send your table, so the invite comes from you and looks real.</span></li>
+          <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>The check, settled directly.</strong> Up to $1,200. You never pay, never front it, never file an expense.</span></li>
+          <li><span class="deliv-when">After</span><span class="deliv-what"><strong>Your link, and the credit.</strong> Every signup through it is attributed to you, and we tell you the number.</span></li>
+        </ol>
+        <p class="note">Miss a deliverable and nothing happens to you — we just probably won't book the next one. There's no clawback and nothing to sign.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── facts ─────────────────────────────────────────────────── -->
+  <ul class="card facts" aria-label="Key facts">
+    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span><span class="fact-label">Fall 2026</span><span class="fact-value">20 dinners, booked as hosts are approved.</span></span></li>
+    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg></span><span><span class="fact-label">fomo pays</span><span class="fact-value">Venue, food, tip. You never front money or file an expense.</span></span></li>
+    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg></span><span><span class="fact-label">You hear back</span><span class="fact-value">Within 5 days — including if the answer is no.</span></span></li>
+  </ul>
+
+  <!-- ── application ───────────────────────────────────────────── -->
+  <section id="apply" class="card apply" aria-labelledby="apply-title">
+    <div>
+      <p class="eyebrow">Apply · Fall 2026</p>
+      <h2 id="apply-title">Host <span class="accent">a table.</span></h2>
+      <p class="sub">Ten questions, about two minutes. The last two decide it, so spend your time there.</p>
+      <ul class="ticks">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>You hear back within 5 days, either way.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Applying costs nothing and commits you to nothing.</span></li>
+      </ul>
+      <p class="note">Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
+    </div>
+
+    <div class="form-panel">
+      <form id="apply-form" novalidate>
+        <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+        <p class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
+
+        <fieldset class="step" data-step="0"><legend class="step-num"><span data-num>01 / 10</span></legend><label for="first_name">First name</label><input id="first_name" name="first_name" type="text" autocomplete="given-name" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="1"><legend class="step-num"><span data-num>02 / 10</span></legend><label for="last_name">Last name</label><input id="last_name" name="last_name" type="text" autocomplete="family-name" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="2"><legend class="step-num"><span data-num>03 / 10</span></legend><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 10</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 10</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">We look at who actually comes to your things. This is how.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 10</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" autocomplete="organization" placeholder="e.g. NYU, Penn State, University of Alabama" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 10</span></legend><label for="city">Which city would you host in?</label><input id="city" name="city" type="text" autocomplete="address-level2" required><p class="help">Where the dinner would actually happen, if that's not your campus.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 10</span></legend><label for="host_type">How do you know the people you'd invite?</label>
+          <select id="host_type" name="host_type" required>
+            <option value="" disabled selected>Choose one…</option>
+            <option>I go to the school</option><option>I run a chapter</option><option>I'm on the fomo campus team</option><option>I make things people watch</option><option>None of these</option>
+          </select><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="8"><legend class="step-num"><span data-num>09 / 10</span></legend><label for="guests">Who would be at your table of 12?</label><textarea id="guests" name="guests" rows="4" required></textarea><p class="help">Names, or the kind of people. This is the part we actually read.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="9"><legend class="step-num"><span data-num>10 / 10</span></legend><label for="why">Why this table, and why now?</label><textarea id="why" name="why" rows="4" required></textarea><p class="help">Two or three sentences. Specific beats polished.</p><p class="field-error" data-error hidden></p></fieldset>
+
+        <div class="form-controls">
+          <button type="button" class="btn btn--ghost" id="apply-back" hidden>← Back</button>
+          <button type="button" class="btn btn--primary" id="apply-next">Next →</button>
+          <button type="submit" class="btn btn--primary" id="apply-submit" hidden>Submit application</button>
+          <span class="hint" id="apply-hint"><kbd>Enter</kbd> to continue</span>
+        </div>
+        <p class="field-error" id="form-error" hidden></p>
+      </form>
+
+      <div class="done" id="apply-done" hidden>
+        <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+        <h3>That's in.</h3>
+        <p>We read every one of these. You'll hear back within 5 days, including if the answer is not this term. Check your email — and your spam folder, just in case.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── closer ────────────────────────────────────────────────── -->
+  <section class="card closer">
+    <span class="closer-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M36.9747 24.3586C44.1067 24.3587 49.7941 27.9515 52.9484 33.5959C48.7626 38.0418 45.6617 43.7612 44.4679 50.0002C43.2743 56.2391 44.1865 61.9572 46.67 66.4026C41.3555 72.0468 34.2931 75.6408 27.1613 75.6409C18.432 75.6407 11.8659 70.2588 9.46204 62.3196H26.8478C27.4159 62.3193 28.0059 61.8593 28.1691 61.2932L34.6486 38.7043C34.8098 38.1381 34.4815 37.6782 33.9152 37.678H14.1788C19.6213 29.7404 28.2465 24.3588 36.9747 24.3586Z" fill="#EAEDFF"/><path d="M72.3285 24.3586C85.0779 24.3586 93.2156 35.8374 90.5062 49.9993C87.7966 64.1596 75.2646 75.6409 62.515 75.6409C53.7856 75.6408 47.2196 70.2589 44.8158 62.3196H64.1537C64.7218 62.3194 65.3127 61.8594 65.476 61.2932L71.9545 38.7043C72.1157 38.138 71.7876 37.678 71.2211 37.678H49.5316C54.9741 29.7401 63.5999 24.3587 72.3285 24.3586Z" fill="#EAEDFF"/></svg>
+    </span>
+    <div>
+      <h2>Already know the table you'd build?</h2>
+      <p>Then you're most of the way through the application.</p>
+    </div>
+    <a class="btn btn--primary" href="#apply">Apply to host →</a>
+  </section>
+
+  <footer class="foot">
+    <span>fomo · Dinner Series</span>
+    <a href="https://fomo.family" target="_blank" rel="noopener">fomo.family</a>
+    <span class="spacer"></span>
+    <span>Trading involves risk, including loss of principal.</span>
+  </footer>
+</main>
+
+<script>
+(function () {
+  // ---------- stepped application, saved to the same Firebase project the crew
+  // sheet and build form use, under dinners/<key>. Rules: write-only from the web.
+  var firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+  var db = null;
+  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+
+  var form = document.getElementById('apply-form');
+  var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var back = document.getElementById('apply-back');
+  var next = document.getElementById('apply-next');
+  var submit = document.getElementById('apply-submit');
+  var hint = document.getElementById('apply-hint');
+  var bar = document.getElementById('progress-bar');
+  var formError = document.getElementById('form-error');
+  var done = document.getElementById('apply-done');
+  var i = 0;
+
+  function field(step) { return step.querySelector('input, select, textarea'); }
+  function errorEl(step) { return step.querySelector('[data-error]'); }
+
+  // Native email validity accepts "arya@gmail" — hold contact fields to something reachable.
+  var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
+  var TYPOS = { 'gmail.con':'gmail.com','gmail.co':'gmail.com','gmai.com':'gmail.com','gmial.com':'gmail.com','gmaill.com':'gmail.com','gnail.com':'gmail.com','yahoo.con':'yahoo.com','yaho.com':'yahoo.com','hotmail.con':'hotmail.com','hotmial.com':'hotmail.com','outlook.con':'outlook.com','icloud.con':'icloud.com' };
+  function emailError(v) {
+    v = v.trim();
+    if (!EMAIL.test(v)) return 'That is not a complete email address — it should look like you@school.edu.';
+    var d = v.split('@').pop().toLowerCase();
+    if (TYPOS[d]) return 'Did you mean @' + TYPOS[d] + '?';
+    return null;
+  }
+  function digits(v) { return String(v).replace(/[^0-9]/g, ''); }
+  function phoneError(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length === 11) d = d.slice(1);
+    if (d.length !== 10) return 'A US mobile number is 10 digits — like 212-555-0199.';
+    if (!/^[2-9][0-9]{2}[2-9][0-9]{6}$/.test(d)) return 'That is not a real US number — check the digits.';
+    return null;
+  }
+  function formatPhone(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length > 10) d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length > 6) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
+    return d;
+  }
+  // "@name", "name" and a pasted profile link all land on one value.
+  function normalizeInstagram(v) {
+    var h = String(v).trim();
+    if (!h) return null;
+    var url = h.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)*instagram\.com\/([^/?#]+)/i);
+    if (url) h = url[1]; else if (/instagram\.com/i.test(h)) return null;
+    h = h.replace(/^@+/, '').replace(/\/+$/, '');
+    if (!/^[a-z0-9._]{1,30}$/i.test(h) || h.charAt(0) === '.' || h.charAt(h.length - 1) === '.' || h.indexOf('..') > -1) return null;
+    return h.toLowerCase();
+  }
+
+  function validate(step) {
+    var el = field(step), v = el.value.trim(), msg = null;
+    if (!v) msg = el.tagName === 'SELECT' ? 'Pick one to continue.' : 'This one is required.';
+    else if (el.id === 'email') msg = emailError(v);
+    else if (el.id === 'phone') msg = phoneError(v);
+    else if (el.id === 'instagram' && !normalizeInstagram(v)) msg = 'That does not look like an Instagram handle — try @yourhandle.';
+    else if ((el.id === 'guests' || el.id === 'why') && v.length < 20) msg = 'Give us a little more than that — a sentence or two.';
+    var err = errorEl(step);
+    err.textContent = msg || '';
+    err.hidden = !msg;
+    el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    return !msg;
+  }
+
+  function show(n) {
+    i = Math.max(0, Math.min(steps.length - 1, n));
+    steps.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+    back.hidden = i === 0;
+    var last = i === steps.length - 1;
+    next.hidden = last;
+    submit.hidden = !last;
+    hint.textContent = '';
+    hint.innerHTML = last ? '' : '<kbd>Enter</kbd> to continue';
+    bar.style.width = ((i + 1) / steps.length * 100) + '%';
+    var el = field(steps[i]);
+    setTimeout(function () { el.focus(); }, 0);
+  }
+
+  next.addEventListener('click', function () { if (validate(steps[i])) show(i + 1); });
+  back.addEventListener('click', function () { show(i - 1); });
+
+  form.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    var el = e.target;
+    if (el.tagName === 'TEXTAREA') return;               // newline in textareas
+    e.preventDefault();
+    if (i < steps.length - 1) { if (validate(steps[i])) show(i + 1); }
+    else form.requestSubmit ? form.requestSubmit() : submit.click();
+  });
+
+  document.getElementById('phone').addEventListener('input', function () {
+    var el = this, caret = el.selectionStart == null ? el.value.length : el.selectionStart;
+    var typed = digits(el.value.slice(0, caret)).length;
+    var f = formatPhone(el.value);
+    if (f === el.value) return;
+    el.value = f;
+    var pos = 0;
+    if (typed > 0) { pos = f.length; for (var k = 0, seen = 0; k < f.length; k++) { if (f.charAt(k) >= '0' && f.charAt(k) <= '9') seen++; if (seen === typed) { pos = k + 1; break; } } }
+    try { el.setSelectionRange(pos, pos); } catch (err) {}
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    formError.hidden = true;
+    for (var k = 0; k < steps.length; k++) { if (!validate(steps[k])) { show(k); return; } }
+    if (form._gotcha && form._gotcha.value) { finish(); return; }   // bot: pretend
+    var data = {};
+    steps.forEach(function (s) { var el = field(s); data[el.name] = el.value.trim(); });
+    data.instagram = normalizeInstagram(data.instagram) || data.instagram;
+    data.phone = formatPhone(data.phone);
+    data.submitted_at = new Date().toISOString();
+    data.page = location.pathname;
+    data.ua = (navigator.userAgent || '').slice(0, 160);
+
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+    if (!db) { fail('We could not reach the server. Email hello@fomo.family with your answers and we will take it from there.'); return; }
+    var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    db.ref('dinners/' + key).set(data).then(finish).catch(function () {
+      fail('That did not send. Check your connection and try again — nothing was lost.');
+    });
+  });
+
+  function fail(msg) {
+    submit.disabled = false;
+    submit.textContent = 'Submit application';
+    formError.textContent = msg;
+    formError.hidden = false;
+  }
+  function finish() {
+    form.hidden = true;
+    done.hidden = false;
+    done.setAttribute('tabindex', '-1');
+    done.focus();
+  }
+
+  show(0);
+})();
+</script>
+</body>
+</html>
