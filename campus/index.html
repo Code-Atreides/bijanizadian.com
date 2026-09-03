@@ -157,8 +157,14 @@
   .pill { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; background: var(--accent-t); color: var(--accent-bright); }
 
   /* ---------- greek wars: the program cards ---------- */
-  .routes { margin-top: 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
-  .route { position: relative; padding: 24px 24px 26px; display: flex; flex-direction: column; gap: 14px; text-decoration: none; overflow: hidden; transition: border-color .15s ease, transform .15s ease; }
+  /* the Greek Wars onboard card is the first thing under the section head, so
+     the "Go to Greek Wars" jump lands on it rather than on the other portals */
+  .gw-onboard { margin-top: 36px; }
+  .routes-label { margin-top: 34px; display: block; }
+  .routes { margin-top: 14px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+  /* the anchor is the card, so it has to fill its grid cell or the row's bottoms stagger */
+  .routes li { display: flex; }
+  .route { position: relative; width: 100%; padding: 24px 24px 26px; display: flex; flex-direction: column; gap: 14px; text-decoration: none; overflow: hidden; transition: border-color .15s ease, transform .15s ease; }
   .route::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(420px 180px at 0% 0%, var(--accent-t), transparent 70%); opacity: 0; transition: opacity .15s ease; }
   .route:hover { border-color: var(--accent-bright); transform: translateY(-2px); }
   .route:hover::before { opacity: 1; }
@@ -170,12 +176,13 @@
   .route p { color: var(--ink-soft); font-size: 14.5px; flex: 1; }
   .route .go { font-weight: 700; font-size: 14px; color: var(--accent-bright); }
   .route.is-external .go::after { content: " ↗"; }
-  .routes-wide { grid-column: span 3; }
   .route--wide { flex-direction: row; align-items: center; gap: 22px; }
   .route--wide .route-icon { flex: none; }
   .route--wide div { flex: 1; }
   .route--wide h3 { font-size: 19px; }
   .route--wide p { margin-top: 3px; }
+  .route--wide .route-meta { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .route--wide .btn { flex: none; }
 
   /* the season: four steps in a strip */
   .season { margin-top: 16px; padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
@@ -275,14 +282,12 @@
   /* ---------- responsive ---------- */
   @media (max-width: 960px) {
     .routes, .lit, .reading { grid-template-columns: 1fr 1fr; }
-    .routes-wide { grid-column: span 2; }
     .season { grid-template-columns: 1fr 1fr; }
     .foot-inner { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 720px) {
     :root { --gap-section: 72px; }
     .routes, .lit, .reading, .apply, .season { grid-template-columns: 1fr; }
-    .routes-wide { grid-column: span 1; }
     .route--wide { flex-direction: column; align-items: flex-start; }
     .nav .btn span { display: none; }
     .brand span { display: none; }
@@ -361,10 +366,25 @@
   <!-- ── greek wars ─────────────────────────────────────────────── -->
   <section id="greekwars" class="section" aria-labelledby="gw-title">
     <div class="section-head">
-      <p class="eyebrow">Greek Wars · Fall 2026</p>
-      <h2 id="gw-title">one campus.<br>one <span class="accent">scoreboard.</span></h2>
-      <p>Every chapter, team, and club on a campus trades under the same flag. Game days move the line. Dinners fill the room. <b>The campus that finishes furthest ahead wins the fall.</b> Pick where you want to start.</p>
+      <p class="eyebrow">Greek Wars · Fall 2026 · Aug 24 – Dec 11</p>
+      <h2 id="gw-title">your chapter vs.<br>every <span class="accent">chapter.</span></h2>
+      <p>Every chapter is a clan. Trade all semester, ranked on raw PnL, against every other chapter at your school and every chapter in the country. <b>Every qualifying chapter crowns a champion.</b></p>
     </div>
+
+    <a class="card route route--wide is-external gw-onboard" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">
+      <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8v3c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V8z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <div>
+        <h3>Onboard your chapter for Greek Wars</h3>
+        <p>Nothing counts until your chapter is registered. Get <b>80% of your actives</b> on fomo and your chapter qualifies — then its top trader is guaranteed $500.</p>
+        <span class="route-meta">
+          <span class="pill">$500 guaranteed</span>
+          <span class="pill">$10,000 national</span>
+        </span>
+      </div>
+      <span class="go">Onboard</span>
+    </a>
+
+    <p class="kicker routes-label">The rest of the programme</p>
 
     <ul class="routes">
       <li>
@@ -400,23 +420,13 @@
           <span class="go">Open the crew sheet →</span>
         </a>
       </li>
-      <li class="routes-wide">
-        <a class="card route route--wide is-external" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">
-          <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6M9 14l2 2 4-4"/></svg></span>
-          <div>
-            <h3>Onboard your chapter</h3>
-            <p>Nothing counts until your chapter is on the board. Register it once, and every game day and dinner from then on scores for your campus.</p>
-          </div>
-          <span class="go">Onboard</span>
-        </a>
-      </li>
     </ul>
 
-    <ol class="card season" aria-label="How the season runs">
-      <li><i>01</i><b>Onboard</b><small>Your chapter registers. That is the whole entry fee.</small></li>
-      <li><i>02</i><b>Trade on game days</b><small>Every realised gain or loss moves your school's line while the game is on.</small></li>
-      <li><i>03</i><b>Fill the tables</b><small>Host dinners, post the night, and the approved views count for your campus.</small></li>
-      <li><i>04</i><b>Win the fall</b><small>One campus ends the season on top of the standings.</small></li>
+    <ol class="card season" aria-label="How Greek Wars works">
+      <li><i>01</i><b>Rally your clan</b><small>Your chapter is your clan. Get everyone on fomo — 80% of actives qualifies you.</small></li>
+      <li><i>02</i><b>Trade together</b><small>Every trade counts. Ranked on raw PnL, not points, not volume, not activity.</small></li>
+      <li><i>03</i><b>Climb the board</b><small>Your school's board and the national one, at the same time.</small></li>
+      <li><i>04</i><b>Win the war</b><small>Your chapter's top trader takes $500. The top chapter in the country takes $10,000.</small></li>
     </ol>
   </section>
 
