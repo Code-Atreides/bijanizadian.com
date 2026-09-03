@@ -9,7 +9,8 @@
       "**/.*",
       "**/node_modules/**",
       "bijanizadian.com.txt",
-      "brand/**"
+      "brand/**",
+      "fomo-handoff/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false
