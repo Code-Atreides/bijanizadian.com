@@ -307,15 +307,27 @@
     :root { --gap-section: 72px; --gap-head: 32px; --gap-group: 36px; }
     .routes, .lit, .reading, .apply, .season, .prizes { grid-template-columns: 1fr; }
     .route--wide { flex-direction: column; align-items: flex-start; }
-    .nav .btn span { display: none; }
-    .brand span { display: none; }
+    /* the two section chips drop out whole rather than losing their second word,
+       which left them reading "Greek" and "Campus"; Apply carries the nav alone
+       and the brand keeps saying what page this is */
+    .nav-right .btn--ghost { display: none; }
     .hero-cta .btn--lg { width: 100%; }
     .hero-art { margin-top: -10px; }
     .foot-inner { grid-template-columns: 1fr; }
+    /* thumb-sized targets: these links are 16-20px tall on a phone otherwise */
+    .hero-foot { gap: 2px 20px; }
+    .hero-foot a { padding: 8px 0; }
+    .foot ul { gap: 2px; }
+    .foot ul a { display: inline-block; padding: 8px 0; }
   }
   @media (max-width: 480px) {
-    .nav-right .btn--ghost { display: none; }
     .apply { padding: 22px 18px 26px; }
+  }
+  /* below ~350px the lockup's clamp floors are wider than the screen, so the
+     title spills into (and past) the gutters — step it down once more */
+  @media (max-width: 350px) {
+    .hero-title svg { height: 38px; }
+    .hero-title .slash { font-size: 34px; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
