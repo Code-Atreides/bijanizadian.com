@@ -58,25 +58,63 @@ Six `.mov` files, ~49 MB total. Not deployed. Largest is
 
 ## Palette
 
-Taken from fomo.family's stylesheet:
+The official kit. These values supersede anything sampled from fomo.family's
+stylesheet.
 
-| Token          | Value     | Use                                  |
-| -------------- | --------- | ------------------------------------ |
-| bg primary     | `#060510` | page ground                          |
-| bg secondary   | `#12111a` | cards                                |
-| bg tertiary    | `#161522` | raised surfaces / inputs             |
-| text primary   | `#f7f7f7` | headings, body                       |
-| text secondary | `#9899a3` | supporting copy                      |
-| text tertiary  | `#474b52` | borders, placeholders                |
-| accent         | `#516af6` | CTAs, focus rings, links             |
-| accent deep    | `#221d4b` | deep indigo fills                    |
-| mark fill      | `#EAEDFF` | the eyes mark                        |
-| green          | `#21c95e` | success                              |
-| yellow         | `#ffbf17` | warning                              |
-| red            | `#ff622e` | critical                             |
+| Name                  | Hex                   | Use                                          |
+| --------------------- | --------------------- | -------------------------------------------- |
+| fomo blue             | `#516AF6`             | default brand background and primary accent  |
+| electric blue         | `#4A36FF`             | small, high-energy accent or gradient depth  |
+| light blue            | `#ACB8F9`             | soft glow or highlight only                  |
+| fomo ink              | `#0B091F`             | dark title cards, high-contrast compositions |
+| white / pale lavender | `#FFFFFF` / `#EAEDFF` | type and light backgrounds                   |
 
-Typeface is **Aeonik** (Regular 400 / Medium 500 / Bold 700). It is not on Google
-Fonts; **Schibsted Grotesk** is the stand-in used on the web pages here.
+**Pairings.** On `#516AF6` or `#0B091F`, type and logo are white or `#EAEDFF`.
+On `#EAEDFF` or white, they are `#516AF6` or `#0B091F`.
+
+The dark UI the web pages are built on uses a supporting set alongside those:
+ground `#060510`, cards `#12111a`, raised surfaces `#161522`, text `#f7f7f7` /
+`#9899a3`, borders `#33343d`, and semantic green `#21c95e`, yellow `#ffbf17`,
+red `#ff622e`. The eyes mark is filled `#EAEDFF`.
+
+## Gradients
+
+The signature treatment is a soft blue spotlight over a solid field. It should
+feel atmospheric, never shiny or multicoloured.
+
+- **Brand** — title cards, covers, launch graphics, social backgrounds. Base
+  `#516AF6`, with a large diffuse `#ACB8F9` glow in the upper third faded to
+  transparent. Type white or `#EAEDFF`. This is what the `/campus` application
+  card uses.
+- **Technical & premium** — dark title cards, product reveals. Base `#0B091F`,
+  with a large diffuse `#221D4B` halo top-centre faded to transparent. Type
+  white or `#EAEDFF`. This is what the `/campus` closer uses.
+
+## Usage rules
+
+- Start with one dominant background: fomo blue, fomo ink, pale lavender, or white.
+- Use one strong focal point: product UI, a wordmark, or the headline.
+- Electric blue is an accent only, never a second competing background. On
+  `/campus` it appears exactly once, as the slash in "fomo/campus".
+- Avoid rainbow gradients, neon green/orange/yellow, metallic effects, and
+  generic crypto gloss.
+- For logos, use the approved white or blue marks with clear contrast. Do not
+  recolour the eyes or use the full-colour eyes in a lockup.
+
+## Typography
+
+**Aeonik** (Regular 400 / Medium 500 / Bold 700) is fomo's exclusive typeface,
+for product UI, motion graphics, videos, and wordmarks. Keep on-screen copy
+legible and avoid overly tight line spacing. It is not on Google Fonts;
+**Schibsted Grotesk** is the stand-in used on the web pages here.
+
+## Product & UI showcases
+
+App screens change constantly, so always cross-reference the live version of the
+fomo app. Price data must be real — old data and old charts are fine, invented
+data never is. Focus each frame on one feature, using depth, cropping, zoom, and
+device framing to direct attention. Never expose user information or private
+balances: use the demo app, or blur that part of the UI.
 
 ## House rule
 

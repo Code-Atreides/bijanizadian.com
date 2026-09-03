@@ -40,8 +40,11 @@
     --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
     --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
     --line: #33343d; --line-soft: rgba(203,208,235,.12);
-    --accent: #516af6; --accent-bright: #8ea0ff; --accent-deep: #221d4b; --accent-t: rgba(81,106,246,.16);
-    --mark: #CBD0EB;
+    /* brand-kit palette: fomo blue, electric blue (small accents only, never a second
+       background), light blue (glow / highlight), fomo ink (dark title cards),
+       pale lavender (type on blue or ink) */
+    --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
+    --ink-deep: #0B091F; --lavender: #EAEDFF; --mark: #CBD0EB;
     --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
     --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
     --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
@@ -99,13 +102,13 @@
   .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 70vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
   .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
   .hero-inner { position: relative; z-index: 2; text-align: center; padding: clamp(120px, 18vh, 168px) 24px 0; display: flex; flex-direction: column; align-items: center; }
-  .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--mark); }
+  .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
   /* the wordmark is ~3.1× as wide as it is tall and "/campus" ~3.9×, so ~7× height
      has to fit inside the viewport minus the 24px gutters */
   .hero-title svg { height: clamp(44px, 9.6vw, 140px); width: auto; display: block; }
   .hero-title .slash { font-size: clamp(40px, 8.7vw, 126px); font-weight: 700; letter-spacing: -.045em; }
-  .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--accent-bright); margin: 0 .04em 0 .02em; }
-  .hero h1 { margin-top: 26px; font-size: clamp(28px, 4.6vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.1; }
+  .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
+  .hero h1 { margin-top: 26px; font-size: clamp(28px, 4.6vw, 44px); font-weight: 700; letter-spacing: -.032em; line-height: 1.18; }
   .hero .lede { margin-top: 12px; max-width: 58ch; color: var(--ink-soft); font-size: clamp(15px, 1.7vw, 19px); }
   .hero-cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
   .hero-art { position: relative; z-index: 2; margin-top: -38px; width: min(560px, 82vw); height: auto; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
@@ -119,8 +122,8 @@
   .section { padding-top: var(--gap-section); }
   .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
   .section-head { max-width: 760px; }
-  .section-head h2 { margin-top: 12px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
-  .section-head h2 .accent { background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .section-head h2 { margin-top: 12px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.038em; line-height: 1.12; }
+  .section-head h2 .accent { background: linear-gradient(92deg, var(--accent-bright), var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .section-head p { margin-top: 16px; color: var(--ink-soft); font-size: 17px; max-width: 58ch; }
   .section-head p b { color: var(--ink); font-weight: 600; }
   .centered { text-align: center; margin-left: auto; margin-right: auto; }
@@ -167,7 +170,7 @@
   .lit small { display: block; margin-top: 8px; font-size: 14px; font-weight: 400; color: var(--ink-soft); letter-spacing: 0; }
 
   /* the longer reading, two columns of prose */
-  .reading { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .reading { margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   .reading .card { padding: 26px 26px 28px; }
   .reading h3 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
   .reading p { color: var(--ink-soft); font-size: 15px; }
@@ -179,44 +182,57 @@
   .ticks b { color: var(--ink); font-weight: 600; }
 
   /* ---------- apply ---------- */
-  .apply { margin-top: 16px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; padding: 30px 30px 34px; position: relative; overflow: hidden; }
-  .apply::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(640px 320px at 0% 0%, var(--accent-t), transparent 65%); }
+  /* Brand-kit "Brand" gradient: a solid fomo-blue field with one large, diffuse light-blue
+     spotlight in the upper third faded to transparent. Type on it is white or pale lavender. */
+  .apply { margin-top: 16px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; padding: 30px 30px 34px; position: relative; overflow: hidden; background: var(--accent); border-color: rgba(234,237,255,.2); color: #fff; }
+  .apply::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(780px 400px at 50% -14%, rgba(172,184,249,.6), transparent 68%); }
   .apply > * { position: relative; }
-  .apply h2 { margin-top: 12px; font-size: clamp(28px, 3.6vw, 40px); font-weight: 700; letter-spacing: -.035em; line-height: 1.05; }
-  .apply h2 .accent { background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .apply .lede { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
+  .apply .eyebrow { color: var(--lavender); }
+  .apply h2 { margin-top: 12px; font-size: clamp(28px, 3.6vw, 40px); font-weight: 700; letter-spacing: -.032em; line-height: 1.14; }
+  .apply h2 .accent { color: var(--lavender); }
+  .apply .lede { margin-top: 14px; color: rgba(234,237,255,.85); font-size: 15.5px; }
   .apply .lede + .lede { margin-top: 10px; }
-  .apply .lede b { color: var(--ink); font-weight: 600; }
-  .progress { height: 3px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-bottom: 22px; }
-  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s ease; }
+  .apply .lede b { color: #fff; font-weight: 600; }
+  .apply .lede a { color: #fff; }
+  .apply .btn--primary { background: var(--ink-deep); color: #fff; box-shadow: 0 14px 34px -16px rgba(11,9,31,.9); }
+  .apply .btn--ghost { background: rgba(11,9,31,.2); color: #fff; border-color: rgba(234,237,255,.36); }
+  .apply .btn--ghost:hover { border-color: #fff; background: rgba(11,9,31,.32); }
+  .apply .btn:focus-visible, .apply input:focus-visible, .apply select:focus-visible, .apply textarea:focus-visible { outline-color: #fff; }
+  .progress { height: 3px; border-radius: 99px; background: rgba(11,9,31,.3); overflow: hidden; margin-bottom: 22px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--lavender); transition: width .2s ease; }
   .step { border: 0; display: none; }
   .step.is-on { display: block; }
-  .step-num { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--accent-bright); margin-bottom: 10px; }
+  .step-num { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--lavender); margin-bottom: 10px; }
   label { display: block; font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
   input, select, textarea {
-    width: 100%; font: inherit; font-size: 16px; color: var(--ink);
-    background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    width: 100%; font: inherit; font-size: 16px; color: #fff;
+    background: rgba(11,9,31,.34); border: 1px solid rgba(234,237,255,.3); border-radius: var(--radius-sm);
     padding: 12px 14px; outline: none; transition: border-color .12s ease, box-shadow .12s ease;
   }
+  input::placeholder, textarea::placeholder { color: rgba(234,237,255,.55); }
+  select option { color: var(--ink); background: var(--bg-2); }
   textarea { resize: vertical; min-height: 110px; }
-  select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239899a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
-  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-t); }
-  input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--crit); }
-  .help { margin-top: 8px; font-size: 13.5px; color: var(--ink-soft); }
-  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
+  select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23EAEDFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
+  input:focus, select:focus, textarea:focus { border-color: #fff; box-shadow: 0 0 0 3px rgba(234,237,255,.3); }
+  input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--warn); }
+  .help { margin-top: 8px; font-size: 13.5px; color: rgba(234,237,255,.8); }
+  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--warn); font-weight: 600; }
   .form-nav { margin-top: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .form-nav .hint { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
-  kbd { font: inherit; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: var(--surface-2); color: var(--ink-soft); }
+  .form-nav .hint { margin-left: auto; font-size: 13px; color: rgba(234,237,255,.68); }
+  kbd { font: inherit; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: rgba(11,9,31,.32); color: #fff; }
   .done { padding: 8px 0; }
   .done h3 { font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
-  .done p { margin-top: 10px; color: var(--ink-soft); font-size: 15.5px; }
+  .done p { margin-top: 10px; color: rgba(234,237,255,.85); font-size: 15.5px; }
   .done .btn { margin-top: 18px; }
 
   /* ---------- closer ---------- */
-  .closer { margin-top: var(--gap-section); text-align: center; padding: 0 24px; }
+  /* Brand-kit "Technical & premium" halo: deep indigo, large and diffuse, top-centre. */
+  .closer { position: relative; margin-top: var(--gap-section); text-align: center; padding: 60px 24px 0; }
+  .closer::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(760px 380px at 50% 0%, var(--accent-deep), transparent 72%); }
+  .closer > * { position: relative; z-index: 1; }
   .closer-mark { width: 74px; height: 74px; margin: 0 auto; border-radius: 22px; background: var(--bg-2); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
   .closer-mark svg { width: 54px; height: 54px; }
-  .closer h2 { margin-top: 22px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+  .closer h2 { margin-top: 22px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.038em; line-height: 1.12; }
   .closer p { margin-top: 14px; color: var(--ink-soft); font-size: 17px; }
   .closer .hero-cta { margin-top: 26px; }
 
@@ -234,7 +250,7 @@
 
   /* ---------- responsive ---------- */
   @media (max-width: 960px) {
-    .routes, .lit { grid-template-columns: 1fr 1fr; }
+    .routes, .lit, .reading { grid-template-columns: 1fr 1fr; }
     .routes-wide { grid-column: span 2; }
     .season { grid-template-columns: 1fr 1fr; }
     .foot-inner { grid-template-columns: 1fr 1fr; }
@@ -385,48 +401,57 @@
     <div class="section-head centered">
       <p class="eyebrow">Campus team</p>
       <h2 id="team-title">the people who <span class="accent">run it.</span></h2>
-      <p>Greek Wars does not happen on its own. On every campus a small team onboards the chapters, books the dinners, and keeps the scoreboard honest. <b>Read what the job is, then apply.</b></p>
+      <p>Greek Wars does not happen on its own. On every campus a team of five onboards the chapters, brings in the partners, books the dinners, and keeps the scoreboard honest. <b>Read what each seat is, then apply.</b></p>
     </div>
 
     <ul id="literature" class="lit" aria-label="Campus team literature">
       <li class="card">
         <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v11H3zM8 21h8M12 16v5"/></svg></span>
         <h3>What it is</h3>
-        <p>fomo's presence on your campus, run by students.<small>A team of two to four per school. You are the reason chapters know the program exists.</small></p>
+        <p>fomo on your campus, run by five students.<small>One team per school, five seats, one campus on the board. You are the reason the chapters know the program exists.</small></p>
       </li>
       <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span>
-        <h3>Campus lead</h3>
-        <p>Onboard the chapters, own the standings.<small>Every fraternity, sorority, team, and club on the board is one you walked in the door of.</small></p>
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8v3c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V8z"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <h3>01 · Campus President</h3>
+        <p>Runs the team, owns the standings.<small>The one fomo calls. Sets the plan for the term, keeps the other four seats moving, and answers for the campus's number.</small></p>
       </li>
       <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
-        <h3>Events</h3>
-        <p>Book the dinners, run the game-day watch parties.<small>You hold the crew sheet. The host holds the table. Nobody pays for anything.</small></p>
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9 20V4M14 20v-7M19 20V8"/></svg></span>
+        <h3>02 · Growth</h3>
+        <p>Gets the campus onto fomo.<small>Onboards the chapters, signs up the traders, and turns every game day into more people on the app.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M15 13a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 0 1-5-5l1-1"/></svg></span>
+        <h3>03 · Partnerships</h3>
+        <p>Brings in the rooms and the orgs.<small>Restaurants, bars, clubs, and the other organisations on campus that host, sponsor, or turn up with their people.</small></p>
       </li>
       <li class="card">
         <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M17 7h.01"/></svg></span>
-        <h3>Content</h3>
-        <p>Post the nights, and make sure the posts count.<small>Every post says fomo paid. You check the insights before a view reaches the board.</small></p>
+        <h3>04 · Content</h3>
+        <p>Posts the nights, and makes sure the posts count.<small>Every post says fomo paid. You check the insights before a view reaches the board.</small></p>
       </li>
       <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/></svg></span>
-        <h3>What you get</h3>
-        <p>A budget, the brand, and a line on your resume that means something.<small>Dinners are funded. Merch and the brand kit are yours. The campus that wins the fall takes the prize.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
-        <h3>Who we want</h3>
-        <p>The person people already text when something is happening.<small>Not a title. If your group chats fill up when you say the word, you are the one.</small></p>
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
+        <h3>05 · Culture</h3>
+        <p>Dinners and events.<small>Books the tables, runs the game-day watch parties, and holds the crew sheet for every night the campus puts on.</small></p>
       </li>
     </ul>
 
     <div class="reading">
       <article class="card">
+        <h3>What you get</h3>
+        <p>A funded program, the brand, and a line on your resume that means something.</p>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Dinners are paid for</b>, up to $1,200 a table, with nothing out of pocket.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>The brand kit and the merch</b> are yours to use, inside the house rules.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>$10,000</b> to the campus that wins the fall.</span></li>
+        </ul>
+      </article>
+      <article class="card">
         <h3>The commitment</h3>
         <p>One term at a time, starting <b>Fall 2026</b>. A few hours a week, and heavier on game days and dinner nights. You report to the fomo team and to your own campus standings.</p>
         <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Onboard at least five chapters</b> before the first live game day.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Get your chapters on the board</b> before the first live game day.</span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Run every dinner</b> your campus is granted, with a crew sheet for each.</span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Keep it disclosed.</b> Every post says fomo paid. Undisclosed posts are rejected.</span></li>
         </ul>
@@ -436,6 +461,7 @@
         <p><b>fomo is always lowercase.</b> It is part of the brand, and it is the first thing we notice in a post.</p>
         <p><b>Only realised PnL counts</b> on game days, and only approved views count for dinners. Claimed numbers never reach the board. Your job is to make sure your campus never has to argue about a number.</p>
         <p>Trading involves risk, including loss of principal. Nobody on the campus team gives trading advice, ever.</p>
+        <p><b>Who we want:</b> the person people already text when something is happening. Not a title. If your group chats fill up when you say the word, you are the one.</p>
       </article>
     </div>
 
@@ -457,16 +483,18 @@
           <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 08</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
           <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 08</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">We look at who actually shows up to your things. This is how.</p><p class="field-error" data-error hidden></p></fieldset>
           <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 08</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" autocomplete="organization" placeholder="e.g. NYU, Penn State, University of Alabama" required><p class="field-error" data-error hidden></p></fieldset>
-          <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 08</span></legend><label for="role">Which part do you want to run?</label>
+          <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 08</span></legend><label for="role">Which seat do you want?</label>
             <select id="role" name="role" required>
               <option value="" disabled selected>Pick one</option>
-              <option value="lead">Campus lead — onboard the chapters, own the standings</option>
-              <option value="events">Events — book the dinners, run the watch parties</option>
+              <option value="president">Campus President — run the team, own the standings</option>
+              <option value="growth">Growth — get the campus onto fomo</option>
+              <option value="partnerships">Partnerships — bring in the rooms and the orgs</option>
               <option value="content">Content — post the nights, verify the views</option>
+              <option value="culture">Culture — dinners and events</option>
               <option value="any">Wherever I am needed</option>
             </select>
             <p class="field-error" data-error hidden></p></fieldset>
-          <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 08</span></legend><label for="why">Why you, and why this campus?</label><textarea id="why" name="why" rows="4" required></textarea><p class="help">Two or three sentences. Which chapters would you walk into first?</p><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 08</span></legend><label for="why">Why you, and why this campus?</label><textarea id="why" name="why" rows="4" required></textarea><p class="help">Two or three sentences. Which chapters, rooms, or orgs would you walk into first?</p><p class="field-error" data-error hidden></p></fieldset>
           <div class="form-nav">
             <button type="button" class="btn btn--ghost" id="apply-back" hidden>← Back</button>
             <button type="button" class="btn btn--primary" id="apply-next">Next →</button>
