@@ -76,15 +76,15 @@
   .brand { display: inline-flex; align-items: center; flex: none; }
   .brand svg { height: 22px; width: auto; display: block; }
   .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
-  .brand-sep { flex: none; color: var(--ink-faint); font-size: 17px; font-weight: 300; margin: 0 -4px; }
   .brand-page {
     flex: none;
-    font-size: 14px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--ink-soft);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
     white-space: nowrap;
   }
+  .brand-sep { color: var(--ink); }
 
   /* ---------- join screen ---------- */
   #join {
@@ -253,6 +253,7 @@
     font-size: 16px;
   }
   .meta-row {
+    position: relative;
     margin-top: 30px;
     padding: 22px 24px;
     border: 1px solid var(--line);
@@ -264,6 +265,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 18px;
+    padding-right: 42px;
   }
   .meta-field label {
     display: block;
@@ -289,35 +291,41 @@
   .meta-field input::placeholder { color: var(--ink-faint); font-weight: 400; }
   /* read-only until you hit Edit — reads as plain text */
   .meta-field input:read-only { border-bottom-color: transparent; cursor: default; }
-  .meta-actions {
+  /* edit / save controls tucked into the card's top-right corner */
+  .meta-tools {
+    position: absolute;
+    top: 12px;
+    right: 12px;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 18px;
-    padding-top: 14px;
-    border-top: 1px solid var(--line-soft);
+    gap: 6px;
   }
-  .meta-saved { font-size: 12.5px; font-weight: 600; color: var(--ok); }
-  .meta-btn {
-    font: inherit;
-    font-size: 13px;
-    font-weight: 700;
-    padding: 8px 16px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: #fff;
-    cursor: pointer;
-  }
-  .meta-btn:hover { filter: brightness(1.08); }
-  .meta-btn--ghost {
+  .meta-saved { font-size: 12px; font-weight: 600; color: var(--ok); }
+  .meta-icon {
+    width: 30px;
+    height: 30px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
     background: var(--surface);
     color: var(--ink-soft);
-    border-color: var(--line);
-    font-weight: 600;
+    cursor: pointer;
   }
-  .meta-btn--ghost:hover { filter: none; color: var(--ink); border-color: var(--accent); }
+  .meta-icon svg {
+    width: 15px; height: 15px;
+    fill: none; stroke: currentColor;
+    stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .meta-icon:hover { color: var(--ink); border-color: var(--accent); }
+  .meta-icon.is-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .meta-icon.is-primary:hover { filter: brightness(1.1); color: #fff; }
 
   /* ---------- reference: pillars ---------- */
   .section-head {
@@ -666,8 +674,7 @@
           <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
         </svg>
       </a>
-      <span class="brand-sep" aria-hidden="true">/</span>
-      <span class="brand-page">dinner crewsheet</span>
+      <span class="brand-page"><span class="brand-sep">/</span>dinner crewsheet</span>
       <div class="nav-meta">
         <span class="code-chip" id="code-chip"></span>
         <span class="status" id="sync-status">Connecting…</span>
@@ -695,10 +702,10 @@
             <input id="m-sponsor" data-meta="sponsor" placeholder="Who's backing this dinner" readonly>
           </div>
         </div>
-        <div class="meta-actions">
+        <div class="meta-tools">
           <span class="meta-saved" id="meta-saved" hidden>Saved</span>
-          <button type="button" class="meta-btn meta-btn--ghost" id="meta-cancel" hidden>Cancel</button>
-          <button type="button" class="meta-btn meta-btn--ghost" id="meta-edit">Edit details</button>
+          <button type="button" class="meta-icon" id="meta-cancel" hidden aria-label="Cancel"></button>
+          <button type="button" class="meta-icon" id="meta-edit" aria-label="Edit dinner details"></button>
         </div>
       </div>
     </div>
@@ -926,6 +933,7 @@
     });
 
     // dinner-details card: edit / save instead of always-on inputs
+    setMetaEditing(false);   // paints the initial pencil icon
     $('meta-edit').addEventListener('click', () => { metaEditing ? saveMeta() : setMetaEditing(true); });
     $('meta-cancel').addEventListener('click', cancelMeta);
     metaInputs().forEach(input => {
@@ -1124,13 +1132,20 @@
     metaInputs().forEach(input => { input.value = state.meta[input.dataset.meta] || ''; });
   }
 
+  const ICON_PENCIL = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13.4 3.1a1.95 1.95 0 0 1 2.75 2.75L7.5 14.5l-3.6.95.95-3.6z"/><path d="M12.1 4.4l2.75 2.75"/></svg>';
+  const ICON_CHECK = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.2 10.5 8 14.3 15.8 5.9"/></svg>';
+  const ICON_X = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg>';
+
   function setMetaEditing(on) {
     metaEditing = on;
     metaInputs().forEach(input => { input.readOnly = !on; });
     const editBtn = $('meta-edit');
-    editBtn.textContent = on ? 'Save' : 'Edit details';
-    editBtn.classList.toggle('meta-btn--ghost', !on);
-    $('meta-cancel').hidden = !on;
+    editBtn.innerHTML = on ? ICON_CHECK : ICON_PENCIL;
+    editBtn.setAttribute('aria-label', on ? 'Save dinner details' : 'Edit dinner details');
+    editBtn.classList.toggle('is-primary', on);
+    const cancelBtn = $('meta-cancel');
+    cancelBtn.innerHTML = ICON_X;
+    cancelBtn.hidden = !on;
     if (on) {
       $('meta-saved').hidden = true;
       metaSnapshot = {
