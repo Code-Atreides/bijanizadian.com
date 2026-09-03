@@ -1,6 +1,6 @@
 # fomo brand kit
 
-Source assets for the fomo brand, used by `/crewsheet` and the `fomo` entry on the
+Source assets for the fomo brand, used by `/campus`, `/crewsheet`, and the `fomo` entry on the
 homepage. These are **source files, not web assets** — they are excluded from
 Firebase Hosting deploys via the `brand/**` entry in `firebase.json`. Anything that
 needs to be served (for example `crewsheet/favicon.svg`) is derived from these and
@@ -38,9 +38,18 @@ Available: `blue` (svg + png), `dark` (svg + png), `light` (svg + png),
 
 `352 × …` viewBox. Available: `blue` (svg + png), `dark` (svg), `white` (svg + png).
 
-Note the wordmark inlined in `crewsheet/index.html` is a separate, tighter
-`75 × 24` version pulled from fomo.family's own nav, kept inline so the nav needs
-no network request.
+Note the wordmark inlined in the nav of `crewsheet`, `gameday`, `dinners` and
+`campus` is a separate, tighter `75 × 24` version pulled from fomo.family's own
+nav, kept inline so the nav needs no network request. The big "fomo/campus" title
+in the `/campus` hero is this kit's `fomo-wordmark-white.svg`, inlined with
+`fill="currentColor"` so it can take the hero lavender `#CBD0EB`.
+
+### `/campus` hero art
+
+`campus/space-bg.webp`, `campus/astronaut.webp` and `campus/astronaut-mobile.webp`
+are fomo.family's own landing-page images, copied so the campus edition of the
+landing page opens on the same picture. They live under `campus/` because they
+are served, unlike everything in this folder.
 
 ### `motion/` — animated logo clips
 

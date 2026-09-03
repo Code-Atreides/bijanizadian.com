@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>fomo/campus</title>
+<meta name="description" content="The fomo college program, in one place. Greek Wars — Game Day, the Dinner Series, and the season standings — and the campus team that runs it.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="fomo/campus">
+<meta property="og:description" content="The fomo college program, in one place. Greek Wars — Game Day, the Dinner Series, and the season standings — and the campus team that runs it.">
+<meta property="og:url" content="https://bijanizadian.com/campus">
+<meta property="og:image" content="https://bijanizadian.com/campus/astronaut.webp">
+<link rel="canonical" href="https://bijanizadian.com/campus">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/campus/space-bg.webp" fetchpriority="high">
+<link rel="preload" as="image" href="/campus/astronaut.webp" media="(min-width: 800px)">
+<link rel="preload" as="image" href="/campus/astronaut-mobile.webp" media="(max-width: 799px)">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<!--
+  This is the campus edition of fomo.family's landing page: same hero, same
+  section rhythm, same footer — pointed at the college program instead of the
+  app. It is a router. Every block on it sends people to one of:
+    /gameday      Game Day (school vs school, live PnL)
+    /dinners      Dinner Series (funded tables of 12)
+    /crewsheet    Crew sheet (who is doing what for a dinner)
+    ONBOARD_URL   chapter onboarding, still on the original backend
+    #team         the campus team: literature, then the application
+  Hero art (space-bg / astronaut) is fomo.family's own, copied into /campus.
+-->
+<style>
+  /* Design language mirrors fomo.family — same token set as /crewsheet, /gameday, /dinners. */
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    --accent: #516af6; --accent-bright: #8ea0ff; --accent-deep: #221d4b; --accent-t: rgba(81,106,246,.16);
+    --mark: #CBD0EB;
+    --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
+    --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+    --gap-section: 96px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+  body {
+    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  a { color: inherit; }
+  b, strong { font-weight: 700; }
+  img { max-width: 100%; display: block; }
+  [id] { scroll-margin-top: 88px; }
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
+  .skip:focus { left: 8px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+    padding: 13px 22px; border-radius: 12px; text-decoration: none; cursor: pointer;
+    border: 1px solid transparent; transition: filter .12s ease, border-color .12s ease, background .12s ease, transform .12s ease;
+  }
+  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 14px 34px -14px var(--accent); }
+  .btn--primary:hover { filter: brightness(1.08); }
+  .btn--dark { background: #1b1a24; color: var(--ink); border-color: rgba(203,208,235,.16); }
+  .btn--dark:hover { border-color: var(--accent-bright); background: #22212d; }
+  .btn--ghost { background: var(--surface); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px); }
+  .btn--ghost:hover { border-color: var(--accent-bright); background: var(--surface-2); }
+  .btn--sm { font-size: 13.5px; padding: 9px 15px; border-radius: 10px; }
+  .btn--lg { min-width: 196px; padding: 16px 26px; font-size: 16px; }
+  .btn:disabled { opacity: .55; cursor: default; filter: none; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- nav (sits over the hero, like fomo.family) ---------- */
+  .nav { position: absolute; top: 0; left: 0; right: 0; z-index: 30; }
+  .nav-inner { max-width: 1440px; margin: 0 auto; padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
+  .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; text-decoration: none; gap: 8px; }
+  .brand svg { height: 24px; width: auto; display: block; }
+  .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; width: 100%; overflow: hidden; min-height: min(100svh, 940px); display: flex; flex-direction: column; align-items: center; }
+  .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 70vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
+  .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
+  .hero-inner { position: relative; z-index: 2; text-align: center; padding: clamp(120px, 18vh, 168px) 24px 0; display: flex; flex-direction: column; align-items: center; }
+  .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--mark); }
+  /* the wordmark is ~3.1× as wide as it is tall and "/campus" ~3.9×, so ~7× height
+     has to fit inside the viewport minus the 24px gutters */
+  .hero-title svg { height: clamp(44px, 9.6vw, 140px); width: auto; display: block; }
+  .hero-title .slash { font-size: clamp(40px, 8.7vw, 126px); font-weight: 700; letter-spacing: -.045em; }
+  .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--accent-bright); margin: 0 .04em 0 .02em; }
+  .hero h1 { margin-top: 26px; font-size: clamp(28px, 4.6vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.1; }
+  .hero .lede { margin-top: 12px; max-width: 58ch; color: var(--ink-soft); font-size: clamp(15px, 1.7vw, 19px); }
+  .hero-cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .hero-art { position: relative; z-index: 2; margin-top: -38px; width: min(560px, 82vw); height: auto; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  .hero-foot { position: relative; z-index: 2; margin-top: -20px; padding-bottom: 28px; display: flex; gap: 8px 24px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--ink-soft); }
+  .hero-foot a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .hero-foot a:hover { color: var(--ink); }
+  .hero-foot a::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-bright); }
+
+  /* ---------- shared section bits ---------- */
+  .section { padding-top: var(--gap-section); }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .section-head { max-width: 760px; }
+  .section-head h2 { margin-top: 12px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+  .section-head h2 .accent { background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .section-head p { margin-top: 16px; color: var(--ink-soft); font-size: 17px; max-width: 58ch; }
+  .section-head p b { color: var(--ink); font-weight: 600; }
+  .centered { text-align: center; margin-left: auto; margin-right: auto; }
+  .centered p { margin-left: auto; margin-right: auto; }
+  .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .kicker { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+  .pill { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; background: var(--accent-t); color: var(--accent-bright); }
+
+  /* ---------- greek wars: the program cards ---------- */
+  .routes { margin-top: 36px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+  .route { position: relative; padding: 24px 24px 26px; display: flex; flex-direction: column; gap: 14px; text-decoration: none; overflow: hidden; transition: border-color .15s ease, transform .15s ease; }
+  .route::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(420px 180px at 0% 0%, var(--accent-t), transparent 70%); opacity: 0; transition: opacity .15s ease; }
+  .route:hover { border-color: var(--accent-bright); transform: translateY(-2px); }
+  .route:hover::before { opacity: 1; }
+  .route > * { position: relative; }
+  .route-top { display: flex; align-items: center; justify-content: space-between; }
+  .route-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .route-icon svg { width: 21px; height: 21px; }
+  .route h3 { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
+  .route p { color: var(--ink-soft); font-size: 14.5px; flex: 1; }
+  .route .go { font-weight: 700; font-size: 14px; color: var(--accent-bright); }
+  .route.is-external .go::after { content: " ↗"; }
+  .routes-wide { grid-column: span 3; }
+  .route--wide { flex-direction: row; align-items: center; gap: 22px; }
+  .route--wide .route-icon { flex: none; }
+  .route--wide div { flex: 1; }
+  .route--wide h3 { font-size: 19px; }
+  .route--wide p { margin-top: 3px; }
+
+  /* the season: four steps in a strip */
+  .season { margin-top: 16px; padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .season li { list-style: none; display: grid; gap: 8px; }
+  .season i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
+  .season b { font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .season small { font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- campus team: the literature grid ---------- */
+  .lit { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
+  .lit li { padding: 26px 24px 28px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; }
+  .lit-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); margin-bottom: 6px; }
+  .lit-icon svg { width: 19px; height: 19px; }
+  .lit h3 { font-size: 12.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-soft); }
+  .lit p { font-size: 19px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
+  .lit small { display: block; margin-top: 8px; font-size: 14px; font-weight: 400; color: var(--ink-soft); letter-spacing: 0; }
+
+  /* the longer reading, two columns of prose */
+  .reading { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .reading .card { padding: 26px 26px 28px; }
+  .reading h3 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
+  .reading p { color: var(--ink-soft); font-size: 15px; }
+  .reading p + p { margin-top: 10px; }
+  .reading p b { color: var(--ink); font-weight: 600; }
+  .ticks { list-style: none; display: grid; gap: 9px; margin-top: 12px; }
+  .ticks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 15px; color: var(--ink-soft); }
+  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 3px; }
+  .ticks b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- apply ---------- */
+  .apply { margin-top: 16px; display: grid; grid-template-columns: 1fr 1.25fr; gap: 28px; padding: 30px 30px 34px; position: relative; overflow: hidden; }
+  .apply::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(640px 320px at 0% 0%, var(--accent-t), transparent 65%); }
+  .apply > * { position: relative; }
+  .apply h2 { margin-top: 12px; font-size: clamp(28px, 3.6vw, 40px); font-weight: 700; letter-spacing: -.035em; line-height: 1.05; }
+  .apply h2 .accent { background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .apply .lede { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
+  .apply .lede + .lede { margin-top: 10px; }
+  .apply .lede b { color: var(--ink); font-weight: 600; }
+  .progress { height: 3px; border-radius: 99px; background: var(--surface-2); overflow: hidden; margin-bottom: 22px; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s ease; }
+  .step { border: 0; display: none; }
+  .step.is-on { display: block; }
+  .step-num { font-size: 12px; font-weight: 800; letter-spacing: .08em; color: var(--accent-bright); margin-bottom: 10px; }
+  label { display: block; font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
+  input, select, textarea {
+    width: 100%; font: inherit; font-size: 16px; color: var(--ink);
+    background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 12px 14px; outline: none; transition: border-color .12s ease, box-shadow .12s ease;
+  }
+  textarea { resize: vertical; min-height: 110px; }
+  select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239899a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px; padding-right: 40px; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-t); }
+  input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--crit); }
+  .help { margin-top: 8px; font-size: 13.5px; color: var(--ink-soft); }
+  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
+  .form-nav { margin-top: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .form-nav .hint { margin-left: auto; font-size: 13px; color: var(--ink-faint); }
+  kbd { font: inherit; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: var(--surface-2); color: var(--ink-soft); }
+  .done { padding: 8px 0; }
+  .done h3 { font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+  .done p { margin-top: 10px; color: var(--ink-soft); font-size: 15.5px; }
+  .done .btn { margin-top: 18px; }
+
+  /* ---------- closer ---------- */
+  .closer { margin-top: var(--gap-section); text-align: center; padding: 0 24px; }
+  .closer-mark { width: 74px; height: 74px; margin: 0 auto; border-radius: 22px; background: var(--bg-2); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+  .closer-mark svg { width: 54px; height: 54px; }
+  .closer h2 { margin-top: 22px; font-size: clamp(34px, 5vw, 58px); font-weight: 700; letter-spacing: -.04em; line-height: 1.02; }
+  .closer p { margin-top: 14px; color: var(--ink-soft); font-size: 17px; }
+  .closer .hero-cta { margin-top: 26px; }
+
+  /* ---------- footer (fomo.family's three columns) ---------- */
+  .foot { margin-top: var(--gap-section); border-top: 1px solid var(--line); }
+  .foot-inner { max-width: var(--wrap); margin: 0 auto; padding: 44px 24px 40px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
+  .foot-brand svg { height: 22px; width: auto; }
+  .foot-brand p { margin-top: 12px; font-size: 14px; color: var(--ink-soft); max-width: 30ch; }
+  .foot h4 { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px; }
+  .foot ul { list-style: none; display: grid; gap: 8px; }
+  .foot ul a { font-size: 14.5px; text-decoration: none; color: var(--ink); }
+  .foot ul a:hover { color: var(--accent-bright); }
+  .foot-legal { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 28px; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12.5px; color: var(--ink-faint); }
+  .foot-legal .spacer { flex: 1; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 960px) {
+    .routes, .lit { grid-template-columns: 1fr 1fr; }
+    .routes-wide { grid-column: span 2; }
+    .season { grid-template-columns: 1fr 1fr; }
+    .foot-inner { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    :root { --gap-section: 72px; }
+    .routes, .lit, .reading, .apply, .season { grid-template-columns: 1fr; }
+    .routes-wide { grid-column: span 1; }
+    .route--wide { flex-direction: column; align-items: flex-start; }
+    .nav .btn span { display: none; }
+    .brand span { display: none; }
+    .hero-cta .btn--lg { width: 100%; }
+    .hero-art { margin-top: -10px; }
+    .foot-inner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .nav-right .btn--ghost { display: none; }
+    .apply { padding: 22px 18px 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hero-art { animation: none; }
+    .btn, .route, .progress i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#greekwars">Skip to Greek Wars</a>
+
+<div class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+        <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+        <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+        <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+        <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+      </svg>
+      <span>/campus</span>
+    </a>
+    <div class="nav-right">
+      <a class="btn btn--ghost btn--sm" href="#greekwars">Greek <span>Wars</span></a>
+      <a class="btn btn--ghost btn--sm" href="#team">Campus <span>team</span></a>
+      <a class="btn btn--dark btn--sm" href="#apply">Apply</a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <img class="hero-bg" src="/campus/space-bg.webp" alt="" aria-hidden="true" width="5172" height="3030" fetchpriority="high">
+  <div class="hero-inner">
+    <!-- the wordmark is the brand-kit lettering (brand/wordmark/fomo-wordmark-white.svg), recoloured to the hero lavender -->
+    <div class="hero-title" role="img" aria-label="fomo/campus">
+      <svg viewBox="0 0 352 113" fill="none" aria-hidden="true">
+        <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+        <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+        <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+        <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+      </svg>
+      <span class="slash"><i>/</i>campus</span>
+    </div>
+    <h1>where campuses become legends.</h1>
+    <p class="lede">Greek Wars, Game Day, and the Dinner Series — the fomo college program, in one place.</p>
+    <div class="hero-cta">
+      <a class="btn btn--primary btn--lg" href="#greekwars">Greek Wars</a>
+      <a class="btn btn--dark btn--lg" href="#team">Campus team</a>
+    </div>
+  </div>
+  <picture>
+    <source srcset="/campus/astronaut.webp" media="(min-width: 800px)" width="1200" height="1326">
+    <img class="hero-art" src="/campus/astronaut-mobile.webp" alt="" aria-hidden="true" width="1080" height="1190" fetchpriority="high">
+  </picture>
+  <nav class="hero-foot" aria-label="Jump to">
+    <a href="/gameday">Game Day</a>
+    <a href="/dinners">Dinner Series</a>
+    <a href="/crewsheet">Crew sheet</a>
+    <a href="#literature">Literature</a>
+    <a href="#apply">Apply</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <!-- ── greek wars ─────────────────────────────────────────────── -->
+  <section id="greekwars" class="section" aria-labelledby="gw-title">
+    <div class="section-head">
+      <p class="eyebrow">Greek Wars · Fall 2026</p>
+      <h2 id="gw-title">one campus.<br>one <span class="accent">scoreboard.</span></h2>
+      <p>Every chapter, team, and club on a campus trades under the same flag. Game days move the line. Dinners fill the room. <b>The campus that finishes furthest ahead wins the fall.</b> Pick where you want to start.</p>
+    </div>
+
+    <ul class="routes">
+      <li>
+        <a class="card route" href="/gameday">
+          <div class="route-top">
+            <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/><path d="M10 15h4M9 20h6M12 15v5"/></svg></span>
+            <span class="pill">Live PnL</span>
+          </div>
+          <h3>Game Day</h3>
+          <p>School versus school. While the football teams play, both schools' traders compete on live PnL, and the scoreboard settles at the final whistle.</p>
+          <span class="go">See the scoreboard →</span>
+        </a>
+      </li>
+      <li>
+        <a class="card route" href="/dinners">
+          <div class="route-top">
+            <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
+            <span class="pill">$1,200 a table</span>
+          </div>
+          <h3>Dinner Series</h3>
+          <p>A table for 12, and fomo picks up the check. You choose the room and the people. Twenty dinners this fall, and $10,000 to the campus that lands hardest.</p>
+          <span class="go">Host a table →</span>
+        </a>
+      </li>
+      <li>
+        <a class="card route" href="/crewsheet">
+          <div class="route-top">
+            <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5h6M9 5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2M9 5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="m9.5 13 1.8 1.8 3.7-3.8"/></svg></span>
+            <span class="pill">For hosts</span>
+          </div>
+          <h3>Crew sheet</h3>
+          <p>Running a dinner? Split the night into jobs, put a name on each one, and keep the whole crew on the same page.</p>
+          <span class="go">Open the crew sheet →</span>
+        </a>
+      </li>
+      <li class="routes-wide">
+        <a class="card route route--wide is-external" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">
+          <span class="route-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V5a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6M9 14l2 2 4-4"/></svg></span>
+          <div>
+            <h3>Onboard your chapter</h3>
+            <p>Nothing counts until your chapter is on the board. Register it once, and every game day and dinner from then on scores for your campus.</p>
+          </div>
+          <span class="go">Onboard</span>
+        </a>
+      </li>
+    </ul>
+
+    <ol class="card season" aria-label="How the season runs">
+      <li><i>01</i><b>Onboard</b><small>Your chapter registers. That is the whole entry fee.</small></li>
+      <li><i>02</i><b>Trade on game days</b><small>Every realised gain or loss moves your school's line while the game is on.</small></li>
+      <li><i>03</i><b>Fill the tables</b><small>Host dinners, post the night, and the approved views count for your campus.</small></li>
+      <li><i>04</i><b>Win the fall</b><small>One campus ends the season on top of the standings.</small></li>
+    </ol>
+  </section>
+
+  <!-- ── campus team ────────────────────────────────────────────── -->
+  <section id="team" class="section" aria-labelledby="team-title">
+    <div class="section-head centered">
+      <p class="eyebrow">Campus team</p>
+      <h2 id="team-title">the people who <span class="accent">run it.</span></h2>
+      <p>Greek Wars does not happen on its own. On every campus a small team onboards the chapters, books the dinners, and keeps the scoreboard honest. <b>Read what the job is, then apply.</b></p>
+    </div>
+
+    <ul id="literature" class="lit" aria-label="Campus team literature">
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v11H3zM8 21h8M12 16v5"/></svg></span>
+        <h3>What it is</h3>
+        <p>fomo's presence on your campus, run by students.<small>A team of two to four per school. You are the reason chapters know the program exists.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span>
+        <h3>Campus lead</h3>
+        <p>Onboard the chapters, own the standings.<small>Every fraternity, sorority, team, and club on the board is one you walked in the door of.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
+        <h3>Events</h3>
+        <p>Book the dinners, run the game-day watch parties.<small>You hold the crew sheet. The host holds the table. Nobody pays for anything.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M17 7h.01"/></svg></span>
+        <h3>Content</h3>
+        <p>Post the nights, and make sure the posts count.<small>Every post says fomo paid. You check the insights before a view reaches the board.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5z"/><path d="M2 12l10 5 10-5M2 17l10 5 10-5"/></svg></span>
+        <h3>What you get</h3>
+        <p>A budget, the brand, and a line on your resume that means something.<small>Dinners are funded. Merch and the brand kit are yours. The campus that wins the fall takes the prize.</small></p>
+      </li>
+      <li class="card">
+        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>
+        <h3>Who we want</h3>
+        <p>The person people already text when something is happening.<small>Not a title. If your group chats fill up when you say the word, you are the one.</small></p>
+      </li>
+    </ul>
+
+    <div class="reading">
+      <article class="card">
+        <h3>The commitment</h3>
+        <p>One term at a time, starting <b>Fall 2026</b>. A few hours a week, and heavier on game days and dinner nights. You report to the fomo team and to your own campus standings.</p>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Onboard at least five chapters</b> before the first live game day.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Run every dinner</b> your campus is granted, with a crew sheet for each.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Keep it disclosed.</b> Every post says fomo paid. Undisclosed posts are rejected.</span></li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>The house rules</h3>
+        <p><b>fomo is always lowercase.</b> It is part of the brand, and it is the first thing we notice in a post.</p>
+        <p><b>Only realised PnL counts</b> on game days, and only approved views count for dinners. Claimed numbers never reach the board. Your job is to make sure your campus never has to argue about a number.</p>
+        <p>Trading involves risk, including loss of principal. Nobody on the campus team gives trading advice, ever.</p>
+      </article>
+    </div>
+
+    <!-- ── apply ───────────────────────────────────────────────── -->
+    <div id="apply" class="card apply">
+      <div>
+        <p class="eyebrow">Apply</p>
+        <h2>Run fomo <span class="accent">on your campus.</span></h2>
+        <p class="lede">Eight questions. Two minutes. <b>We read every one.</b></p>
+        <p class="lede">If you already have a table in mind, that goes through the <a href="/dinners#apply">Dinner Series application</a> instead. If you just want your chapter on the board, <a data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">onboard it here</a>.</p>
+      </div>
+      <div>
+        <form id="apply-form" novalidate>
+          <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+          <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+          <fieldset class="step" data-step="0"><legend class="step-num"><span data-num>01 / 08</span></legend><label for="first_name">First name</label><input id="first_name" name="first_name" type="text" autocomplete="given-name" required><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="1"><legend class="step-num"><span data-num>02 / 08</span></legend><label for="last_name">Last name</label><input id="last_name" name="last_name" type="text" autocomplete="family-name" required><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="2"><legend class="step-num"><span data-num>03 / 08</span></legend><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" required><p class="help">Your school email if you have one.</p><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 08</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 08</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">We look at who actually shows up to your things. This is how.</p><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 08</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" autocomplete="organization" placeholder="e.g. NYU, Penn State, University of Alabama" required><p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 08</span></legend><label for="role">Which part do you want to run?</label>
+            <select id="role" name="role" required>
+              <option value="" disabled selected>Pick one</option>
+              <option value="lead">Campus lead — onboard the chapters, own the standings</option>
+              <option value="events">Events — book the dinners, run the watch parties</option>
+              <option value="content">Content — post the nights, verify the views</option>
+              <option value="any">Wherever I am needed</option>
+            </select>
+            <p class="field-error" data-error hidden></p></fieldset>
+          <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 08</span></legend><label for="why">Why you, and why this campus?</label><textarea id="why" name="why" rows="4" required></textarea><p class="help">Two or three sentences. Which chapters would you walk into first?</p><p class="field-error" data-error hidden></p></fieldset>
+          <div class="form-nav">
+            <button type="button" class="btn btn--ghost" id="apply-back" hidden>← Back</button>
+            <button type="button" class="btn btn--primary" id="apply-next">Next →</button>
+            <button type="submit" class="btn btn--primary" id="apply-submit" hidden>Submit application</button>
+            <span class="hint" id="apply-hint"><kbd>Enter</kbd> to continue</span>
+          </div>
+          <p class="field-error" id="form-error" hidden></p>
+        </form>
+        <div class="done" id="apply-done" hidden>
+          <h3>Got it. We will be in touch.</h3>
+          <p>Expect a text or an email within a few days. In the meantime, the fastest thing you can do for your campus is get a chapter on the board.</p>
+          <a class="btn btn--primary" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── closer ─────────────────────────────────────────────────── -->
+  <section class="closer">
+    <span class="closer-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M36.9747 24.3586C44.1067 24.3587 49.7941 27.9515 52.9484 33.5959C48.7626 38.0418 45.6617 43.7612 44.4679 50.0002C43.2743 56.2391 44.1865 61.9572 46.67 66.4026C41.3555 72.0468 34.2931 75.6408 27.1613 75.6409C18.432 75.6407 11.8659 70.2588 9.46204 62.3196H26.8478C27.4159 62.3193 28.0059 61.8593 28.1691 61.2932L34.6486 38.7043C34.8098 38.1381 34.4815 37.6782 33.9152 37.678H14.1788C19.6213 29.7404 28.2465 24.3588 36.9747 24.3586Z" fill="#EAEDFF"/><path d="M72.3285 24.3586C85.0779 24.3586 93.2156 35.8374 90.5062 49.9993C87.7966 64.1596 75.2646 75.6409 62.515 75.6409C53.7856 75.6408 47.2196 70.2589 44.8158 62.3196H64.1537C64.7218 62.3194 65.3127 61.8594 65.476 61.2932L71.9545 38.7043C72.1157 38.138 71.7876 37.678 71.2211 37.678H49.5316C54.9741 29.7401 63.5999 24.3587 72.3285 24.3586Z" fill="#EAEDFF"/></svg>
+    </span>
+    <h2>a trading app<br>for the whole campus.</h2>
+    <p>join the schools already making their name on fomo.</p>
+    <div class="hero-cta">
+      <a class="btn btn--primary btn--lg" data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a>
+      <a class="btn btn--dark btn--lg" href="https://fomo.family" target="_blank" rel="noopener">Download app</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+          <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+          <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+          <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+          <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+        </svg>
+      </a>
+      <p>where campuses become legends.</p>
+    </div>
+    <div>
+      <h4>Greek Wars</h4>
+      <ul>
+        <li><a href="/gameday">Game Day</a></li>
+        <li><a href="/dinners">Dinner Series</a></li>
+        <li><a href="/crewsheet">Crew sheet</a></li>
+        <li><a data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a></li>
+        <li><a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Campus team</h4>
+      <ul>
+        <li><a href="#literature">Literature</a></li>
+        <li><a href="#apply">Apply</a></li>
+        <li><a href="/dinners#apply">Host a dinner</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>fomo</h4>
+      <ul>
+        <li><a href="https://fomo.family" target="_blank" rel="noopener">fomo.family</a></li>
+        <li><a href="https://fomo.family/blog" target="_blank" rel="noopener">Blog</a></li>
+        <li><a href="https://fomo.family/answers" target="_blank" rel="noopener">FAQ</a></li>
+        <li><a href="https://fomo.family/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
+        <li><a href="https://fomo.family/terms" target="_blank" rel="noopener">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-legal">
+    <span>© 2026 fomo · campus program</span>
+    <span class="spacer"></span>
+    <span>Trading involves risk, including loss of principal.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // ---------- stepped application, saved to the same Firebase project the
+  // dinners form uses, under campus/<key>. Rules: write-only from the web.
+  var firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+  var db = null;
+  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+
+  var form = document.getElementById('apply-form');
+  var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var back = document.getElementById('apply-back');
+  var next = document.getElementById('apply-next');
+  var submit = document.getElementById('apply-submit');
+  var hint = document.getElementById('apply-hint');
+  var bar = document.getElementById('progress-bar');
+  var formError = document.getElementById('form-error');
+  var done = document.getElementById('apply-done');
+  var i = 0;
+
+  function field(step) { return step.querySelector('input, select, textarea'); }
+  function errorEl(step) { return step.querySelector('[data-error]'); }
+
+  var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
+  var TYPOS = { 'gmail.con':'gmail.com','gmail.co':'gmail.com','gmai.com':'gmail.com','gmial.com':'gmail.com','gmaill.com':'gmail.com','gnail.com':'gmail.com','yahoo.con':'yahoo.com','yaho.com':'yahoo.com','hotmail.con':'hotmail.com','hotmial.com':'hotmail.com','outlook.con':'outlook.com','icloud.con':'icloud.com' };
+  function emailError(v) {
+    v = v.trim();
+    if (!EMAIL.test(v)) return 'That is not a complete email address — it should look like you@school.edu.';
+    var d = v.split('@').pop().toLowerCase();
+    if (TYPOS[d]) return 'Did you mean @' + TYPOS[d] + '?';
+    return null;
+  }
+  function digits(v) { return String(v).replace(/[^0-9]/g, ''); }
+  function phoneError(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length === 11) d = d.slice(1);
+    if (d.length !== 10) return 'A US mobile number is 10 digits — like 212-555-0199.';
+    if (!/^[2-9][0-9]{2}[2-9][0-9]{6}$/.test(d)) return 'That is not a real US number — check the digits.';
+    return null;
+  }
+  function formatPhone(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length > 10) d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length > 6) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
+    return d;
+  }
+  function normalizeInstagram(v) {
+    var h = String(v).trim();
+    if (!h) return null;
+    var url = h.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)*instagram\.com\/([^/?#]+)/i);
+    if (url) h = url[1]; else if (/instagram\.com/i.test(h)) return null;
+    h = h.replace(/^@+/, '').replace(/\/+$/, '');
+    if (!/^[a-z0-9._]{1,30}$/i.test(h) || h.charAt(0) === '.' || h.charAt(h.length - 1) === '.' || h.indexOf('..') > -1) return null;
+    return h.toLowerCase();
+  }
+
+  function validate(step) {
+    var el = field(step), v = el.value.trim(), msg = null;
+    if (!v) msg = el.tagName === 'SELECT' ? 'Pick one to continue.' : 'This one is required.';
+    else if (el.id === 'email') msg = emailError(v);
+    else if (el.id === 'phone') msg = phoneError(v);
+    else if (el.id === 'instagram' && !normalizeInstagram(v)) msg = 'That does not look like an Instagram handle — try @yourhandle.';
+    else if (el.id === 'why' && v.length < 20) msg = 'Give us a little more than that — a sentence or two.';
+    var err = errorEl(step);
+    err.textContent = msg || '';
+    err.hidden = !msg;
+    el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    return !msg;
+  }
+
+  // The initial paint must not move focus: focusing a field this far down the
+  // page would scroll the hero away.
+  function show(n, moveFocus) {
+    i = Math.max(0, Math.min(steps.length - 1, n));
+    steps.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+    back.hidden = i === 0;
+    var last = i === steps.length - 1;
+    next.hidden = last;
+    submit.hidden = !last;
+    hint.innerHTML = last ? '' : '<kbd>Enter</kbd> to continue';
+    bar.style.width = ((i + 1) / steps.length * 100) + '%';
+    if (moveFocus === false) return;
+    var el = field(steps[i]);
+    setTimeout(function () { el.focus(); }, 0);
+  }
+
+  next.addEventListener('click', function () { if (validate(steps[i])) show(i + 1); });
+  back.addEventListener('click', function () { show(i - 1); });
+
+  form.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    var el = e.target;
+    if (el.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+    if (i < steps.length - 1) { if (validate(steps[i])) show(i + 1); }
+    else form.requestSubmit ? form.requestSubmit() : submit.click();
+  });
+
+  document.getElementById('phone').addEventListener('input', function () {
+    var el = this, caret = el.selectionStart == null ? el.value.length : el.selectionStart;
+    var typed = digits(el.value.slice(0, caret)).length;
+    var f = formatPhone(el.value);
+    if (f === el.value) return;
+    el.value = f;
+    var pos = 0;
+    if (typed > 0) { pos = f.length; for (var k = 0, seen = 0; k < f.length; k++) { if (f.charAt(k) >= '0' && f.charAt(k) <= '9') seen++; if (seen === typed) { pos = k + 1; break; } } }
+    try { el.setSelectionRange(pos, pos); } catch (err) {}
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    formError.hidden = true;
+    for (var k = 0; k < steps.length; k++) { if (!validate(steps[k])) { show(k); return; } }
+    if (form._gotcha && form._gotcha.value) { finish(); return; }   // bot: pretend
+    var data = {};
+    steps.forEach(function (s) { var el = field(s); data[el.name] = el.value.trim(); });
+    data.instagram = normalizeInstagram(data.instagram) || data.instagram;
+    data.phone = formatPhone(data.phone);
+    data.submitted_at = new Date().toISOString();
+    data.page = location.pathname;
+    data.ua = (navigator.userAgent || '').slice(0, 160);
+
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+    if (!db) { fail('We could not reach the server. Email hello@fomo.family with your answers and we will take it from there.'); return; }
+    var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    db.ref('campus/' + key).set(data).then(finish).catch(function () {
+      fail('That did not send. Check your connection and try again — nothing was lost.');
+    });
+  });
+
+  function fail(msg) {
+    submit.disabled = false;
+    submit.textContent = 'Submit application';
+    formError.textContent = msg;
+    formError.hidden = false;
+  }
+  function finish() {
+    form.hidden = true;
+    done.hidden = false;
+    done.setAttribute('tabindex', '-1');
+    done.focus();
+  }
+
+  show(0, false);
+})();
+</script>
+</body>
+</html>
