@@ -76,15 +76,6 @@
   .brand { display: inline-flex; align-items: center; flex: none; }
   .brand svg { height: 22px; width: auto; display: block; }
   .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
-  .brand-page {
-    flex: none;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-    white-space: nowrap;
-  }
-  .brand-sep { color: var(--ink); }
 
   /* ---------- join screen ---------- */
   #join {
@@ -630,9 +621,6 @@
     .join-form { flex-direction: column; }
     .members { margin-left: 0; width: 100%; justify-content: flex-start; }
   }
-  @media (max-width: 560px) {
-    .brand-sep, .brand-page { display: none; }
-  }
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
@@ -674,7 +662,6 @@
           <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
         </svg>
       </a>
-      <span class="brand-page"><span class="brand-sep">/</span>dinner crewsheet</span>
       <div class="nav-meta">
         <span class="code-chip" id="code-chip"></span>
         <span class="status" id="sync-status">Connecting…</span>
