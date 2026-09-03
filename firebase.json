@@ -8,7 +8,8 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "bijanizadian.com.txt"
+      "bijanizadian.com.txt",
+      "brand/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false
