@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>fomo/campus/greekwars</title>
+<meta name="description" content="Greek Wars — your chapter vs. every chapter. Onboard 80% of your actives, trade together, and take your school then the country. $27,500 on the table for Fall 2026.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="fomo/campus/greekwars">
+<meta property="og:description" content="Greek Wars — your chapter vs. every chapter. $500 to every chapter's top trader, $10,000 to the best chapter in the country, and $250 to the first frat and first sorority on each campus to hit 80%.">
+<meta property="og:url" content="https://bijanizadian.com/greekwars">
+<meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
+<link rel="canonical" href="https://bijanizadian.com/greekwars">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Bold.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/campus/space-bg.webp" fetchpriority="high">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<!--
+  Greek Wars, as the greekwars edition of fomo.family's landing page. Content is
+  the original at aryatoufanian.com/fomo; the board and the map read the public
+  `greekwars` node in the same Firebase project the other pages write to, and
+  fall back to the sample season embedded below until it has rows.
+-->
+<style>
+  /* Aeonik is fomo's exclusive typeface — the same self-hosted woff2 files
+     /campus and /dinners serve. Schibsted Grotesk is the fallback. */
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+  /* Design language mirrors fomo.family — the token set /campus and /dinners carry. */
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    /* brand-kit palette: fomo blue, electric blue (small accents only), light blue
+       (glow / highlight), fomo ink (dark title cards), pale lavender (type on blue) */
+    --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
+    --ink-deep: #0B091F; --lavender: #EAEDFF; --mark: #CBD0EB;
+    /* fomo.family's button set: a 50%-opacity indigo fill, white at 12%, and a
+       #CBD0EB hairline at 10% around both */
+    --btn-fill: rgba(96,106,247,.5); --btn-fill-hover: rgba(96,106,247,.8);
+    --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
+    --hairline: rgba(203,208,235,.1);
+    --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
+    --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+    --gap-section: 88px; --gap-head: 34px; --gap-group: 40px; --gap-block: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { scroll-behavior: smooth; scroll-padding-top: 24px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
+  body {
+    font-family: Aeonik, 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55;
+    /* fomo.family runs body copy at Medium, not Regular */
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  b, strong { font-weight: 700; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  /* a section is a head plus its blocks; its own top padding is the space
+     between sections, and the negative scroll-margin cancels that padding so an
+     anchor lands on the head instead of a --gap-section below it */
+  .section { padding-top: var(--gap-section); scroll-margin-top: calc(var(--gap-section) * -1); }
+  .section-head { max-width: 720px; }
+  .section-head h2 { margin-top: 12px; font-size: clamp(28px, 3.8vw, 42px); font-weight: 700; letter-spacing: -.035em; line-height: 1.06; }
+  .section-head h2 .accent { color: var(--accent-bright); }
+  .section-head p { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
+  .section-head p b { color: var(--ink); font-weight: 600; }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
+  .note { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .note a { color: var(--accent-bright); font-weight: 600; }
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
+  .skip:focus { left: 8px; }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+    padding: 11px 20px; border-radius: 12px; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .btn--primary { background: var(--btn-fill); color: #fff; }
+  .btn--primary:hover { background: var(--btn-fill-hover); }
+  .btn--dark { background: var(--btn-quiet); color: var(--ink); }
+  .btn--dark:hover { background: var(--btn-quiet-hover); }
+  .btn--ghost { background: rgba(255,255,255,.06); color: var(--ink); }
+  .btn--ghost:hover { background: var(--btn-quiet); border-color: rgba(203,208,235,.24); }
+  .btn--lg { min-width: 200px; justify-content: center; padding: 12px 20px; font-size: 18px; line-height: 1.556; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- nav (sits over the hero, like fomo.family) ---------- */
+  .nav { position: absolute; top: 0; left: 0; right: 0; z-index: 30; }
+  .nav-inner { padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+  .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; text-decoration: none; gap: 8px; }
+  .brand svg { height: 24px; width: auto; display: block; }
+  .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .store { display: block; border-radius: 6px; background: rgba(255,255,255,.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity .15s ease, box-shadow .15s ease; }
+  .store:hover { opacity: .9; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+  .store img { display: block; height: 40px; width: auto; }
+
+  /* ---------- hero ---------- */
+  .hero { position: relative; width: 100%; overflow: hidden; min-height: min(62svh, 540px); display: flex; flex-direction: column; align-items: center; }
+  .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 70vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
+  .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
+  .hero-inner { position: relative; z-index: 3; text-align: center; padding: 104px 24px 32px; display: flex; flex-direction: column; align-items: center; }
+  .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
+  /* "/campus/greekwars" is a long path, so the lockup steps down from /campus's
+     own glyph size to stay on one line inside the 24px gutters */
+  .hero-title svg { height: clamp(24px, 5vw, 72px); width: auto; display: block; }
+  .hero-title .slash { font-size: clamp(20px, 4.5vw, 64px); font-weight: 700; letter-spacing: -.045em; }
+  .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
+  /* the parent segment is dimmed, so the lockup reads as a path into this page */
+  .hero-title .slash .up { opacity: .5; }
+  .hero h1 { margin-top: 34px; font-size: clamp(26px, 3.1vw, 40px); font-weight: 700; letter-spacing: -.05em; line-height: 1.2; color: var(--lavender); }
+  .hero .lede { margin-top: 10px; max-width: 60ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); line-height: 1.25; letter-spacing: -.025em; }
+  .hero-cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .hero-alt {
+    position: relative; z-index: 3; margin-top: 4px; padding: 6px 4px;
+    font-size: 15px; font-weight: 600; color: rgba(209,216,255,.75);
+    text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px;
+    transition: color .15s ease;
+  }
+  .hero-alt:hover { color: #fff; }
+  @media (min-width: 800px) { .hero-inner { padding: 158px 24px 24px; } }
+
+  /* ---------- the pot: three prizes in one card ---------- */
+  .pot { margin-top: var(--gap-head); padding: 30px; }
+  .prizes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; list-style: none; }
+  .prizes li { display: grid; gap: 8px; align-content: start; }
+  .prizes li + li { padding-left: 30px; border-left: 1px solid var(--line-soft); }
+  .prize-who { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .prizes p { color: var(--ink-soft); font-size: 14.5px; }
+  .prizes p b { color: var(--ink); font-weight: 600; }
+  /* Aeonik stops at Bold, so 800 is synthesised and smears at display size */
+  .prizes .amount { font-size: clamp(34px, 4.2vw, 50px); font-weight: 700; letter-spacing: -.04em; line-height: 1; color: var(--ink); }
+  /* the qualifier strip runs flush to the card's bottom edge, so the negative
+     margins cancel the card's own padding */
+  .pot-foot { margin: 30px -30px -30px; padding: 22px 30px 24px; border-top: 1px solid var(--line-soft); background: var(--bg-3); border-radius: 0 0 var(--radius) var(--radius); display: flex; flex-wrap: wrap; align-items: center; gap: 16px 26px; }
+  .pot-foot p { flex: 1 1 420px; font-size: 15px; color: var(--ink-soft); }
+  .pot-foot b { color: var(--ink); font-weight: 600; }
+  .pot-foot .btn { flex: none; }
+
+  /* ---------- onboarding ---------- */
+  .steps { margin-top: var(--gap-head); padding: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; list-style: none; }
+  .steps li { display: grid; gap: 10px; align-content: start; }
+  .steps li + li { padding-left: 26px; border-left: 1px solid var(--line-soft); }
+  .step-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .step-icon svg { width: 18px; height: 18px; }
+  .step-name { font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .step-name i { font-style: normal; color: var(--accent-bright); font-size: 11.5px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
+  .step-blurb { color: var(--ink-soft); font-size: 14px; }
+  .gates { margin-top: var(--gap-block); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .gates > div { padding: 22px 24px 24px; }
+  .gates h3 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .ticks { list-style: none; display: grid; gap: 10px; margin-top: 14px; }
+  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14.5px; color: var(--ink-soft); }
+  .ticks li strong { color: var(--ink); }
+  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
+
+  /* ---------- the map ---------- */
+  .mapcard { margin-top: var(--gap-head); padding: 22px 24px 20px; }
+  .map-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 8px; }
+  .map-stats { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-left: auto; }
+  .map-stat b { display: block; font-size: 21px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+  .map-stat span { font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
+  .usmap { display: block; width: 100%; height: auto; overflow: visible; }
+  .usmap .land { fill: #1b1a29; stroke: rgba(203,208,235,.22); stroke-width: .9; stroke-linejoin: round; }
+  .ping { cursor: pointer; }
+  .ping .halo { fill: var(--accent); opacity: .18; transform-box: fill-box; transform-origin: center; animation: ping 3.2s ease-out infinite; }
+  .ping .dot { fill: #7E90FF; stroke: #EAEDFF; stroke-width: 1.1; }
+  .ping:hover .dot, .ping.is-on .dot { fill: #EAEDFF; }
+  @keyframes ping { 0% { transform: scale(.55); opacity: .38; } 70%, 100% { transform: scale(1.7); opacity: 0; } }
+  .map-tip { position: absolute; z-index: 5; pointer-events: none; padding: 8px 11px; border-radius: 9px; background: var(--ink-deep); border: 1px solid var(--line); box-shadow: var(--shadow); font-size: 12.5px; white-space: nowrap; transform: translate(-50%, -128%); }
+  .map-tip b { display: block; font-size: 13.5px; }
+  .map-tip span { color: var(--ink-soft); }
+  /* a soft accent wash under the country, so the map sits in its own light
+     rather than on a flat panel */
+  .map-stage { position: relative; }
+  .map-stage::before { content: ""; position: absolute; inset: 6% 4% 10%; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-t), transparent 78%); }
+  .map-stage > * { position: relative; }
+  .map-foot { display: flex; gap: 8px; align-items: start; margin-top: 10px; font-size: 12px; color: var(--ink-faint); }
+  .map-foot svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+
+  /* ---------- the board ---------- */
+  .boardcard { margin-top: var(--gap-head); padding: 20px 24px 22px; }
+  .tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .tab {
+    font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    padding: 8px 15px; border-radius: 10px; color: var(--ink-soft);
+    background: transparent; border: 1px solid var(--line-soft);
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .tab:hover { color: var(--ink); border-color: rgba(203,208,235,.24); }
+  .tab[aria-selected="true"] { background: var(--btn-fill); border-color: var(--hairline); color: #fff; }
+  .tabs select {
+    margin-left: auto; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
+    background: var(--bg-3); border: 1px solid var(--line); border-radius: 10px; padding: 8px 34px 8px 12px;
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+    background-position: calc(100% - 18px) 52%, calc(100% - 13px) 52%;
+    background-size: 5px 5px; background-repeat: no-repeat;
+  }
+  .scroll-x { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 640px; }
+  th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); padding: 0 10px 10px 0; border-bottom: 1px solid var(--line); }
+  td { padding: 11px 10px 11px 0; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+  tr:last-child td { border-bottom: 0; }
+  th.r, td.r { text-align: right; padding-right: 0; }
+  .rank { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 7px; font-size: 12px; font-weight: 800; background: var(--surface); color: var(--ink-soft); }
+  .rank-1 { background: var(--warn); color: #08060f; }
+  .rank-2 { background: #cbd0eb; color: #08060f; }
+  .rank-3 { background: #c98b4a; color: #08060f; }
+  .who { font-weight: 700; }
+  .who span { display: block; font-weight: 500; font-size: 12px; color: var(--ink-faint); }
+  .pnl { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ok); }
+  .bar { display: inline-flex; align-items: center; gap: 8px; }
+  .bar i { display: block; width: 54px; height: 5px; border-radius: 99px; background: var(--surface); overflow: hidden; }
+  .bar i b { display: block; height: 100%; background: var(--accent-bright); }
+  .tag { display: inline-flex; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: .04em; background: var(--accent-t); color: var(--accent-bright); }
+  .board-empty { padding: 26px 0; color: var(--ink-soft); font-size: 14.5px; }
+
+  /* ---------- the season ---------- */
+  .season { margin-top: var(--gap-head); padding: 26px 26px 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .season li { list-style: none; display: grid; gap: 8px; align-content: start; }
+  .season li + li { padding-left: 22px; border-left: 1px solid var(--line-soft); }
+  .season i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
+  .season b { font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .season small { font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- closer ---------- */
+  /* Brand-kit "Technical & premium" halo: deep indigo, large and diffuse, top-centre. */
+  .closer { position: relative; margin-top: 56px; text-align: center; padding: 56px 24px 0; }
+  .closer::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(760px 380px at 50% 0%, var(--accent-deep), transparent 72%); }
+  .closer > * { position: relative; z-index: 1; }
+  .closer-mark { width: 74px; height: 74px; margin: 0 auto; border-radius: 22px; background: var(--bg-2); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
+  .closer-mark svg { width: 54px; height: 54px; }
+  .closer h2 { margin-top: 22px; font-size: clamp(30px, 4.4vw, 52px); font-weight: 700; letter-spacing: -.038em; line-height: 1.12; }
+  .closer h2 .accent { color: var(--accent-bright); }
+  .closer p { margin-top: 14px; color: var(--ink-soft); font-size: 17px; }
+  .closer .hero-cta { margin-top: 26px; }
+
+  /* ---------- footer (fomo.family's four columns) ---------- */
+  .foot { margin-top: 64px; border-top: 1px solid var(--line); }
+  .foot-inner { max-width: var(--wrap); margin: 0 auto; padding: 44px 24px 40px; display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
+  .foot-brand svg { height: 22px; width: auto; }
+  .foot-brand p { margin-top: 12px; font-size: 14px; color: var(--ink-soft); max-width: 30ch; }
+  .foot h4 { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px; }
+  .foot ul { list-style: none; display: grid; gap: 8px; }
+  .foot ul a { font-size: 14.5px; text-decoration: none; color: var(--ink); }
+  .foot ul a:hover { color: var(--accent-bright); }
+  .foot-legal { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 28px; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12.5px; color: var(--ink-faint); }
+  .foot-legal .spacer { flex: 1; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1020px) {
+    .season { grid-template-columns: 1fr 1fr; }
+    .season li:nth-child(3) { padding-left: 0; border-left: 0; }
+    .foot-inner { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 880px) {
+    :root { --gap-section: 64px; --gap-head: 28px; --gap-group: 32px; }
+    /* stacked, the dividers between columns become rules above */
+    .prizes, .steps { grid-template-columns: 1fr; gap: 0; }
+    .prizes li + li, .steps li + li { margin-top: 24px; padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
+    .gates { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    :root { --gap-section: 52px; --gap-head: 24px; --gap-group: 28px; }
+    .nav-inner { padding: 12px 14px; gap: 10px; }
+    .nav-right { gap: 8px; }
+    .store img { height: 32px; }
+    .hero-cta .btn--lg { width: 100%; }
+    .wrap { padding: 0 20px; }
+    .pot { padding: 22px 18px; }
+    .pot-foot { margin: 24px -18px -22px; padding: 20px 18px 22px; }
+    .pot-foot .btn { width: 100%; justify-content: center; }
+    .steps, .mapcard, .boardcard, .season { padding: 20px 18px; }
+    .scroll-x { margin: 0 -18px; padding: 0 18px; }
+    .season { grid-template-columns: 1fr; }
+    .season li + li { padding: 22px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
+    .tabs select { margin-left: 0; width: 100%; }
+    .foot-inner { grid-template-columns: 1fr; }
+    .foot ul { gap: 2px; }
+    .foot ul a { display: inline-block; padding: 8px 0; }
+  }
+  @media (max-width: 480px) { .store img { height: 28px; } }
+  /* below ~350px the lockup's clamp floors are wider than the screen */
+  @media (max-width: 350px) {
+    .hero-title svg { height: 19px; }
+    .hero-title .slash { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .ping .halo { animation: none; opacity: .22; }
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#onboard">Skip to onboarding</a>
+
+<div class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+      <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+      <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+      <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+      <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+      </svg>
+      <span>/campus/greekwars</span>
+    </a>
+    <div class="nav-right">
+      <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener">
+        <img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40">
+      </a>
+      <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener">
+        <img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40">
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <img class="hero-bg" src="/campus/space-bg.webp" alt="" aria-hidden="true" width="5172" height="3030" fetchpriority="high">
+  <div class="hero-inner">
+    <!-- the wordmark is the brand-kit lettering, recoloured to the hero lavender.
+         /campus is dimmed and /greekwars is not, so the lockup reads as a path. -->
+    <div class="hero-title" role="img" aria-label="fomo/campus/greekwars">
+      <svg viewBox="0 0 352 113" fill="none" aria-hidden="true">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+      </svg>
+      <span class="slash"><i>/</i><span class="up">campus</span><i>/</i>greekwars</span>
+    </div>
+    <h1>your chapter vs. every chapter.</h1>
+    <p class="lede">Every chapter becomes a clan. Trade together, take your school, then take the country — ranked on raw PnL, not points, not volume, not activity.</p>
+    <div class="hero-cta">
+      <a class="btn btn--primary btn--lg" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a>
+    </div>
+    <a class="hero-alt" href="#board">See the live board</a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ── the pot ─────────────────────────────────────────────────── -->
+  <section id="pot" class="section" aria-labelledby="pot-title">
+    <div class="section-head">
+      <p class="eyebrow">Fall 2026 · Aug 24 – Dec 11</p>
+      <h2 id="pot-title">$27,500 <span class="accent">on the table.</span></h2>
+      <p>Three prizes run at once, and a chapter can win all three. <b>Every participating chapter crowns a winner</b> — the national title and the campus bonuses are what you race everyone else for.</p>
+    </div>
+
+    <div class="card pot">
+      <ul class="prizes" aria-label="What Greek Wars pays out">
+        <li>
+          <span class="prize-who">Individual</span>
+          <p class="amount">$500</p>
+          <p><b>Guaranteed.</b> Every participating chapter's #1 trader takes $500 cash at the end of the semester.</p>
+        </li>
+        <li>
+          <span class="prize-who">Chapter</span>
+          <p class="amount">$10,000+</p>
+          <p><b>And eternal glory.</b> The best trading chapter in the country takes the grand prize.</p>
+        </li>
+        <li>
+          <span class="prize-who">Campus first</span>
+          <p class="amount">+$250</p>
+          <p><b>A race, not a ranking.</b> The first fraternity and the first sorority on each campus to clear 80% onboarded each take $250.</p>
+        </li>
+      </ul>
+      <div class="pot-foot">
+        <p><b>110 bonuses nationwide.</b> The $250 is first-come on every campus, so the chapter that fills its roster in week one takes it from the chapter that fills in week six.</p>
+        <a class="btn btn--primary" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── onboarding ──────────────────────────────────────────────── -->
+  <section id="onboard" class="section" aria-labelledby="onboard-title">
+    <div class="section-head">
+      <p class="eyebrow">Onboarding</p>
+      <h2 id="onboard-title">Three steps, <span class="accent">and one number.</span></h2>
+      <p>The number is <b>80%</b>. Everything about qualifying, the campus bonus and the national title comes down to how much of your active roster is on fomo, and whether it stays there.</p>
+    </div>
+
+    <ol class="card steps" aria-label="How to onboard a chapter">
+      <li>
+        <span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M9 9h6M9 13h6M9 17h3"/></svg></span>
+        <span class="step-name"><i>01</i>Register</span>
+        <span class="step-blurb">Your school, your chapter, and your roster size. The roster number is what 80% gets measured against, so give us the real one.</span>
+      </li>
+      <li>
+        <span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l3-3a4 4 0 1 0-5.7-5.7l-1 1"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-3 3a4 4 0 1 0 5.7 5.7l1-1"/></svg></span>
+        <span class="step-name"><i>02</i>Send the link</span>
+        <span class="step-blurb">You get one link for your chapter. Drop it in the group chat — every download through it is counted against your roster automatically.</span>
+      </li>
+      <li>
+        <span class="step-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><path d="m9.2 10.4 1.9 1.9 3.7-3.7"/></svg></span>
+        <span class="step-name"><i>03</i>Fill to 80%</span>
+        <span class="step-blurb">At 80% your chapter is qualified and lands on the map. First frat and first sorority on your campus to get there each take the $250.</span>
+      </li>
+    </ol>
+
+    <div class="gates">
+      <div class="card">
+        <h3>What qualifies you</h3>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>80% or more of your active members</strong> onboarded onto fomo.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Kept downloaded through the end of the semester.</strong> Drop below 80% and the chapter stops counting until it is back.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Everyone trading is <strong>18 or over</strong> and signed up in their own name.</span></li>
+        </ul>
+        <p class="note">Actives only — pledges, alumni and everyone on a leave of absence are outside the count, in both directions.</p>
+      </div>
+      <div class="card">
+        <h3>What you get for it</h3>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>A guaranteed <strong>$500</strong> for whoever in your chapter finishes the semester up the most.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>A place on <strong>both boards</strong> — your school's and the national one — from the day you qualify.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>fomo perks through the season: <strong>trading rewards, events</strong>, and first call on everything the campus team runs.</span></li>
+        </ul>
+        <p class="note">Nothing to pay and nothing to sign. <a href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Register your chapter →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── the map ─────────────────────────────────────────────────── -->
+  <section id="map" class="section" aria-labelledby="map-title">
+    <div class="section-head">
+      <p class="eyebrow">Onboarded</p>
+      <h2 id="map-title">Where the war <span class="accent">is already running.</span></h2>
+      <p>Every campus with at least one qualified chapter lights up. <b>Hover a ping</b> for what is on the ground there.</p>
+    </div>
+
+    <div class="card mapcard">
+      <div class="map-head">
+        <span class="pill" id="map-source">Sample season</span>
+        <div class="map-stats">
+          <span class="map-stat"><b id="stat-chapters">—</b><span>Chapters</span></span>
+          <span class="map-stat"><b id="stat-schools">—</b><span>Campuses</span></span>
+          <span class="map-stat"><b id="stat-members">—</b><span>Members on fomo</span></span>
+        </div>
+      </div>
+      <div class="map-stage">
+        <svg class="usmap" viewBox="0 0 975 610" role="img" aria-labelledby="map-title">
+          <path class="land" d="M641.6 384L689.2 379.7L702.4 426.8L707.8 436.5L707.3 438.8L709.5 439.9L706.7 443.2L705.9 450.1L708.6 457.2L708.3 464.8L710.8 468.8L660.7 474L660.5 477.4L665.1 480.9L664.6 484.3L666.4 486.3L663.7 490.1L654.4 492.1L659 490.2L655.9 487.8L655.4 483.1L653.4 481.7L651.6 490.2L646.5 489.5L642.2 455L643.7 386.2L641.6 384ZM145.1 407L148.9 406.9L150.3 405.1L150.2 400.8L146.9 398.8L147.5 393.9L148 391.6L152.4 389.1L153.8 380.6L157 377L162.7 374.6L158.9 369.3L158.5 363.3L156.2 359L156.8 356.2L158.8 351.9L159.5 331.3L166.6 331.5L168.4 334.8L170 334.9L172.6 331.5L176 313.3L264.6 328L246.9 456.3L208.1 450.5L142.3 411.7L145.1 407ZM277.1 237.2L361.4 246.6L395.3 249.1L393.8 271.9L389.6 340.7L372.5 339.3L264.6 328L277.1 237.2ZM793.7 604.2L800.5 597.7L805.1 600.1L793.7 604.2ZM777.4 558.3L779.8 562.4L783.3 563.1L779.5 562.7L777.4 558.3ZM710.8 468.8L714.2 475L765.8 471.5L767.3 476L769.8 475.4L768.6 466.9L770 464.9L780.2 466.1L786.8 485.6L795.5 500.4L804.7 511L806.6 521.9L822.1 549L824 572.1L823.9 574.6L823 572.9L821.1 576L820.9 583.7L824.1 578.6L821.6 586.6L816.4 593.3L819.7 586.1L806.9 589.7L805.5 589L805 584.1L800.6 577.8L793.1 574.2L791.9 575.4L786.5 564.2L782.1 561L781.3 562.6L779.2 558.4L781 558.5L780.4 552L778.5 553.2L779.5 555.9L777.3 557.8L765.1 540.9L766.1 541.7L768.4 538.9L770.6 531.9L769 531.7L769.6 533.8L768 533.5L767.6 530.8L764.7 529.8L764.2 531.7L767.4 534.3L765.1 539.2L762 534L760.7 526.1L762.7 529.5L763.7 520.5L761.9 510.2L758.9 505L754 506.1L753.2 503.4L746.1 498.3L745.3 494.9L742.7 494L740.4 490.6L732.2 486.7L727.4 487.4L725.8 489.7L726.5 492.1L722.7 492.3L716.5 497.1L715.7 496L711.8 498L714.2 499.9L720.1 496L713.6 500.8L709.9 499.1L707.5 499.8L705.7 495.8L707.6 499.1L708.1 496.3L705.2 493.4L694.9 488L687.3 485.9L678.4 486.1L663.7 490.1L666.4 486.3L664.6 484.3L665.1 480.9L660.5 477.4L660.7 474L710.8 468.8ZM689.2 379.7L712.7 376.8L734.9 373.7L731.6 379L731.6 381.5L738.4 385.4L740.8 385L748.4 396.2L761.6 405.4L761.8 408.1L766.1 412.1L771.3 414.4L774.1 423L778.7 425.8L781.5 433.5L786.1 434.6L786.8 436L781.2 442.6L782.9 444.6L780.7 446.6L782.4 447.1L781.3 454.4L778.3 460.2L779.9 459.9L780.2 466.1L770 464.9L768.6 466.9L769.8 475.4L767.3 476L765.8 471.5L714.2 475L710.8 468.8L708.3 464.8L708.6 457.2L705.9 450.1L706.7 443.2L709.5 439.9L707.3 438.8L707.8 436.5L702.4 426.8L689.2 379.7ZM640.3 229.8L645.6 231.3L651.9 227.5L685.6 223.9L685.8 225.4L692.5 284.3L691.4 285.7L693.6 291.4L687.8 294.4L682.6 294.6L683.6 298.3L680.6 301L679.7 304.3L677.1 305.1L676 311L674 312.8L667.7 308L668.7 309.3L666.3 310.3L666 314.3L663.9 316.5L663.6 315L659.7 313.6L655.3 318.7L650.6 315.6L648.5 316.4L646.6 315.1L646.3 318.5L645.3 316.8L641.3 316.7L641.6 319.3L639.4 319.7L638 317.5L639.5 317.5L638.8 314L640.5 311.7L639.2 309.4L641.5 308.6L646.9 297.4L643.5 287.9L645 283.6L640.3 229.8ZM393.8 271.9L449.2 274.5L509.9 275.2L512.9 278L516.5 277.7L517.5 281.3L516.1 281L513.6 285.9L517.5 289.4L518.3 293L522.6 294.4L522.8 343.8L455.8 343.5L389.6 340.7L393.8 271.9ZM931.3 119.2L932.7 117.1L934.4 119.3L933 120.8L931.3 119.2ZM910.2 150.1L903.8 144.3L890.9 102.4L891.8 101.2L894.8 103.1L894.8 98.4L897.3 98.8L895.2 96.3L900 86.1L897.8 79.8L899.9 73.8L899.1 67.5L905.9 47.6L908.8 47.5L909.8 51.2L912.5 52.3L921.2 45.5L929.7 49.7L938.7 79.9L944.6 79.9L946.2 87.1L949.4 89.7L949.8 88.1L952 88.1L957.1 94.8L954.2 100.6L952.8 98.6L951.4 99.6L952.4 100.5L949.7 103.1L951.1 104.2L950.2 105.6L946.8 104.3L943.9 110.3L941.5 109.7L942.2 113L938.9 113.7L937.4 111.9L938.7 110.4L936.7 109.9L936.9 111.3L936.5 110.1L935.5 111.5L937.4 119.8L934.5 117L934.5 114.7L931.9 114.3L931.5 110.2L928.5 112.6L929.7 113.9L929 120.1L930.2 120.3L930.2 122.9L927.1 126.5L927 124.7L924.8 124.8L924.4 127.7L923.4 127L919.7 132.2L918 130.9L914.9 134.3L914.8 137.5L912.6 139.1L912.9 142.3L911 143.7L910.2 150.1ZM927.7 186.8L930.2 186.4L931.5 184.3L933.1 186.6L927.7 186.8ZM918.3 188.3L921.3 184.5L924.2 185.1L924.6 186.7L919.6 189.2L918.3 188.3ZM871 167.6L884.1 164.8L902.9 160.7L906.2 156L909.5 154.8L911.2 158.5L914.3 158.5L913.8 160.4L910.6 162.2L911.5 162.9L909.5 165.7L910 168.6L911.8 167.5L915 169L917.1 171.2L916.7 173.7L922.8 177.8L925.5 177.8L929 174.6L926.2 170L923.6 169.8L925.6 169.4L929 172.1L931 176.8L930.9 180.3L930 177.7L924.4 180L916.1 187.6L920 183.3L919.5 179.5L917.9 179.4L915.4 185.3L912.8 186.4L910.5 182.8L909.8 182.1L907.7 181L905.5 176L898.8 178L871.2 184L871 167.6ZM479.5 70.7L510.8 70.8L510.7 62.1L513.7 62.4L515.7 64.1L518.6 76.5L530.9 78.8L531.5 81.3L536.5 80.5L538.2 78.6L543.7 78.5L549.1 80.2L548 82L551.1 82.2L553.4 87.3L554.9 84.2L558 84L559.9 86.8L565.9 89.3L565.8 90.7L570.6 89.6L576 85.7L578.1 88.8L587.6 88L591.8 90.6L597.6 89.5L577.1 101.1L558.9 119.3L560.3 121.2L559 120.2L555.9 122.3L556.4 135.6L550 140L547.7 143.9L547.5 147.2L551.4 150.2L549.7 153.6L549.4 165.5L553.8 170L557.4 170.3L558.9 172.5L563.1 174.1L564.8 177.8L572.2 182.1L575.6 187.1L576.3 193.3L490.6 195.2L490.8 154.3L484.4 147.3L488.9 142.4L489.1 139.9L488.6 130.9L485.6 123.3L484.8 102L480.7 90L481.4 77.8L479.5 70.7ZM849.2 245.8L849.7 244.4L850.7 241.4L860.7 231L853.7 226.4L849.9 220.8L851.6 216.2L849.6 214.2L855 204L869.9 209L869.2 216.4L868.9 217.1L866.9 218.3L866.6 221.4L868 222.5L871.5 221.5L873.2 237.3L870.9 245.6L866.8 251.5L864.4 258.6L862.6 259L862.9 253.8L857.9 253.9L850.4 249.5L849.3 246.3L849.2 245.8ZM863.3 349.7L870.9 343.2L868.8 332.1L870.7 335.7L871.3 344.1L863.3 349.7ZM755.5 334L794.3 328.7L858.8 315.9L868.5 331.7L864 327.6L859.7 318.9L856.7 316.9L862.3 326.4L859.3 323L860 324.7L854.4 322.8L857.3 325.5L855.3 326.7L853.7 325.6L854.8 327.4L850.1 326.4L853.3 327.6L849.9 330.6L846.8 330.3L845.4 325.1L845 328.3L847.4 332.7L858 329.2L859.9 336.4L860.2 329.5L862.7 328.9L864.8 331.7L865.1 337.3L863 337.9L859.8 344.3L853.4 344.7L850.9 342L853.1 340.6L850.1 342.1L851.6 344.7L843.1 344L854.2 347.1L853.2 351.1L849.6 355L845.9 353.5L846.2 354.7L850.5 355.8L855 351.4L856.8 353.2L858 353.1L857.1 351.8L858.6 352L855.9 360.3L853.7 358.3L853.1 360.2L856.1 360.9L862.9 350L856.1 362.4L853.1 360.6L846.8 362.6L838.4 370L834.5 376.7L833.4 384.1L829.2 383.5L822.8 386.1L798.2 368.4L777.6 371.5L777.5 368.8L774.1 365.4L772.4 367.1L772 364.8L747.3 367L734.9 373.7L712.7 376.8L712.6 371.4L717.3 369L717 366.6L719.2 363.8L726.3 361.7L731.7 356.5L734.5 355.9L735.6 352.2L740.2 348.3L741.8 350.7L745 346.4L750.8 345.3L752.3 341.1L755.9 339.7L755.5 334ZM376.9 65.7L479.5 70.7L481.4 77.8L480.7 90L484.8 102L485.6 123.3L488.6 130.9L489.1 139.9L434.7 138.4L371.1 134.3L376.9 65.7ZM372.5 339.3L389.6 340.7L455.8 343.5L522.8 343.8L523 355.3L526.8 380.5L526.4 420.7L519.2 418.3L517.3 415.7L512.4 413.5L511.2 415.5L505.5 414.1L501.2 416.4L499.2 415.2L495.2 416.4L494.7 418.1L491.2 419.7L486.2 416.2L487.1 415L483.6 416.5L480.8 413.5L477.7 415.9L476.9 419L475.4 414.4L471 416.5L470.8 414.6L466.5 412.7L462.9 415.7L461.2 415L461.7 412.5L459.1 412.2L458.7 408.7L454 408.5L451.7 410.6L448.7 408.2L438.6 406.7L437.5 402.4L435.3 401.1L434.9 402.9L429.1 402.5L425.3 398L423.9 398.3L425.8 353.9L371.6 350.8L372.5 339.3ZM756.1 208.9L767.5 200.3L768.6 206.4L840.9 192.1L843.1 194.8L846.5 195.6L849.6 202.4L853.9 202.5L855 204L849.6 214.2L851.6 216.2L849.9 220.8L853.7 226.4L860.7 231L850.7 241.4L846.5 241.9L844.8 244.6L782.3 256.9L764.5 259.9L761.1 239.2L756.1 208.9ZM369 155.7L371.1 134.3L434.7 138.4L489.1 139.9L488.9 142.4L484.4 147.3L490.8 154.3L490.6 195.2L488.2 195.2L488.8 201.5L490.2 201.6L490.8 203.9L487.5 211.9L490.6 218.3L487.9 217.9L486.6 214.5L477.9 210.1L467.5 209.4L464.6 211.7L456.8 206.2L365.3 201L369 155.7ZM371.6 350.8L425.8 353.9L423.9 398.3L425.3 398L429.1 402.5L434.9 402.9L435.3 401.1L437.5 402.4L438.6 406.7L448.7 408.2L451.7 410.6L454 408.5L458.7 408.7L459.1 412.2L461.7 412.5L461.2 415L462.9 415.7L466.5 412.7L470.8 414.6L471 416.5L475.4 414.4L476.9 419L477.7 415.9L480.8 413.5L483.6 416.5L487.1 415L486.2 416.2L491.2 419.7L494.7 418.1L495.2 416.4L499.2 415.2L501.2 416.4L505.5 414.1L511.2 415.5L512.4 413.5L517.3 415.7L519.2 418.3L526.4 420.7L528.9 422.8L532.1 421.6L534.7 422.5L534.7 422.5L535 434.7L535.5 458.1L539.8 463L539.6 467L544.4 476.5L545.8 476.3L546.1 479.9L545.6 484.5L542.1 491L543.1 501.8L538.7 508L540.6 510.4L534.8 511.5L523.1 518L522.1 517.9L524.2 515.5L527.8 514.4L522.3 513.9L523.7 510.6L522.5 508.6L520.3 511L518.9 510.6L517.4 513.8L519.5 515.1L519.9 519.4L514.7 522.2L514.6 523.9L521.3 518.6L523.1 518.8L510.3 529.5L491.2 539.7L477.8 551.1L471.8 561.9L470.2 568.1L474.2 592.2L471.8 581.9L470 581.5L471.4 581L469.5 574L470.4 563.6L476.3 551L479.5 546.9L489.6 540L484.3 542L482.6 539.8L481.9 544L479.3 546.3L477.2 544.8L474.9 546L473.6 547.3L476.9 546.6L477.4 548.1L474.1 552.8L467.9 551.5L472.7 555.8L469.4 564.3L467.4 565.3L467.3 563.3L464.7 565.3L469.2 565.6L468.5 580.3L471.8 588L471.3 590.7L474.3 592.7L474.4 595.2L468.2 597.4L464.1 593.5L452.8 592.5L447.5 588.6L443.6 588.2L440.7 585.3L434.9 584.3L431.4 574.1L427.9 569.9L428.3 564.8L426.4 563.3L427.1 557.7L419.9 552.1L419 547.9L412 540.8L411.4 535.8L408.3 532.1L405.3 522L398.1 513.5L394.3 511.8L394.5 509.5L393.7 510.6L391.5 506.3L373.3 502.8L372.4 504.9L366.8 505.1L361.6 516.8L359.6 517.3L356.8 521.6L350.7 519.8L348.9 517.5L339.1 512.5L330.5 504.5L324.4 481.9L315.8 475.4L306.2 462.7L301.7 459.9L298.9 453.5L296.3 452.1L294.4 450L295.1 447L362.9 453.3L371.6 350.8ZM369 155.7L365.3 201L361.4 246.6L277.1 237.2L243.5 232.2L247.2 209.6L256 153.9L257.8 142L320.8 150.9L369 155.7ZM871.2 184L898.8 178L901.8 193.5L890.9 197.9L885.2 199.5L884.7 198.4L881.9 202.6L874 208.3L872.3 206L875.7 202.6L874.2 201L871.2 184ZM502 261.9L570.9 259.6L576.5 264.7L575.1 269.4L578 279.4L589.9 290.3L592.7 298.5L595.7 296.1L600.9 298.4L597.2 310.3L597.6 313.2L605.2 318.3L605.2 320.3L607 319.7L613.2 324.2L615.3 330.8L613.8 333.5L616.7 338.9L618.3 339.9L618.8 338.2L621.2 339.9L621.2 347.2L619.6 349.6L617.5 348.5L616.8 351.3L615.6 351.5L615.6 349.8L614.2 349.8L614.6 351.5L615.4 354.3L613.6 355.9L615.1 357.1L612.2 357.3L614.1 360.3L611.9 363.1L600.2 364L605.2 357.3L603.6 352.2L523 355.3L522.8 343.8L522.6 294.4L518.3 293L517.5 289.4L513.6 285.9L516.1 281L517.5 281.3L516.5 277.7L512.9 278L509.9 275.2L504.6 268.1L504 262.8L502 263.1L502 261.9ZM733.2 294.8L737.9 293.5L738 290.6L739.9 289.3L738.5 285.4L741.1 279.6L744 282.8L745.7 281.3L744.6 277.8L746.2 273.2L748.2 273L749.4 269.6L751 270.8L753.9 269.2L758.7 263.2L760.9 246.6L758.8 241L761.1 239.2L764.5 259.9L782.3 256.9L784.1 268.5L789.8 261.3L792.3 261.6L794.5 257L800.3 258.4L800.4 256L804.4 253.4L807.8 255L810.8 254.4L810 255.6L813.9 260.3L812.9 264.9L802.6 259.1L802.9 266L796.5 276.6L794 275L790.3 285.9L783.8 282.9L782.6 290.6L776.4 303.5L777.6 306.3L775.9 308.1L776.6 309.3L773.8 311.7L773 310.5L768.8 313.7L767.1 312.7L766.4 315.6L761.3 318.1L758.5 316.1L753.4 320.1L748.4 317.2L747.1 313.2L740.9 311.1L736.4 305.6L737 304.5L733.4 301.3L733.2 294.8ZM576.5 264.7L577.2 259.6L581.2 257.7L581.6 254.2L583.6 251.9L583.7 247.9L580.7 244.8L581.6 240.7L591.3 237.7L595.7 230.9L595.5 223.8L591.8 221.8L587 215.4L634.2 212.4L633.9 216.8L640.3 229.8L645 283.6L643.5 287.9L646.9 297.4L641.5 308.6L639.2 309.4L640.5 311.7L638.8 314L639.5 317.5L638 317.5L639.4 319.7L637.3 323L639 327.3L632.2 329.8L633.1 336.9L623.4 334.1L620.4 337.9L621.2 339.9L618.8 338.2L618.3 339.9L616.7 338.9L613.8 333.5L615.3 330.8L613.2 324.2L607 319.7L605.2 320.3L605.2 318.3L597.6 313.2L597.2 310.3L600.9 298.4L595.7 296.1L592.7 298.5L589.9 290.3L578 279.4L575.1 269.4L576.5 264.7ZM264.6 328L372.5 339.3L371.6 350.8L362.9 453.3L295.1 447L294.4 450L296.3 452.1L264.2 448.2L262.9 458.4L246.9 456.3L264.6 328ZM523 355.3L603.6 352.2L605.2 357.3L600.2 364L611.9 363.1L613.5 365.6L611.9 365.3L612.7 366.9L608.2 369.7L610.3 371.5L608.6 372.5L609.2 374.5L607.1 373.7L606.9 377.1L606.3 375.4L604.8 376.9L606.6 377.6L605.1 379.7L607.1 383.2L602.8 386.7L604.1 388.6L600.9 390.6L599.9 389.4L600.5 392.7L598.7 391.9L600.4 394.3L598.1 394.5L598.8 400.1L597.3 402.5L595.5 401.5L593.9 405.3L592.2 405.1L594.7 406.3L592 407L593.6 408.3L592.1 410.6L589.9 410.6L591.7 414.9L588.9 416.6L591.1 417.7L587.6 417.4L589.4 419.5L587.5 420.4L587.6 423.2L589.6 422.3L588.8 424.5L590.5 422.7L589.5 426.4L591.4 427L590.6 430L588.6 430.7L590.2 431.9L589.4 433.1L535 434.7L534.7 422.5L534.7 422.5L532.1 421.6L528.9 422.8L526.4 420.7L526.8 380.5L523 355.3ZM77.2 374.3L81.1 376.9L81.3 379.5L78.9 378.3L77.2 374.3ZM74.7 384.2L78.3 390L75.9 388.9L74.7 384.2ZM56.6 355L63.5 357.9L59.5 358.6L56.9 357.4L56.6 355ZM50.3 355.2L54.2 355.4L54.8 357.8L51.9 358.1L50.3 355.2ZM46.8 353.4L48.5 353L49.4 354.4L46.8 353.4ZM32.6 159.9L100.5 179.2L100.4 179.2L83.3 245.5L156.8 356.2L156.2 359L158.5 363.3L158.9 369.3L162.7 374.6L157 377L153.8 380.6L152.4 389.1L148 391.6L147.5 393.9L146.9 398.8L150.2 400.8L150.3 405.1L148.9 406.9L145.1 407L99.5 401.7L99.4 398.4L97.9 398.1L98.7 387.7L96.6 382.3L87.9 370.9L82.1 369.3L83 367.2L81.3 362.1L76.4 361.8L71 358.1L65 349.3L48.8 344.2L46.7 341.2L49.8 328.5L46.4 325.6L46.9 320.1L42.1 313.8L39.7 305L35 296.8L35 290.1L38.4 288.5L39.2 282.7L35.1 281L31.5 274.3L33.2 260.8L35.3 260.7L34.7 265.7L39.3 270.3L35.9 257.2L39.2 256.3L38.9 254.7L35.8 253.7L35.2 259L33.2 259.9L28.6 253.7L26.2 253.5L28.5 248.3L20.1 229L21.6 226.9L21.4 219.6L23.6 215.5L24.1 209.2L18.5 197.2L18.9 193.1L27.7 181.7L27.7 178.9L31.3 172.9L31.7 165.8L30.4 164.4L32.6 159.9ZM844.8 244.6L846.5 241.9L850.7 241.4L849.7 244.4L848.4 246.2L849.5 249.7L853.7 253.6L856.8 260.7L861.1 262.6L863.7 270.3L852.6 272.5L844.8 244.6ZM490.6 195.2L576.3 193.3L576.8 196.7L579.2 198.9L577.4 201.7L579.9 210.5L585.8 212.6L587 215.4L591.8 221.8L595.5 223.8L595.7 230.9L591.3 237.7L581.6 240.7L580.7 244.8L583.7 247.9L583.6 251.9L581.6 254.2L581.2 257.7L577.2 259.6L576.5 264.7L570.9 259.6L502 261.9L500 258.8L501.2 254.7L499.1 241.8L496.5 240.2L496.9 234.1L492.2 225.7L490.6 218.3L487.5 211.9L490.8 203.9L490.2 201.6L488.8 201.5L488.2 195.2L490.6 195.2ZM621.2 339.9L620.4 337.9L623.4 334.1L633.1 336.9L632.2 329.8L639 327.3L637.3 323L639.4 319.7L641.6 319.3L641.3 316.7L645.3 316.8L646.3 318.5L646.6 315.1L648.5 316.4L650.6 315.6L655.3 318.7L659.7 313.6L663.6 315L663.9 316.5L666 314.3L666.3 310.3L668.7 309.3L667.7 308L674 312.8L676 311L677.1 305.1L679.7 304.3L680.6 301L683.6 298.3L682.6 294.6L687.8 294.4L693.6 291.4L691.4 285.7L692.5 284.3L699 283.3L703.9 289.8L708.5 289.7L713.9 292.7L716.2 290.6L720.2 292.4L722.8 291.6L727 287.9L728.3 291.5L733.2 294.8L733.4 301.3L737 304.5L736.4 305.6L740.9 311.1L747.1 313.2L741.2 320.4L735.1 324.7L733.1 330.3L729.8 331.5L729 334.2L719.8 338.7L644.8 346.1L640.8 345.4L641.4 349.5L616.8 351.3L617.5 348.5L619.6 349.6L621.2 347.2L621.2 339.9ZM849.8 285L849 285.2L849 283.1L849.8 285ZM847.3 281.5L847.7 279.6L849.1 282.2L847.3 281.5ZM782.3 256.9L844.8 244.6L852.6 272.5L863.7 270.3L862.5 280.5L855.5 283.8L851.8 285.4L851.9 280.3L849.6 280.7L851.2 278.7L849.7 277.7L850.2 275.4L848.9 278.3L847.7 275.6L847.4 279.1L846.1 279.2L841.4 274.2L842.5 270.7L846.4 271.4L841.6 268.4L840.3 269.8L840.8 265.9L842.3 266.2L841.6 263.9L839 266.3L839.4 262.1L841.9 262.1L841.8 260L840.5 261.8L839.3 259.3L840.1 255.1L842.9 253.3L842.6 248.9L840.6 249.9L841.6 251.7L839.2 254.5L838.3 252.4L838.5 255.9L836.8 254L837.7 257L836.2 258.8L833.7 257.7L838 262.7L836.3 268.8L843.8 284.3L841.2 281.9L840.8 283.3L838.3 281.3L834.6 281.5L833.6 279.1L833.8 281.3L832.2 280.7L829.9 277.6L826.1 279.8L825.2 277.7L827.1 273.7L827.9 269.9L829.7 267.2L826.9 265.4L825.9 267L818.2 264.2L818.8 261.6L816.7 260.2L813.9 260.3L810 255.6L810.8 254.4L807.8 255L804.4 253.4L800.4 256L800.3 258.4L794.5 257L792.3 261.6L789.8 261.3L784.1 268.5L782.3 256.9ZM677.1 130.9L682 132.3L679.8 133.4L677.1 130.9ZM662.4 138.6L664 134.8L664.5 138.1L662.4 138.6ZM651.9 227.5L655.1 224.2L658.5 215.8L660 207.6L658.9 198L652.5 184.9L653.8 180.8L651.9 175.1L655.2 168L654.6 160.1L657.2 158.7L657.1 155.4L659.1 153.3L661.1 153.5L664.7 147.2L663.8 155.5L664.9 157.3L666.4 152L666.1 157.6L667.8 153.2L667.3 145.5L674.1 141.9L671.2 140.4L670.5 138.2L672.9 134.8L671.7 133.8L675.4 132.7L680.6 135.2L684.6 135.1L687.5 138.1L696.7 139.9L701.3 147L698.4 147.1L702.2 153.9L702.4 162.5L699.3 165L699.2 169.4L694.8 172.2L695.1 178.8L699.5 179.8L702 176.6L702.2 173L703.5 173.2L702.5 172.1L709.9 167.7L715 172L721.5 191.4L720.9 199.8L718.6 202.2L719.1 198.7L716.3 199.4L715.5 205.7L712.9 207.6L712.5 213L708.3 221.7L685.8 225.4L685.6 223.9L651.9 227.5ZM601.4 92.4L613.5 84.4L610.1 88.7L605.2 91.4L606.6 91.7L603.5 93.3L601.4 92.4ZM585.3 123.1L594.7 116.8L600.2 115.9L607.4 111.6L618.6 100.5L624.4 99.7L625.9 101.2L622.2 101.8L618.3 106.4L615.4 111.8L615 116.7L620.1 111.5L618.1 114.7L621.1 112.5L625.3 112.8L628.9 114.9L633.3 120.9L638.5 119.7L641.8 121.6L643.6 121.4L643.2 119L645.3 120.7L651.8 115.2L662 114L670 111L669.6 117.6L675.7 116.8L676.5 118.3L683.4 114.8L684.4 121.5L682.5 123L684.5 122.7L688.9 126.4L690.5 125.6L689.4 123.8L692.5 123.4L695.2 125.8L694.1 127.6L685.2 127.2L681.2 128.8L676.5 126.6L675.7 131.6L671 128.2L663 127.2L660.4 130.5L651.3 131.9L646.8 140L645 138.8L647.3 133.5L643.6 134.7L643 137.7L641.1 139L639.9 135.4L632.4 153L629.8 150.9L630.8 146.9L627.8 147.8L627.8 147.8L628.2 140.2L622.3 137.4L622.7 135L616.1 133.4L613.7 134.2L590.3 128L588.5 124.3L586.4 123.6L586.4 123.6L585.3 123.1ZM589.4 433.1L590.2 431.9L588.6 430.7L590.6 430L591.4 427L589.5 426.4L590.5 422.7L588.8 424.5L589.6 422.3L587.6 423.2L587.5 420.4L589.4 419.5L587.6 417.4L591.1 417.7L588.9 416.6L591.7 414.9L589.9 410.6L592.1 410.6L593.6 408.3L592 407L594.7 406.3L592.2 405.1L593.9 405.3L595.5 401.5L597.3 402.5L598.8 400.1L598.1 394.5L600.4 394.3L598.7 391.9L600.5 392.7L599.9 389.4L600.9 390.6L604.1 388.6L602.8 386.7L641.6 384L643.7 386.2L642.2 455L646.5 489.5L645.1 490.7L635.2 489.9L629.1 492.3L628.5 490.7L626.2 495.2L624.7 495.4L622.9 494.6L617.6 484.9L619.1 477.1L582.6 479.2L583.9 477.6L582.2 473.1L584.7 472.7L583.3 470L585.4 470.6L584.3 467.1L586.4 466L584.5 464.4L586.5 464.8L586.5 462.8L589 461.5L587 461.4L587.4 459.5L588.9 460.4L591.9 456L590.5 454.6L593.4 452.2L590.4 452.9L590.4 451.4L593.7 450.9L595.7 447.5L593.4 447.7L593.3 445.5L591 445.1L591.2 443.9L593.4 444.6L591.5 443.2L592.4 441.1L590.3 442.3L591.8 439.3L589.7 438.8L589.7 437.4L591.4 434.8L590.8 433.5L588.6 435L589.4 433.1ZM198.1 39.1L285.2 54.9L376.9 65.7L371.1 134.3L369 155.7L320.8 150.9L257.8 142L256 153.9L251.7 146.7L249.9 147.5L249.5 151.3L236.7 148.5L234.6 150.9L228.5 149L226.9 151.6L224.8 149.1L224.1 141.5L219.3 138.5L220.2 134.2L216.8 127.3L216.9 121L214.5 118.2L207.9 122.6L205.1 119.7L206.6 116.6L205.9 114.9L209.1 112.9L208.1 107.3L213.3 95.9L208.9 95.5L208.1 93.1L206.8 93.8L200.8 79.7L195 74.7L197.3 73.8L195.8 72.2L196.8 68.7L193.3 61.5L198.1 39.1ZM886.1 110.5L885.8 105.4L887.8 103.3L890.5 103.9L890.9 102.4L903.8 144.3L910.2 150.1L909.5 154.8L906.2 156L902.9 160.7L884.1 164.8L881.8 162.5L882.7 158.5L880.6 145.8L883.2 133L881.8 127.9L885.1 126.3L887.9 122.1L885.7 116.9L886.1 110.5ZM868.9 217.1L869.2 219.2L866.6 221.4L866.9 218.3L868.9 217.1ZM767.5 200.3L776.4 192.1L780.4 186.1L775.5 180.1L774.9 176L783.8 171.7L795.1 170.4L799.8 171.9L811.4 167.8L819.6 159.9L816.9 154.4L819.3 152.5L814.7 150.3L814.9 146.4L820.5 141.3L827.7 128.8L834.4 123.2L857.6 117.8L858.9 126.3L861.4 130.2L861.2 139.5L864.1 145.2L863.8 149.6L865.6 148.3L866.9 149.7L871 167.6L871.2 184L874.2 201L875.7 202.6L872.3 206L874 208.3L872.2 212L873 213L877.1 208.5L881.5 208.4L882.7 206.7L890.9 204.2L895.8 198.9L895.2 200.2L899.6 201.8L903.2 199L883.4 214.4L871.7 219.3L869.2 216.4L869.9 209L855 204L853.9 202.5L849.6 202.4L846.5 195.6L843.1 194.8L840.9 192.1L768.6 206.4L767.5 200.3ZM685.8 225.4L708.3 221.7L717.6 225.5L719 223.6L725.6 227.4L733 223.2L737.7 223.2L744.2 215.9L756.1 208.9L761.1 239.2L758.8 241L760.9 246.6L758.7 263.2L753.9 269.2L751 270.8L749.4 269.6L748.2 273L746.2 273.2L744.6 277.8L745.7 281.3L744 282.8L741.1 279.6L738.5 285.4L739.9 289.3L738 290.6L737.9 293.5L733.2 294.8L728.3 291.5L727 287.9L722.8 291.6L720.2 292.4L716.2 290.6L713.9 292.7L708.5 289.7L703.9 289.8L699 283.3L692.5 284.3L685.8 225.4ZM70.9 70.2L72.9 73.5L77 73.8L79.6 76.9L79 86.8L85.9 91.5L93.8 89.9L101 91.9L102.8 94.7L112.1 93.9L115.3 95.8L129.3 94.2L136.2 95.7L138.7 94.8L170.5 102.4L172 106.9L175.1 109.4L175.6 112.6L165.7 127.5L162.3 129.6L157.4 136.6L157.3 139.1L160.9 141.1L161.7 143.3L157.9 150.5L148.8 190.7L100.5 179.2L100.4 179.2L100.5 179.2L32.6 159.9L31.1 153.5L33.6 146.7L32.8 139.9L46.3 118.5L58.3 89.6L64 68.7L65.7 71.1L70.9 70.2ZM611.9 363.1L614.1 360.3L612.2 357.3L615.1 357.1L613.6 355.9L615.4 354.3L614.6 351.5L615.6 351.5L616.8 351.3L641.4 349.5L640.8 345.4L644.8 346.1L719.8 338.7L755.5 334L755.9 339.7L752.3 341.1L750.8 345.3L745 346.4L741.8 350.7L740.2 348.3L735.6 352.2L734.5 355.9L731.7 356.5L726.3 361.7L719.2 363.8L717 366.6L717.3 369L712.6 371.4L712.7 376.8L689.2 379.7L641.6 384L602.8 386.7L607.1 383.2L605.1 379.7L606.6 377.6L604.8 376.9L606.3 375.4L606.9 377.1L607.1 373.7L609.2 374.5L608.6 372.5L610.3 371.5L608.2 369.7L612.7 366.9L611.9 365.3L613.5 365.6L611.9 363.1ZM197.8 201.1L247.2 209.6L243.5 232.2L277.1 237.2L264.6 328L176 313.3L197.8 201.1ZM855.5 283.8L862.5 280.5L858.8 286.7L856.4 301.9L854.4 304.3L852.6 300.7L852.7 292.6L855.5 283.8ZM747.1 313.2L748.4 317.2L753.4 320.1L758.5 316.1L761.3 318.1L766.4 315.6L767.1 312.7L768.8 313.7L773 310.5L773.8 311.7L776.6 309.3L775.9 308.1L777.6 306.3L776.4 303.5L782.6 290.6L783.8 282.9L790.3 285.9L794 275L796.5 276.6L802.9 266L802.6 259.1L812.9 264.9L813.9 260.3L816.7 260.2L818.8 261.6L818.2 264.2L825.9 267L827.9 269.9L827.1 273.7L825 274.1L824.6 277.6L826.1 281L829.6 278.7L831.8 282.6L838.2 282.9L846 287.3L845.1 294L842.3 293.8L840.5 291.3L833.9 287.8L841.9 294.5L846.4 294.9L845.7 296.4L847.4 296.5L848 300.4L845.1 298.9L846.9 301.5L844.5 302.6L848.6 304.6L849 307.5L846.9 308.6L841.8 303.8L836.6 304.7L840.5 305.7L841.3 304.4L842.6 307.9L846.3 310.5L849.3 310.1L849.8 308.2L854.8 308.1L858.8 315.9L794.3 328.7L755.5 334L719.8 338.7L729 334.2L729.8 331.5L733.1 330.3L735.1 324.7L741.2 320.4L747.1 313.2ZM93.2 50.9L94.9 47.8L95.7 50.9L93.2 50.9ZM95 31L98.5 27.7L99.4 30.6L95.8 31.1L97.5 32.7L97.1 36.6L97.8 34.9L99.6 36.9L98.8 39.7L96.7 37.6L96.9 33.2L95 31ZM91 21.2L94 22.9L93.4 21.3L95.9 19.9L98.2 21.8L94.7 26.5L91 21.2ZM183.6 35.9L170.1 93.7L170.5 102.4L138.7 94.8L136.2 95.7L129.3 94.2L115.3 95.8L112.1 93.9L102.8 94.7L101 91.9L93.8 89.9L85.9 91.5L79 86.8L79.6 76.9L77 73.8L72.9 73.5L70.9 70.2L68.6 68.5L65.9 69.2L64.2 66.9L63 67.7L65.6 59.7L65.6 65.8L65.9 63.1L67.6 62.7L67.2 60.2L69.7 59L65.9 57.2L66.3 53.6L66.8 54.6L70.7 53.9L67.4 50.7L65.8 52.9L67.6 34.3L65.6 28L67.7 19L76.9 27.1L87.3 31.4L89.4 30.6L90.2 33L92 33.3L92 35.6L92.7 33.1L94.7 32.9L93.7 33.9L93.9 35L95.3 34L95.3 39.1L90.8 42.3L91.8 39.9L83.9 48.2L87.7 48.6L84.6 47.6L95.6 39.9L95.7 37.9L96.6 39L92.4 52.4L91.2 53.6L91.1 50.1L90.1 50.6L90.5 53.7L89 55.1L87.9 51.7L88.9 49.5L87.6 51.3L87.1 53.6L89.4 55.7L92.8 51.7L93.9 53.2L96.1 51.9L96.1 46.6L97.5 46.2L96.5 44.8L101.4 38.9L100.5 32.6L99 33.1L99.8 36.4L98.2 34.1L98.7 31.6L100.5 32L100.9 30.4L97.3 26.2L99.1 25.3L101 27L102.4 24.4L101.8 20.2L100.4 21.6L99.6 20.5L98.9 15.1L100 14.4L183.6 35.9ZM641.9 146.3L642.1 144.7L643.9 144.9L642.9 147.5L641.9 146.3ZM579.2 113L581.1 112.2L582.7 113.4L580.9 114.6L579.2 113ZM560.3 121.2L568 119.6L577.7 114.5L579.7 116.1L577 122.8L580.2 120.5L585.3 123.1L586.4 123.6L586.4 123.6L588.5 124.3L590.3 128L613.7 134.2L616.1 133.4L622.7 135L622.3 137.4L628.2 140.2L627.8 147.8L627.8 147.8L630.8 146.9L629.8 150.9L632.4 153L632 155.8L628.8 157.1L626.9 162.1L626.2 165.6L627.4 166.3L632.6 158.9L636.2 157.9L637.8 150.9L641.7 147.7L635.4 165.2L635.4 173.7L633.5 175.5L632.5 180.7L633.4 185.3L630.9 195.6L634.1 205.7L634.2 212.4L587 215.4L585.8 212.6L579.9 210.5L577.4 201.7L579.2 198.9L576.8 196.7L576.3 193.3L575.6 187.1L572.2 182.1L564.8 177.8L563.1 174.1L558.9 172.5L557.4 170.3L553.8 170L549.4 165.5L549.7 153.6L551.4 150.2L547.5 147.2L547.7 143.9L550 140L556.4 135.6L555.9 122.3L559 120.2L560.3 121.2ZM365.3 201L456.8 206.2L464.6 211.7L467.5 209.4L477.9 210.1L486.6 214.5L487.9 217.9L490.6 218.3L492.2 225.7L496.9 234.1L496.5 240.2L499.1 241.8L501.2 254.7L500 258.8L502 261.9L502 263.1L504 262.8L504.6 268.1L509.9 275.2L449.2 274.5L393.8 271.9L395.3 249.1L361.4 246.6L365.3 201ZM734.9 373.7L747.3 367L772 364.8L772.4 367.1L774.1 365.4L777.5 368.8L777.6 371.5L798.2 368.4L822.8 386.1L816.3 392.2L811 407.9L806.9 408.6L807.4 410.8L802.9 415.1L801.4 414.8L802.5 416.8L800.6 419L794.9 422.9L792.2 422.9L793.1 426.7L790 428.8L787.6 428L789.6 429.8L786.1 434.6L781.5 433.5L778.7 425.8L774.1 423L771.3 414.4L766.1 412.1L761.8 408.1L761.6 405.4L748.4 396.2L740.8 385L738.4 385.4L731.6 381.5L731.6 379L734.9 373.7ZM170.5 102.4L170.1 93.7L183.6 35.9L198.1 39.1L193.3 61.5L196.8 68.7L195.8 72.2L197.3 73.8L195 74.7L200.8 79.7L206.8 93.8L208.1 93.1L208.9 95.5L213.3 95.9L208.1 107.3L209.1 112.9L205.9 114.9L206.6 116.6L205.1 119.7L207.9 122.6L214.5 118.2L216.9 121L216.8 127.3L220.2 134.2L219.3 138.5L224.1 141.5L224.8 149.1L226.9 151.6L228.5 149L234.6 150.9L236.7 148.5L249.5 151.3L249.9 147.5L251.7 146.7L256 153.9L247.2 209.6L197.8 201.1L148.8 190.7L157.9 150.5L161.7 143.3L160.9 141.1L157.3 139.1L157.4 136.6L162.3 129.6L165.7 127.5L175.6 112.6L175.1 109.4L172 106.9L170.5 102.4ZM100.4 179.2L100.5 179.2L148.8 190.7L197.8 201.1L176 313.3L172.6 331.5L170 334.9L168.4 334.8L166.6 331.5L159.5 331.3L158.8 351.9L156.8 356.2L83.3 245.5L100.4 179.2ZM857.6 117.8L886.1 110.5L885.7 116.9L887.9 122.1L885.1 126.3L881.8 127.9L883.2 133L880.6 145.8L882.7 158.5L881.8 162.5L884.1 164.8L871 167.6L866.9 149.7L865.6 148.3L863.8 149.6L864.1 145.2L861.2 139.5L861.4 130.2L858.9 126.3L857.6 117.8ZM637.6 497.4L639 500L638.4 504.1L637.6 497.4ZM628.5 497.9L631.3 495.4L630.8 499.1L628.5 497.9ZM576.6 511.5L579.9 510.5L582.6 512L580.6 514L576.6 511.5ZM535 434.7L589.4 433.1L588.6 435L590.8 433.5L591.4 434.8L589.7 437.4L589.7 438.8L591.8 439.3L590.3 442.3L592.4 441.1L591.5 443.2L593.4 444.6L591.2 443.9L591 445.1L593.3 445.5L593.4 447.7L595.7 447.5L593.7 450.9L590.4 451.4L590.4 452.9L593.4 452.2L590.5 454.6L591.9 456L588.9 460.4L587.4 459.5L587 461.4L589 461.5L586.5 462.8L586.5 464.8L584.5 464.4L586.4 466L584.3 467.1L585.4 470.6L583.3 470L584.7 472.7L582.2 473.1L583.9 477.6L582.6 479.2L619.1 477.1L617.6 484.9L622.9 494.6L624.7 495.4L621.2 499.1L619.2 498.9L619 501.1L621.1 500.7L621.5 502.5L623.5 502.5L625.7 497.7L627.9 498.1L626.9 499.9L628.2 501.3L631.1 499.7L629.2 501.8L630.6 502.2L628.4 502.8L630.2 503.5L629.7 504.7L628.1 504.1L627.4 507.2L625.4 505.7L626.4 508.1L622.8 507.8L624.2 509.1L622.5 508.2L622.7 510.3L626.3 513.4L632.4 513.8L634.4 517L636.6 517.3L634.9 517.8L636 518.4L634.2 521.8L631.8 519.9L628.8 523.6L631.1 517.7L629 519.2L623.8 515.7L619.8 515.3L612.6 521.1L610.7 517.1L608.9 518L608.1 515.4L605.3 516.4L605.7 518.1L599.8 522.5L597.8 519.8L590.3 517.5L591.6 516L594.6 518.3L592.5 514.3L590.2 515.4L589.7 512.7L587.7 513.7L585.6 510.1L583.8 510.2L584.2 507.9L579.6 508.7L580 505.9L572.8 507.9L574.8 511L576.5 510.9L570.6 513.1L553.6 508.2L540.6 510.4L538.7 508L543.1 501.8L542.1 491L545.6 484.5L546.1 479.9L545.8 476.3L544.4 476.5L539.6 467L539.8 463L535.5 458.1L535 434.7ZM910.5 182.8L912.8 186.4L911.9 187.6L910.1 184.2L911 187.2L909.5 188.4L910.5 182.8ZM901.8 193.5L898.8 178L905.5 176L907.7 181L909.8 182.1L909.3 184L906.7 181.2L907.6 190.8L901.8 193.5Z"/>
+          <g id="pings"></g>
+        </svg>
+        <div class="map-tip" id="map-tip" hidden></div>
+      </div>
+      <p class="map-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span id="map-note">Illustrative until the first chapters qualify. Campuses are placed by their real coordinates.</span></p>
+    </div>
+  </section>
+
+  <!-- ── the board ───────────────────────────────────────────────── -->
+  <section id="board" class="section" aria-labelledby="board-title">
+    <div class="section-head">
+      <p class="eyebrow">The board</p>
+      <h2 id="board-title">Live standings, <span class="accent">raw PnL.</span></h2>
+      <p>Not points, not volume, not activity — what your chapter is actually up. <b>Two titles run at once:</b> your school crowns a chapter, and so does the country.</p>
+    </div>
+
+    <div class="card boardcard">
+      <div class="tabs" role="tablist" aria-label="Leaderboard view">
+        <button class="tab" type="button" role="tab" id="tab-schools" aria-selected="true" aria-controls="board-body">By school</button>
+        <button class="tab" type="button" role="tab" id="tab-chapters" aria-selected="false" aria-controls="board-body">By chapter</button>
+        <select id="school-pick" aria-label="Which school's chapters" hidden></select>
+      </div>
+      <div class="scroll-x">
+        <table id="board-body">
+          <thead id="board-head"></thead>
+          <tbody id="board-rows"></tbody>
+        </table>
+      </div>
+      <p class="map-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span id="board-note">Sample season. The board goes live when the first chapters qualify, and official rules will be linked here before it does.</span></p>
+    </div>
+  </section>
+
+  <!-- ── the season ──────────────────────────────────────────────── -->
+  <section id="season" class="section" aria-labelledby="season-title">
+    <div class="section-head">
+      <p class="eyebrow">How it runs</p>
+      <h2 id="season-title">Team up, trade, <span class="accent">win the war.</span></h2>
+      <p>One semester, Aug 24 to Dec 11. <b>Every trade counts from the day your chapter qualifies</b> — there is nothing to enter and no weekly check-in.</p>
+    </div>
+    <ol class="card season" aria-label="How Greek Wars works">
+      <li><i>01</i><b>Rally your clan</b><small>Your chapter is your clan. Get everyone on fomo — 80% of actives qualifies you.</small></li>
+      <li><i>02</i><b>Trade together</b><small>Every trade counts. Ranked on raw PnL, not points, not volume, not activity.</small></li>
+      <li><i>03</i><b>Climb the board</b><small>Your school's board and the national one, at the same time.</small></li>
+      <li><i>04</i><b>Win the war</b><small>Your chapter's top trader takes $500. The top chapter in the country takes $10,000.</small></li>
+    </ol>
+  </section>
+
+  <section class="closer">
+    <span class="closer-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 100" fill="none"><path d="M36.9747 24.3586C44.1067 24.3587 49.7941 27.9515 52.9484 33.5959C48.7626 38.0418 45.6617 43.7612 44.4679 50.0002C43.2743 56.2391 44.1865 61.9572 46.67 66.4026C41.3555 72.0468 34.2931 75.6408 27.1613 75.6409C18.432 75.6407 11.8659 70.2588 9.46204 62.3196H26.8478C27.4159 62.3193 28.0059 61.8593 28.1691 61.2932L34.6486 38.7043C34.8098 38.1381 34.4815 37.6782 33.9152 37.678H14.1788C19.6213 29.7404 28.2465 24.3588 36.9747 24.3586Z" fill="#EAEDFF"/><path d="M72.3285 24.3586C85.0779 24.3586 93.2156 35.8374 90.5062 49.9993C87.7966 64.1596 75.2646 75.6409 62.515 75.6409C53.7856 75.6408 47.2196 70.2589 44.8158 62.3196H64.1537C64.7218 62.3194 65.3127 61.8594 65.476 61.2932L71.9545 38.7043C72.1157 38.138 71.7876 37.678 71.2211 37.678H49.5316C54.9741 29.7401 63.5999 24.3587 72.3285 24.3586Z" fill="#EAEDFF"/></svg>
+    </span>
+    <h2>Your chapter is a clan. <span class="accent">Go take the country.</span></h2>
+    <p>Register the roster, send one link, fill to 80%. That is the whole entry.</p>
+    <div class="hero-cta">
+      <a class="btn btn--primary btn--lg" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a>
+      <a class="btn btn--dark btn--lg" href="https://fomo.family" target="_blank" rel="noopener">Download app</a>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+          <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+          <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+          <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+          <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+        </svg>
+      </a>
+      <p>Your chapter vs. every chapter.</p>
+    </div>
+    <div>
+      <h4>Greek Wars</h4>
+      <ul>
+        <li><a href="#pot">What it pays</a></li>
+        <li><a href="#onboard">Onboarding</a></li>
+        <li><a href="#map">Who is onboarded</a></li>
+        <li><a href="#board">The live board</a></li>
+        <li><a data-onboard href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a></li>
+        <li><a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>The programme</h4>
+      <ul>
+        <li><a href="/campus">The campus program</a></li>
+        <li><a href="/gameday">Game Day</a></li>
+        <li><a href="/dinners">Dinner Series</a></li>
+        <li><a href="/crewsheet">Crew sheet</a></li>
+        <li><a href="/campus#apply">Join the campus team</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>fomo</h4>
+      <ul>
+        <li><a href="https://fomo.family" target="_blank" rel="noopener">fomo.family</a></li>
+        <li><a href="https://fomo.family/blog" target="_blank" rel="noopener">Blog</a></li>
+        <li><a href="https://fomo.family/answers" target="_blank" rel="noopener">FAQ</a></li>
+        <li><a href="https://fomo.family/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
+        <li><a href="https://fomo.family/terms" target="_blank" rel="noopener">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-legal">
+    <span>© 2026 fomo · Greek Wars</span>
+    <span class="spacer"></span>
+    <span>Trading involves risk, including loss of principal.</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---------- the sample season, replaced by the Firebase node when it has rows
+  var SCHOOLS = [{"id":"university-of-alabama","name":"University of Alabama","where":"Tuscaloosa, AL","lat":33.214,"lon":-87.5391,"chapters":14,"members":1240,"pnl":18.4},{"id":"university-of-georgia","name":"University of Georgia","where":"Athens, GA","lat":33.948,"lon":-83.3773,"chapters":11,"members":960,"pnl":16.1},{"id":"university-of-mississippi","name":"University of Mississippi","where":"Oxford, MS","lat":34.365,"lon":-89.5384,"chapters":9,"members":780,"pnl":14.8},{"id":"texas-a-m-university","name":"Texas A&M University","where":"College Station, TX","lat":30.6188,"lon":-96.3365,"chapters":12,"members":1015,"pnl":13.2},{"id":"penn-state-university","name":"Penn State University","where":"University Park, PA","lat":40.7982,"lon":-77.8599,"chapters":10,"members":870,"pnl":11.9},{"id":"indiana-university","name":"Indiana University","where":"Bloomington, IN","lat":39.1682,"lon":-86.523,"chapters":8,"members":690,"pnl":11.0},{"id":"university-of-texas","name":"University of Texas","where":"Austin, TX","lat":30.2849,"lon":-97.7341,"chapters":9,"members":810,"pnl":10.4},{"id":"florida-state-university","name":"Florida State University","where":"Tallahassee, FL","lat":30.4419,"lon":-84.2985,"chapters":8,"members":700,"pnl":9.6},{"id":"syracuse-university","name":"Syracuse University","where":"Syracuse, NY","lat":43.0392,"lon":-76.1351,"chapters":6,"members":505,"pnl":8.9},{"id":"arizona-state-university","name":"Arizona State University","where":"Tempe, AZ","lat":33.4242,"lon":-111.9281,"chapters":7,"members":640,"pnl":8.1},{"id":"university-of-wisconsin","name":"University of Wisconsin","where":"Madison, WI","lat":43.0766,"lon":-89.4125,"chapters":6,"members":520,"pnl":7.4},{"id":"clemson-university","name":"Clemson University","where":"Clemson, SC","lat":34.6834,"lon":-82.8374,"chapters":5,"members":430,"pnl":6.8},{"id":"southern-methodist-university","name":"Southern Methodist University","where":"Dallas, TX","lat":32.8412,"lon":-96.7845,"chapters":5,"members":395,"pnl":6.2},{"id":"university-of-michigan","name":"University of Michigan","where":"Ann Arbor, MI","lat":42.278,"lon":-83.7382,"chapters":6,"members":540,"pnl":5.5},{"id":"vanderbilt-university","name":"Vanderbilt University","where":"Nashville, TN","lat":36.1447,"lon":-86.8027,"chapters":4,"members":330,"pnl":4.9},{"id":"university-of-miami","name":"University of Miami","where":"Coral Gables, FL","lat":25.7215,"lon":-80.2793,"chapters":5,"members":415,"pnl":4.1},{"id":"university-of-colorado","name":"University of Colorado","where":"Boulder, CO","lat":40.0076,"lon":-105.2659,"chapters":4,"members":350,"pnl":3.4},{"id":"university-of-southern-california","name":"University of Southern California","where":"Los Angeles, CA","lat":34.0224,"lon":-118.2851,"chapters":6,"members":520,"pnl":2.8}];
+  var CHAPTERS = [{"school":"university-of-alabama","name":"Sigma Chi","kind":"Fraternity","members":108,"pct":96,"pnl":21.9,"bonus":true},{"school":"university-of-alabama","name":"Alpha Phi","kind":"Sorority","members":105,"pct":95,"pnl":21.4,"bonus":true},{"school":"university-of-alabama","name":"Kappa Alpha Order","kind":"Fraternity","members":102,"pct":94,"pnl":20.8,"bonus":false},{"school":"university-of-alabama","name":"Pi Beta Phi","kind":"Sorority","members":99,"pct":93,"pnl":20.3,"bonus":false},{"school":"university-of-alabama","name":"Sigma Nu","kind":"Fraternity","members":96,"pct":92,"pnl":19.7,"bonus":false},{"school":"university-of-alabama","name":"Chi Omega","kind":"Sorority","members":93,"pct":91,"pnl":19.2,"bonus":false},{"school":"university-of-alabama","name":"Beta Theta Pi","kind":"Fraternity","members":90,"pct":90,"pnl":18.7,"bonus":false},{"school":"university-of-alabama","name":"Kappa Kappa Gamma","kind":"Sorority","members":87,"pct":89,"pnl":18.1,"bonus":false},{"school":"university-of-alabama","name":"Phi Delta Theta","kind":"Fraternity","members":84,"pct":88,"pnl":17.6,"bonus":false},{"school":"university-of-alabama","name":"Delta Gamma","kind":"Sorority","members":81,"pct":87,"pnl":17.1,"bonus":false},{"school":"university-of-alabama","name":"Lambda Chi Alpha","kind":"Fraternity","members":78,"pct":86,"pnl":16.5,"bonus":false},{"school":"university-of-alabama","name":"Zeta Tau Alpha","kind":"Sorority","members":75,"pct":85,"pnl":16.0,"bonus":false},{"school":"university-of-alabama","name":"Alpha Tau Omega","kind":"Fraternity","members":72,"pct":84,"pnl":15.4,"bonus":false},{"school":"university-of-alabama","name":"Delta Delta Delta","kind":"Sorority","members":69,"pct":83,"pnl":14.9,"bonus":false},{"school":"university-of-georgia","name":"Kappa Alpha Order","kind":"Fraternity","members":101,"pct":96,"pnl":19.6,"bonus":true},{"school":"university-of-georgia","name":"Pi Beta Phi","kind":"Sorority","members":99,"pct":95,"pnl":18.9,"bonus":true},{"school":"university-of-georgia","name":"Sigma Nu","kind":"Fraternity","members":96,"pct":94,"pnl":18.2,"bonus":false},{"school":"university-of-georgia","name":"Chi Omega","kind":"Sorority","members":93,"pct":93,"pnl":17.5,"bonus":false},{"school":"university-of-georgia","name":"Beta Theta Pi","kind":"Fraternity","members":90,"pct":92,"pnl":16.8,"bonus":false},{"school":"university-of-georgia","name":"Kappa Kappa Gamma","kind":"Sorority","members":87,"pct":91,"pnl":16.1,"bonus":false},{"school":"university-of-georgia","name":"Phi Delta Theta","kind":"Fraternity","members":84,"pct":90,"pnl":15.4,"bonus":false},{"school":"university-of-georgia","name":"Delta Gamma","kind":"Sorority","members":82,"pct":89,"pnl":14.7,"bonus":false},{"school":"university-of-georgia","name":"Lambda Chi Alpha","kind":"Fraternity","members":79,"pct":88,"pnl":14.0,"bonus":false},{"school":"university-of-georgia","name":"Zeta Tau Alpha","kind":"Sorority","members":76,"pct":87,"pnl":13.3,"bonus":false},{"school":"university-of-georgia","name":"Alpha Tau Omega","kind":"Fraternity","members":73,"pct":86,"pnl":12.6,"bonus":false},{"school":"university-of-mississippi","name":"Sigma Nu","kind":"Fraternity","members":98,"pct":96,"pnl":18.3,"bonus":true},{"school":"university-of-mississippi","name":"Chi Omega","kind":"Sorority","members":95,"pct":95,"pnl":17.4,"bonus":true},{"school":"university-of-mississippi","name":"Beta Theta Pi","kind":"Fraternity","members":92,"pct":94,"pnl":16.6,"bonus":false},{"school":"university-of-mississippi","name":"Kappa Kappa Gamma","kind":"Sorority","members":89,"pct":93,"pnl":15.7,"bonus":false},{"school":"university-of-mississippi","name":"Phi Delta Theta","kind":"Fraternity","members":87,"pct":92,"pnl":14.8,"bonus":false},{"school":"university-of-mississippi","name":"Delta Gamma","kind":"Sorority","members":84,"pct":91,"pnl":13.9,"bonus":false},{"school":"university-of-mississippi","name":"Lambda Chi Alpha","kind":"Fraternity","members":81,"pct":90,"pnl":13.1,"bonus":false},{"school":"university-of-mississippi","name":"Zeta Tau Alpha","kind":"Sorority","members":78,"pct":89,"pnl":12.2,"bonus":false},{"school":"university-of-mississippi","name":"Alpha Tau Omega","kind":"Fraternity","members":76,"pct":88,"pnl":11.3,"bonus":false},{"school":"texas-a-m-university","name":"Beta Theta Pi","kind":"Fraternity","members":100,"pct":96,"pnl":16.7,"bonus":true},{"school":"texas-a-m-university","name":"Kappa Kappa Gamma","kind":"Sorority","members":97,"pct":95,"pnl":16.1,"bonus":true},{"school":"texas-a-m-university","name":"Phi Delta Theta","kind":"Fraternity","members":94,"pct":94,"pnl":15.4,"bonus":false},{"school":"texas-a-m-university","name":"Delta Gamma","kind":"Sorority","members":92,"pct":93,"pnl":14.8,"bonus":false},{"school":"texas-a-m-university","name":"Lambda Chi Alpha","kind":"Fraternity","members":89,"pct":92,"pnl":14.2,"bonus":false},{"school":"texas-a-m-university","name":"Zeta Tau Alpha","kind":"Sorority","members":86,"pct":91,"pnl":13.5,"bonus":false},{"school":"texas-a-m-university","name":"Alpha Tau Omega","kind":"Fraternity","members":83,"pct":90,"pnl":12.9,"bonus":false},{"school":"texas-a-m-university","name":"Delta Delta Delta","kind":"Sorority","members":80,"pct":89,"pnl":12.2,"bonus":false},{"school":"texas-a-m-university","name":"Theta Chi","kind":"Fraternity","members":78,"pct":88,"pnl":11.6,"bonus":false},{"school":"texas-a-m-university","name":"Alpha Chi Omega","kind":"Sorority","members":75,"pct":87,"pnl":11.0,"bonus":false},{"school":"texas-a-m-university","name":"Pi Kappa Alpha","kind":"Fraternity","members":72,"pct":86,"pnl":10.3,"bonus":false},{"school":"texas-a-m-university","name":"Kappa Delta","kind":"Sorority","members":69,"pct":85,"pnl":9.7,"bonus":false},{"school":"penn-state-university","name":"Phi Delta Theta","kind":"Fraternity","members":100,"pct":96,"pnl":15.4,"bonus":true},{"school":"penn-state-university","name":"Delta Gamma","kind":"Sorority","members":97,"pct":95,"pnl":14.6,"bonus":true},{"school":"penn-state-university","name":"Lambda Chi Alpha","kind":"Fraternity","members":94,"pct":94,"pnl":13.8,"bonus":false},{"school":"penn-state-university","name":"Zeta Tau Alpha","kind":"Sorority","members":91,"pct":93,"pnl":13.1,"bonus":false},{"school":"penn-state-university","name":"Alpha Tau Omega","kind":"Fraternity","members":88,"pct":92,"pnl":12.3,"bonus":false},{"school":"penn-state-university","name":"Delta Delta Delta","kind":"Sorority","members":86,"pct":91,"pnl":11.5,"bonus":false},{"school":"penn-state-university","name":"Theta Chi","kind":"Fraternity","members":83,"pct":90,"pnl":10.7,"bonus":false},{"school":"penn-state-university","name":"Alpha Chi Omega","kind":"Sorority","members":80,"pct":89,"pnl":10.0,"bonus":false},{"school":"penn-state-university","name":"Pi Kappa Alpha","kind":"Fraternity","members":77,"pct":88,"pnl":9.2,"bonus":false},{"school":"penn-state-university","name":"Kappa Delta","kind":"Sorority","members":74,"pct":87,"pnl":8.4,"bonus":false},{"school":"indiana-university","name":"Lambda Chi Alpha","kind":"Fraternity","members":96,"pct":96,"pnl":14.5,"bonus":true},{"school":"indiana-university","name":"Zeta Tau Alpha","kind":"Sorority","members":93,"pct":95,"pnl":13.5,"bonus":true},{"school":"indiana-university","name":"Alpha Tau Omega","kind":"Fraternity","members":90,"pct":94,"pnl":12.5,"bonus":false},{"school":"indiana-university","name":"Delta Delta Delta","kind":"Sorority","members":88,"pct":93,"pnl":11.5,"bonus":false},{"school":"indiana-university","name":"Theta Chi","kind":"Fraternity","members":85,"pct":92,"pnl":10.5,"bonus":false},{"school":"indiana-university","name":"Alpha Chi Omega","kind":"Sorority","members":82,"pct":91,"pnl":9.5,"bonus":false},{"school":"indiana-university","name":"Pi Kappa Alpha","kind":"Fraternity","members":80,"pct":90,"pnl":8.5,"bonus":false},{"school":"indiana-university","name":"Kappa Delta","kind":"Sorority","members":77,"pct":89,"pnl":7.5,"bonus":false},{"school":"university-of-texas","name":"Alpha Tau Omega","kind":"Fraternity","members":101,"pct":96,"pnl":13.9,"bonus":true},{"school":"university-of-texas","name":"Delta Delta Delta","kind":"Sorority","members":99,"pct":95,"pnl":13.0,"bonus":true},{"school":"university-of-texas","name":"Theta Chi","kind":"Fraternity","members":96,"pct":94,"pnl":12.2,"bonus":false},{"school":"university-of-texas","name":"Alpha Chi Omega","kind":"Sorority","members":93,"pct":93,"pnl":11.3,"bonus":false},{"school":"university-of-texas","name":"Pi Kappa Alpha","kind":"Fraternity","members":90,"pct":92,"pnl":10.4,"bonus":false},{"school":"university-of-texas","name":"Kappa Delta","kind":"Sorority","members":87,"pct":91,"pnl":9.5,"bonus":false},{"school":"university-of-texas","name":"Sigma Alpha Epsilon","kind":"Fraternity","members":84,"pct":90,"pnl":8.7,"bonus":false},{"school":"university-of-texas","name":"Phi Mu","kind":"Sorority","members":81,"pct":89,"pnl":7.8,"bonus":false},{"school":"university-of-texas","name":"Sigma Chi","kind":"Fraternity","members":79,"pct":88,"pnl":6.9,"bonus":false},{"school":"florida-state-university","name":"Theta Chi","kind":"Fraternity","members":97,"pct":96,"pnl":13.1,"bonus":true},{"school":"florida-state-university","name":"Alpha Chi Omega","kind":"Sorority","members":94,"pct":95,"pnl":12.1,"bonus":true},{"school":"florida-state-university","name":"Pi Kappa Alpha","kind":"Fraternity","members":92,"pct":94,"pnl":11.1,"bonus":false},{"school":"florida-state-university","name":"Kappa Delta","kind":"Sorority","members":89,"pct":93,"pnl":10.1,"bonus":false},{"school":"florida-state-university","name":"Sigma Alpha Epsilon","kind":"Fraternity","members":86,"pct":92,"pnl":9.1,"bonus":false},{"school":"florida-state-university","name":"Phi Mu","kind":"Sorority","members":83,"pct":91,"pnl":8.1,"bonus":false},{"school":"florida-state-university","name":"Sigma Chi","kind":"Fraternity","members":81,"pct":90,"pnl":7.1,"bonus":false},{"school":"florida-state-university","name":"Alpha Phi","kind":"Sorority","members":78,"pct":89,"pnl":6.1,"bonus":false},{"school":"syracuse-university","name":"Pi Kappa Alpha","kind":"Fraternity","members":91,"pct":96,"pnl":12.4,"bonus":true},{"school":"syracuse-university","name":"Kappa Delta","kind":"Sorority","members":88,"pct":95,"pnl":11.0,"bonus":true},{"school":"syracuse-university","name":"Sigma Alpha Epsilon","kind":"Fraternity","members":85,"pct":94,"pnl":9.6,"bonus":false},{"school":"syracuse-university","name":"Phi Mu","kind":"Sorority","members":83,"pct":93,"pnl":8.2,"bonus":false},{"school":"syracuse-university","name":"Sigma Chi","kind":"Fraternity","members":80,"pct":92,"pnl":6.8,"bonus":false},{"school":"syracuse-university","name":"Alpha Phi","kind":"Sorority","members":78,"pct":91,"pnl":5.4,"bonus":false},{"school":"arizona-state-university","name":"Sigma Alpha Epsilon","kind":"Fraternity","members":100,"pct":96,"pnl":11.6,"bonus":true},{"school":"arizona-state-university","name":"Phi Mu","kind":"Sorority","members":97,"pct":95,"pnl":10.4,"bonus":true},{"school":"arizona-state-university","name":"Sigma Chi","kind":"Fraternity","members":94,"pct":94,"pnl":9.3,"bonus":false},{"school":"arizona-state-university","name":"Alpha Phi","kind":"Sorority","members":91,"pct":93,"pnl":8.1,"bonus":false},{"school":"arizona-state-university","name":"Kappa Alpha Order","kind":"Fraternity","members":89,"pct":92,"pnl":6.9,"bonus":false},{"school":"arizona-state-university","name":"Pi Beta Phi","kind":"Sorority","members":86,"pct":91,"pnl":5.8,"bonus":false},{"school":"arizona-state-university","name":"Sigma Nu","kind":"Fraternity","members":83,"pct":90,"pnl":4.6,"bonus":false},{"school":"university-of-wisconsin","name":"Sigma Chi","kind":"Fraternity","members":93,"pct":96,"pnl":10.9,"bonus":true},{"school":"university-of-wisconsin","name":"Alpha Phi","kind":"Sorority","members":91,"pct":95,"pnl":9.5,"bonus":true},{"school":"university-of-wisconsin","name":"Kappa Alpha Order","kind":"Fraternity","members":88,"pct":94,"pnl":8.1,"bonus":false},{"school":"university-of-wisconsin","name":"Pi Beta Phi","kind":"Sorority","members":85,"pct":93,"pnl":6.7,"bonus":false},{"school":"university-of-wisconsin","name":"Sigma Nu","kind":"Fraternity","members":83,"pct":92,"pnl":5.3,"bonus":false},{"school":"university-of-wisconsin","name":"Chi Omega","kind":"Sorority","members":80,"pct":91,"pnl":3.9,"bonus":false},{"school":"clemson-university","name":"Kappa Alpha Order","kind":"Fraternity","members":91,"pct":96,"pnl":10.3,"bonus":true},{"school":"clemson-university","name":"Pi Beta Phi","kind":"Sorority","members":89,"pct":95,"pnl":8.6,"bonus":true},{"school":"clemson-university","name":"Sigma Nu","kind":"Fraternity","members":86,"pct":94,"pnl":6.8,"bonus":false},{"school":"clemson-university","name":"Chi Omega","kind":"Sorority","members":83,"pct":93,"pnl":5.0,"bonus":false},{"school":"clemson-university","name":"Beta Theta Pi","kind":"Fraternity","members":81,"pct":92,"pnl":3.3,"bonus":false},{"school":"southern-methodist-university","name":"Sigma Nu","kind":"Fraternity","members":84,"pct":96,"pnl":9.7,"bonus":true},{"school":"southern-methodist-university","name":"Chi Omega","kind":"Sorority","members":81,"pct":95,"pnl":8.0,"bonus":true},{"school":"southern-methodist-university","name":"Beta Theta Pi","kind":"Fraternity","members":79,"pct":94,"pnl":6.2,"bonus":false},{"school":"southern-methodist-university","name":"Kappa Kappa Gamma","kind":"Sorority","members":77,"pct":93,"pnl":4.5,"bonus":false},{"school":"southern-methodist-university","name":"Phi Delta Theta","kind":"Fraternity","members":74,"pct":92,"pnl":2.7,"bonus":false},{"school":"university-of-michigan","name":"Beta Theta Pi","kind":"Fraternity","members":97,"pct":96,"pnl":9.0,"bonus":true},{"school":"university-of-michigan","name":"Kappa Kappa Gamma","kind":"Sorority","members":94,"pct":95,"pnl":7.6,"bonus":true},{"school":"university-of-michigan","name":"Phi Delta Theta","kind":"Fraternity","members":91,"pct":94,"pnl":6.2,"bonus":false},{"school":"university-of-michigan","name":"Delta Gamma","kind":"Sorority","members":89,"pct":93,"pnl":4.8,"bonus":false},{"school":"university-of-michigan","name":"Lambda Chi Alpha","kind":"Fraternity","members":86,"pct":92,"pnl":3.4,"bonus":false},{"school":"university-of-michigan","name":"Zeta Tau Alpha","kind":"Sorority","members":83,"pct":91,"pnl":2.0,"bonus":false},{"school":"vanderbilt-university","name":"Phi Delta Theta","kind":"Fraternity","members":86,"pct":96,"pnl":8.4,"bonus":true},{"school":"vanderbilt-university","name":"Delta Gamma","kind":"Sorority","members":84,"pct":95,"pnl":6.1,"bonus":true},{"school":"vanderbilt-university","name":"Lambda Chi Alpha","kind":"Fraternity","members":81,"pct":94,"pnl":3.7,"bonus":false},{"school":"vanderbilt-university","name":"Zeta Tau Alpha","kind":"Sorority","members":79,"pct":93,"pnl":1.4,"bonus":false},{"school":"university-of-miami","name":"Lambda Chi Alpha","kind":"Fraternity","members":88,"pct":96,"pnl":7.6,"bonus":true},{"school":"university-of-miami","name":"Zeta Tau Alpha","kind":"Sorority","members":85,"pct":95,"pnl":5.8,"bonus":true},{"school":"university-of-miami","name":"Alpha Tau Omega","kind":"Fraternity","members":83,"pct":94,"pnl":4.1,"bonus":false},{"school":"university-of-miami","name":"Delta Delta Delta","kind":"Sorority","members":81,"pct":93,"pnl":2.3,"bonus":false},{"school":"university-of-miami","name":"Theta Chi","kind":"Fraternity","members":78,"pct":92,"pnl":0.6,"bonus":false},{"school":"university-of-colorado","name":"Alpha Tau Omega","kind":"Fraternity","members":91,"pct":96,"pnl":6.9,"bonus":true},{"school":"university-of-colorado","name":"Delta Delta Delta","kind":"Sorority","members":89,"pct":95,"pnl":4.6,"bonus":true},{"school":"university-of-colorado","name":"Theta Chi","kind":"Fraternity","members":86,"pct":94,"pnl":2.2,"bonus":false},{"school":"university-of-colorado","name":"Alpha Chi Omega","kind":"Sorority","members":84,"pct":93,"pnl":-0.1,"bonus":false},{"school":"university-of-southern-california","name":"Theta Chi","kind":"Fraternity","members":93,"pct":96,"pnl":6.3,"bonus":true},{"school":"university-of-southern-california","name":"Alpha Chi Omega","kind":"Sorority","members":91,"pct":95,"pnl":4.9,"bonus":true},{"school":"university-of-southern-california","name":"Pi Kappa Alpha","kind":"Fraternity","members":88,"pct":94,"pnl":3.5,"bonus":false},{"school":"university-of-southern-california","name":"Kappa Delta","kind":"Sorority","members":85,"pct":93,"pnl":2.1,"bonus":false},{"school":"university-of-southern-california","name":"Sigma Alpha Epsilon","kind":"Fraternity","members":83,"pct":92,"pnl":0.7,"bonus":false},{"school":"university-of-southern-california","name":"Phi Mu","kind":"Sorority","members":80,"pct":91,"pnl":-0.7,"bonus":false}];
+
+  // ---------- d3.geoAlbersUsa's lower-48 projection, at the scale and translate
+  // us-atlas renders with (975 x 610). The map path in the markup was projected
+  // with exactly these constants, so pings and coastline cannot disagree.
+  var P0 = 29.5 * Math.PI / 180, P1 = 45.5 * Math.PI / 180;
+  var SY0 = Math.sin(P0);
+  var N = (SY0 + Math.sin(P1)) / 2;
+  var C = 1 + SY0 * (2 * N - SY0);
+  var R0 = Math.sqrt(C) / N;
+  var SCALE = 1300, TX = 487.5, TY = 305;
+
+  function raw(lon, lat) {
+    var lam = (lon + 96) * Math.PI / 180, phi = lat * Math.PI / 180;
+    var r = Math.sqrt(C - 2 * N * Math.sin(phi)) / N;
+    return [r * Math.sin(lam * N), R0 - r * Math.cos(lam * N)];
+  }
+  var CTR = raw(-96.6, 38.7);   // d3's center([-0.6, 38.7]), in rotated coords
+  function project(lon, lat) {
+    var p = raw(lon, lat);
+    return [TX + SCALE * (p[0] - CTR[0]), TY - SCALE * (p[1] - CTR[1])];
+  }
+
+  // ---------- the map
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var tip = document.getElementById('map-tip');
+  var stage = tip.parentNode;
+
+  function fmtInt(n) { return n.toLocaleString('en-US'); }
+  function fmtPnl(n) { return (n > 0 ? '+' : '') + n.toFixed(1) + '%'; }
+
+  function drawMap() {
+    var g = document.getElementById('pings');
+    g.textContent = '';
+    SCHOOLS.forEach(function (s, i) {
+      var p = project(s.lon, s.lat);
+      var node = document.createElementNS(SVGNS, 'g');
+      node.setAttribute('class', 'ping');
+      node.setAttribute('tabindex', '0');
+      node.setAttribute('role', 'img');
+      node.setAttribute('aria-label', s.name + ': ' + s.chapters + ' chapters, ' + fmtInt(s.members) + ' members');
+      // bigger campuses get a bigger dot, but only a little - this is a map, not a chart
+      var r = 4 + Math.min(3, s.chapters / 4.5);
+      var halo = document.createElementNS(SVGNS, 'circle');
+      halo.setAttribute('class', 'halo');
+      halo.setAttribute('cx', p[0]); halo.setAttribute('cy', p[1]);
+      halo.setAttribute('r', r * 2.6);
+      // stagger the pulses so the map breathes instead of blinking in unison
+      halo.style.animationDelay = (i * 0.17 % 3.2).toFixed(2) + 's';
+      var dot = document.createElementNS(SVGNS, 'circle');
+      dot.setAttribute('class', 'dot');
+      dot.setAttribute('cx', p[0]); dot.setAttribute('cy', p[1]);
+      dot.setAttribute('r', r);
+      node.appendChild(halo); node.appendChild(dot);
+
+      function show() {
+        node.classList.add('is-on');
+        tip.innerHTML = '';
+        var b = document.createElement('b'); b.textContent = s.name;
+        var sp = document.createElement('span');
+        sp.textContent = s.chapters + ' chapters · ' + fmtInt(s.members) + ' on fomo · ' + fmtPnl(s.pnl);
+        tip.appendChild(b); tip.appendChild(sp);
+        tip.hidden = false;
+        // the svg scales to the card, so place the tip off the rendered geometry
+        var box = dot.getBoundingClientRect(), host = stage.getBoundingClientRect();
+        tip.style.left = (box.left + box.width / 2 - host.left) + 'px';
+        tip.style.top = (box.top - host.top) + 'px';
+      }
+      function hide() { node.classList.remove('is-on'); tip.hidden = true; }
+      node.addEventListener('mouseenter', show);
+      node.addEventListener('mouseleave', hide);
+      node.addEventListener('focus', show);
+      node.addEventListener('blur', hide);
+      g.appendChild(node);
+    });
+
+    document.getElementById('stat-schools').textContent = fmtInt(SCHOOLS.length);
+    document.getElementById('stat-chapters').textContent =
+      fmtInt(SCHOOLS.reduce(function (a, s) { return a + s.chapters; }, 0));
+    document.getElementById('stat-members').textContent =
+      fmtInt(SCHOOLS.reduce(function (a, s) { return a + s.members; }, 0));
+  }
+
+  // ---------- the board
+  var head = document.getElementById('board-head');
+  var rows = document.getElementById('board-rows');
+  var tabSchools = document.getElementById('tab-schools');
+  var tabChapters = document.getElementById('tab-chapters');
+  var pick = document.getElementById('school-pick');
+  var mode = 'schools';
+
+  function cell(row, html, cls) {
+    var td = document.createElement('td');
+    if (cls) td.className = cls;
+    if (html instanceof Node) td.appendChild(html); else td.innerHTML = html;
+    row.appendChild(td);
+    return td;
+  }
+  function rankCell(row, i) {
+    var td = document.createElement('td');
+    var s = document.createElement('span');
+    s.className = 'rank' + (i < 3 ? ' rank-' + (i + 1) : '');
+    s.textContent = i + 1;
+    td.appendChild(s); row.appendChild(td);
+  }
+  function whoCell(row, title, sub) {
+    var td = document.createElement('td');
+    td.className = 'who';
+    td.appendChild(document.createTextNode(title));
+    if (sub) { var s = document.createElement('span'); s.textContent = sub; td.appendChild(s); }
+    row.appendChild(td);
+  }
+
+  function render() {
+    head.textContent = ''; rows.textContent = '';
+    var hr = document.createElement('tr');
+    var cols = mode === 'schools'
+      ? ['Rank', 'Campus', 'Chapters', 'Members', 'Season PnL']
+      : ['Rank', 'Chapter', 'Roster on fomo', 'Members', 'Season PnL'];
+    cols.forEach(function (c, i) {
+      var th = document.createElement('th');
+      if (i >= 2) th.className = 'r';
+      th.textContent = c; hr.appendChild(th);
+    });
+    head.appendChild(hr);
+
+    var list;
+    if (mode === 'schools') {
+      list = SCHOOLS.slice().sort(function (a, b) { return b.pnl - a.pnl; });
+      list.forEach(function (s, i) {
+        var tr = document.createElement('tr');
+        rankCell(tr, i);
+        whoCell(tr, s.name, s.where);
+        cell(tr, String(s.chapters), 'r');
+        cell(tr, fmtInt(s.members), 'r');
+        cell(tr, fmtPnl(s.pnl), 'r pnl');
+        rows.appendChild(tr);
+      });
+    } else {
+      var id = pick.value;
+      list = CHAPTERS.filter(function (c) { return c.school === id; })
+        .sort(function (a, b) { return b.pnl - a.pnl; });
+      if (!list.length) {
+        var tr0 = document.createElement('tr');
+        var td = cell(tr0, 'No qualified chapters here yet.', 'board-empty');
+        td.colSpan = 5; rows.appendChild(tr0);
+        return;
+      }
+      list.forEach(function (c, i) {
+        var tr = document.createElement('tr');
+        rankCell(tr, i);
+        whoCell(tr, c.name, c.kind);
+        var wrap = document.createElement('span');
+        wrap.className = 'bar';
+        var bar = document.createElement('i');
+        var fill = document.createElement('b');
+        fill.style.width = Math.min(100, c.pct) + '%';
+        bar.appendChild(fill);
+        wrap.appendChild(document.createTextNode(c.pct + '%'));
+        wrap.appendChild(bar);
+        if (c.bonus) { var t = document.createElement('span'); t.className = 'tag'; t.textContent = '+$250'; wrap.appendChild(t); }
+        cell(tr, wrap, 'r');
+        cell(tr, fmtInt(c.members), 'r');
+        cell(tr, fmtPnl(c.pnl), 'r pnl');
+        rows.appendChild(tr);
+      });
+    }
+  }
+
+  function setMode(next) {
+    mode = next;
+    tabSchools.setAttribute('aria-selected', String(mode === 'schools'));
+    tabChapters.setAttribute('aria-selected', String(mode === 'chapters'));
+    pick.hidden = mode !== 'chapters';
+    render();
+  }
+  tabSchools.addEventListener('click', function () { setMode('schools'); });
+  tabChapters.addEventListener('click', function () { setMode('chapters'); });
+  pick.addEventListener('change', render);
+
+  function fillPicker() {
+    pick.textContent = '';
+    SCHOOLS.slice().sort(function (a, b) { return a.name.localeCompare(b.name); })
+      .forEach(function (s) {
+        var o = document.createElement('option');
+        o.value = s.id; o.textContent = s.name;
+        pick.appendChild(o);
+      });
+  }
+
+  function boot() { fillPicker(); drawMap(); render(); }
+  boot();
+
+  // ---------- live data, if the season has started
+  // `greekwars` is public-read in database.rules.json: it carries no personal
+  // information, unlike the application nodes the other pages write to.
+  try {
+    firebase.initializeApp({
+      apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+      authDomain: 'bijanizadian-84e48.firebaseapp.com',
+      databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+      projectId: 'bijanizadian-84e48'
+    });
+    firebase.database().ref('greekwars').on('value', function (snap) {
+      var v = snap.val();
+      if (!v || !v.schools) return;
+      var live = Object.keys(v.schools).map(function (k) {
+        var s = v.schools[k]; s.id = s.id || k; return s;
+      }).filter(function (s) { return typeof s.lat === 'number' && typeof s.lon === 'number'; });
+      if (!live.length) return;
+      SCHOOLS = live;
+      CHAPTERS = v.chapters ? Object.keys(v.chapters).map(function (k) { return v.chapters[k]; }) : [];
+      document.getElementById('map-source').textContent = 'Live';
+      document.getElementById('map-note').textContent =
+        'Live from the season. Campuses are placed by their real coordinates.';
+      document.getElementById('board-note').textContent =
+        'Live from the season, updating as trades settle.';
+      boot();
+    }, function () { /* read denied or offline - the sample season stands */ });
+  } catch (e) { /* no firebase - the sample season stands */ }
+})();
+</script>
+</body>
+</html>

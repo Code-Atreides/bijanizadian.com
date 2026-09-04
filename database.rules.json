@@ -23,6 +23,10 @@
         ".write": "!data.exists()",
         ".validate": "newData.hasChildren(['first_name', 'last_name', 'email', 'phone', 'instagram', 'school', 'role', 'why', 'submitted_at']) && newData.child('email').val().length < 200 && newData.child('why').val().length < 4000"
       }
+    },
+    "greekwars": {
+      ".read": true,
+      ".write": false
     }
   }
 }
