@@ -128,6 +128,11 @@
   .brand svg { height: 24px; width: auto; display: block; }
   .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  /* the store badges fomo.family carries in its own header: white artwork on a
+     translucent, blurred pill, so they read against the hero photo */
+  .store { display: block; border-radius: 6px; background: rgba(255,255,255,.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity .15s ease, box-shadow .15s ease; }
+  .store:hover { opacity: .9; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+  .store img { display: block; height: 40px; width: auto; }
 
   /* ---------- hero ---------- */
   .hero { position: relative; width: 100%; overflow: hidden; min-height: min(100svh, 940px); display: flex; flex-direction: column; align-items: center; }
@@ -316,10 +321,11 @@
     .prizes { grid-template-columns: 1fr; gap: 0; }
     .prizes li + li { margin-top: 24px; padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
     .seats-row { grid-template-columns: 1fr 1fr; }
-    /* the two section chips drop out whole rather than losing their second word,
-       which left them reading "Greek" and "Campus"; Apply carries the nav alone
-       and the brand keeps saying what page this is */
-    .nav-right .btn--ghost { display: none; }
+    /* the badges shrink rather than drop — either one alone would read as the
+       nav picking a platform */
+    .nav-inner { padding: 12px 14px; gap: 10px; }
+    .nav-right { gap: 8px; }
+    .store img { height: 32px; }
     .hero-cta .btn--lg { width: 100%; }
     .hero-art { margin-top: -10px; }
     .foot-inner { grid-template-columns: 1fr; }
@@ -328,6 +334,7 @@
   }
   @media (max-width: 480px) {
     .apply { padding: 22px 18px 26px; }
+    .store img { height: 28px; }
     .gw-card { padding: 22px 18px; }
     .gw-qualify { margin: 24px -18px -22px; padding: 20px 18px 22px; }
     .gw-qualify .btn { width: 100%; }
@@ -360,9 +367,12 @@
       <span>/campus</span>
     </a>
     <div class="nav-right">
-      <a class="btn btn--ghost btn--sm" href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Greek <span>Wars</span></a>
-      <a class="btn btn--ghost btn--sm" href="https://milomessina.com/fomo" target="_blank" rel="noopener">Campus <span>team</span></a>
-      <a class="btn btn--dark btn--sm" href="#apply">Apply</a>
+      <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener">
+        <img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40">
+      </a>
+      <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener">
+        <img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40">
+      </a>
     </div>
   </div>
 </div>
