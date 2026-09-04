@@ -68,7 +68,7 @@
   }
   a { color: inherit; }
   b, strong { font-weight: 700; }
-  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
   /* One rhythm for the page: a section is a head plus its blocks, and the section's
      own top padding is the space between sections. That padding sits *inside* the
      scroll target, so it stacked on top of html's scroll-padding-top and left an
@@ -116,12 +116,14 @@
   .store img { display: block; height: 40px; width: auto; }
 
   /* ---------- hero ---------- */
-  /* text-only hero, so it is sized to its content plus air rather than to the
-     viewport - a 100svh band would be mostly empty sky under the link */
-  .hero { position: relative; width: 100%; overflow: hidden; min-height: min(76svh, 680px); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  /* Text-only hero, so it is sized to its content rather than to the viewport.
+     It does not centre inside a min-height either: the leftover slack used to
+     stack on top of the section's padding and open a ~250px hole above "the
+     deal". The band still runs deep enough to carry the earth. */
+  .hero { position: relative; width: 100%; overflow: hidden; min-height: min(62svh, 540px); display: flex; flex-direction: column; align-items: center; }
   .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 70vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
   .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 32%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
-  .hero-inner { position: relative; z-index: 3; text-align: center; padding: 104px 24px 76px; display: flex; flex-direction: column; align-items: center; }
+  .hero-inner { position: relative; z-index: 3; text-align: center; padding: 104px 24px 32px; display: flex; flex-direction: column; align-items: center; }
   .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
   /* /campus caps its lockup at fomo.family's own glyph size, but this path is
      "/campus/dinners" — more than twice the string — so the whole lockup steps
@@ -148,7 +150,7 @@
 
   /* fomo.family's own desktop step (its breakpoint is 800px) */
   @media (min-width: 800px) {
-    .hero-inner { padding: 158px 24px 104px; }
+    .hero-inner { padding: 158px 24px 24px; }
   }
 
   /* ---------- shared card / kicker ---------- */
@@ -252,6 +254,8 @@
   .apply .sub { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
   .apply .ticks { margin-top: 18px; }
   .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; min-height: 320px; display: flex; flex-direction: column; }
+  .form-panel form { flex: 1; display: flex; flex-direction: column; }
+  .form-panel .done { flex: 1; }
   .step { border: 0; display: none; }
   .step.is-on { display: block; }
   .step-num { display: flex; align-items: center; gap: 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
@@ -321,7 +325,7 @@
   }
   @media (max-width: 760px) {
     :root { --gap-section: 52px; --gap-head: 24px; --gap-group: 28px; }
-    .wrap { padding: 0 20px 72px; }
+    .wrap { padding: 0 20px; }
     /* the badges shrink rather than drop — either one alone would read as the
        nav picking a platform */
     .nav-inner { padding: 12px 14px; gap: 10px; }
