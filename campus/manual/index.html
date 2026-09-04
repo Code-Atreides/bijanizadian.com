@@ -149,6 +149,31 @@
   .toc a:hover { color: var(--accent-bright); }
   .toc a:hover::before { color: var(--accent-bright); }
 
+  /* ---------- the fictional national board the original draws ---------- */
+  /* It is a design-only illustration, so it is labelled as one twice: on the
+     card and underneath it. */
+  .fake-board { margin-top: var(--gap-head); padding: 22px 26px 24px; }
+  .fake-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 6px; }
+  .fake-head .pill { border-color: rgba(255,191,23,.4); color: var(--warn); background: rgba(255,191,23,.08); }
+  .fake-board ol { list-style: none; }
+  .fake-board li { display: grid; grid-template-columns: 30px 1fr auto; gap: 14px; align-items: center; padding: 13px 0; border-top: 1px solid var(--line-soft); font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .fake-board li:first-child { border-top: 0; }
+  .fake-board i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--ink-faint); }
+  .fake-board li:nth-child(-n+3) i { color: var(--accent-bright); }
+  .fake-board .go { font-size: 14px; color: var(--ink-faint); }
+  .fake-foot { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-soft); display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .fake-foot b { font-size: 15px; }
+  .fake-foot span { font-size: 12.5px; color: var(--ink-faint); }
+
+  /* ---------- what the app is, as chips ---------- */
+  .chips { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
+  .chips li { font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px; background: var(--accent-t); color: var(--accent-bright); }
+
+  /* a TODO in the source is a real disclosure, not a note to self */
+  .todo { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--warn); padding: 4px 0 4px 12px; }
+  .todo b { color: var(--warn); font-weight: 700; }
+  .legalese { margin-top: 14px; font-size: 12.5px; color: var(--ink-faint); }
+
   /* ---------- the four pillars, the five steps ---------- */
   .grid4 { margin-top: var(--gap-head); padding: 26px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; list-style: none; }
   .grid4 li { display: grid; gap: 8px; align-content: start; }
@@ -321,7 +346,7 @@
       <span class="slash"><i>/</i><span class="up">campus</span><i>/</i>manual</span>
     </div>
     <h1>run fomo at your school.</h1>
-    <p class="lede">This isn't an ambassador program. You run the campus — fomo backs you, but the calls are yours.</p>
+    <p class="lede">your people. your campus. your move. build something that brings people together.</p>
     <div class="hero-cta">
       <a class="btn btn--primary btn--lg" href="/campus#apply">Apply to run your campus</a>
     </div>
@@ -335,6 +360,7 @@
   <nav class="card toc" id="contents" aria-labelledby="toc-title">
     <h2 id="toc-title">The manual · v2.0</h2>
     <ol>
+      <li><a href="#opportunity">Own the opportunity</a></li>
       <li><a href="#canvas">Your canvas</a></li>
       <li><a href="#product">What fomo is</a></li>
       <li><a href="#picture">The national picture</a></li>
@@ -347,226 +373,254 @@
     </ol>
   </nav>
 
-  <!-- ── your canvas ─────────────────────────────────────────────── -->
+  <!-- ── own the opportunity ───────────────────────────── -->
+  <section id="opportunity" class="section" aria-labelledby="opp-title">
+    <div class="section-head">
+      <p class="eyebrow">01 · Own the opportunity</p>
+      <h2 id="opp-title">this isn't an ambassador program. <span class="accent">you run the campus.</span></h2>
+      <p>we're building fomo school by school. <b>Campus Leads bring it into the communities that shape their school.</b> you decide how.</p>
+    </div>
+  </section>
+
+  <!-- ── your canvas ─────────────────────────────────── -->
   <section id="canvas" class="section" aria-labelledby="canvas-title">
     <div class="section-head">
-      <p class="eyebrow">01 · Your canvas</p>
+      <p class="eyebrow">02 · Your canvas</p>
       <h2 id="canvas-title">make things happen. <span class="accent">four ways to make it yours.</span></h2>
-      <p>Nobody hands you a campaign calendar. <b>These are the four levers you have</b>, and how you pull them is the job.</p>
     </div>
     <ol class="card grid4" aria-label="The four levers">
-      <li><i>01</i><b>People</b><small>Bring the right people in. The ones whose group chat is the campus.</small></li>
-      <li><i>02</i><b>Chapters</b><small>Get organizations competing. A chapter is a clan, and clans want a scoreboard.</small></li>
-      <li><i>03</i><b>Moments</b><small>Create things people talk about. A dinner, a watch party, a rivalry.</small></li>
-      <li><i>04</i><b>Content</b><small>Your campus, your people, your story — in your voice, not a script.</small></li>
+      <li><i>01</i><b>people</b><small>bring the right people in.</small></li>
+      <li><i>02</i><b>chapters</b><small>get organizations competing.</small></li>
+      <li><i>03</i><b>moments</b><small>create things people talk about.</small></li>
+      <li><i>04</i><b>content</b><small>your campus. your people. your story.</small></li>
     </ol>
   </section>
 
-  <!-- ── what fomo is ────────────────────────────────────────────── -->
+  <!-- ── what fomo is ────────────────────────────────── -->
   <section id="product" class="section" aria-labelledby="product-title">
     <div class="section-head">
-      <p class="eyebrow">02 · What fomo is</p>
+      <p class="eyebrow">03 · What fomo is</p>
       <h2 id="product-title">know what you're <span class="accent">putting your name on.</span></h2>
-      <p>You will be asked what this actually is, probably in a group chat, probably at midnight. <b>This is the answer.</b></p>
+      <p>a trading app for the rest of us.</p>
     </div>
     <div class="card about">
       <div>
-        <h3>A trading app for the rest of us</h3>
-        <p>Sign in with an Apple ID and trade <b>Bitcoin, Ethereum and Solana</b>. No gas fees, no bridging, nothing to set up before you can do anything.</p>
-        <p>The part that makes it different: <b>positions are social.</b> You can see what the people you follow are actually holding, tied to who they are. Everywhere else that lives in a private spreadsheet.</p>
-        <p class="note">That visibility is the product and the pitch. It is also why the rules further down about other people's positions exist.</p>
+        <p>you sign in with your Apple ID, buy and sell across <b>Bitcoin, Ethereum and Solana</b> without bridging anything or paying gas, and you can see what the people you follow are actually holding.</p>
+        <p>that last part is the difference. <b>every other trading app is a private spreadsheet</b> — you have no idea whether the person telling you they are up 40% is up at all. on fomo the position is attached to the person.</p>
+        <p><b>it is not a game and it is not free money.</b> real dollars go in and real dollars can be lost. what it is, for someone your age, is the first place your friends are all doing the same thing in public.</p>
+        <ul class="chips" aria-label="What you get">
+          <li>Apple ID sign-in</li><li>Bitcoin</li><li>Ethereum</li><li>Solana</li><li>no gas fees</li>
+        </ul>
       </div>
       <div class="stats">
-        <span class="stat"><b>625,000+</b><span>Users in year one</span></span>
-        <span class="stat"><b>$4B+</b><span>Traded</span></span>
-        <span class="stat"><b>$75M</b><span>Series B, Index Ventures</span></span>
-        <span class="stat"><b>110M+</b><span>Social interactions</span></span>
+        <span class="stat"><b>625,000+</b><span>people in the first year</span></span>
+        <span class="stat"><b>$4B+</b><span>traded through the app</span></span>
+        <span class="stat"><b>$75M</b><span>Series B, led by Index Ventures</span></span>
+        <span class="stat"><b>110M+</b><span>social interactions on it</span></span>
       </div>
     </div>
+    <p class="legalese">Trading involves risk, including loss of funds. No returns are guaranteed. Product access and promotional participation are subject to eligibility.</p>
   </section>
 
-  <!-- ── the national picture ────────────────────────────────────── -->
+  <!-- ── the national picture ──────────────────────────── -->
   <section id="picture" class="section" aria-labelledby="picture-title">
     <div class="section-head">
-      <p class="eyebrow">03 · The national picture</p>
+      <p class="eyebrow">04 · The national picture</p>
       <h2 id="picture-title">your campus. <span class="accent">your leaderboard.</span></h2>
-      <p>Every campus running fomo lands on a national board, and the board is the point: <b>it is the thing your people check.</b> Alabama, Texas, Miami, USC, San Diego State — the names change every week.</p>
     </div>
-    <p class="card" style="padding: 20px 24px; font-size: 14.5px; color: var(--ink-soft);"><b style="color: var(--ink)">Any rankings shown in materials are invented.</b> No real participation, affiliation, trading performance or financial returns are represented by them. The live board is at <a href="/greekwars#board" style="color: var(--accent-bright); font-weight: 600;">greekwars</a>.</p>
+    <div class="card fake-board">
+      <div class="fake-head">
+        <span class="pill">Concept only · fictional rankings</span>
+      </div>
+      <ol>
+        <li><i>01</i><span>Alabama</span><span class="go">⟶</span></li>
+        <li><i>02</i><span>Texas</span><span class="go">⟶</span></li>
+        <li><i>03</i><span>Miami</span><span class="go">⟶</span></li>
+        <li><i>04</i><span>USC</span><span class="go">⟶</span></li>
+        <li><i>05</i><span>SDSU</span><span class="go">⟶</span></li>
+      </ol>
+      <div class="fake-foot">
+        <b>see you at #1.</b>
+        <span>Design-only illustration. Rankings are invented. No real participation, affiliation, trading performance or financial returns are represented.</span>
+      </div>
+    </div>
+    <p class="note">The board that is real — campuses, chapters and raw PnL — is on the <a href="/greekwars#board">Greek Wars page</a>.</p>
   </section>
 
-  <!-- ── greek wars ──────────────────────────────────────────────── -->
+  <!-- ── greek wars ──────────────────────────────────── -->
   <section id="greekwars" class="section" aria-labelledby="gw-title">
     <div class="section-head">
-      <p class="eyebrow">04 · Greek Wars</p>
+      <p class="eyebrow">05 · Greek Wars by fomo</p>
       <h2 id="gw-title">your chapter is <span class="accent">on the leaderboard.</span></h2>
-      <p>A semester-long competition between chapters. <b>$500 — a promotional competition prize — to the top trader in every qualifying chapter</b>, and the national title on top of that.</p>
+      <p>a semester of chapter competition. <b>$500 — a promotional competition prize — to the top trader in every qualifying chapter.</b></p>
     </div>
     <ol class="card grid4" aria-label="How Greek Wars runs" style="grid-template-columns: repeat(3, 1fr);">
-      <li><i>01</i><b>Qualify</b><small>Meet the entry criteria — 80% of the chapter's actives onboarded, and kept there.</small></li>
-      <li><i>02</i><b>Compete</b><small>The whole semester. Ranked on raw PnL, not points, not volume, not activity.</small></li>
-      <li><i>03</i><b>Recognise</b><small>Every qualifying chapter crowns a winner. One chapter takes the country.</small></li>
+      <li><i>01</i><b>qualify</b><small>meet the entry criteria</small></li>
+      <li><i>02</i><b>compete</b><small>take part all semester</small></li>
+      <li><i>03</i><b>recognize</b><small>celebrate chapter winners</small></li>
     </ol>
+    <p class="legalese">Subject to eligibility and official rules, including qualification criteria, competition dates, scoring and prize terms. A prize is not a trading return. Trading involves risk, including loss of funds. No returns are guaranteed.</p>
     <p class="note">The full rules, the map of who is onboarded and the live board are on the <a href="/greekwars">Greek Wars page</a>. Chapters register at <a href="/greekwars/onboard">onboard</a>.</p>
   </section>
 
-  <!-- ── fomo irl ────────────────────────────────────────────────── -->
+  <!-- ── fomo irl ───────────────────────────────────── -->
   <section id="irl" class="section" aria-labelledby="irl-title">
     <div class="section-head">
-      <p class="eyebrow">05 · fomo IRL</p>
-      <h2 id="irl-title">fomo, after hours. <span class="accent">12 people, a table.</span></h2>
-      <p>fomo covers the table — <b>up to $1,200</b> — and you choose the room and the eleven people at it. Nothing about the dinner is conditional on posting it.</p>
+      <p class="eyebrow">06 · fomo IRL</p>
+      <h2 id="irl-title">fomo, after hours. <span class="accent">12 people. a table.</span></h2>
+      <p>bring together the people making moves on your campus. <b>fomo covers the table — up to $1,200.</b></p>
     </div>
     <p class="note">How a table gets funded, what you owe and when, and the application are on the <a href="/dinners">Dinner Series page</a>.</p>
   </section>
 
-  <!-- ── the hunt ────────────────────────────────────────────────── -->
+  <!-- ── the hunt ───────────────────────────────────── -->
   <section id="hunt" class="section" aria-labelledby="hunt-title">
     <div class="section-head">
-      <p class="eyebrow">06 · The hunt</p>
+      <p class="eyebrow">07 · The hunt</p>
       <h2 id="hunt-title">tasks with <span class="accent">a number on them.</span></h2>
-      <p>Do the thing, send the proof, get paid. <b>One claim per task, per person, per term</b>, and every claim is checked before it is paid.</p>
+      <p>do the thing. send the proof. get paid. <b>half of these check themselves</b> — anyone who signs up through your link is already counted, so there is nothing to send.</p>
     </div>
     <div class="card hunt">
       <div class="scroll-x">
         <table>
           <thead>
-            <tr><th>Task</th><th>What proves it</th><th class="r">Pays</th></tr>
+            <tr><th>Task</th><th>What to send</th><th class="r">Pays</th></tr>
           </thead>
           <tbody>
             <tr>
-              <td class="task">The first five<span>Five friends download and open fomo</span></td>
-              <td class="proof">One photo of all five of you, app open on every screen</td>
+              <td class="task">the first five<span>five friends download fomo and open it.</span></td>
+              <td class="proof"><b>send a photo</b> — one photo of all five of you, app open on every screen, plus their handles.</td>
               <td class="r pay">$20</td>
             </tr>
             <tr>
-              <td class="task">Full table<span>Ten people in one room, all on the app</span></td>
-              <td class="proof">A photo of the table, and ten signups through your link</td>
+              <td class="task">full table<span>ten people in one room, all on the app.</span></td>
+              <td class="proof"><b>send a photo</b> — a photo of the table, and ten signups through your link.</td>
               <td class="r pay">$50</td>
             </tr>
             <tr>
-              <td class="task">First flag<span>First chapter at your school to register for Greek Wars</span></td>
-              <td class="proof"><span class="self">Self-verifying</span> — we can see who registered first</td>
+              <td class="task">first flag<span>be the first chapter at your school to register for Greek Wars.</span></td>
+              <td class="proof"><span class="self">checks itself</span> — nothing. we can see who was first.</td>
               <td class="r pay">$100</td>
             </tr>
             <tr>
-              <td class="task">The floor<span>Twenty-five people onboarded through your link</span></td>
-              <td class="proof"><span class="self">Self-verifying</span> — the link counts them</td>
+              <td class="task">the floor<span>twenty-five people onboarded through your link.</span></td>
+              <td class="proof"><span class="self">checks itself</span> — nothing. your link counts them.</td>
               <td class="r pay">$150</td>
             </tr>
             <tr>
-              <td class="task">Kickoff crew<span>Fifty people from your school trading before game day</span></td>
-              <td class="proof"><span class="self">Self-verifying</span> — the link counts them</td>
+              <td class="task">kickoff crew<span>fifty people from your school trading before a game day kickoff.</span></td>
+              <td class="proof"><span class="self">checks itself</span> — nothing. your link counts them.</td>
               <td class="r pay">$200</td>
             </tr>
             <tr>
-              <td class="task">Ten thousand<span>A post that reaches 10,000 views</span></td>
-              <td class="proof">The link, plus a screenshot of your insights</td>
+              <td class="task">ten thousand<span>a post about fomo that clears 10,000 views.</span></td>
+              <td class="proof"><b>send a link</b> — the link, and a screenshot of your insights.</td>
               <td class="r pay">$50</td>
             </tr>
             <tr>
-              <td class="task">Six figures<span>A post that reaches 100,000 views</span></td>
-              <td class="proof">The link, plus a screenshot of your insights</td>
+              <td class="task">six figures<span>a post that clears 100,000 views.</span></td>
+              <td class="proof"><b>send a link</b> — the link, and a screenshot of your insights.</td>
               <td class="r pay">$250</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <p class="note">Claimed numbers do not count on their own — a screenshot of your own insights is what makes a view count. Anything you post about a task fomo paid for has to say so; see <a href="#rules">what is not up to you</a>.</p>
+      <p class="note">One claim per task, per person, per term. Every claim is checked before it is paid.</p>
+      <p class="todo"><b>TODO:</b> the claim and payment flow is not built yet — for now these are sent by email.</p>
+      <p class="legalese">Product access and promotional participation are subject to eligibility.</p>
     </div>
   </section>
 
-  <!-- ── your first move ─────────────────────────────────────────── -->
+  <!-- ── make your first move ─────────────────────────── -->
   <section id="firstmove" class="section" aria-labelledby="move-title">
     <div class="section-head">
-      <p class="eyebrow">07 · Your first move</p>
-      <h2 id="move-title">you make it move. <span class="accent">start small.</span></h2>
-      <p>Nobody's first week is a launch event. <b>The order matters more than the size</b> — a full table of people you actually know beats a flyer in every building on campus.</p>
+      <p class="eyebrow">08 · Make your first move</p>
+      <h2 id="move-title">you make it move. <span class="accent">start small. build from there.</span></h2>
     </div>
     <ol class="card steps5" aria-label="Your first five moves">
-      <li><i>01</i><div><b>Find your people</b><span>Start with communities you are already in. You do not need permission to talk to your own group chat.</span></div></li>
-      <li><i>02</i><div><b>Bring them on fomo</b><span>Get your circle on the app through your link, so it counts toward the tasks above.</span></div></li>
-      <li><i>03</i><div><b>Launch your campus</b><span>Give people a reason to gather — a dinner, a watch party, the first chapter to register.</span></div></li>
-      <li><i>04</i><div><b>Make some noise</b><span>Tell the story in your campus's voice. Yours, not a script we sent you.</span></div></li>
-      <li><i>05</i><div><b>Climb the leaderboard</b><span>Build participation and keep it there. The board rewards the campus that stays, not the one that spikes.</span></div></li>
+      <li><i>01</i><div><b>find your people.</b><span>start with the communities you know.</span></div></li>
+      <li><i>02</i><div><b>bring them on fomo.</b><span>connect your circle through the app.</span></div></li>
+      <li><i>03</i><div><b>launch your campus.</b><span>give people a reason to gather.</span></div></li>
+      <li><i>04</i><div><b>make some noise.</b><span>tell the story in your campus voice.</span></div></li>
+      <li><i>05</i><div><b>climb the leaderboard.</b><span>build participation. keep showing up.</span></div></li>
     </ol>
   </section>
 
-  <!-- ── built together ──────────────────────────────────────────── -->
+  <!-- ── built together ──────────────────────────────── -->
   <section id="together" class="section" aria-labelledby="together-title">
     <div class="section-head">
-      <p class="eyebrow">08 · Built together</p>
+      <p class="eyebrow">09 · Built together</p>
       <h2 id="together-title">your instinct. <span class="accent">our support.</span></h2>
-      <p>A shared foundation and a campus that feels like you. <b>If it is on the right, nobody is going to do it for you</b> — and if it is on the left, you should not be building it yourself.</p>
+      <p>a shared foundation. a campus that feels like you. <b>build something people want to be part of.</b></p>
     </div>
     <div class="card matrix">
       <h3>fomo provides</h3>
-      <h3>You own</h3>
+      <h3>you own</h3>
       <div class="mcol">
-        <div><strong>The product</strong><span>The social trading app itself, and everything in it.</span></div>
-        <div><strong>Resources</strong><span>The tools, the links, the assets, the budget behind a table.</span></div>
-        <div><strong>Campaigns</strong><span>The ideas and the programs — Greek Wars, Game Day, the Dinner Series.</span></div>
-        <div><strong>Support</strong><span>A team you can reach when something needs a decision.</span></div>
+        <div><strong>product</strong><span>the social trading app</span></div>
+        <div><strong>resources</strong><span>tools to get moving</span></div>
+        <div><strong>campaigns</strong><span>ideas to bring to life</span></div>
+        <div><strong>support</strong><span>a team in your corner</span></div>
       </div>
       <div class="mcol">
-        <div><strong>The local network</strong><span>The people who actually shape your campus, and getting to them.</span></div>
-        <div><strong>Execution</strong><span>The work that makes any of it happen on the ground.</span></div>
-        <div><strong>Culture</strong><span>Reading what will land at your school and what will not.</span></div>
-        <div><strong>Content</strong><span>Your people and your voice. This is the part nobody can send you.</span></div>
+        <div><strong>local network</strong><span>the people who shape campus</span></div>
+        <div><strong>execution</strong><span>the work that makes it happen</span></div>
+        <div><strong>culture</strong><span>what feels right at your school</span></div>
+        <div><strong>content</strong><span>your people, in your voice</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ── what is not up to you ───────────────────────────────────── -->
+  <!-- ── the part that is not up to you ──────────────────── -->
   <section id="rules" class="section" aria-labelledby="rules-title">
     <div class="section-head">
-      <p class="eyebrow">09 · Not up to you</p>
+      <p class="eyebrow">10 · The part that is not up to you</p>
       <h2 id="rules-title">most of this is your judgement. <span class="accent">this part is not.</span></h2>
-      <p>Four rules. <b>They are not style preferences</b> — three of them are the law, and the fourth is what happens if you ignore the first three.</p>
     </div>
     <ol class="rules" aria-label="The four rules">
       <li class="card">
-        <p class="rule-n">Rule 01</p>
-        <h3>Say when fomo paid</h3>
-        <p><b>Nothing here is conditional on posting</b> — not a dinner, not a prize. But when you do post about something fomo paid for, say so in the post.</p>
+        <p class="rule-n">say it when fomo paid</p>
+        <h3>the only rule about posting.</h3>
+        <p><b>nothing here is conditional on posting</b> — not a dinner, not a prize. but when you post about something fomo paid for, say so in the post. “#ad”, “paid by fomo” or “fomo covered this” all work. a comment or the fourth line of a caption does not.</p>
         <ul>
-          <li><b>#ad</b>, <b>paid by fomo</b> or <b>fomo covered this</b> all do the job.</li>
-          <li>A comment underneath does not, and neither does a caption added later.</li>
-          <li>An undisclosed post is rejected — it does not count toward a task or a prize.</li>
+          <li>any post about something fomo paid for must say so, <b>in the post itself</b>.</li>
+          <li>undisclosed posts are rejected and count toward nothing.</li>
         </ul>
       </li>
       <li class="card">
-        <p class="rule-n">Rule 02</p>
-        <h3>Describe the app, never the outcome</h3>
-        <p>This is a trading app, and the line matters. <b>Describe what it does. Never what it will pay.</b></p>
+        <p class="rule-n">describe the app, never the outcome</p>
+        <h3>this is a trading app. the line matters.</h3>
+        <p>say what fomo is and say what you did. <b>your own experience is yours to talk about.</b> what you cannot do is suggest what anyone else will make.</p>
         <ul>
-          <li>No promised or implied returns, and nothing that reads as <b>easy money</b>.</li>
-          <li>A prize is a prize. It is not a trading return, and it must not be shown as one.</li>
-          <li>Never post someone else's positions without asking them first.</li>
-          <li>Never pitch or sign up anyone <b>under 18</b>.</li>
+          <li>never promise, imply or hint at returns — no “easy money”, <b>no screenshot framed as what to expect</b>.</li>
+          <li>a prize is a <b>promotional competition prize</b>. it is not a trading return.</li>
+          <li>never post someone else's positions without them saying yes.</li>
+          <li>never pitch anyone <b>under 18</b>, and never sign them up.</li>
         </ul>
       </li>
       <li class="card">
-        <p class="rule-n">Rule 03</p>
-        <h3>Use the name properly</h3>
-        <p>Two things, and the first one catches everybody out.</p>
+        <p class="rule-n">use the name properly</p>
+        <h3>two things, and one catches everyone out.</h3>
+        <p>anything you post is yours and reads as yours. <b>if something needs to come from fomo, ask and we will send it from fomo.</b></p>
         <ul>
-          <li><b>fomo is always lowercase.</b> Never Fomo, never FOMO — not at the start of a sentence either.</li>
-          <li>Do not make official-looking material: no accounts that look like fomo's, no speaking as if you decide policy.</li>
+          <li><b>fomo is always lowercase.</b> never Fomo, never FOMO — including at the start of a sentence.</li>
+          <li>do not make things that look official — no fake accounts, no profiles implying you speak for the company.</li>
         </ul>
       </li>
       <li class="card is-hard">
-        <p class="rule-n">Rule 04 · Ends it</p>
-        <h3>The short list</h3>
-        <p>None of this is about performance. <b>A quiet campus is not a problem</b>; these are:</p>
+        <p class="rule-n">what ends it</p>
+        <h3>short list, and none of it is about performance.</h3>
+        <p><b>a quiet term where nothing worked has never been a problem.</b> every item here is about honesty, because the whole thing runs on people believing you.</p>
         <ul>
-          <li>Undisclosed paid posts, after a warning.</li>
-          <li>Presenting trading as guaranteed income.</li>
-          <li>Fabricated numbers — bought engagement, invented signups, edited metrics.</li>
-          <li>Signing up anyone under 18.</li>
+          <li>undisclosed paid posts, after being told once.</li>
+          <li>presenting trading as a way to make guaranteed money.</li>
+          <li>faked numbers — bought engagement, invented signups, edited insights.</li>
+          <li>signing up anyone under 18, <b>or anyone who did not ask</b>.</li>
         </ul>
       </li>
     </ol>
+    <p class="todo"><b>TODO:</b> official rules for Greek Wars and the Dinner Series competition are not published yet. Until they are, this manual is guidance and prize questions are decided case by case.</p>
+    <p class="legalese">Trading involves risk, including loss of funds. No returns are guaranteed.</p>
   </section>
 
   <section class="closer">
@@ -574,7 +628,7 @@
       <svg viewBox="0 0 100 100" fill="none"><path d="M36.9747 24.3586C44.1067 24.3587 49.7941 27.9515 52.9484 33.5959C48.7626 38.0418 45.6617 43.7612 44.4679 50.0002C43.2743 56.2391 44.1865 61.9572 46.67 66.4026C41.3555 72.0468 34.2931 75.6408 27.1613 75.6409C18.432 75.6407 11.8659 70.2588 9.46204 62.3196H26.8478C27.4159 62.3193 28.0059 61.8593 28.1691 61.2932L34.6486 38.7043C34.8098 38.1381 34.4815 37.6782 33.9152 37.678H14.1788C19.6213 29.7404 28.2465 24.3588 36.9747 24.3586Z" fill="#EAEDFF"/><path d="M72.3285 24.3586C85.0779 24.3586 93.2156 35.8374 90.5062 49.9993C87.7966 64.1596 75.2646 75.6409 62.515 75.6409C53.7856 75.6408 47.2196 70.2589 44.8158 62.3196H64.1537C64.7218 62.3194 65.3127 61.8594 65.476 61.2932L71.9545 38.7043C72.1157 38.138 71.7876 37.678 71.2211 37.678H49.5316C54.9741 29.7401 63.5999 24.3587 72.3285 24.3586Z" fill="#EAEDFF"/></svg>
     </span>
     <h2>your campus <span class="accent">starts with you.</span></h2>
-    <p>Someone is going to run fomo at your school. It could be you.</p>
+    <p>someone is going to run fomo at your school. it could be you.</p>
     <div class="hero-cta">
       <a class="btn btn--primary btn--lg" href="/campus#apply">Apply to run your campus</a>
       <a class="btn btn--dark btn--lg" href="/campus">The campus program</a>
