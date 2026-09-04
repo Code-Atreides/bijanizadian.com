@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>fomo/campus/greekwars/onboard</title>
+<meta name="description" content="Register your chapter for Greek Wars. Two minutes — your chapter becomes a clan, and you get the link to send everyone else.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Onboard your chapter — Greek Wars">
+<meta property="og:description" content="Two minutes. Your chapter becomes a clan, and you get the link to send everyone else. $500 is guaranteed once 80% of your chapter is onboarded.">
+<meta property="og:url" content="https://bijanizadian.com/greekwars/onboard">
+<meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
+<link rel="canonical" href="https://bijanizadian.com/greekwars/onboard">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Bold.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/campus/space-bg.webp" fetchpriority="high">
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<!--
+  Greek Wars chapter registration. Same twelve questions as the original at
+  aryatoufanian.com/fomo/onboard/, on this project's design language, saved to
+  greekwars_onboard/<key> in the shared Firebase project. That node is
+  write-only from the web: it carries names, emails and phone numbers.
+-->
+<style>
+  /* Aeonik is fomo's exclusive typeface — the same self-hosted woff2 files the
+     other pages serve. Schibsted Grotesk is the fallback. */
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
+    --ink-deep: #0B091F; --lavender: #EAEDFF; --mark: #CBD0EB;
+    --btn-fill: rgba(96,106,247,.5); --btn-fill-hover: rgba(96,106,247,.8);
+    --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
+    --hairline: rgba(203,208,235,.1);
+    --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
+    --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  /* scroll-padding also governs focus-driven scrolling, so advancing a step
+     never parks the focused field against the top of the window */
+  html { scroll-behavior: smooth; scroll-padding-top: 88px; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
+  body {
+    font-family: Aeonik, 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55; font-weight: 500;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  a { color: inherit; }
+  b, strong { font-weight: 700; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
+  .skip:focus { left: 8px; }
+  .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+
+  /* ---------- buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+    padding: 11px 20px; border-radius: 12px; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .btn--primary { background: var(--btn-fill); color: #fff; }
+  .btn--primary:hover { background: var(--btn-fill-hover); }
+  .btn--ghost { background: rgba(255,255,255,.06); color: var(--ink); }
+  .btn--ghost:hover { background: var(--btn-quiet); border-color: rgba(203,208,235,.24); }
+  .btn--dark { background: var(--btn-quiet); color: var(--ink); }
+  .btn--dark:hover { background: var(--btn-quiet-hover); }
+  .btn:disabled { opacity: .55; cursor: default; }
+  .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- nav ---------- */
+  .nav { position: absolute; top: 0; left: 0; right: 0; z-index: 30; }
+  .nav-inner { padding: 14px 20px; display: flex; align-items: center; gap: 14px; }
+  .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; text-decoration: none; gap: 8px; }
+  .brand svg { height: 24px; width: auto; display: block; }
+  .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .store { display: block; border-radius: 6px; background: rgba(255,255,255,.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity .15s ease, box-shadow .15s ease; }
+  .store:hover { opacity: .9; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+  .store img { display: block; height: 40px; width: auto; }
+
+  /* ---------- hero ---------- */
+  /* Short by design: this is the page people arrive at to fill something in, so
+     the band states where they are and gets out of the form's way. */
+  .hero { position: relative; width: 100%; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+  .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: auto; min-height: 60vh; object-fit: cover; object-position: top center; z-index: 0; pointer-events: none; user-select: none; }
+  .hero::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(to bottom, transparent, var(--bg)); z-index: 1; pointer-events: none; }
+  .hero-inner { position: relative; z-index: 3; text-align: center; padding: 96px 24px 30px; display: flex; flex-direction: column; align-items: center; }
+  .hero-title { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
+  /* four segments is the longest path on the site, so the lockup runs smaller
+     than the landing pages' to stay on one line inside the gutters */
+  .hero-title svg { height: clamp(17px, 3.5vw, 50px); width: auto; display: block; }
+  .hero-title .slash { font-size: clamp(14px, 3.1vw, 44px); font-weight: 700; letter-spacing: -.045em; }
+  .hero-title .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
+  .hero-title .slash .up { opacity: .5; }
+  .hero h1 { margin-top: 26px; font-size: clamp(28px, 3.4vw, 44px); font-weight: 700; letter-spacing: -.05em; line-height: 1.12; color: var(--lavender); }
+  .hero .lede { margin-top: 10px; max-width: 52ch; color: rgba(209,216,255,.65); font-size: clamp(16px, 1.6vw, 20px); line-height: 1.3; letter-spacing: -.025em; }
+  @media (min-width: 800px) { .hero-inner { padding: 132px 24px 34px; } }
+
+  /* ---------- the registration card ---------- */
+  .reg { margin-top: 30px; padding: 30px; display: grid; grid-template-columns: minmax(0,.85fr) minmax(0,1.15fr); gap: 34px; }
+  .reg-side h2 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .ticks { list-style: none; display: grid; gap: 12px; margin-top: 16px; }
+  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 15px; color: var(--ink-soft); }
+  .ticks li strong { color: var(--ink); font-weight: 600; }
+  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 3px; }
+  .note { margin-top: 20px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
+  .note b { color: var(--ink); font-weight: 600; }
+  .note a { color: var(--accent-bright); font-weight: 600; }
+  .legal { margin-top: 18px; font-size: 12.5px; color: var(--ink-faint); }
+
+  /* ---------- the form ---------- */
+  .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; min-height: 340px; display: flex; flex-direction: column; }
+  /* the form has to be the flex column that fills the panel, or margin-top:auto
+     on the controls does nothing and the buttons strand under the field */
+  .form-panel form { flex: 1; display: flex; flex-direction: column; }
+  .form-panel .done { flex: 1; }
+  .progress { height: 4px; border-radius: 99px; background: var(--surface); margin-bottom: 20px; overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--accent); width: 8%; transition: width .25s ease; }
+  .step { border: 0; display: none; }
+  .step.is-on { display: block; }
+  .step-num { display: flex; align-items: center; gap: 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .step-num .opt { color: var(--ink-faint); letter-spacing: .06em; }
+  .step label { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+  .step .help { margin-top: 6px; font-size: 13.5px; color: var(--ink-soft); }
+  .step input, .step select {
+    display: block; width: 100%; margin-top: 14px;
+    font: inherit; font-size: 16px; font-weight: 500; color: var(--ink);
+    background: var(--bg-2); border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px;
+  }
+  .step input:focus, .step select:focus { outline: none; border-color: var(--accent); }
+  .step input::placeholder { color: var(--ink-faint); }
+  .step select {
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%);
+    background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%;
+    background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px;
+  }
+  .step option { background: var(--bg-2); }
+  /* the number spinners are noise on a roster count */
+  .step input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+  .step input[type="number"]::-webkit-outer-spin-button,
+  .step input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
+  .hp { position: absolute; left: -9999px; }
+  .form-controls { margin-top: auto; padding-top: 22px; display: flex; align-items: center; gap: 10px; }
+  .form-controls .hint { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); }
+  kbd { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); }
+  .done { display: grid; gap: 10px; align-content: center; }
+  .done h3 { font-size: 26px; font-weight: 700; letter-spacing: -.03em; }
+  .done p { color: var(--ink-soft); font-size: 15px; }
+  .done .ok-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(33,201,94,.14); color: var(--ok); margin-bottom: 6px; }
+  .done .ok-mark svg { width: 22px; height: 22px; }
+  .done .btn { margin-top: 12px; justify-self: start; }
+
+  /* ---------- what happens next ---------- */
+  .after { margin-top: 16px; padding: 24px 26px 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+  .after li { list-style: none; display: grid; gap: 8px; align-content: start; }
+  .after li + li { padding-left: 26px; border-left: 1px solid var(--line-soft); }
+  .after i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
+  .after b { font-size: 15.5px; font-weight: 700; letter-spacing: -.02em; }
+  .after small { font-size: 13.5px; color: var(--ink-soft); }
+
+  /* ---------- footer ---------- */
+  .foot { margin-top: 64px; border-top: 1px solid var(--line); }
+  .foot-legal { max-width: var(--wrap); margin: 0 auto; padding: 22px 24px 30px; display: flex; flex-wrap: wrap; gap: 8px 22px; align-items: center; font-size: 12.5px; color: var(--ink-faint); }
+  .foot-legal a { color: var(--ink-soft); text-decoration: none; }
+  .foot-legal a:hover { color: var(--ink); }
+  .foot-legal .spacer { flex: 1; }
+
+  @media (max-width: 1020px) { .reg { grid-template-columns: 1fr; gap: 28px; } }
+  @media (max-width: 760px) {
+    .nav-inner { padding: 12px 14px; gap: 10px; }
+    .nav-right { gap: 8px; }
+    .store img { height: 32px; }
+    .wrap { padding: 0 20px 72px; }
+    .reg { padding: 22px 20px; }
+    .form-panel { padding: 18px; min-height: 0; }
+    .after { grid-template-columns: 1fr; padding: 20px 18px; }
+    .after li + li { margin-top: 20px; padding: 20px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
+  }
+  @media (max-width: 480px) { .store img { height: 28px; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .btn, .progress i { transition: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#onboard-form">Skip to the form</a>
+
+<div class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 24" fill="none" role="img">
+      <path d="M0.000730533 4.96351C0.000730533 1.80193 1.70048 0 5.3036 0H8.96C9.08115 0 9.17895 0.0977959 9.17895 0.218946V3.92862C9.17895 4.04977 9.08115 4.14757 8.96 4.14757H6.11954C5.20143 4.14757 4.79346 4.55554 4.79346 5.43935V6.10421C4.79346 6.22536 4.89125 6.32316 5.0124 6.32316H8.74106C8.86221 6.32316 8.96 6.42096 8.96 6.54211V10.2175C8.96 10.3386 8.86221 10.4364 8.74106 10.4364H5.0124C4.89125 10.4364 4.79346 10.5342 4.79346 10.6554V23.5776C4.79346 23.6987 4.69566 23.7965 4.57451 23.7965H0.218946C0.0977959 23.7965 0 23.6987 0 23.5776V4.96351H0.000730533Z" fill="#CBD0EB"/>
+      <path d="M8.80603 15.0597C8.80603 9.6882 12.4778 6.11938 18.0185 6.11938C23.5593 6.11938 27.2311 9.68893 27.2311 15.0597C27.2311 20.4304 23.5593 24 18.0185 24C12.4778 24 8.80603 20.4304 8.80603 15.0597ZM22.3354 15.0597C22.3354 12.1703 20.7036 10.1305 18.0178 10.1305C15.3321 10.1305 13.7009 12.1703 13.7009 15.0597C13.7009 17.949 15.3328 19.9889 18.0178 19.9889C20.7028 19.9889 22.3354 17.949 22.3354 15.0597Z" fill="#CBD0EB"/>
+      <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
+      <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
+      </svg>
+      <span>/campus/greekwars/onboard</span>
+    </a>
+    <div class="nav-right">
+      <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener">
+        <img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40">
+      </a>
+      <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener">
+        <img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40">
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <img class="hero-bg" src="/campus/space-bg.webp" alt="" aria-hidden="true" width="5172" height="3030" fetchpriority="high">
+  <div class="hero-inner">
+    <div class="hero-title" role="img" aria-label="fomo/campus/greekwars/onboard">
+      <svg viewBox="0 0 352 113" fill="none" aria-hidden="true">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+      </svg>
+      <span class="slash"><i>/</i><span class="up">campus</span><i>/</i><span class="up">greekwars</span><i>/</i>onboard</span>
+    </div>
+    <h1>onboard your chapter.</h1>
+    <p class="lede">Two minutes. Your chapter becomes a clan, and you get the link to send everyone else.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="card reg">
+    <div class="reg-side">
+      <h2>Registration · Fall 2026</h2>
+      <ul class="ticks">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>$500 is guaranteed</strong> once 80% of your chapter is onboarded.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>One registration covers your whole chapter</strong> — you get a link to send everyone.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Any recognised Greek chapter — <strong>fraternity or sorority.</strong></span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Members competing must be <strong>18 or older.</strong></span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Nobody needs to know anything about crypto</strong> to enter.</span></li>
+      </ul>
+      <p class="note">First fraternity and first sorority on your campus to clear 80% each take <b>+$250</b> on top. <a href="/greekwars#pot">What Greek Wars pays →</a></p>
+      <p class="legal">Official rules will be linked here before the season opens. Trading involves risk, including loss of principal.</p>
+    </div>
+
+    <div class="form-panel">
+      <form id="onboard-form" novalidate>
+        <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
+        <p class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
+
+        <fieldset class="step" data-step="0"><legend class="step-num"><span data-num>01 / 12</span></legend><label for="first_name">First name</label><input id="first_name" name="first_name" type="text" autocomplete="given-name" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="1"><legend class="step-num"><span data-num>02 / 12</span></legend><label for="last_name">Last name</label><input id="last_name" name="last_name" type="text" autocomplete="family-name" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="2"><legend class="step-num"><span data-num>03 / 12</span></legend><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" required><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 12</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 12</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">So we can tell a real chapter from a name typed into a form.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 12</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" list="schools" autocomplete="organization" placeholder="Start typing and pick yours" required><p class="help">NYU, GWU, Penn State — if it is not in the list, just type it.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 12</span></legend><label for="org_type">Fraternity or sorority?</label>
+          <select id="org_type" name="org_type" required>
+            <option value="" disabled selected>Choose one…</option>
+            <option>Fraternity</option><option>Sorority</option><option>Co-ed / other Greek org</option>
+          </select><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 12</span></legend><label for="chapter">Which chapter?</label><input id="chapter" name="chapter" type="text" list="chapters" autocomplete="off" placeholder="Start typing your letters" required><p class="help">SAE, FIJI, Tri Delt — nicknames are fine.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="8"><legend class="step-num"><span data-num>09 / 12</span></legend><label for="role">What's your role in the chapter?</label>
+          <select id="role" name="role" required>
+            <option value="" disabled selected>Choose one…</option>
+            <option>President</option><option>Vice President</option><option>Treasurer</option><option>Social Chair</option><option>Rush Chair</option><option>Philanthropy Chair</option><option>Member</option>
+          </select><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="9"><legend class="step-num"><span data-num>10 / 12</span></legend><label for="actives">How many active members?</label><input id="actives" name="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" placeholder="e.g. 84" required><p class="help">Rough number is fine — it sets your clan size, and 80% of it is your target.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="10"><legend class="step-num"><span data-num>11 / 12</span></legend><label for="best_trader">Who's going to be your chapter's best trader?</label><input id="best_trader" name="best_trader" type="text" autocomplete="off" required><p class="help">Name them. They will have to live up to it on the leaderboard.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="11"><legend class="step-num"><span data-num>12 / 12</span><span class="opt">Optional</span></legend><label for="worst_trader">And who will be the worst?</label><input id="worst_trader" name="worst_trader" type="text" autocomplete="off"><p class="help">The leaderboard settles this one either way.</p><p class="field-error" data-error hidden></p></fieldset>
+
+        <div class="form-controls">
+          <button type="button" class="btn btn--ghost" id="onboard-back" hidden>← Back</button>
+          <button type="button" class="btn btn--primary" id="onboard-next">Next →</button>
+          <button type="submit" class="btn btn--primary" id="onboard-submit" hidden>Register my chapter</button>
+          <span class="hint" id="onboard-hint"><kbd>Enter</kbd> to continue</span>
+        </div>
+        <p class="field-error" id="form-error" hidden></p>
+      </form>
+
+      <div class="done" id="onboard-done" hidden>
+        <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+        <h3>Your clan is in.</h3>
+        <p>We'll be in touch with what your chapter needs to do next, including the link to send everyone. Check your email — and your spam folder, just in case.</p>
+        <a class="btn btn--dark" href="/greekwars#board">See the board →</a>
+      </div>
+    </div>
+  </div>
+
+  <ol class="card after" aria-label="What happens after you register">
+    <li><i>01</i><b>You get the link</b><small>One link for your chapter. Every download through it counts against the roster number you just gave us.</small></li>
+    <li><i>02</i><b>Your clan fills up</b><small>Drop it in the group chat. You can see where you are against 80% at any point — just ask.</small></li>
+    <li><i>03</i><b>You land on the map</b><small>At 80% the chapter is qualified, joins both boards, and the campus $250 is settled on whoever got there first.</small></li>
+  </ol>
+
+  <footer class="foot">
+    <div class="foot-legal">
+      <a href="/greekwars">← Back to Greek Wars</a>
+      <a href="/campus">The campus program</a>
+      <a href="https://fomo.family" target="_blank" rel="noopener">fomo.family</a>
+      <span class="spacer"></span>
+      <span>© 2026 fomo · Greek Wars</span>
+      <span>Trading involves risk, including loss of principal.</span>
+    </div>
+  </footer>
+</main>
+
+<datalist id="schools"><option value="Arizona State University"></option><option value="Auburn University"></option><option value="Clemson University"></option><option value="Florida State University"></option><option value="Georgia Institute of Technology"></option><option value="Indiana University Bloomington"></option><option value="Louisiana State University"></option><option value="Michigan State University"></option><option value="New York University"></option><option value="Ohio State University"></option><option value="Penn State University"></option><option value="Purdue University"></option><option value="Southern Methodist University"></option><option value="Syracuse University"></option><option value="Texas A&amp;M University"></option><option value="Texas Christian University"></option><option value="The George Washington University"></option><option value="Tulane University"></option><option value="University of Alabama"></option><option value="University of Arizona"></option><option value="University of Arkansas"></option><option value="University of California, Los Angeles"></option><option value="University of Colorado Boulder"></option><option value="University of Florida"></option><option value="University of Georgia"></option><option value="University of Illinois Urbana-Champaign"></option><option value="University of Iowa"></option><option value="University of Kansas"></option><option value="University of Kentucky"></option><option value="University of Miami"></option><option value="University of Michigan"></option><option value="University of Mississippi"></option><option value="University of Missouri"></option><option value="University of Nebraska"></option><option value="University of North Carolina at Chapel Hill"></option><option value="University of Oklahoma"></option><option value="University of Oregon"></option><option value="University of South Carolina"></option><option value="University of Southern California"></option><option value="University of Tennessee"></option><option value="University of Texas at Austin"></option><option value="University of Virginia"></option><option value="University of Washington"></option><option value="University of Wisconsin-Madison"></option><option value="Vanderbilt University"></option><option value="Villanova University"></option><option value="Virginia Tech"></option><option value="Wake Forest University"></option><option value="Washington University in St. Louis"></option></datalist>
+<datalist id="chapters"><option value="Alpha Chi Omega"></option><option value="Alpha Delta Pi"></option><option value="Alpha Epsilon Phi"></option><option value="Alpha Epsilon Pi"></option><option value="Alpha Gamma Delta"></option><option value="Alpha Omicron Pi"></option><option value="Alpha Phi"></option><option value="Alpha Sigma Phi"></option><option value="Alpha Tau Omega"></option><option value="Alpha Xi Delta"></option><option value="Beta Theta Pi"></option><option value="Chi Omega"></option><option value="Chi Phi"></option><option value="Chi Psi"></option><option value="Delta Chi"></option><option value="Delta Delta Delta (Tri Delt)"></option><option value="Delta Gamma"></option><option value="Delta Kappa Epsilon"></option><option value="Delta Phi Epsilon"></option><option value="Delta Sigma Phi"></option><option value="Delta Tau Delta"></option><option value="Delta Upsilon"></option><option value="Delta Zeta"></option><option value="Gamma Phi Beta"></option><option value="Kappa Alpha Order"></option><option value="Kappa Alpha Theta"></option><option value="Kappa Delta"></option><option value="Kappa Kappa Gamma"></option><option value="Kappa Sigma"></option><option value="Lambda Chi Alpha"></option><option value="Phi Delta Theta"></option><option value="Phi Gamma Delta (FIJI)"></option><option value="Phi Kappa Psi"></option><option value="Phi Kappa Sigma"></option><option value="Phi Kappa Tau"></option><option value="Phi Mu"></option><option value="Phi Sigma Sigma"></option><option value="Pi Beta Phi"></option><option value="Pi Kappa Alpha (Pike)"></option><option value="Pi Kappa Phi"></option><option value="Sigma Alpha Epsilon (SAE)"></option><option value="Sigma Chi"></option><option value="Sigma Delta Tau"></option><option value="Sigma Kappa"></option><option value="Sigma Nu"></option><option value="Sigma Phi Epsilon (SigEp)"></option><option value="Sigma Pi"></option><option value="Tau Kappa Epsilon (TKE)"></option><option value="Theta Chi"></option><option value="Theta Xi"></option><option value="Zeta Beta Tau"></option><option value="Zeta Psi"></option><option value="Zeta Tau Alpha"></option></datalist>
+
+<script>
+(function () {
+  // ---------- stepped registration, saved to the shared Firebase project under
+  // greekwars_onboard/<key>. Rules: write-only from the web, like the other
+  // application forms — this one carries names, emails and phone numbers.
+  var firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+  var db = null;
+  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+
+  var form = document.getElementById('onboard-form');
+  var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
+  var back = document.getElementById('onboard-back');
+  var next = document.getElementById('onboard-next');
+  var submit = document.getElementById('onboard-submit');
+  var hint = document.getElementById('onboard-hint');
+  var bar = document.getElementById('progress-bar');
+  var formError = document.getElementById('form-error');
+  var done = document.getElementById('onboard-done');
+  var i = 0;
+
+  function field(step) { return step.querySelector('input, select'); }
+  function errorEl(step) { return step.querySelector('[data-error]'); }
+  function optional(step) { return field(step).id === 'worst_trader'; }
+
+  // Native email validity accepts "arya@gmail" — hold contact fields to something reachable.
+  var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
+  var TYPOS = { 'gmail.con':'gmail.com','gmail.co':'gmail.com','gmai.com':'gmail.com','gmial.com':'gmail.com','gmaill.com':'gmail.com','gnail.com':'gmail.com','yahoo.con':'yahoo.com','yaho.com':'yahoo.com','hotmail.con':'hotmail.com','hotmial.com':'hotmail.com','outlook.con':'outlook.com','icloud.con':'icloud.com' };
+  function emailError(v) {
+    v = v.trim();
+    if (!EMAIL.test(v)) return 'That is not a complete email address — it should look like you@school.edu.';
+    var d = v.split('@').pop().toLowerCase();
+    if (TYPOS[d]) return 'Did you mean @' + TYPOS[d] + '?';
+    return null;
+  }
+  function digits(v) { return String(v).replace(/[^0-9]/g, ''); }
+  function phoneError(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length === 11) d = d.slice(1);
+    if (d.length !== 10) return 'A US mobile number is 10 digits — like 212-555-0199.';
+    if (!/^[2-9][0-9]{2}[2-9][0-9]{6}$/.test(d)) return 'That is not a real US number — check the digits.';
+    return null;
+  }
+  function formatPhone(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length > 10) d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length > 6) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
+    return d;
+  }
+  // "@name", "name" and a pasted profile link all land on one value.
+  function normalizeInstagram(v) {
+    var h = String(v).trim();
+    if (!h) return null;
+    var url = h.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)*instagram\.com\/([^/?#]+)/i);
+    if (url) h = url[1]; else if (/instagram\.com/i.test(h)) return null;
+    h = h.replace(/^@+/, '').replace(/\/+$/, '');
+    if (!/^[a-z0-9._]{1,30}$/i.test(h) || h.charAt(0) === '.' || h.charAt(h.length - 1) === '.' || h.indexOf('..') > -1) return null;
+    return h.toLowerCase();
+  }
+
+  function validate(step) {
+    var el = field(step), v = el.value.trim(), msg = null;
+    if (!v) { if (!optional(step)) msg = el.tagName === 'SELECT' ? 'Pick one to continue.' : 'This one is required.'; }
+    else if (el.id === 'email') msg = emailError(v);
+    else if (el.id === 'phone') msg = phoneError(v);
+    else if (el.id === 'instagram' && !normalizeInstagram(v)) msg = 'That does not look like an Instagram handle — try @yourhandle.';
+    else if (el.id === 'actives') {
+      var n = parseInt(v, 10);
+      // the roster number is what 80% is measured against, so a typo here costs
+      // the chapter its qualification later
+      if (!/^[0-9]+$/.test(v) || isNaN(n)) msg = 'Just the number of actives — digits only.';
+      else if (n < 5) msg = 'That is fewer people than a table. Give us the real roster.';
+      else if (n > 1000) msg = 'That is bigger than any chapter we have seen — check the number.';
+    }
+    else if ((el.id === 'school' || el.id === 'chapter') && v.length < 2) msg = 'A couple of letters at least.';
+    var err = errorEl(step);
+    err.textContent = msg || '';
+    err.hidden = !msg;
+    el.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    return !msg;
+  }
+
+  // moveFocus is opt-out: every user-driven move should land the caret in the
+  // next field, but the initial paint must not — focusing a field below the fold
+  // makes the browser scroll to it, so the page would open on the form.
+  function show(n, moveFocus) {
+    i = Math.max(0, Math.min(steps.length - 1, n));
+    steps.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
+    back.hidden = i === 0;
+    var last = i === steps.length - 1;
+    next.hidden = last;
+    submit.hidden = !last;
+    hint.innerHTML = last ? '' : '<kbd>Enter</kbd> to continue';
+    bar.style.width = ((i + 1) / steps.length * 100) + '%';
+    if (moveFocus === false) return;
+    var el = field(steps[i]);
+    setTimeout(function () { el.focus(); }, 0);
+  }
+
+  next.addEventListener('click', function () { if (validate(steps[i])) show(i + 1); });
+  back.addEventListener('click', function () { show(i - 1); });
+
+  form.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    if (i < steps.length - 1) { if (validate(steps[i])) show(i + 1); }
+    else form.requestSubmit ? form.requestSubmit() : submit.click();
+  });
+
+  document.getElementById('phone').addEventListener('input', function () {
+    var el = this, caret = el.selectionStart == null ? el.value.length : el.selectionStart;
+    var typed = digits(el.value.slice(0, caret)).length;
+    var f = formatPhone(el.value);
+    if (f === el.value) return;
+    el.value = f;
+    var pos = 0;
+    if (typed > 0) { pos = f.length; for (var k = 0, seen = 0; k < f.length; k++) { if (f.charAt(k) >= '0' && f.charAt(k) <= '9') seen++; if (seen === typed) { pos = k + 1; break; } } }
+    try { el.setSelectionRange(pos, pos); } catch (err) {}
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    formError.hidden = true;
+    for (var k = 0; k < steps.length; k++) { if (!validate(steps[k])) { show(k); return; } }
+    if (form._gotcha && form._gotcha.value) { finish(); return; }   // bot: pretend
+    var data = {};
+    steps.forEach(function (s) { var el = field(s); data[el.name] = el.value.trim(); });
+    data.instagram = normalizeInstagram(data.instagram) || data.instagram;
+    data.phone = formatPhone(data.phone);
+    data.actives = String(parseInt(data.actives, 10));
+    // the number the chapter is actually chasing, worked out once here so it is
+    // the same everywhere it gets quoted back to them
+    data.target = String(Math.ceil(parseInt(data.actives, 10) * 0.8));
+    data.submitted_at = new Date().toISOString();
+    data.page = location.pathname;
+    data.ua = (navigator.userAgent || '').slice(0, 160);
+
+    submit.disabled = true;
+    submit.textContent = 'Sending…';
+    if (!db) { fail('We could not reach the server. Email hello@fomo.family with your answers and we will take it from there.'); return; }
+    var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    db.ref('greekwars_onboard/' + key).set(data).then(finish).catch(function () {
+      fail('That did not send. Check your connection and try again — nothing was lost.');
+    });
+  });
+
+  function fail(msg) {
+    submit.disabled = false;
+    submit.textContent = 'Register my chapter';
+    formError.textContent = msg;
+    formError.hidden = false;
+  }
+  function finish() {
+    form.hidden = true;
+    done.hidden = false;
+    done.setAttribute('tabindex', '-1');
+    done.focus();
+  }
+
+  show(0, false);
+})();
+</script>
+</body>
+</html>
