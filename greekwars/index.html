@@ -133,7 +133,7 @@
   /* the parent segment is dimmed, so the lockup reads as a path into this page */
   .hero-title .slash .up { opacity: .5; }
   .hero h1 { margin-top: 34px; font-size: clamp(26px, 3.1vw, 40px); font-weight: 700; letter-spacing: -.05em; line-height: 1.2; color: var(--lavender); }
-  .hero .lede { margin-top: 10px; max-width: 60ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); line-height: 1.25; letter-spacing: -.025em; }
+  .hero .lede { margin-top: 10px; max-width: 54ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); line-height: 1.25; letter-spacing: -.025em; }
   .hero-cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
   .hero-alt {
     position: relative; z-index: 3; margin-top: 4px; padding: 6px 4px;
@@ -179,12 +179,14 @@
   .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
 
   /* ---------- the map ---------- */
-  .mapcard { margin-top: var(--gap-head); padding: 22px 24px 20px; }
-  .map-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 8px; }
-  .map-stats { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-left: auto; }
-  .map-stat b { display: block; font-size: 21px; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
+  .mapcard { margin-top: var(--gap-head); padding: 20px 24px 16px; }
+  .map-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-bottom: 4px; }
+  .map-stats { display: flex; flex-wrap: wrap; gap: 8px 34px; margin-left: auto; }
+  .map-stat b { display: block; font-size: 27px; font-weight: 700; letter-spacing: -.035em; line-height: 1.05; }
   .map-stat span { font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
-  .usmap { display: block; width: 100%; height: auto; overflow: visible; }
+  /* the country is 975x610, so at full card width it runs ~760px tall — deeper
+     than most viewports. Capped and centred it reads as a map on a panel. */
+  .usmap { display: block; width: 100%; max-width: 880px; margin: 0 auto; height: auto; overflow: visible; }
   .usmap .land { fill: #1b1a29; stroke: rgba(203,208,235,.22); stroke-width: .9; stroke-linejoin: round; }
   .ping { cursor: pointer; }
   .ping .halo { fill: var(--accent); opacity: .18; transform-box: fill-box; transform-origin: center; animation: ping 3.2s ease-out infinite; }
@@ -197,7 +199,7 @@
   /* a soft accent wash under the country, so the map sits in its own light
      rather than on a flat panel */
   .map-stage { position: relative; }
-  .map-stage::before { content: ""; position: absolute; inset: 6% 4% 10%; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-t), transparent 78%); }
+  .map-stage::before { content: ""; position: absolute; inset: 4% 14% 8%; pointer-events: none; border-radius: 50%; background: radial-gradient(closest-side, var(--accent-t), transparent 78%); }
   .map-stage > * { position: relative; }
   .map-foot { display: flex; gap: 8px; align-items: start; margin-top: 10px; font-size: 12px; color: var(--ink-faint); }
   .map-foot svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
@@ -329,7 +331,7 @@
       <path d="M55.4065 14.0401V23.5774C55.4065 23.6986 55.3087 23.7964 55.1875 23.7964H50.8319C50.7108 23.7964 50.613 23.6986 50.613 23.5774V14.0058C50.613 11.4901 49.6613 10.1648 47.6215 10.1648C45.5816 10.1648 44.1541 11.6602 44.222 14.3459V23.5774C44.222 23.6986 44.1242 23.7964 44.003 23.7964H39.6475C39.5263 23.7964 39.4285 23.6986 39.4285 23.5774V14.0058C39.4285 11.4901 38.4768 10.1648 36.4027 10.1648C34.3285 10.1648 33.0375 11.7288 33.0375 14.1759V23.5774C33.0375 23.6986 32.9397 23.7964 32.8185 23.7964H28.463C28.3418 23.7964 28.244 23.6986 28.244 23.5774V6.54268C28.244 6.42153 28.3418 6.32373 28.463 6.32373H32.2544C32.3551 6.32373 32.4427 6.39234 32.4668 6.4894L32.7901 7.7841C32.8236 7.91839 32.99 7.96875 33.0908 7.87387C34.087 6.94043 35.4262 6.11938 37.7616 6.11938C39.7854 6.11938 41.6837 6.7463 42.8251 8.57231C42.893 8.68032 43.0455 8.68981 43.1243 8.5891C44.3278 7.05137 46.245 6.11938 48.8775 6.11938C52.277 6.11938 55.4043 7.88701 55.4043 14.0401H55.4065Z" fill="#CBD0EB"/>
       <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
       </svg>
-      <span>/campus/greekwars</span>
+      <span>/campus</span>
     </a>
     <div class="nav-right">
       <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener">
@@ -359,7 +361,7 @@
     <h1>your chapter vs. every chapter.</h1>
     <p class="lede">Every chapter becomes a clan. Trade together, take your school, then take the country — ranked on raw PnL, not points, not volume, not activity.</p>
     <div class="hero-cta">
-      <a class="btn btn--primary btn--lg" href="/greekwars/onboard">Onboard your chapter</a>
+      <a class="btn btn--primary btn--lg" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a>
     </div>
     <a class="hero-alt" href="#board">See the live board</a>
   </div>
@@ -390,12 +392,12 @@
         <li>
           <span class="prize-who">Campus first</span>
           <p class="amount">+$250</p>
-          <p><b>A race, not a ranking.</b> The first fraternity and the first sorority on each campus to clear 80% onboarded each take $250.</p>
+          <p><b>A race, not a ranking.</b> First fraternity and first sorority on each campus to clear 80% take $250 each.</p>
         </li>
       </ul>
       <div class="pot-foot">
         <p><b>110 bonuses nationwide.</b> The $250 is first-come on every campus, so the chapter that fills its roster in week one takes it from the chapter that fills in week six.</p>
-        <a class="btn btn--primary" href="/greekwars/onboard">Onboard your chapter ↗</a>
+        <a class="btn btn--primary" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter ↗</a>
       </div>
     </div>
   </section>
@@ -443,7 +445,7 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>A place on <strong>both boards</strong> — your school's and the national one — from the day you qualify.</span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>fomo perks through the season: <strong>trading rewards, events</strong>, and first call on everything the campus team runs.</span></li>
         </ul>
-        <p class="note">Nothing to pay and nothing to sign. <a href="/greekwars/onboard">Register your chapter →</a></p>
+        <p class="note">Nothing to pay and nothing to sign. <a href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Register your chapter →</a></p>
       </div>
     </div>
   </section>
@@ -522,7 +524,7 @@
     <h2>Your chapter is a clan. <span class="accent">Go take the country.</span></h2>
     <p>Register the roster, send one link, fill to 80%. That is the whole entry.</p>
     <div class="hero-cta">
-      <a class="btn btn--primary btn--lg" href="/greekwars/onboard">Onboard your chapter</a>
+      <a class="btn btn--primary btn--lg" href="https://www.aryatoufanian.com/fomo/onboard/" target="_blank" rel="noopener">Onboard your chapter</a>
       <a class="btn btn--dark btn--lg" href="https://fomo.family" target="_blank" rel="noopener">Download app</a>
     </div>
   </section>
@@ -544,10 +546,10 @@
     <div>
       <h4>Greek Wars</h4>
       <ul>
-        <li><a href="#pot">What it pays</a></li>
-        <li><a href="#onboard">Onboarding</a></li>
-        <li><a href="#map">Who is onboarded</a></li>
-        <li><a href="#board">The live board</a></li>
+        <li><a href="/greekwars">Greek Wars</a></li>
+        <li><a href="/gameday">Game Day</a></li>
+        <li><a href="/dinners">Dinner Series</a></li>
+        <li><a href="/crewsheet">Crew sheet</a></li>
         <li><a data-onboard href="/greekwars/onboard">Onboard your chapter</a></li>
         <li><a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post</a></li>
       </ul>
