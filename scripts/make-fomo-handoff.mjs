@@ -90,6 +90,14 @@ for (const node of RULE_NODES) {
 }
 await writeFile(join(OUT, 'database.rules.json'), JSON.stringify({ rules }, null, 2) + '\n');
 
+// A way in. Without this the bundle opens as a bare directory listing, which is
+// a poor first thing to hand someone. The wordmark is lifted from /campus so it
+// cannot drift from the pages it introduces.
+const heroMark = (await readFile('campus/index.html', 'utf8'))
+  .match(/<svg viewBox="0 0 352 113"[\s\S]*?<\/svg>/)[0];
+await writeFile(join(OUT, 'index.html'),
+  (await readFile('scripts/handoff-index.html', 'utf8')).replace('{{HERO_MARK}}', heroMark));
+
 await writeFile(join(OUT, 'README.md'), `# fomo / campus — site bundle
 
 A standalone copy of the fomo campus pages. Everything tying them to the

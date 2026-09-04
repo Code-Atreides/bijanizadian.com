@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060510">
+<title>fomo/campus — the pages</title>
+<meta name="description" content="Every page in the fomo campus site, and what each one is.">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @font-face { font-family: Aeonik; src: url("campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+  :root {
+    --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
+    --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
+    --line: #33343d; --line-soft: rgba(203,208,235,.12);
+    --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
+    --lavender: #EAEDFF; --mark: #CBD0EB; --warn: #ffbf17;
+    --btn-fill: rgba(96,106,247,.5); --hairline: rgba(203,208,235,.1);
+    --radius: 14px; --wrap: 1080px;
+    --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: Aeonik, 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); line-height: 1.55; font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 90px; }
+
+  .top { position: relative; overflow: hidden; padding: 92px 24px 54px; text-align: center; }
+  .top::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(820px 400px at 50% -10%, var(--accent-deep), transparent 70%); }
+  .top > * { position: relative; }
+  .lockup { display: inline-flex; align-items: baseline; justify-content: center; gap: .04em; line-height: 1; color: var(--lavender); }
+  .lockup svg { height: clamp(28px, 6vw, 62px); width: auto; display: block; }
+  .lockup .slash { font-size: clamp(24px, 5.4vw, 56px); font-weight: 700; letter-spacing: -.045em; }
+  .lockup .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
+  .top h1 { margin-top: 26px; font-size: clamp(22px, 2.6vw, 32px); font-weight: 700; letter-spacing: -.04em; color: var(--lavender); }
+  .top p { margin-top: 10px; color: rgba(209,216,255,.6); font-size: 16.5px; letter-spacing: -.02em; max-width: 56ch; margin-inline: auto; }
+
+  h2 { margin-top: 52px; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .pages { margin-top: 18px; display: grid; gap: 12px; list-style: none; }
+  .pages a {
+    display: grid; grid-template-columns: 34px 1fr auto; gap: 18px; align-items: center;
+    padding: 20px 24px; text-decoration: none;
+    background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow);
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .pages a:hover { border-color: var(--accent-bright); transform: translateY(-2px); }
+  .pages i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--ink-faint); }
+  .pages b { display: block; font-size: 18px; font-weight: 700; letter-spacing: -.025em; }
+  .pages b code { font: inherit; font-size: 13px; font-weight: 600; color: var(--accent-bright); margin-left: 10px; letter-spacing: 0; }
+  .pages span { display: block; margin-top: 3px; font-size: 14.5px; color: var(--ink-soft); }
+  .pages .go { color: var(--accent-bright); font-weight: 700; font-size: 15px; }
+  .pages a.is-sub { margin-left: 34px; }
+
+  .setup { margin-top: 16px; padding: 24px 26px 26px; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); }
+  .setup ol { margin-top: 14px; padding-left: 20px; display: grid; gap: 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .setup li b { color: var(--ink); font-weight: 600; }
+  .setup code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: rgba(203,208,235,.08); border: 1px solid var(--line-soft); border-radius: 6px; padding: 1px 6px; }
+  .setup .warn { margin-top: 16px; font-size: 13.5px; color: var(--ink-soft); border-left: 3px solid var(--warn); padding: 4px 0 4px 12px; }
+  .setup .warn b { color: var(--warn); font-weight: 700; }
+
+  .foot { margin-top: 54px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 12.5px; color: var(--ink-faint); }
+  .foot .spacer { flex: 1; }
+
+  @media (max-width: 620px) {
+    .top { padding: 64px 20px 40px; }
+    .wrap { padding: 0 20px 70px; }
+    .pages a { grid-template-columns: 1fr; gap: 6px; padding: 18px 20px; }
+    .pages a.is-sub { margin-left: 16px; }
+    .pages .go { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="lockup" role="img" aria-label="fomo/campus">
+    {{HERO_MARK}}
+    <span class="slash"><i>/</i>campus</span>
+  </div>
+  <h1>every page, and what it is.</h1>
+  <p>The fomo campus site. Open any of them below — they all work from a plain file server, before anything is configured.</p>
+</div>
+
+<main class="wrap">
+  <h2>The pages</h2>
+  <ol class="pages">
+    <li><a href="campus/">
+      <i>01</i>
+      <span><b>campus <code>/campus</code></b><span>The hub. Everything else hangs off it, plus the campus-team application.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a class="is-sub" href="campus/manual/">
+      <i>02</i>
+      <span><b>manual <code>/campus/manual</code></b><span>The internship manual — what fomo is, the tasks that pay, and the four rules that are not up to you.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a href="greekwars/">
+      <i>03</i>
+      <span><b>greekwars <code>/greekwars</code></b><span>Chapter vs. chapter. The prizes, onboarding, a live map of who has qualified, and the raw-PnL board.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a class="is-sub" href="greekwars/onboard/">
+      <i>04</i>
+      <span><b>onboard <code>/greekwars/onboard</code></b><span>Chapter registration. Twelve questions, about two minutes.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a href="gameday/">
+      <i>05</i>
+      <span><b>gameday <code>/gameday</code></b><span>The second scoreboard — two schools trade while the teams play. Runs a simulated game so you can watch it move.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a href="dinners/">
+      <i>06</i>
+      <span><b>dinners <code>/dinners</code></b><span>The Dinner Series. A table for 12, fomo picks up the check, and the host application.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+    <li><a href="crewsheet/">
+      <i>07</i>
+      <span><b>crewsheet <code>/crewsheet</code></b><span>Who is doing what for a dinner. Shared by anyone who has the sheet's code.</span></span>
+      <span class="go">Open →</span>
+    </a></li>
+  </ol>
+
+  <h2>Making it yours</h2>
+  <div class="setup">
+    <ol>
+      <li>Serve the folder — <code>npx serve .</code> — or open any <code>index.html</code> straight from disk.</li>
+      <li>To deploy it: make a <b>Firebase project</b>, put its id in <code>.firebaserc</code>, and fill in every <code>PASTE_YOUR_…</code> in the HTML.</li>
+      <li>Swap <code>https://YOUR-DOMAIN.com</code> in the canonical and og:url tags for your own.</li>
+      <li>Push the database rules and the site with <code>firebase deploy</code>.</li>
+    </ol>
+    <p class="warn"><b>Until step 2:</b> every page reads and renders correctly, but the three forms cannot save. They fail with a readable message rather than an error, and the crew sheet drops into a local preview mode.</p>
+    <p class="warn" style="border-left-color: var(--accent);">Full detail — including which data node is readable by whom, and how to light up the live map and board — is in <b>README.md</b> next to this file.</p>
+  </div>
+
+  <div class="foot">
+    <span>fomo — a trading app for the rest of us.</span>
+    <span class="spacer"></span>
+    <span>Trading involves risk, including loss of funds. No returns are guaranteed.</span>
+  </div>
+</main>
+
+</body>
+</html>
