@@ -162,6 +162,28 @@
   .step input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
   .step input[type="number"]::-webkit-outer-spin-button,
   .step input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  /* A native <datalist> is browser chrome: it cannot be styled, it opens beside
+     the field rather than under it, and it lists everything at once. This is the
+     same thing built out of markup — four rows tall, scrolled for the rest. */
+  .combo { position: relative; margin-top: 14px; }
+  .combo input { margin-top: 0; }
+  .combo-list {
+    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 6px);
+    max-height: 176px; overflow-y: auto; overscroll-behavior: contain;
+    list-style: none; padding: 4px; margin: 0;
+    background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow);
+    scrollbar-width: thin; scrollbar-color: var(--line) transparent;
+  }
+  .combo-list li {
+    padding: 9px 11px; border-radius: 7px; cursor: pointer;
+    font-size: 14.5px; font-weight: 500; color: var(--ink-soft);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .combo-list li:hover { background: var(--surface); color: var(--ink); }
+  .combo-list li[aria-selected="true"] { background: var(--surface-2); color: var(--ink); }
+  .combo-list mark { background: none; color: var(--accent-bright); font-weight: 700; }
+  .combo-empty { padding: 9px 11px; font-size: 13.5px; color: var(--ink-faint); }
   .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
   .hp { position: absolute; left: -9999px; }
   .form-controls { margin-top: auto; padding-top: 22px; display: flex; align-items: center; gap: 10px; }
@@ -274,13 +296,13 @@
         <fieldset class="step" data-step="2"><legend class="step-num"><span data-num>03 / 12</span></legend><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" required><p class="field-error" data-error hidden></p></fieldset>
         <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 12</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
         <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 12</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">So we can tell a real chapter from a name typed into a form.</p><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 12</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" list="schools" autocomplete="organization" placeholder="Start typing and pick yours" required><p class="help">NYU, GWU, Penn State — if it is not in the list, just type it.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 12</span></legend><label for="school">What school do you go to?</label><div class="combo"><input id="school" name="school" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="school-list" placeholder="Start typing and pick yours" required><ul class="combo-list" id="school-list" role="listbox" aria-label="Schools" hidden></ul></div><p class="help">NYU, GWU, Penn State — if it is not in the list, just type it.</p><p class="field-error" data-error hidden></p></fieldset>
         <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 12</span></legend><label for="org_type">Fraternity or sorority?</label>
           <select id="org_type" name="org_type" required>
             <option value="" disabled selected>Choose one…</option>
             <option>Fraternity</option><option>Sorority</option><option>Co-ed / other Greek org</option>
           </select><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 12</span></legend><label for="chapter">Which chapter?</label><input id="chapter" name="chapter" type="text" list="chapters" autocomplete="off" placeholder="Start typing your letters" required><p class="help">SAE, FIJI, Tri Delt — nicknames are fine.</p><p class="field-error" data-error hidden></p></fieldset>
+        <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 12</span></legend><label for="chapter">Which chapter?</label><div class="combo"><input id="chapter" name="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" placeholder="Start typing your letters" required><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Chapters" hidden></ul></div><p class="help">SAE, FIJI, Tri Delt — nicknames are fine.</p><p class="field-error" data-error hidden></p></fieldset>
         <fieldset class="step" data-step="8"><legend class="step-num"><span data-num>09 / 12</span></legend><label for="role">What's your role in the chapter?</label>
           <select id="role" name="role" required>
             <option value="" disabled selected>Choose one…</option>
@@ -326,9 +348,6 @@
   </footer>
 </main>
 
-<datalist id="schools"><option value="Arizona State University"></option><option value="Auburn University"></option><option value="Clemson University"></option><option value="Florida State University"></option><option value="Georgia Institute of Technology"></option><option value="Indiana University Bloomington"></option><option value="Louisiana State University"></option><option value="Michigan State University"></option><option value="New York University"></option><option value="Ohio State University"></option><option value="Penn State University"></option><option value="Purdue University"></option><option value="Southern Methodist University"></option><option value="Syracuse University"></option><option value="Texas A&amp;M University"></option><option value="Texas Christian University"></option><option value="The George Washington University"></option><option value="Tulane University"></option><option value="University of Alabama"></option><option value="University of Arizona"></option><option value="University of Arkansas"></option><option value="University of California, Los Angeles"></option><option value="University of Colorado Boulder"></option><option value="University of Florida"></option><option value="University of Georgia"></option><option value="University of Illinois Urbana-Champaign"></option><option value="University of Iowa"></option><option value="University of Kansas"></option><option value="University of Kentucky"></option><option value="University of Miami"></option><option value="University of Michigan"></option><option value="University of Mississippi"></option><option value="University of Missouri"></option><option value="University of Nebraska"></option><option value="University of North Carolina at Chapel Hill"></option><option value="University of Oklahoma"></option><option value="University of Oregon"></option><option value="University of South Carolina"></option><option value="University of Southern California"></option><option value="University of Tennessee"></option><option value="University of Texas at Austin"></option><option value="University of Virginia"></option><option value="University of Washington"></option><option value="University of Wisconsin-Madison"></option><option value="Vanderbilt University"></option><option value="Villanova University"></option><option value="Virginia Tech"></option><option value="Wake Forest University"></option><option value="Washington University in St. Louis"></option></datalist>
-<datalist id="chapters"><option value="Alpha Chi Omega"></option><option value="Alpha Delta Pi"></option><option value="Alpha Epsilon Phi"></option><option value="Alpha Epsilon Pi"></option><option value="Alpha Gamma Delta"></option><option value="Alpha Omicron Pi"></option><option value="Alpha Phi"></option><option value="Alpha Sigma Phi"></option><option value="Alpha Tau Omega"></option><option value="Alpha Xi Delta"></option><option value="Beta Theta Pi"></option><option value="Chi Omega"></option><option value="Chi Phi"></option><option value="Chi Psi"></option><option value="Delta Chi"></option><option value="Delta Delta Delta (Tri Delt)"></option><option value="Delta Gamma"></option><option value="Delta Kappa Epsilon"></option><option value="Delta Phi Epsilon"></option><option value="Delta Sigma Phi"></option><option value="Delta Tau Delta"></option><option value="Delta Upsilon"></option><option value="Delta Zeta"></option><option value="Gamma Phi Beta"></option><option value="Kappa Alpha Order"></option><option value="Kappa Alpha Theta"></option><option value="Kappa Delta"></option><option value="Kappa Kappa Gamma"></option><option value="Kappa Sigma"></option><option value="Lambda Chi Alpha"></option><option value="Phi Delta Theta"></option><option value="Phi Gamma Delta (FIJI)"></option><option value="Phi Kappa Psi"></option><option value="Phi Kappa Sigma"></option><option value="Phi Kappa Tau"></option><option value="Phi Mu"></option><option value="Phi Sigma Sigma"></option><option value="Pi Beta Phi"></option><option value="Pi Kappa Alpha (Pike)"></option><option value="Pi Kappa Phi"></option><option value="Sigma Alpha Epsilon (SAE)"></option><option value="Sigma Chi"></option><option value="Sigma Delta Tau"></option><option value="Sigma Kappa"></option><option value="Sigma Nu"></option><option value="Sigma Phi Epsilon (SigEp)"></option><option value="Sigma Pi"></option><option value="Tau Kappa Epsilon (TKE)"></option><option value="Theta Chi"></option><option value="Theta Xi"></option><option value="Zeta Beta Tau"></option><option value="Zeta Psi"></option><option value="Zeta Tau Alpha"></option></datalist>
-
 <script>
 (function () {
   // ---------- stepped registration, saved to the shared Firebase project under
@@ -342,6 +361,111 @@
   };
   var db = null;
   try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+
+  // ---------- the school and chapter suggestion lists
+  // Ranked so the four rows you can see without scrolling are the four you most
+  // likely meant: whole-string prefix first, then a word starting with what you
+  // typed, then anything containing it.
+  var SCHOOLS = ["Arizona State University","Auburn University","Clemson University","Florida State University","Georgia Institute of Technology","Indiana University Bloomington","Louisiana State University","Michigan State University","New York University","Ohio State University","Penn State University","Purdue University","Southern Methodist University","Syracuse University","Texas A&M University","Texas Christian University","The George Washington University","Tulane University","University of Alabama","University of Arizona","University of Arkansas","University of California, Los Angeles","University of Colorado Boulder","University of Florida","University of Georgia","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Miami","University of Michigan","University of Mississippi","University of Missouri","University of Nebraska","University of North Carolina at Chapel Hill","University of Oklahoma","University of Oregon","University of South Carolina","University of Southern California","University of Tennessee","University of Texas at Austin","University of Virginia","University of Washington","University of Wisconsin-Madison","Vanderbilt University","Villanova University","Virginia Tech","Wake Forest University","Washington University in St. Louis"];
+  var CHAPTERS = ["Alpha Chi Omega","Alpha Delta Pi","Alpha Epsilon Phi","Alpha Epsilon Pi","Alpha Gamma Delta","Alpha Omicron Pi","Alpha Phi","Alpha Sigma Phi","Alpha Tau Omega","Alpha Xi Delta","Beta Theta Pi","Chi Omega","Chi Phi","Chi Psi","Delta Chi","Delta Delta Delta (Tri Delt)","Delta Gamma","Delta Kappa Epsilon","Delta Phi Epsilon","Delta Sigma Phi","Delta Tau Delta","Delta Upsilon","Delta Zeta","Gamma Phi Beta","Kappa Alpha Order","Kappa Alpha Theta","Kappa Delta","Kappa Kappa Gamma","Kappa Sigma","Lambda Chi Alpha","Phi Delta Theta","Phi Gamma Delta (FIJI)","Phi Kappa Psi","Phi Kappa Sigma","Phi Kappa Tau","Phi Mu","Phi Sigma Sigma","Pi Beta Phi","Pi Kappa Alpha (Pike)","Pi Kappa Phi","Sigma Alpha Epsilon (SAE)","Sigma Chi","Sigma Delta Tau","Sigma Kappa","Sigma Nu","Sigma Phi Epsilon (SigEp)","Sigma Pi","Tau Kappa Epsilon (TKE)","Theta Chi","Theta Xi","Zeta Beta Tau","Zeta Psi","Zeta Tau Alpha"];
+
+  function rank(items, q) {
+    q = q.trim().toLowerCase();
+    if (!q) return items.slice();
+    var starts = [], word = [], has = [];
+    for (var k = 0; k < items.length; k++) {
+      var v = items[k], lv = v.toLowerCase(), at = lv.indexOf(q);
+      if (at < 0) continue;
+      if (at === 0) starts.push(v);
+      else if (/[\s(]/.test(lv.charAt(at - 1))) word.push(v);
+      else has.push(v);
+    }
+    return starts.concat(word, has);
+  }
+
+  function highlight(li, value, q) {
+    var at = q ? value.toLowerCase().indexOf(q.trim().toLowerCase()) : -1;
+    if (at < 0) { li.textContent = value; return; }
+    var n = q.trim().length;
+    li.appendChild(document.createTextNode(value.slice(0, at)));
+    var mark = document.createElement('mark');
+    mark.textContent = value.slice(at, at + n);
+    li.appendChild(mark);
+    li.appendChild(document.createTextNode(value.slice(at + n)));
+  }
+
+  function combobox(input, list, items) {
+    var open = false, active = -1, shown = [];
+
+    function close() {
+      open = false; active = -1;
+      list.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+    }
+    function paint() {
+      list.textContent = '';
+      shown = rank(items, input.value);
+      if (!shown.length) { close(); return; }
+      shown.forEach(function (v, k) {
+        var li = document.createElement('li');
+        li.id = list.id + '-' + k;
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', 'false');
+        highlight(li, v, input.value);
+        // mousedown, not click: blur would close the list before click landed
+        li.addEventListener('mousedown', function (e) { e.preventDefault(); pick(k); });
+        list.appendChild(li);
+      });
+      open = true; active = -1;
+      list.hidden = false;
+      list.scrollTop = 0;
+      input.setAttribute('aria-expanded', 'true');
+    }
+    function mark(k) {
+      var kids = list.children;
+      if (active >= 0 && kids[active]) kids[active].setAttribute('aria-selected', 'false');
+      active = k;
+      if (active < 0) { input.removeAttribute('aria-activedescendant'); return; }
+      var el = kids[active];
+      el.setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', el.id);
+      // keep the active row inside the four that are visible
+      var top = el.offsetTop - list.clientTop, bottom = top + el.offsetHeight;
+      if (top < list.scrollTop) list.scrollTop = top - 4;
+      else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 4;
+    }
+    function pick(k) {
+      input.value = shown[k];
+      close();
+      input.focus();
+    }
+
+    input.addEventListener('input', paint);
+    input.addEventListener('focus', function () { if (!open) paint(); });
+    input.addEventListener('blur', function () { setTimeout(close, 0); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!open) { paint(); if (!open) return; }
+        var n = shown.length;
+        mark(e.key === 'ArrowDown'
+          ? (active + 1) % n
+          : (active <= 0 ? n - 1 : active - 1));
+        return;
+      }
+      if (e.key === 'Escape') { if (open) { e.stopPropagation(); close(); } return; }
+      if (e.key === 'Enter') {
+        // Enter advances the form, so it must only pick a suggestion when the
+        // reader has actually arrowed onto one - and then not advance as well
+        if (open && active >= 0) { e.preventDefault(); e.stopPropagation(); pick(active); }
+        else close();
+      }
+    });
+  }
+
+  combobox(document.getElementById('school'), document.getElementById('school-list'), SCHOOLS);
+  combobox(document.getElementById('chapter'), document.getElementById('chapter-list'), CHAPTERS);
 
   var form = document.getElementById('onboard-form');
   var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
