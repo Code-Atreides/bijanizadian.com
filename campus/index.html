@@ -150,12 +150,8 @@
      of 1.55 was making this far looser than theirs wherever it wraps. */
   .hero .lede { margin-top: 10px; max-width: 80ch; color: rgba(209,216,255,.6); font-size: clamp(16px, 1.75vw, 22px); line-height: 1.2; letter-spacing: -.025em; }
   .hero-cta { margin-top: 32px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-  .hero-art { position: relative; z-index: 2; margin-top: -64px; width: min(100%, 470px); height: auto; object-fit: contain; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
+  .hero-art { position: relative; z-index: 2; margin-top: -64px; margin-bottom: 30px; width: min(100%, 470px); height: auto; object-fit: contain; pointer-events: none; user-select: none; animation: float 6s ease-in-out infinite; }
   @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
-  .hero-foot { position: relative; z-index: 2; margin-top: -20px; padding-bottom: 28px; display: flex; gap: 8px 24px; flex-wrap: wrap; justify-content: center; font-size: 13px; color: var(--ink-soft); }
-  .hero-foot a { text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-  .hero-foot a:hover { color: var(--ink); }
-  .hero-foot a::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-bright); }
 
   /* fomo.family's own desktop step (its breakpoint is 800px) */
   @media (min-width: 800px) {
@@ -182,50 +178,11 @@
   .pill { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; background: var(--accent-t); color: var(--accent-bright); }
 
   /* ---------- greek wars / campus team switcher ---------- */
-  /* The page carries two long programmes. Only one is shown at a time, and the
-     control sticks to the top so switching never means scrolling back up. */
-  .switch-bar {
-    position: sticky; top: 0; z-index: 20;
-    padding: 16px 0 14px;
-    /* the control is inline-grid, so text-align centres it in the column */
-    text-align: center;
-    background: linear-gradient(180deg, var(--bg) 66%, rgba(6,5,16,0));
-  }
-  .switch {
-    position: relative;
-    display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-    gap: 4px; padding: 4px;
-    border: 1px solid var(--hairline); border-radius: 14px;
-    background: rgba(255,255,255,.06);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  }
-  /* padding 4 + gap 4 + padding 4 = 12px of chrome across two equal columns */
-  .switch-thumb {
-    position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px;
-    width: calc((100% - 12px) / 2);
-    border-radius: 10px; background: var(--btn-fill);
-    border: 1px solid var(--hairline);
-    transition: transform .28s cubic-bezier(.4, 0, .2, 1);
-  }
-  .switch[data-on="1"] .switch-thumb { transform: translateX(calc(100% + 4px)); }
-  .switch button {
-    position: relative; z-index: 1;
-    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
-    padding: 10px 24px; border: 0; border-radius: 10px;
-    background: none; color: var(--ink-soft); cursor: pointer; white-space: nowrap;
-    transition: color .2s ease;
-  }
-  .switch button:hover { color: var(--ink); }
-  .switch button[aria-selected="true"] { color: #fff; }
-  /* the switcher already separates the panels, so they do not need a full
-     section gap above them as well */
-  .section[role="tabpanel"] { padding-top: var(--gap-head); }
 
   /* ---------- greek wars: the program cards ---------- */
   /* the Greek Wars onboard card is the first thing under the section head, so
      the "Go to Greek Wars" jump lands on it rather than on the other portals */
   .gw-onboard { margin-top: var(--gap-head); }
-  .routes-label { margin-top: var(--gap-group); display: block; }
   .routes { margin-top: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
   /* the anchor is the card, so it has to fill its grid cell or the row's bottoms stagger */
   .routes li { display: flex; }
@@ -268,25 +225,12 @@
   .season small { font-size: 14px; color: var(--ink-soft); }
 
   /* ---------- campus team: the literature grid ---------- */
-  .lit { margin-top: var(--gap-head); display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; }
-  .lit li { padding: 26px 24px 28px; display: grid; grid-template-rows: auto auto 1fr; gap: 10px; }
-  .lit-icon { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); margin-bottom: 6px; }
-  .lit-icon svg { width: 19px; height: 19px; }
-  .lit h3 { font-size: 12.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--ink-soft); }
-  .lit p { font-size: 19px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3; }
-  .lit small { display: block; margin-top: 8px; font-size: 14px; font-weight: 400; color: var(--ink-soft); letter-spacing: 0; }
+  /* just the seat names — what each one does is on the campus team page */
+  .seats-row { margin-top: var(--gap-head); display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; list-style: none; }
+  .seats-row li { padding: 18px 16px 20px; border: 1px solid var(--line-soft); border-radius: var(--radius); background: var(--bg-2); text-align: center; font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .seats-row i { display: block; margin-bottom: 8px; font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
 
   /* the longer reading, two columns of prose */
-  .reading { margin-top: var(--gap-block); display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .reading .card { padding: 26px 26px 28px; }
-  .reading h3 { font-size: 20px; font-weight: 700; letter-spacing: -.025em; margin-bottom: 12px; }
-  .reading p { color: var(--ink-soft); font-size: 15px; }
-  .reading p + p { margin-top: 10px; }
-  .reading p b { color: var(--ink); font-weight: 600; }
-  .ticks { list-style: none; display: grid; gap: 9px; margin-top: 12px; }
-  .ticks li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; font-size: 15px; color: var(--ink-soft); }
-  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 3px; }
-  .ticks b { color: var(--ink); font-weight: 600; }
 
   /* ---------- apply ---------- */
   /* Brand-kit "Brand" gradient: a solid fomo-blue field with one large, diffuse light-blue
@@ -357,14 +301,16 @@
 
   /* ---------- responsive ---------- */
   @media (max-width: 960px) {
-    .routes, .lit, .reading { grid-template-columns: 1fr 1fr; }
+    .routes { grid-template-columns: 1fr 1fr; }
+    .seats-row { grid-template-columns: repeat(3, 1fr); }
     .prizes { grid-template-columns: 1fr 1fr; }
     .season { grid-template-columns: 1fr 1fr; }
     .foot-inner { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 720px) {
     :root { --gap-section: 72px; --gap-head: 32px; --gap-group: 36px; }
-    .routes, .lit, .reading, .apply, .season, .prizes { grid-template-columns: 1fr; }
+    .routes, .apply, .season, .prizes { grid-template-columns: 1fr; }
+    .seats-row { grid-template-columns: 1fr 1fr; }
     .route--wide { flex-direction: column; align-items: flex-start; }
     /* the two section chips drop out whole rather than losing their second word,
        which left them reading "Greek" and "Campus"; Apply carries the nav alone
@@ -373,16 +319,8 @@
     .hero-cta .btn--lg { width: 100%; }
     .hero-art { margin-top: -10px; }
     .foot-inner { grid-template-columns: 1fr; }
-    /* thumb-sized targets: these links are 16-20px tall on a phone otherwise */
-    .hero-foot { gap: 2px 20px; }
-    .hero-foot a { padding: 8px 0; }
     .foot ul { gap: 2px; }
     .foot ul a { display: inline-block; padding: 8px 0; }
-  }
-  @media (max-width: 560px) {
-    /* full-bleed so the two options split the screen evenly */
-    .switch { display: grid; width: 100%; }
-    .switch button { padding: 10px 8px; font-size: 14px; }
   }
   @media (max-width: 480px) {
     .apply { padding: 22px 18px 26px; }
@@ -396,7 +334,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero-art { animation: none; }
-    .btn, .route, .progress i, .switch-thumb, .switch button { transition: none; }
+    .btn, .route, .progress i { transition: none; }
   }
 </style>
 </head>
@@ -446,30 +384,12 @@
     <source srcset="/campus/astronaut.webp" media="(min-width: 800px)" width="1200" height="1326">
     <img class="hero-art" src="/campus/astronaut-mobile.webp" alt="" aria-hidden="true" width="1080" height="1190" fetchpriority="high">
   </picture>
-  <nav class="hero-foot" aria-label="Jump to">
-    <a href="https://www.aryatoufanian.com/fomo/" target="_blank" rel="noopener">Greek Wars</a>
-    <a href="/gameday">Game Day</a>
-    <a href="/dinners">Dinner Series</a>
-    <a href="/crewsheet">Crew sheet</a>
-    <a href="https://milomessina.com/fomo" target="_blank" rel="noopener">Campus team</a>
-    <a href="#apply">Apply</a>
-  </nav>
 </header>
 
 <main class="wrap">
 
-  <!-- ── switcher ───────────────────────────────────────────────── -->
-  <!-- Without JS both panels stay in the flow, so the page still reads whole. -->
-  <div class="switch-bar">
-    <div class="switch" id="switch" role="tablist" aria-label="Choose a programme">
-      <span class="switch-thumb" aria-hidden="true"></span>
-      <button type="button" role="tab" id="tab-gw" aria-controls="greekwars" aria-selected="true">Greek Wars</button>
-      <button type="button" role="tab" id="tab-team" aria-controls="team" aria-selected="false">Campus team</button>
-    </div>
-  </div>
-
   <!-- ── greek wars ─────────────────────────────────────────────── -->
-  <section id="greekwars" class="section" role="tabpanel" aria-labelledby="tab-gw">
+  <section id="greekwars" class="section" aria-labelledby="gw-title">
     <div class="section-head">
       <p class="eyebrow">Greek Wars · Fall 2026 · Aug 24 – Dec 11</p>
       <h2 id="gw-title">your chapter vs.<br>every <span class="accent">chapter.</span></h2>
@@ -514,7 +434,16 @@
       <li><i>04</i><b>Win the war</b><small>Your chapter's top trader takes $500. The top chapter in the country takes $10,000.</small></li>
     </ol>
 
-    <p class="kicker routes-label">The rest of the programme</p>
+
+  </section>
+
+  <!-- ── the rest of the programme ──────────────────────────────── -->
+  <section class="section" aria-labelledby="rest-title">
+    <div class="section-head">
+      <p class="eyebrow">Also running</p>
+      <h2 id="rest-title">the rest of <span class="accent">the programme.</span></h2>
+    </div>
+
 
     <ul class="routes">
       <li>
@@ -551,82 +480,33 @@
         </a>
       </li>
     </ul>
-
   </section>
 
+
   <!-- ── campus team ────────────────────────────────────────────── -->
-  <section id="team" class="section" role="tabpanel" aria-labelledby="tab-team">
+  <!-- The literature lives on the campus team page. This is the signpost. -->
+  <section id="team" class="section" aria-labelledby="team-title">
     <div class="section-head centered">
       <p class="eyebrow">Campus team</p>
       <h2 id="team-title">the people who <span class="accent">run it.</span></h2>
-      <p>Every campus runs the same five seats, and you apply to one of them, not to a general pool. Each seat is paid on its own bounty ladder, and every seat earns on views. <b>Read what each one is, then apply.</b></p>
+      <p>Every campus runs the same five seats, and you apply to one of them, not to a general pool. Each seat is paid on its own ladder and earns on views. <b>The full breakdown of every seat lives on the campus team page.</b></p>
       <div class="head-cta">
         <a class="btn btn--primary" href="https://milomessina.com/fomo" target="_blank" rel="noopener">Open campus team ↗</a>
-        <a class="btn btn--dark" href="#apply">Apply for a seat</a>
       </div>
     </div>
 
-    <ul id="literature" class="lit" aria-label="Campus team literature">
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v11H3zM8 21h8M12 16v5"/></svg></span>
-        <h3>What it is</h3>
-        <p>fomo on your campus, run by five students.<small>One team per school, five seats, one campus on the board. You are the reason the chapters know the program exists.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 8v3c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V8z"/><path d="m9 12 2 2 4-4"/></svg></span>
-        <h3>01 · Campus President</h3>
-        <p>Runs the team, owns the standings.<small>The one fomo calls. Sets the plan for the term, keeps the other four seats moving, and answers for the campus's number.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M9 20V4M14 20v-7M19 20V8"/></svg></span>
-        <h3>02 · Growth</h3>
-        <p>Gets the campus onto fomo.<small>Onboards the chapters, signs up the traders, and turns every game day into more people on the app.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11a3.5 3.5 0 0 1 0-5l2-2a3.5 3.5 0 0 1 5 5l-1 1"/><path d="M15 13a3.5 3.5 0 0 1 0 5l-2 2a3.5 3.5 0 0 1-5-5l1-1"/></svg></span>
-        <h3>03 · Partnerships</h3>
-        <p>Brings in the rooms and the orgs.<small>Restaurants, bars, clubs, and the other organisations on campus that host, sponsor, or turn up with their people.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3.5"/><path d="M17 7h.01"/></svg></span>
-        <h3>04 · Content</h3>
-        <p>Posts the nights, and makes sure the posts count.<small>Every post says fomo paid. You check the insights before a view reaches the board.</small></p>
-      </li>
-      <li class="card">
-        <span class="lit-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
-        <h3>05 · Culture</h3>
-        <p>Dinners and events.<small>Books the tables, runs the game-day watch parties, and holds the crew sheet for every night the campus puts on.</small></p>
-      </li>
-    </ul>
+    <ol class="seats-row" aria-label="The five seats">
+      <li><i>01</i>Campus President</li>
+      <li><i>02</i>Growth</li>
+      <li><i>03</i>Partnerships</li>
+      <li><i>04</i>Content</li>
+      <li><i>05</i>Culture</li>
+    </ol>
+  </section>
 
-    <div class="reading">
-      <article class="card">
-        <h3>What it pays</h3>
-        <p>The seat is paid, not a volunteer badge. Two ways, and they stack.</p>
-        <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>A bounty ladder built for your seat.</b> Clear the rung you are on and the next one opens.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Paid on views, every seat.</b> $2 per 1,000 as standard, a $10 floor on anything approved, counted 30 days after you post.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Paid on the 1st and the 15th</b>, as a 1099 contractor. Dinners you host are funded separately.</span></li>
-        </ul>
-      </article>
-      <article class="card">
-        <h3>The commitment</h3>
-        <p>One semester, starting <b>Fall 2026</b>, at roughly four to six hours a week depending on the seat. It costs you nothing.</p>
-        <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>No experience and no following required.</b> You apply to one seat, and that is the ladder you are on.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>The president owns the number</b> and runs a 20-minute standup with the other four.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><b>Keep it disclosed.</b> Every post tags fomo and says fomo paid. Undisclosed posts are rejected.</span></li>
-        </ul>
-      </article>
-      <article class="card">
-        <h3>The house rules</h3>
-        <p><b>fomo is always lowercase.</b> It is part of the brand, and it is the first thing we notice in a post.</p>
-        <p><b>Only realised PnL counts</b> on game days, and only approved views count for dinners. Claimed numbers never reach the board. Your job is to make sure your campus never has to argue about a number.</p>
-        <p>Trading involves risk, including loss of principal. Nobody on the campus team gives trading advice, ever.</p>
-        <p><b>Who we want:</b> the person people already text when something is happening. Not a title. If your group chats fill up when you say the word, you are the one.</p>
-      </article>
-    </div>
 
+  <!-- ── apply ──────────────────────────────────────────────────── -->
+  <section class="section" aria-label="Apply for a campus team seat">
     <!-- ── apply ───────────────────────────────────────────────── -->
     <div id="apply" class="card apply">
       <div>
@@ -673,6 +553,7 @@
       </div>
     </div>
   </section>
+
 
   <!-- ── closer ─────────────────────────────────────────────────── -->
   <section class="closer">
@@ -738,86 +619,6 @@
 </footer>
 
 <script>
-(function () {
-  // ---------- programme switcher: one panel at a time, so the page is two
-  // short reads instead of one very long scroll.
-  var strip = document.getElementById('switch');
-  if (!strip) return;
-  var tabs = Array.prototype.slice.call(strip.querySelectorAll('[role="tab"]'));
-  var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
-  if (!tabs.length || panels.indexOf(null) > -1) return;
-
-  function select(n, o) {
-    o = o || {};
-    n = Math.max(0, Math.min(tabs.length - 1, n));
-    tabs.forEach(function (t, k) {
-      var on = k === n;
-      t.setAttribute('aria-selected', on ? 'true' : 'false');
-      t.tabIndex = on ? 0 : -1;      // one tab stop for the whole group
-      panels[k].hidden = !on;
-    });
-    strip.dataset.on = n;
-    if (o.focus) tabs[n].focus();
-    if (o.scroll) {
-      // only pull the page if the strip is off-screen or well down it —
-      // switching from a sticky control that is already in view should not jump
-      var top = strip.getBoundingClientRect().top;
-      if (top < 0 || top > window.innerHeight * 0.5) {
-        window.scrollTo({ top: window.scrollY + top - 8, behavior: 'smooth' });
-      }
-    }
-    if (o.hash !== false) { try { history.replaceState(null, '', '#' + panels[n].id); } catch (e) {} }
-  }
-
-  tabs.forEach(function (t, k) {
-    t.addEventListener('click', function () { select(k, { scroll: true }); });
-    t.addEventListener('keydown', function (e) {
-      var n = null;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') n = k + 1;
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') n = k - 1;
-      else if (e.key === 'Home') n = 0;
-      else if (e.key === 'End') n = tabs.length - 1;
-      if (n === null) return;
-      e.preventDefault();
-      select((n + tabs.length) % tabs.length, { focus: true, scroll: true });
-    });
-  });
-
-  // Which panel holds a given id? #apply lives inside the campus-team panel, so
-  // a link to it has to open that panel before the browser can scroll to it.
-  function panelFor(id) {
-    if (!id) return -1;
-    var el = document.getElementById(id);
-    if (!el) return -1;
-    for (var k = 0; k < panels.length; k++) { if (panels[k] === el || panels[k].contains(el)) return k; }
-    return -1;
-  }
-
-  document.addEventListener('click', function (e) {
-    var a = e.target.closest ? e.target.closest('a[href^="#"]') : null;
-    if (!a) return;
-    var id = a.getAttribute('href').slice(1);
-    var k = panelFor(id);
-    if (k < 0 || !panels[k].hidden) return;   // same panel: let the browser do it
-    e.preventDefault();
-    select(k, { hash: false });
-    var target = document.getElementById(id);
-    requestAnimationFrame(function () {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      try { history.replaceState(null, '', '#' + id); } catch (err) {}
-    });
-  });
-
-  var deep = (location.hash || '').slice(1);
-  var start = panelFor(deep);
-  select(start < 0 ? 0 : start, { hash: false });
-  if (start > 0) {
-    // the panel was hidden when the browser tried to honour the hash
-    var target = document.getElementById(deep);
-    if (target) requestAnimationFrame(function () { target.scrollIntoView({ block: 'start' }); });
-  }
-})();
-
 (function () {
   // ---------- stepped application, saved to the same Firebase project the
   // dinners form uses, under campus/<key>. Rules: write-only from the web.
