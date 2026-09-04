@@ -13,24 +13,42 @@
 <link rel="canonical" href="https://bijanizadian.com/dinners">
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Bold.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
 <style>
-  /* Design language mirrors fomo.family — same token set as /crewsheet and /gameday. */
+  /* Aeonik is fomo's exclusive typeface — the same self-hosted woff2 files /campus
+     serves, so the two pages set type in the real face. Schibsted Grotesk is the
+     fallback, not the default. */
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+
+  /* Design language mirrors fomo.family — the same token set /campus carries. */
   :root {
     --bg: #060510; --bg-2: #12111a; --bg-3: #161522;
     --surface: rgba(203,208,235,.06); --surface-2: rgba(203,208,235,.10);
     --ink: #f7f7f7; --ink-soft: #9899a3; --ink-faint: #565a63;
     --line: #33343d; --line-soft: rgba(203,208,235,.12);
-    --accent: #516af6; --accent-bright: #8ea0ff; --accent-deep: #221d4b; --accent-t: rgba(81,106,246,.16);
+    /* brand-kit palette: fomo blue, electric blue (small accents only), light blue
+       (glow / highlight), fomo ink (dark title cards), pale lavender (type on blue) */
+    --accent: #516AF6; --electric: #4A36FF; --accent-bright: #ACB8F9; --accent-deep: #221D4B; --accent-t: rgba(81,106,246,.16);
+    --ink-deep: #0B091F; --lavender: #EAEDFF; --mark: #CBD0EB;
+    /* fomo.family's button set: a 50%-opacity indigo fill, white at 12%, and a
+       #CBD0EB hairline at 10% around both */
+    --btn-fill: rgba(96,106,247,.5); --btn-fill-hover: rgba(96,106,247,.8);
+    --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
+    --hairline: rgba(203,208,235,.1);
     --ok: #21c95e; --warn: #ffbf17; --crit: #ff622e;
     --radius: 14px; --radius-sm: 9px; --wrap: 1180px;
     --shadow: 0 1px 0 rgba(255,255,255,.03), 0 26px 60px -34px #000;
-    /* one vertical rhythm for the whole page: between sections, and within one */
-    --gap-section: 48px; --gap-tight: 16px;
+    /* the same four spacing steps /campus uses: between sections, from a section
+       head to its first block, between subgroups, and between siblings in a group */
+    --gap-section: 88px; --gap-head: 34px; --gap-group: 40px; --gap-block: 16px;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -42,36 +60,44 @@
   ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; border: 3px solid var(--bg); }
   ::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
   body {
-    font-family: 'Schibsted Grotesk', 'Aeonik', ui-sans-serif, system-ui, sans-serif;
+    font-family: Aeonik, 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif;
     background: var(--bg); color: var(--ink); line-height: 1.55;
+    /* fomo.family runs body copy at Medium, not Regular */
+    font-weight: 500;
     -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   }
   a { color: inherit; }
   b, strong { font-weight: 700; }
-  .num { font-variant-numeric: tabular-nums; }
-  .wrap { max-width: var(--wrap); margin: 0 auto; padding: var(--gap-section) 24px 96px; }
-  /* every top-level block gets the same gap; the callout below opts back in
-     tight because it belongs to the strip above it */
-  .wrap > * + * { margin-top: var(--gap-section); }
-  .wrap > .two-parts { margin-top: var(--gap-tight); }
-  /* sticky nav is ~65px — keep anchor targets clear of it */
-  [id] { scroll-margin-top: 88px; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px 96px; }
+  /* One rhythm for the page: a section is a head plus its blocks, and the section's
+     own top padding is the space between sections. That padding sits *inside* the
+     scroll target, so it stacked on top of html's scroll-padding-top and left an
+     anchor jump parked a whole --gap-section too low; the negative scroll-margin
+     cancels it, and scroll-padding-top alone clears the sticky nav. */
+  .section { padding-top: var(--gap-section); scroll-margin-top: calc(var(--gap-section) * -1); }
+  .section-head { max-width: 720px; }
+  .section-head h2 { margin-top: 12px; font-size: clamp(28px, 3.8vw, 42px); font-weight: 700; letter-spacing: -.035em; line-height: 1.06; }
+  .section-head h2 .accent { color: var(--accent-bright); }
+  .section-head p { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
+  .section-head p b { color: var(--ink); font-weight: 600; }
   .skip { position: absolute; left: -999px; top: 8px; z-index: 100; padding: 8px 12px; background: var(--accent); color: #fff; border-radius: 8px; font-weight: 700; }
   .skip:focus { left: 8px; }
 
   /* ---------- buttons ---------- */
   .btn {
     display: inline-flex; align-items: center; gap: 8px;
-    font: inherit; font-size: 14px; font-weight: 700; letter-spacing: -.01em;
-    padding: 11px 18px; border-radius: var(--radius-sm); text-decoration: none; cursor: pointer;
-    border: 1px solid transparent; transition: filter .12s ease, border-color .12s ease, background .12s ease;
+    font: inherit; font-size: 15px; font-weight: 700; letter-spacing: -.01em;
+    padding: 11px 20px; border-radius: 12px; text-decoration: none; cursor: pointer;
+    border: 1px solid var(--hairline);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
   }
-  .btn--primary { background: var(--accent); color: #fff; box-shadow: 0 14px 34px -14px var(--accent); }
-  .btn--primary:hover { filter: brightness(1.08); }
-  .btn--ghost { background: var(--surface); color: var(--ink); border-color: var(--line); backdrop-filter: blur(8px); }
-  .btn--ghost:hover { border-color: var(--accent-bright); background: var(--surface-2); }
-  .btn--sm { font-size: 13px; padding: 8px 14px; }
-  .btn:disabled { opacity: .55; cursor: default; filter: none; }
+  .btn--primary { background: var(--btn-fill); color: #fff; }
+  .btn--primary:hover { background: var(--btn-fill-hover); }
+  .btn--ghost { background: rgba(255,255,255,.06); color: var(--ink); }
+  .btn--ghost:hover { background: var(--btn-quiet); border-color: rgba(203,208,235,.24); }
+  .btn--sm { font-size: 14px; padding: 8px 14px; border-radius: 10px; }
+  .btn:disabled { opacity: .55; cursor: default; }
   .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   /* ---------- nav ---------- */
@@ -84,10 +110,6 @@
   .brand { display: inline-flex; align-items: center; flex: none; border-radius: 4px; }
   .brand svg { height: 22px; width: auto; display: block; }
   .lockup { display: flex; align-items: center; gap: 10px; min-width: 0; }
-  .lockup .x {
-    width: 20px; height: 20px; border-radius: 6px; display: grid; place-items: center; flex: none;
-    background: var(--accent); color: #fff; font-size: 11px; font-weight: 800; line-height: 1;
-  }
   .lockup .seg { font-size: 15px; font-weight: 700; letter-spacing: -.02em; color: var(--ink); white-space: nowrap; }
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
 
@@ -108,29 +130,17 @@
       radial-gradient(1px 1px at 88% 58%, rgba(255,255,255,.5), transparent),
       radial-gradient(1.2px 1.2px at 62% 12%, rgba(255,255,255,.5), transparent);
   }
-  .hero-inner { position: relative; max-width: var(--wrap); margin: 0 auto; padding: 52px 24px 48px; display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.95fr); gap: 40px; align-items: start; }
+  .hero-inner { position: relative; max-width: var(--wrap); margin: 0 auto; padding: 52px 24px 48px; display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.95fr); gap: 40px; align-items: center; }
   .eyebrow { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
   .hero h1 { margin-top: 10px; font-size: clamp(36px, 5.2vw, 60px); font-weight: 700; letter-spacing: -.038em; line-height: .99; }
   .hero h1 .accent { display: block; background: linear-gradient(92deg, #a9b6ff, var(--accent) 85%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .hero .lede { margin-top: 16px; font-size: 18.5px; font-weight: 600; letter-spacing: -.01em; max-width: 32ch; }
   .hero .sub { margin-top: 10px; max-width: 52ch; color: var(--ink-soft); font-size: 15.5px; }
   .hero .sub b { color: var(--ink); font-weight: 600; }
-  /* subgrid keeps icon / name / blurb on shared rows, so the three columns line
-     up even though the blurbs wrap to different depths */
-  .pillars { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto auto auto; gap: 8px 16px; list-style: none; max-width: 540px; }
-  .pillars li { display: grid; grid-row: span 3; grid-template-rows: subgrid; gap: 8px; }
-  @supports not (grid-template-rows: subgrid) {
-    .pillars { grid-template-rows: none; }
-    .pillars li { grid-row: auto; grid-template-rows: none; align-content: start; }
-  }
-  .pillar-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
-  .pillar-icon svg { width: 18px; height: 18px; }
-  .pillar-name { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-  .pillar-blurb { font-size: 13.5px; color: var(--ink-soft); }
   .hero-cta { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px; }
 
   /* ---------- shared card / kicker ---------- */
-  .card { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
   .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-bright); }
   .pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
   .ticks { list-style: none; display: grid; gap: 10px; }
@@ -159,33 +169,30 @@
   .seats li.is-you .seat-n { background: var(--accent); color: #fff; }
   .seats-foot { display: flex; gap: 8px; align-items: start; margin-top: 12px; font-size: 12px; color: var(--ink-faint); }
   .seats-foot svg { width: 14px; height: 14px; flex: none; margin-top: 2px; }
+  .seats-foot a { color: var(--accent-bright); font-weight: 600; }
 
-  /* ---------- plain terms ---------- */
-  .plain { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; list-style: none; }
-  .plain li { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; padding: 16px 18px; }
-  .plain i { font-style: normal; font-size: 12px; font-weight: 800; color: var(--accent-bright); letter-spacing: .04em; padding-top: 3px; }
-  .plain span { font-size: 15px; font-weight: 600; line-height: 1.35; }
-  .plain span small { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 13px; font-weight: 400; }
-  .two-parts { padding: 14px 18px; display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; border-color: rgba(81,106,246,.35); background: linear-gradient(90deg, var(--accent-t), var(--bg-2) 60%); }
-  .two-parts .kicker { color: var(--accent-bright); }
-  .two-parts p { font-size: 14.5px; color: var(--ink-soft); }
-  .two-parts p b { color: var(--ink); }
 
-  /* ---------- money cards ---------- */
-  .money { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .money .card { padding: 24px; display: grid; gap: 16px; }
-  .amount { font-size: clamp(38px, 4.6vw, 54px); font-weight: 800; letter-spacing: -.045em; line-height: 1; }
+  /* ---------- the deal: two amounts in one card ---------- */
+  .deal { margin-top: var(--gap-head); padding: 30px; }
+  .amounts { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; list-style: none; }
+  .amounts li { display: grid; gap: 10px; align-content: start; }
+  .amounts li + li { padding-left: 30px; border-left: 1px solid var(--line-soft); }
+  /* Aeonik stops at Bold, so 800 gets synthesised and the comma in "$1,200"
+     smears at display size; 700 is the real face */
+  .amount { font-size: clamp(38px, 4.6vw, 54px); font-weight: 700; letter-spacing: -.04em; line-height: 1; }
   .amount .word { display: block; margin-top: 4px; font-size: 15px; font-weight: 700; letter-spacing: -.01em; color: var(--accent-bright); }
   .money-lead { font-size: 16px; font-weight: 600; }
   .money-body { color: var(--ink-soft); font-size: 14.5px; }
   .money-body strong { color: var(--ink); }
-  .money h3 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px; }
-  .money .note { margin-top: 0; }
+  /* the qualifier strip runs flush to the card's bottom edge, so the negative
+     margins cancel the card's own padding */
+  .deal-foot { margin: 30px -30px -30px; padding: 22px 30px 24px; border-top: 1px solid var(--line-soft); background: var(--bg-3); border-radius: 0 0 var(--radius) var(--radius); display: flex; flex-wrap: wrap; align-items: center; gap: 16px 26px; }
+  .deal-foot p { flex: 1 1 420px; font-size: 15px; color: var(--ink-soft); }
+  .deal-foot b { color: var(--ink); font-weight: 600; }
+  .deal-foot .btn { flex: none; }
 
   /* ---------- standings ---------- */
-  .standings { padding: 22px 24px; }
-  .board-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
-  .board-head h2 { font-size: 18px; font-weight: 700; letter-spacing: -.02em; }
+  .standings { margin-top: var(--gap-head); padding: 22px 24px; }
   .scroll-x { overflow-x: auto; margin: 0 -24px; padding: 0 24px; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 620px; }
   th { text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); padding: 0 10px 10px 0; border-bottom: 1px solid var(--line); }
@@ -204,24 +211,20 @@
   .qual.yes { background: rgba(33,201,94,.14); color: var(--ok); }
   .qual.no { background: var(--surface); color: var(--ink-faint); }
 
-  /* ---------- trio ---------- */
-  .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .trio .card { padding: 22px 22px 24px; }
-  .trio .kicker { margin-bottom: 14px; }
-  .flow { list-style: none; display: grid; gap: 12px; }
-  .flow li { display: grid; grid-template-columns: 38px 1fr; gap: 4px 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line-soft); }
-  .flow li:first-child { border-top: 0; padding-top: 0; }
-  .flow-icon { grid-row: span 2; width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
-  .flow-icon svg { width: 18px; height: 18px; }
-  .flow-name { font-weight: 700; font-size: 14.5px; }
-  .flow-name i { font-style: normal; color: var(--accent-bright); font-size: 11.5px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
-  .flow-blurb { color: var(--ink-soft); font-size: 13.5px; }
-  .ticks-lg li { font-size: 14px; padding: 8px 0; border-top: 1px solid var(--line-soft); }
-  .ticks-lg li:first-child { border-top: 0; padding-top: 0; }
+
+  /* ---------- how the night runs ---------- */
+  .runs { margin-top: var(--gap-head); padding: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; list-style: none; }
+  .runs li { display: grid; gap: 10px; align-content: start; }
+  .runs li + li { padding-left: 26px; border-left: 1px solid var(--line-soft); }
+  .run-icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
+  .run-icon svg { width: 18px; height: 18px; }
+  .run-name { font-size: 16px; font-weight: 700; letter-spacing: -.02em; }
+  .run-name i { font-style: normal; color: var(--accent-bright); font-size: 11.5px; font-weight: 800; margin-right: 8px; letter-spacing: .04em; }
+  .run-blurb { color: var(--ink-soft); font-size: 14px; }
 
   /* ---------- deliverables ---------- */
-  .deliv-wrap { padding: 24px; }
-  .deliv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 14px; }
+  .deliv-wrap { margin-top: var(--gap-head); padding: 24px; }
+  .deliv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
   .deliv-grid h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
   .deliv { list-style: none; display: grid; }
   .deliv li { display: grid; grid-template-columns: 118px 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line-soft); font-size: 14px; }
@@ -230,13 +233,6 @@
   .deliv-what { color: var(--ink-soft); }
   .deliv-what strong { color: var(--ink); }
 
-  /* ---------- facts ---------- */
-  .facts { padding: 18px 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; list-style: none; }
-  .facts li { display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; }
-  .fact-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-t); color: var(--accent-bright); }
-  .fact-icon svg { width: 17px; height: 17px; }
-  .fact-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-  .fact-value { display: block; font-size: 13.5px; color: var(--ink-soft); margin-top: 2px; }
 
   /* ---------- application ---------- */
   .apply { padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 32px; }
@@ -275,14 +271,14 @@
   .done .ok-mark svg { width: 22px; height: 22px; }
 
   /* ---------- closer / footer ---------- */
-  .closer { padding: 30px 28px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; position: relative; overflow: hidden; }
+  .closer { margin-top: var(--gap-group); padding: 30px 28px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 22px; position: relative; overflow: hidden; }
   .closer::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(520px 200px at 12% 50%, var(--accent-t), transparent 70%); }
   .closer > * { position: relative; }
   .closer-mark { width: 62px; height: 62px; border-radius: 18px; background: var(--bg); display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); }
   .closer-mark svg { width: 46px; height: 46px; }
   .closer h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 700; letter-spacing: -.03em; }
   .closer p { margin-top: 6px; color: var(--ink-soft); font-size: 15px; }
-  .foot { padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 12.5px; color: var(--ink-faint); }
+  .foot { margin-top: var(--gap-section); padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 12.5px; color: var(--ink-faint); }
   .foot a { color: var(--ink-soft); text-decoration: none; }
   .foot a:hover { color: var(--ink); }
   .foot .spacer { flex: 1; }
@@ -291,24 +287,27 @@
   @media (max-width: 1020px) {
     .hero-inner { grid-template-columns: 1fr; gap: 30px; padding-bottom: 40px; }
     .seats-card { max-width: 560px; }
-    .trio { grid-template-columns: 1fr; }
     .apply { grid-template-columns: 1fr; gap: 26px; }
   }
   /* tablet: side-by-side cards get too narrow for their body copy */
   @media (max-width: 880px) {
-    :root { --gap-section: 36px; }
-    .plain, .money, .deliv-grid { grid-template-columns: 1fr; }
+    :root { --gap-section: 64px; --gap-head: 28px; --gap-group: 32px; }
+    .deliv-grid { grid-template-columns: 1fr; }
+    /* stacked, the dividers between columns have to become rules above */
+    .amounts, .runs { grid-template-columns: 1fr; gap: 0; }
+    .amounts li + li, .runs li + li { margin-top: 24px; padding: 24px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
   }
   @media (max-width: 760px) {
-    :root { --gap-section: 30px; }
+    :root { --gap-section: 52px; --gap-head: 24px; --gap-group: 28px; }
     .hero-inner { padding: 38px 20px 32px; }
     .nav-inner { padding: 12px 20px; gap: 8px; }
-    .wrap { padding: var(--gap-section) 20px 72px; }
-    .facts { grid-template-columns: 1fr; gap: 14px; }
-    .two-parts { grid-template-columns: 1fr; gap: 8px; }
+    .wrap { padding: 0 20px 72px; }
+    .deal { padding: 22px 18px; }
+    .deal-foot { margin: 24px -18px -22px; padding: 20px 18px 22px; }
+    .deal-foot .btn { width: 100%; justify-content: center; }
+    .runs { padding: 20px 18px; }
     .closer { grid-template-columns: 1fr; }
     .closer-mark { display: none; }
-    .lockup .seg--hide, .lockup .x--hide { display: none; }
     .deliv li { grid-template-columns: 1fr; gap: 2px; }
     .deliv-when { padding-top: 0; }
     .apply { padding: 22px 20px; }
@@ -317,11 +316,6 @@
     .scroll-x { margin: 0 -18px; padding: 0 18px; }
     .seats-card { max-width: none; padding: 18px 18px 16px; }
     .table-art { width: 116px; height: 116px; margin-bottom: 6px; }
-    /* pillars go from three columns to three compact rows — much less scroll
-       than stacking the column layout would be */
-    .pillars { grid-template-columns: 1fr; grid-template-rows: none; gap: 12px; max-width: none; }
-    .pillars li { grid-row: auto; grid-template-rows: none; grid-template-columns: 34px 1fr; align-items: center; gap: 1px 12px; }
-    .pillar-icon { grid-row: span 2; }
   }
   @media (max-width: 480px) {
     .nav .btn span { display: none; }
@@ -346,10 +340,7 @@
           <path d="M56.3983 15.0597C56.3983 9.6882 60.07 6.11938 65.6108 6.11938C71.1516 6.11938 74.8233 9.68893 74.8233 15.0597C74.8233 20.4304 71.1516 24 65.6108 24C60.07 24 56.3983 20.4304 56.3983 15.0597ZM69.9277 15.0597C69.9277 12.1703 68.2958 10.1305 65.6101 10.1305C62.9244 10.1305 61.2932 12.1703 61.2932 15.0597C61.2932 17.949 62.9251 19.9889 65.6101 19.9889C68.2951 19.9889 69.9277 17.949 69.9277 15.0597Z" fill="#CBD0EB"/>
         </svg>
       </a>
-      <span class="x x--hide" aria-hidden="true">✕</span>
-      <span class="seg seg--hide">college</span>
-      <span class="x" aria-hidden="true">✕</span>
-      <span class="seg">dinfluencer</span>
+      <span class="seg">/dinners</span>
     </div>
     <div class="nav-right">
       <a class="btn btn--primary btn--sm" href="#apply">Apply <span>to host</span> →</a>
@@ -360,15 +351,10 @@
 <header class="hero">
   <div class="hero-inner">
     <div>
-      <p class="eyebrow">Dinner Series · Fall 2026</p>
+      <p class="eyebrow">Dinner Series · Fall 2026 · 20 tables</p>
       <h1>A table for 12. <span class="accent">We pick up the check.</span></h1>
       <p class="lede">Gather them. Sit down. Post it. $10,000 to the campus that lands hardest.</p>
       <p class="sub">fomo travels by word of mouth, and word of mouth happens at dinner — not in a feed. <b>You choose the room and the 11 people at it. We pay for all of it.</b></p>
-      <ul class="pillars">
-        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span><span class="pillar-name">Gather</span><span class="pillar-blurb">You pick the 11 people.</span></li>
-        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span><span class="pillar-name">Sit</span><span class="pillar-blurb">One table, one conversation.</span></li>
-        <li><span class="pillar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></span><span class="pillar-name">Bring</span><span class="pillar-blurb">They bring their people after.</span></li>
-      </ul>
       <div class="hero-cta">
         <a class="btn btn--primary" href="#apply">Apply to host →</a>
         <a class="btn btn--ghost" href="#how">How the night runs</a>
@@ -420,146 +406,133 @@
 
 <main class="wrap">
 
-  <!-- ── in plain terms ─────────────────────────────────────────── -->
-  <ul class="plain" aria-label="In plain terms">
-    <li class="card"><i>01</i><span>You host a dinner for 12 people you actually know.<small>Any restaurant, any city we can reach this term.</small></span></li>
-    <li class="card"><i>02</i><span>fomo books it and settles the check — up to $1,200.<small>Nothing out of pocket, no receipts, no reimbursements.</small></span></li>
-    <li class="card"><i>03</i><span>Post the night if you want the prize.<small>Most approved views by the end of Fall 2026 wins $10,000 for the campus.</small></span></li>
-  </ul>
-  <div class="card two-parts">
-    <span class="kicker">Two separate things</span>
-    <p><b>The dinner is covered no matter what.</b> The $10,000 competition is optional — you only enter it by posting and logging the night. Nobody at your table has to download anything for the check to be paid.</p>
-  </div>
+  <!-- ── the deal ────────────────────────────────────── -->
+  <section class="section" aria-labelledby="deal-title">
+    <div class="section-head">
+      <p class="eyebrow">The deal</p>
+      <h2 id="deal-title">One table. <span class="accent">Two numbers.</span></h2>
+      <p>You host 12 people you actually know, at any restaurant we can reach this term. <b>fomo books it and settles the check.</b> Posting the night is optional — it is only how you enter the $10,000.</p>
+    </div>
 
-  <!-- ── money ─────────────────────────────────────────────────── -->
-  <section class="money" aria-label="What fomo covers and what you can win">
-    <div class="card">
-      <p class="amount num">$1,200<span class="word">Covered.</span></p>
-      <p class="money-lead">You never see a bill.</p>
-      <p class="money-body">fomo books the restaurant and settles the check directly — up to <strong>$1,200 a table</strong>. No reimbursements, no receipts, nothing out of your pocket.</p>
-      <div>
-        <h3>All we ask</h3>
-        <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Fill the 12 seats with people you actually know.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Send us a few lines the next day about who came.</span></li>
-        </ul>
-      </div>
-    </div>
-    <div class="card">
-      <p class="amount num">$10,000<span class="word">One winner.</span></p>
-      <p class="money-lead">Every campus running a dinner is competing.</p>
-      <p class="money-body">Host your table, post the night, and the views count toward your campus. The campus host with the most approved views at the end of Fall 2026 takes <strong>$10,000</strong>.</p>
-      <div>
-        <h3>To qualify</h3>
-        <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Reach <strong>1M approved views</strong> across your posts.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Every post says <strong>fomo paid</strong>. Undisclosed posts are rejected.</span></li>
-        </ul>
-      </div>
-      <p class="note">Claimed views don't count — each post is checked against your insights first, and only the approved number reaches the board. <a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post →</a></p>
-    </div>
-  </section>
-
-  <!-- ── standings ─────────────────────────────────────────────── -->
-  <section class="card standings" aria-labelledby="standings-title">
-    <div class="board-head">
-      <h2 id="standings-title">Campus standings</h2>
-      <span class="pill">Sample</span>
-    </div>
-    <div class="scroll-x">
-      <table>
-        <thead><tr><th>Rank</th><th>Campus</th><th>Host</th><th class="r">Approved views</th><th class="r">Dinners</th><th class="r">Qualified</th></tr></thead>
-        <tbody>
-          <tr><td><span class="rank rank-1">1</span></td><td class="campus">University of Alabama</td><td><a href="https://instagram.com/ellieb" target="_blank" rel="noopener">@ellieb</a></td><td class="r views num">2.4M</td><td class="r num">3</td><td class="r"><span class="qual yes">Yes</span></td></tr>
-          <tr><td><span class="rank rank-2">2</span></td><td class="campus">University of Georgia</td><td><a href="https://instagram.com/maddie.r" target="_blank" rel="noopener">@maddie.r</a></td><td class="r views num">1.8M</td><td class="r num">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
-          <tr><td><span class="rank rank-3">3</span></td><td class="campus">Syracuse University</td><td><a href="https://instagram.com/gracewrites" target="_blank" rel="noopener">@gracewrites</a></td><td class="r views num">1.1M</td><td class="r num">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
-          <tr><td><span class="rank">4</span></td><td class="campus">Texas A&amp;M University</td><td><a href="https://instagram.com/sloane.k" target="_blank" rel="noopener">@sloane.k</a></td><td class="r views num">840K</td><td class="r num">2</td><td class="r"><span class="qual no">1M needed</span></td></tr>
-          <tr><td><span class="rank">5</span></td><td class="campus">Indiana University</td><td><a href="https://instagram.com/jules" target="_blank" rel="noopener">@jules</a></td><td class="r views num">610K</td><td class="r num">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
-          <tr><td><span class="rank">6</span></td><td class="campus">University of Miami</td><td><a href="https://instagram.com/nataliaa" target="_blank" rel="noopener">@nataliaa</a></td><td class="r views num">470K</td><td class="r num">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="seats-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span>Illustrative until the first dinners run. Official rules will be linked here before the board goes live.</span></p>
-  </section>
-
-  <!-- ── trio ──────────────────────────────────────────────────── -->
-  <section id="how" class="trio">
-    <div class="card">
-      <p class="kicker">How the night runs</p>
-      <ol class="flow">
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span><span class="flow-name"><i>01</i>Before</span><span class="flow-blurb">You name the room and the people. We book it and cover it.</span></li>
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span><span class="flow-name"><i>02</i>At the table</span><span class="flow-blurb">No deck, no pitch. Someone from fomo comes as a guest.</span></li>
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-7-3.5L5 21z"/></svg></span><span class="flow-name"><i>03</i>After</span><span class="flow-blurb">You tell us who came and what landed. Good tables get asked back.</span></li>
-      </ol>
-      <p class="note">That's the entire run of show. There is no hidden second half where somebody stands up and presents something.</p>
-    </div>
-    <div class="card">
-      <p class="kicker">What we look for</p>
-      <ol class="flow">
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16.5 5.3a3.2 3.2 0 0 1 0 5.9M18 14.4a6.5 6.5 0 0 1 3.5 5.6"/></svg></span><span class="flow-name">Seats that carry a room</span><span class="flow-blurb">Half your table should be people who bring others — a chapter officer, a captain, whoever runs the group chat.</span></li>
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span><span class="flow-name">A list you can write today</span><span class="flow-blurb">If you can name all 11 right now, the table is real. If not, it's a plan.</span></li>
-        <li><span class="flow-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10.5 13.5M21 3l-6.8 18-3.7-7.5L3 9.8z"/></svg></span><span class="flow-name">A host people say yes to</span><span class="flow-blurb">Not follower count. Whether the things you organise actually fill up.</span></li>
-      </ol>
-    </div>
-    <div class="card">
-      <p class="kicker">What this is not</p>
-      <ul class="ticks ticks-lg">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a launch party.</strong> 12 people, one table, one conversation.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a focus group.</strong> Nobody is going to make your friends rate an app.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a script.</strong> Post what you actually thought of the night — that's what travels.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Not a sales dinner.</strong> No deck, and nobody from fomo at the head of the table.</span></li>
+    <div class="card deal">
+      <ul class="amounts">
+        <li>
+          <p class="amount">$1,200<span class="word">Covered.</span></p>
+          <p class="money-lead">You never see a bill.</p>
+          <p class="money-body">fomo books the restaurant and settles the check directly, up to <strong>$1,200 a table</strong> — no reimbursements, no receipts, nothing out of your pocket. All we ask is that you fill the 12 seats with people you actually know, and send us a few lines the next day about who came.</p>
+        </li>
+        <li>
+          <p class="amount">$10,000<span class="word">One winner.</span></p>
+          <p class="money-lead">Every campus running a dinner is competing.</p>
+          <p class="money-body">Post the night and the views count toward your campus; the host with the most approved views at the end of Fall 2026 takes it. To qualify you need <strong>1M approved views</strong>, and every post has to say <strong>fomo paid</strong>. Claimed views do not count — each post is checked against your insights first.</p>
+        </li>
       </ul>
-    </div>
-  </section>
-
-  <!-- ── deliverables ──────────────────────────────────────────── -->
-  <section class="card deliv-wrap" aria-labelledby="deliv-title">
-    <p class="kicker" id="deliv-title">Deliverables</p>
-    <div class="deliv-grid">
-      <div>
-        <h3>What you deliver</h3>
-        <ol class="deliv">
-          <li><span class="deliv-when">7 days before</span><span class="deliv-what"><strong>The list.</strong> 11 names, confirmed. We book the table to that number, so it has to be real.</span></li>
-          <li><span class="deliv-when">48 hours before</span><span class="deliv-what"><strong>Any changes.</strong> Drop-outs happen and are fine. A table booked for 12 that seats 6 is not.</span></li>
-          <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>A full table.</strong> At least 10 of the 12 seats filled, and everyone 18 or over.</span></li>
-          <li><span class="deliv-when">Within 48 hours</span><span class="deliv-what"><strong>The recap.</strong> A few lines: who came, what landed, what didn't. Not a report — an honest paragraph.</span></li>
-          <li><span class="deliv-when">To compete</span><span class="deliv-what"><strong>Post it, and log it.</strong> Only if you want the prize — the dinner is covered either way. Post the night however you normally would, then submit the link so the views count toward your campus. Every post has to say fomo paid — that one's a rule, not a preference.</span></li>
-        </ol>
-      </div>
-      <div>
-        <h3>What fomo delivers</h3>
-        <ol class="deliv">
-          <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>The booking.</strong> We find and reserve the restaurant, or take yours if you already have one.</span></li>
-          <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>Something to forward.</strong> A confirmation you can send your table, so the invite comes from you and looks real.</span></li>
-          <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>The check, settled directly.</strong> Up to $1,200. You never pay, never front it, never file an expense.</span></li>
-          <li><span class="deliv-when">After</span><span class="deliv-what"><strong>Your link, and the credit.</strong> Every signup through it is attributed to you, and we tell you the number.</span></li>
-        </ol>
-        <p class="note">Miss a deliverable and nothing happens to you — we just probably won't book the next one. There's no clawback and nothing to sign.</p>
+      <div class="deal-foot">
+        <p><b>These are two separate things.</b> The dinner is covered whether or not you post, and nobody at your table has to download anything for the check to be paid.</p>
+        <a class="btn btn--primary" href="#apply">Apply to host →</a>
       </div>
     </div>
   </section>
 
-  <!-- ── facts ─────────────────────────────────────────────────── -->
-  <ul class="card facts" aria-label="Key facts">
-    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span><span class="fact-label">Fall 2026</span><span class="fact-value">20 dinners, booked as hosts are approved.</span></span></li>
-    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/></svg></span><span><span class="fact-label">fomo pays</span><span class="fact-value">Venue, food, tip. You never front money or file an expense.</span></span></li>
-    <li><span class="fact-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg></span><span><span class="fact-label">You hear back</span><span class="fact-value">Within 5 days — including if the answer is no.</span></span></li>
-  </ul>
+  <!-- ── standings ───────────────────────────────────── -->
+  <section class="section" aria-labelledby="standings-title">
+    <div class="section-head">
+      <p class="eyebrow">The board · sample</p>
+      <h2 id="standings-title">Campus <span class="accent">standings.</span></h2>
+      <p>Approved views roll up from the host to the campus. <b>One campus takes the $10,000</b> — but a campus only qualifies once its host clears 1M approved views.</p>
+    </div>
+    <div class="card standings">
+      <div class="scroll-x">
+        <table>
+          <thead><tr><th>Rank</th><th>Campus</th><th>Host</th><th class="r">Approved views</th><th class="r">Dinners</th><th class="r">Qualified</th></tr></thead>
+          <tbody>
+            <tr><td><span class="rank rank-1">1</span></td><td class="campus">University of Alabama</td><td><a href="https://instagram.com/ellieb" target="_blank" rel="noopener">@ellieb</a></td><td class="r views">2.4M</td><td class="r">3</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+            <tr><td><span class="rank rank-2">2</span></td><td class="campus">University of Georgia</td><td><a href="https://instagram.com/maddie.r" target="_blank" rel="noopener">@maddie.r</a></td><td class="r views">1.8M</td><td class="r">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+            <tr><td><span class="rank rank-3">3</span></td><td class="campus">Syracuse University</td><td><a href="https://instagram.com/gracewrites" target="_blank" rel="noopener">@gracewrites</a></td><td class="r views">1.1M</td><td class="r">2</td><td class="r"><span class="qual yes">Yes</span></td></tr>
+            <tr><td><span class="rank">4</span></td><td class="campus">Texas A&amp;M University</td><td><a href="https://instagram.com/sloane.k" target="_blank" rel="noopener">@sloane.k</a></td><td class="r views">840K</td><td class="r">2</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+            <tr><td><span class="rank">5</span></td><td class="campus">Indiana University</td><td><a href="https://instagram.com/jules" target="_blank" rel="noopener">@jules</a></td><td class="r views">610K</td><td class="r">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+            <tr><td><span class="rank">6</span></td><td class="campus">University of Miami</td><td><a href="https://instagram.com/nataliaa" target="_blank" rel="noopener">@nataliaa</a></td><td class="r views">470K</td><td class="r">1</td><td class="r"><span class="qual no">1M needed</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="seats-foot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.3l3.2 2.2"/></svg><span>Illustrative until the first dinners run. Official rules will be linked here before the board goes live. <a href="https://www.aryatoufanian.com/dinner-series/submit/" target="_blank" rel="noopener">Submit a post →</a></span></p>
+    </div>
+  </section>
+
+  <!-- ── how the night runs ────────────────────────────── -->
+  <section id="how" class="section" aria-labelledby="how-title">
+    <div class="section-head">
+      <p class="eyebrow">How the night runs</p>
+      <h2 id="how-title">Three moments, <span class="accent">no run of show.</span></h2>
+      <p>Not a launch party, not a focus group, not a sales dinner. <b>There is no hidden second half where somebody stands up and presents something</b> — someone from fomo comes as a guest, not at the head of the table, and you post whatever you actually thought.</p>
+    </div>
+    <ol class="card runs">
+      <li>
+        <span class="run-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg></span>
+        <span class="run-name"><i>01</i>Before</span>
+        <span class="run-blurb">You name the room and the people. We book it and cover it.</span>
+      </li>
+      <li>
+        <span class="run-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v8a2.5 2.5 0 0 0 5 0V3M8.5 11v10"/><path d="M17 3c-1.7 1.2-2.5 3-2.5 5.5 0 1.7.8 2.8 2.5 3V21"/></svg></span>
+        <span class="run-name"><i>02</i>At the table</span>
+        <span class="run-blurb">No deck, no pitch. One table, one conversation, for 12 people.</span>
+      </li>
+      <li>
+        <span class="run-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18l-7-3.5L5 21z"/></svg></span>
+        <span class="run-name"><i>03</i>After</span>
+        <span class="run-blurb">You tell us who came and what landed. Good tables get asked back.</span>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── deliverables ────────────────────────────────── -->
+  <section class="section" aria-labelledby="deliv-title">
+    <div class="section-head">
+      <p class="eyebrow">The fine print</p>
+      <h2 id="deliv-title">Who owes what, <span class="accent">and when.</span></h2>
+      <p>Miss one and nothing happens to you — we just probably will not book the next one. <b>There is no clawback and nothing to sign.</b></p>
+    </div>
+    <div class="card deliv-wrap">
+      <div class="deliv-grid">
+        <div>
+          <h3>What you deliver</h3>
+          <ol class="deliv">
+            <li><span class="deliv-when">7 days before</span><span class="deliv-what"><strong>The list.</strong> 11 names, confirmed. We book the table to that number, so it has to be real.</span></li>
+            <li><span class="deliv-when">48 hours before</span><span class="deliv-what"><strong>Any changes.</strong> Drop-outs are fine. A table booked for 12 that seats 6 is not.</span></li>
+            <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>A full table.</strong> At least 10 of the 12 seats filled, everyone 18 or over.</span></li>
+            <li><span class="deliv-when">Within 48 hours</span><span class="deliv-what"><strong>The recap.</strong> A few honest lines: who came, what landed, what did not.</span></li>
+            <li><span class="deliv-when">To compete</span><span class="deliv-what"><strong>The post, logged.</strong> Only if you want the prize. Submit the link so the views count, and say fomo paid.</span></li>
+          </ol>
+        </div>
+        <div>
+          <h3>What fomo delivers</h3>
+          <ol class="deliv">
+            <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>The booking.</strong> We find and reserve the restaurant, or take yours if you have one.</span></li>
+            <li><span class="deliv-when">On approval</span><span class="deliv-what"><strong>Something to forward.</strong> A confirmation you can send your table, so the invite comes from you.</span></li>
+            <li><span class="deliv-when">On the night</span><span class="deliv-what"><strong>The check, settled directly.</strong> Up to $1,200. You never front it or file an expense.</span></li>
+            <li><span class="deliv-when">After</span><span class="deliv-what"><strong>Your link, and the credit.</strong> Every signup through it is attributed to you, and we tell you the number.</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ── application ───────────────────────────────────────────── -->
-  <section id="apply" class="card apply" aria-labelledby="apply-title">
-    <div>
-      <p class="eyebrow">Apply · Fall 2026</p>
-      <h2 id="apply-title">Host <span class="accent">a table.</span></h2>
-      <p class="sub">Ten questions, about two minutes. The last two decide it, so spend your time there.</p>
-      <ul class="ticks">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>You hear back within 5 days, either way.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Applying costs nothing and commits you to nothing.</span></li>
-      </ul>
-      <p class="note">Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
-    </div>
+  <section id="apply" class="section" aria-labelledby="apply-title">
+    <div class="card apply">
+      <div>
+        <p class="eyebrow">Apply · Fall 2026</p>
+        <h2 id="apply-title">Host <span class="accent">a table.</span></h2>
+        <p class="sub">Ten questions, about two minutes. The last two decide it, so spend your time there — this is what we read them for:</p>
+        <ul class="ticks">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Seats that carry a room.</strong> Half your table should be people who bring others — a chapter officer, a captain, whoever runs the group chat.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A list you can write today.</strong> If you can name all 11 right now, the table is real. If not, it is a plan.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A host people say yes to.</strong> Not follower count. Whether the things you organise actually fill up.</span></li>
+        </ul>
+        <p class="note">You hear back within 5 days either way, and applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
+      </div>
 
-    <div class="form-panel">
+      <div class="form-panel">
       <form id="apply-form" novalidate>
         <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
         <p class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
@@ -588,10 +561,11 @@
         <p class="field-error" id="form-error" hidden></p>
       </form>
 
-      <div class="done" id="apply-done" hidden>
-        <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
-        <h3>That's in.</h3>
-        <p>We read every one of these. You'll hear back within 5 days, including if the answer is not this term. Check your email — and your spam folder, just in case.</p>
+        <div class="done" id="apply-done" hidden>
+          <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
+          <h3>That's in.</h3>
+          <p>We read every one of these. You'll hear back within 5 days, including if the answer is not this term. Check your email — and your spam folder, just in case.</p>
+        </div>
       </div>
     </div>
   </section>
