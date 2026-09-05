@@ -158,7 +158,7 @@
   .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
   .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-bright); }
   .pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
-  .ticks { list-style: none; display: grid; gap: 10px; }
+  .ticks { list-style: none; display: grid; gap: 15px; }
   .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14.5px; color: var(--ink-soft); }
   .ticks li strong { color: var(--ink); }
   .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
@@ -248,16 +248,17 @@
 
 
   /* ---------- application ---------- */
-  .apply { padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 32px; }
+  .apply { padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 30px 40px; }
   .apply h2 { margin-top: 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
   .apply h2 .accent { display: block; color: var(--accent-bright); }
-  .apply .sub { margin-top: 14px; color: var(--ink-soft); font-size: 15.5px; }
-  .apply .ticks { margin-top: 18px; }
-  .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; min-height: 320px; display: flex; flex-direction: column; }
+  .apply .sub { margin-top: 16px; color: var(--ink-soft); font-size: 15.5px; }
+  .apply .ticks { margin-top: 24px; }
+  .apply-note { grid-column: 1 / -1; margin-top: 0; }
+  .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: flex; flex-direction: column; }
   .form-panel form { flex: 1; display: flex; flex-direction: column; }
   .form-panel .done { flex: 1; }
   .step { border: 0; display: none; }
-  .step.is-on { display: block; }
+  .step.is-on { display: block; margin-block: auto; }
   .step-num { display: flex; align-items: center; gap: 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
   .step-num .opt { color: var(--ink-faint); letter-spacing: .06em; }
   .step label { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
@@ -274,7 +275,7 @@
   .step option { background: var(--bg-2); }
   .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
   .hp { position: absolute; left: -9999px; }
-  .form-controls { margin-top: auto; padding-top: 22px; display: flex; align-items: center; gap: 10px; }
+  .form-controls { padding-top: 26px; display: flex; align-items: center; gap: 10px; }
   .form-controls .hint { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); }
   kbd { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); }
   .progress { height: 4px; border-radius: 99px; background: var(--surface); margin-bottom: 20px; overflow: hidden; }
@@ -345,7 +346,7 @@
     .deliv li { grid-template-columns: 1fr; gap: 2px; }
     .deliv-when { padding-top: 0; }
     .apply { padding: 22px 20px; }
-    .form-panel { padding: 18px; min-height: 0; }
+    .form-panel { padding: 20px; }
     .standings, .deliv-wrap { padding: 20px 18px; }
     .scroll-x { margin: 0 -18px; padding: 0 18px; }
   }
@@ -558,7 +559,6 @@
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A list you can write today.</strong> If you can name all 11 right now, the table is real. If not, it is a plan.</span></li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A host people say yes to.</strong> Not follower count. Whether the things you organise actually fill up.</span></li>
         </ul>
-        <p class="note">You hear back within 5 days either way, and applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
       </div>
 
       <div class="form-panel">
@@ -596,6 +596,8 @@
           <p>We read every one of these. You'll hear back within 5 days, including if the answer is not this term. Check your email — and your spam folder, just in case.</p>
         </div>
       </div>
+
+      <p class="note apply-note">You hear back within 5 days either way, and applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
     </div>
   </section>
 
