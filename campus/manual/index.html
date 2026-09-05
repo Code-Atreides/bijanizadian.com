@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#060510">
 <title>fomo/campus/manual</title>
-<meta name="description" content="The fomo campus internship manual. What fomo is, what you own on your campus, the tasks that pay, and the rules that are not up to you.">
+<meta name="description" content="The fomo campus internship manual. The five seats on a campus team, what fomo is, the eight-week goal map, the tasks that pay, and the rules that are not up to you.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="fomo/campus/manual">
 <meta property="og:description" content="Run fomo at your school. This isn't an ambassador program — you run the campus. The manual: what you own, the tasks that pay, and the four rules that are not up to you.">
@@ -239,6 +239,45 @@
   .rules > li.is-hard .rule-n { color: var(--crit); }
   .rules > li.is-hard ul li::before { background: var(--crit); }
 
+
+  /* ---------- the five seats ---------- */
+  .seats { margin-top: var(--gap-head); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; list-style: none; }
+  .seats > li { padding: 22px 26px 24px; }
+  .seats > li:first-child { grid-column: 1 / -1; }
+  .seats > li:first-child ul { grid-template-columns: 1fr 1fr; gap: 9px 26px; }
+  .seat-n { font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-bright); }
+  .seats h3 { margin-top: 8px; font-size: 20px; font-weight: 700; letter-spacing: -.025em; }
+  .seats > li > p { margin-top: 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .seats > li > p b { color: var(--ink); font-weight: 600; }
+  .seats .fit { margin-top: 18px; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+  .seats ul { margin-top: 10px; list-style: none; display: grid; gap: 9px; }
+  .seats ul li { position: relative; padding-left: 17px; font-size: 14px; color: var(--ink-soft); }
+  .seats ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: 99px; background: var(--accent-bright); }
+  .seats .tag { float: right; margin-left: 12px; }
+
+  /* ---------- the line this puts on a resume ---------- */
+  .resume { margin-top: var(--gap-block); padding: 24px 26px 26px; }
+  .resume h3 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .resume .role { margin-top: 14px; font-size: 18px; font-weight: 700; letter-spacing: -.025em; }
+  .resume .meta { margin-top: 2px; font-size: 13px; color: var(--ink-faint); }
+  .resume .line { margin-top: 16px; padding: 16px 18px; background: var(--bg-3); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); font-size: 14.5px; color: var(--ink-soft); }
+  .resume .line ul { margin-top: 12px; list-style: none; display: grid; gap: 7px; }
+  .resume .line ul li { position: relative; padding-left: 17px; font-size: 14px; }
+  .resume .line ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: 99px; background: var(--ink-faint); }
+  .resume mark { background: var(--accent-t); color: var(--accent-bright); border-radius: 4px; padding: 0 5px; font-weight: 700; }
+
+  /* ---------- the eight-week goal map ---------- */
+  .wkmap { margin-top: var(--gap-head); padding: 20px 26px 22px; }
+  .wkmap table { min-width: 880px; font-size: 13.5px; }
+  .wkmap td { color: var(--ink-soft); }
+  .wkmap .wk { font-size: 11.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--accent-bright); white-space: nowrap; padding-right: 20px; }
+
+  /* ---------- how the team runs ---------- */
+  .six { margin-top: var(--gap-head); padding: 8px 26px 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 30px; list-style: none; }
+  .six li { display: grid; gap: 6px; align-content: start; padding: 18px 0 0; border-top: 1px solid var(--line-soft); margin-top: 18px; }
+  .six i { font-style: normal; font-size: 12px; font-weight: 800; letter-spacing: .06em; color: var(--accent-bright); }
+  .six b { font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+  .six small { font-size: 14px; color: var(--ink-soft); }
   /* ---------- closer ---------- */
   /* Brand-kit "Technical & premium" halo: deep indigo, large and diffuse, top-centre. */
   .closer { position: relative; margin-top: 56px; text-align: center; padding: 56px 24px 0; }
@@ -274,7 +313,9 @@
     /* stacked, the dividers between columns become rules above */
     .grid4 { grid-template-columns: 1fr; gap: 0; }
     .grid4 li + li { margin-top: 22px; padding: 22px 0 0; border-left: 0; border-top: 1px solid var(--line-soft); }
-    .rules { grid-template-columns: 1fr; }
+    .rules, .seats { grid-template-columns: 1fr; }
+    .seats > li:first-child ul { grid-template-columns: 1fr; }
+    .six { grid-template-columns: 1fr 1fr; }
     .matrix { grid-template-columns: 1fr; gap: 0; }
     .matrix h3 + h3 { margin-top: 26px; }
   }
@@ -289,6 +330,8 @@
     .toc ol { grid-template-columns: 1fr; }
     .grid4, .hunt, .matrix, .about { padding: 20px 18px; }
     .steps5 { padding: 4px 18px 10px; }
+    .seats > li, .resume, .wkmap, .six { padding: 20px 18px; }
+    .six { grid-template-columns: 1fr; gap: 0; }
     .scroll-x { margin: 0 -18px; padding: 0 18px; }
     .stats { grid-template-columns: 1fr 1fr; }
     .foot-inner { grid-template-columns: 1fr; }
@@ -362,12 +405,14 @@
     <ol>
       <li><a href="#opportunity">Own the opportunity</a></li>
       <li><a href="#canvas">Your canvas</a></li>
+      <li><a href="#seats">The five seats</a></li>
       <li><a href="#product">What fomo is</a></li>
       <li><a href="#picture">The national picture</a></li>
       <li><a href="#greekwars">Greek Wars</a></li>
       <li><a href="#irl">fomo IRL</a></li>
       <li><a href="#hunt">The hunt</a></li>
-      <li><a href="#firstmove">Your first move</a></li>
+      <li><a href="#firstmove">Your first sixty days</a></li>
+      <li><a href="#howitruns">How the team runs</a></li>
       <li><a href="#together">Built together</a></li>
       <li><a href="#rules">What is not up to you</a></li>
     </ol>
@@ -378,9 +423,31 @@
     <div class="section-head">
       <p class="eyebrow">01 · Own the opportunity</p>
       <h2 id="opp-title">this isn't an ambassador program. <span class="accent">you run the campus.</span></h2>
-      <p>we're building fomo school by school. <b>Campus Leads bring it into the communities that shape their school.</b> you decide how.</p>
+      <p>we're building fomo school by school. <b>Campus Leads bring it into the communities that shape their school.</b> you decide how. <b>five seats per campus, sixty days.</b> we hand you the brand, a budget and the playbook, then get out of the way.</p>
     </div>
   </section>
+
+    <ol class="card grid4" aria-label="What you get out of it">
+      <li><i>01</i><b>numbers you own</b><small>users, views, partnerships closed. that is what interviews are about.</small></li>
+      <li><i>02</i><b>a network</b><small>campus creators, org presidents, promoters, and the fomo team.</small></li>
+      <li><i>03</i><b>budget and autonomy</b><small>real money for events, dinners and prizes. you decide how to spend it.</small></li>
+      <li><i>04</i><b>a foot in the door</b><small>top performers get referred internally for internships and full-time roles.</small></li>
+    </ol>
+    <div class="card resume">
+      <h3>the line it puts on your r&eacute;sum&eacute;</h3>
+      <p class="role">Campus Lead &middot; fomo</p>
+      <p class="meta">Contract &middot; skills: growth marketing &middot; partnerships &middot; content strategy &middot; events</p>
+      <div class="line">
+        <p>campus lead for fomo, a venture-backed social trading app (<b>$75M raised</b>). ran user acquisition and brand strategy on a <mark>[X],000</mark>-student campus as part of a five-person growth team.</p>
+        <ul>
+          <li><mark>[400]</mark> active users acquired in 60 days</li>
+          <li><mark>[3]</mark> org partnerships closed, reaching <mark>[1,200]</mark>+ students</li>
+          <li><mark>[100k]</mark> views on the campus social account</li>
+          <li>managed a <mark>[$X]</mark> event budget</li>
+        </ul>
+      </div>
+      <p class="note">Swap the brackets for your own numbers at the end of the term. Most people do not touch work like this until two years into a real job.</p>
+    </div>
 
   <!-- ── your canvas ─────────────────────────────────── -->
   <section id="canvas" class="section" aria-labelledby="canvas-title">
@@ -396,10 +463,83 @@
     </ol>
   </section>
 
+
+  <!-- ── the five seats ────────────────── -->
+  <section id="seats" class="section" aria-labelledby="seats-title">
+    <div class="section-head">
+      <p class="eyebrow">03 &middot; The five seats</p>
+      <h2 id="seats-title">read all five. <span class="accent">apply to one.</span></h2>
+      <p>a campus is not one person with a link. it is five, and each one owns a lever. <b>you apply to one seat, not a general pool</b> &mdash; so read what each one actually is first.</p>
+    </div>
+    <ol class="seats" aria-label="The five seats on a campus team">
+      <li class="card">
+        <span class="pill tag">the lead role</span><p class="seat-n">seat 01</p>
+        <h3>campus president</h3>
+        <p>runs the team, and is the main line to fomo HQ.</p>
+        <p class="fit">this suits you if</p>
+        <ul>
+          <li>you are a frat exec, an org president, or whoever already runs things on campus</li>
+          <li>you know people across Greek life, teams and clubs</li>
+          <li>you can hold four people accountable without being annoying about it</li>
+          <li>you answer texts</li>
+        </ul>
+      </li>
+      <li class="card">
+        <p class="seat-n">seat 02</p>
+        <h3>growth</h3>
+        <p>gets people to download it and actually use it.</p>
+        <p class="fit">this suits you if</p>
+        <ul>
+          <li>you are the competitive one</li>
+          <li>walking up to a stranger or posting to 300 people does not faze you</li>
+          <li>you treat a number as a personal challenge</li>
+          <li>you have sold something before &mdash; tickets, merch, bids, anything</li>
+        </ul>
+      </li>
+      <li class="card">
+        <p class="seat-n">seat 03</p>
+        <h3>partnerships</h3>
+        <p>gets fomo into orgs, teams and events.</p>
+        <p class="fit">this suits you if</p>
+        <ul>
+          <li>you already know exec boards</li>
+          <li>you can text a social chair and get a reply</li>
+          <li>you keep a pipeline updated without being asked</li>
+          <li>you are comfortable on the phone and in meetings, not just DMs</li>
+        </ul>
+      </li>
+      <li class="card">
+        <span class="pill tag">most applied for</span><p class="seat-n">seat 04</p>
+        <h3>content</h3>
+        <p>runs the school's page, mic in hand.</p>
+        <p class="fit">this suits you if</p>
+        <ul>
+          <li>you can film, edit, and hold a mic in front of a crowd without freezing</li>
+          <li>you already know what is going viral at your school</li>
+          <li>you post constantly on your own account</li>
+          <li>you are funny &mdash; that matters more here than being polished</li>
+        </ul>
+      </li>
+      <li class="card">
+        <p class="seat-n">seat 05</p>
+        <h3>culture</h3>
+        <p>makes the fomo dinners happen.</p>
+        <p class="fit">this suits you if</p>
+        <ul>
+          <li>you are the most socially plugged-in person on campus</li>
+          <li>you know every creator, DJ, promoter and personality by name &mdash; and they know you</li>
+          <li>you get invited to things</li>
+          <li>you could build a guest list from memory right now</li>
+        </ul>
+      </li>
+    </ol>
+    <p class="note">One application, one role. Tell us which of the five you want and why you are the person for it &mdash; <a href="/campus#apply">apply for a seat</a>.</p>
+  </section>
+
   <!-- ── what fomo is ────────────────────────────────── -->
   <section id="product" class="section" aria-labelledby="product-title">
     <div class="section-head">
-      <p class="eyebrow">03 · What fomo is</p>
+      <p class="eyebrow">04 · What fomo is</p>
       <h2 id="product-title">know what you're <span class="accent">putting your name on.</span></h2>
       <p>a trading app for the rest of us.</p>
     </div>
@@ -425,7 +565,7 @@
   <!-- ── the national picture ──────────────────────────── -->
   <section id="picture" class="section" aria-labelledby="picture-title">
     <div class="section-head">
-      <p class="eyebrow">04 · The national picture</p>
+      <p class="eyebrow">05 · The national picture</p>
       <h2 id="picture-title">your campus. <span class="accent">your leaderboard.</span></h2>
     </div>
     <div class="card fake-board">
@@ -450,7 +590,7 @@
   <!-- ── greek wars ──────────────────────────────────── -->
   <section id="greekwars" class="section" aria-labelledby="gw-title">
     <div class="section-head">
-      <p class="eyebrow">05 · Greek Wars by fomo</p>
+      <p class="eyebrow">06 · Greek Wars by fomo</p>
       <h2 id="gw-title">your chapter is <span class="accent">on the leaderboard.</span></h2>
       <p>a semester of chapter competition. <b>$500 — a promotional competition prize — to the top trader in every qualifying chapter.</b></p>
     </div>
@@ -466,7 +606,7 @@
   <!-- ── fomo irl ───────────────────────────────────── -->
   <section id="irl" class="section" aria-labelledby="irl-title">
     <div class="section-head">
-      <p class="eyebrow">06 · fomo IRL</p>
+      <p class="eyebrow">07 · fomo IRL</p>
       <h2 id="irl-title">fomo, after hours. <span class="accent">12 people. a table.</span></h2>
       <p>bring together the people making moves on your campus. <b>fomo covers the table — up to $1,200.</b></p>
     </div>
@@ -476,7 +616,7 @@
   <!-- ── the hunt ───────────────────────────────────── -->
   <section id="hunt" class="section" aria-labelledby="hunt-title">
     <div class="section-head">
-      <p class="eyebrow">07 · The hunt</p>
+      <p class="eyebrow">08 · The hunt</p>
       <h2 id="hunt-title">tasks with <span class="accent">a number on them.</span></h2>
       <p>do the thing. send the proof. get paid. <b>half of these check themselves</b> — anyone who signs up through your link is already counted, so there is nothing to send.</p>
     </div>
@@ -534,8 +674,9 @@
   <!-- ── make your first move ─────────────────────────── -->
   <section id="firstmove" class="section" aria-labelledby="move-title">
     <div class="section-head">
-      <p class="eyebrow">08 · Make your first move</p>
+      <p class="eyebrow">09 · Your first sixty days</p>
       <h2 id="move-title">you make it move. <span class="accent">start small. build from there.</span></h2>
+      <p>the first five moves are the same in every seat. after that, the eight-week map below is the bar &mdash; <b>the bar, not the ceiling</b>. HQ adjusts it per school size.</p>
     </div>
     <ol class="card steps5" aria-label="Your first five moves">
       <li><i>01</i><div><b>find your people.</b><span>start with the communities you know.</span></div></li>
@@ -544,12 +685,50 @@
       <li><i>04</i><div><b>make some noise.</b><span>tell the story in your campus voice.</span></div></li>
       <li><i>05</i><div><b>climb the leaderboard.</b><span>build participation. keep showing up.</span></div></li>
     </ol>
+    <div class="card wkmap">
+      <div class="scroll-x">
+        <table>
+          <thead>
+            <tr><th>Week</th><th>president</th><th>growth</th><th>partnerships</th><th>content</th><th>culture</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="wk">wk 1</td><td>team locked, chat live, first meeting</td><td>learn the app cold</td><td>build a target list (25 orgs)</td><td>accounts live, first 3 posts</td><td>build a creator list (30 names)</td></tr>
+            <tr><td class="wk">wk 2</td><td>first campus opportunity map</td><td>25 users</td><td>first 10 outreach messages</td><td>mic arrives, first street interviews</td><td>first 10 DMs sent</td></tr>
+            <tr><td class="wk">wk 3</td><td>make sure everyone is working</td><td>group chat blitz</td><td>follow-ups + first meetings</td><td>test 3 formats</td><td>lock relationships, scout a venue</td></tr>
+            <tr><td class="wk">wk 4</td><td>month 1 review with HQ</td><td>150 users</td><td>1 partnership confirmed</td><td>1 video over 10k</td><td>dinner guest list finalised</td></tr>
+            <tr><td class="wk">wk 5</td><td>coordinate the first big activation</td><td>referral competition</td><td>deliver the first partnership</td><td>cover the activation</td><td>dinner #1</td></tr>
+            <tr><td class="wk">wk 6</td><td>double down on what worked</td><td>convert dinner + event traffic</td><td>2 more in discussion</td><td>repeat the winning format</td><td>post-dinner follow-up</td></tr>
+            <tr><td class="wk">wk 7</td><td>push toward the big event</td><td>push toward 400</td><td>lock a major campus event</td><td>biggest content week</td><td>line up dinner #2</td></tr>
+            <tr><td class="wk">wk 8</td><td>60-day report + next quarter plan</td><td>400 active users</td><td>3 confirmed total</td><td>100k+ total views</td><td>2 dinners done, roster built</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Read down your own column. Week 8 is the 60-day report, and the start of the next one.</p>
+    </div>
+  </section>
+
+  <!-- ── how the team runs ──────────────── -->
+  <section id="howitruns" class="section" aria-labelledby="runs-title">
+    <div class="section-head">
+      <p class="eyebrow">10 &middot; How the team runs</p>
+      <h2 id="runs-title">six rules, <span class="accent">all five of you.</span></h2>
+      <p>none of this is about how hard you work. it is about the five of you not tripping over each other &mdash; <b>a lead that nobody else hears about is a lead that dies.</b></p>
+    </div>
+    <ol class="card six" aria-label="The six rules the team runs on">
+      <li><i>01</i><b>one group chat</b><small>everything goes in it. no side deals, no silos.</small></li>
+      <li><i>02</i><b>sunday team meeting</b><small>twenty minutes. the president runs it.</small></li>
+      <li><i>03</i><b>sunday report to HQ</b><small>the president sends it, using the template.</small></li>
+      <li><i>04</i><b>ask before you promise</b><small>never commit fomo to money, prizes or sponsorships without approval. never guarantee an org anything HQ has not signed off on.</small></li>
+      <li><i>05</i><b>post it, do not perfect it</b><small>speed beats polish every time.</small></li>
+      <li><i>06</i><b>pass it across, same day</b><small>content spots a big creator &rarr; culture. culture meets a frat president &rarr; partnerships. partnerships lands a 400-person event &rarr; growth and content.</small></li>
+    </ol>
+    <p class="note"><b>The Sunday report.</b> Every Sunday, drop your report in as a PDF or a spreadsheet. That is the whole thing.</p>
   </section>
 
   <!-- ── built together ──────────────────────────────── -->
   <section id="together" class="section" aria-labelledby="together-title">
     <div class="section-head">
-      <p class="eyebrow">09 · Built together</p>
+      <p class="eyebrow">11 · Built together</p>
       <h2 id="together-title">your instinct. <span class="accent">our support.</span></h2>
       <p>a shared foundation. a campus that feels like you. <b>build something people want to be part of.</b></p>
     </div>
@@ -574,7 +753,7 @@
   <!-- ── the part that is not up to you ──────────────────── -->
   <section id="rules" class="section" aria-labelledby="rules-title">
     <div class="section-head">
-      <p class="eyebrow">10 · The part that is not up to you</p>
+      <p class="eyebrow">12 · The part that is not up to you</p>
       <h2 id="rules-title">most of this is your judgement. <span class="accent">this part is not.</span></h2>
     </div>
     <ol class="rules" aria-label="The four rules">
@@ -652,6 +831,7 @@
     <div>
       <h4>The manual</h4>
       <ul>
+        <li><a href="#seats">The five seats</a></li>
         <li><a href="#product">What fomo is</a></li>
         <li><a href="#hunt">The hunt</a></li>
         <li><a href="#together">Built together</a></li>
