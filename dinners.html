@@ -18,8 +18,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
 <style>
   /* Aeonik is fomo's exclusive typeface — the same self-hosted woff2 files /campus
      serves, so the two pages set type in the real face. Schibsted Grotesk is the
@@ -248,43 +246,27 @@
 
 
   /* ---------- application ---------- */
+  /* the application lives at /dinners/apply now; this panel is the door to it,
+     and keeps the two halves of the card the same height as the form did */
+  .apply-jump {
+    background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 30px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 14px;
+  }
+  .jump-k { font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
+  .jump-t { font-size: 16px; color: var(--ink-soft); max-width: 34ch; }
+  .apply-jump .btn { margin-top: 6px; }
+  .jump-s { font-size: 12.5px; color: var(--ink-faint); }
   .apply { padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 30px 40px; }
   .apply h2 { margin-top: 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
   .apply h2 .accent { display: block; color: var(--accent-bright); }
   .apply .sub { margin-top: 16px; color: var(--ink-soft); font-size: 15.5px; }
   .apply .ticks { margin-top: 24px; }
   .apply-note { grid-column: 1 / -1; margin-top: 0; }
-  .form-panel { background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; display: flex; flex-direction: column; }
-  .form-panel form { flex: 1; display: flex; flex-direction: column; }
-  .form-panel .done { flex: 1; }
-  .step { border: 0; display: none; }
-  .step.is-on { display: block; margin-block: auto; }
-  .step-num { display: flex; align-items: center; gap: 10px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
-  .step-num .opt { color: var(--ink-faint); letter-spacing: .06em; }
-  .step label { display: block; margin-top: 8px; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
-  .step .help { margin-top: 6px; font-size: 13.5px; color: var(--ink-soft); }
   .step input, .step select, .step textarea {
     display: block; width: 100%; margin-top: 14px;
     font: inherit; font-size: 16px; font-weight: 500; color: var(--ink);
     background: var(--bg-2); border: 1.5px solid var(--line); border-radius: var(--radius-sm); padding: 12px 14px;
   }
-  .step textarea { min-height: 120px; resize: vertical; }
-  .step input:focus, .step select:focus, .step textarea:focus { outline: none; border-color: var(--accent); }
-  .step input::placeholder, .step textarea::placeholder { color: var(--ink-faint); }
-  .step select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--ink-soft) 50%), linear-gradient(135deg, var(--ink-soft) 50%, transparent 50%); background-position: calc(100% - 20px) 50%, calc(100% - 15px) 50%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }
-  .step option { background: var(--bg-2); }
-  .field-error { margin-top: 8px; font-size: 13.5px; color: var(--crit); font-weight: 600; }
-  .hp { position: absolute; left: -9999px; }
-  .form-controls { padding-top: 26px; display: flex; align-items: center; gap: 10px; }
-  .form-controls .hint { margin-left: auto; font-size: 12.5px; color: var(--ink-faint); }
-  kbd { font: inherit; font-size: 11px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); }
-  .progress { height: 4px; border-radius: 99px; background: var(--surface); margin-bottom: 20px; overflow: hidden; }
-  .progress i { display: block; height: 100%; background: var(--accent); width: 10%; transition: width .25s ease; }
-  .done { display: grid; gap: 10px; align-content: center; text-align: left; }
-  .done h3 { font-size: 26px; font-weight: 700; letter-spacing: -.03em; }
-  .done p { color: var(--ink-soft); font-size: 15px; }
-  .done .ok-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(33,201,94,.14); color: var(--ok); margin-bottom: 6px; }
-  .done .ok-mark svg { width: 22px; height: 22px; }
 
   /* ---------- closer ---------- */
   /* Brand-kit "Technical & premium" halo: deep indigo, large and diffuse, top-centre. */
@@ -346,8 +328,7 @@
     .deliv li { grid-template-columns: 1fr; gap: 2px; }
     .deliv-when { padding-top: 0; }
     .apply { padding: 22px 20px; }
-    .form-panel { padding: 20px; }
-    .standings, .deliv-wrap { padding: 20px 18px; }
+      .standings, .deliv-wrap { padding: 20px 18px; }
     .scroll-x { margin: 0 -18px; padding: 0 18px; }
   }
   @media (max-width: 480px) {
@@ -407,7 +388,7 @@
     <h1>a table for 12, and we pick up the check.</h1>
     <p class="lede">You choose the room and the 11 people at it. fomo books it and settles the check — and $10,000 goes to the campus that lands hardest.</p>
     <div class="hero-cta">
-      <a class="btn btn--primary btn--lg" href="#apply">Apply to host</a>
+      <a class="btn btn--primary btn--lg" href="/dinners/apply">Apply to host</a>
     </div>
     <a class="hero-alt" href="#how">See how the night runs</a>
   </div>
@@ -438,7 +419,7 @@
       </ul>
       <div class="deal-foot">
         <p><b>These are two separate things.</b> The dinner is covered whether or not you post, and nobody at your table has to download anything for the check to be paid.</p>
-        <a class="btn btn--primary" href="#apply">Apply to host →</a>
+        <a class="btn btn--primary" href="/dinners/apply">Apply to host →</a>
       </div>
     </div>
   </section>
@@ -561,43 +542,15 @@
         </ul>
       </div>
 
-      <div class="form-panel">
-      <form id="apply-form" novalidate>
-        <div class="progress" aria-hidden="true"><i id="progress-bar"></i></div>
-        <p class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></p>
 
-        <fieldset class="step" data-step="0"><legend class="step-num"><span data-num>01 / 10</span></legend><label for="first_name">First name</label><input id="first_name" name="first_name" type="text" autocomplete="given-name" required><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="1"><legend class="step-num"><span data-num>02 / 10</span></legend><label for="last_name">Last name</label><input id="last_name" name="last_name" type="text" autocomplete="family-name" required><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="2"><legend class="step-num"><span data-num>03 / 10</span></legend><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" inputmode="email" required><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="3"><legend class="step-num"><span data-num>04 / 10</span></legend><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="212-555-0199" maxlength="12" required><p class="help">Fastest way to reach you.</p><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="4"><legend class="step-num"><span data-num>05 / 10</span></legend><label for="instagram">What is your Instagram?</label><input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" placeholder="@yourhandle" required><p class="help">We look at who actually comes to your things. This is how.</p><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="5"><legend class="step-num"><span data-num>06 / 10</span></legend><label for="school">What school do you go to?</label><input id="school" name="school" type="text" autocomplete="organization" placeholder="e.g. NYU, Penn State, University of Alabama" required><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="6"><legend class="step-num"><span data-num>07 / 10</span></legend><label for="city">Which city would you host in?</label><input id="city" name="city" type="text" autocomplete="address-level2" required><p class="help">Where the dinner would actually happen, if that's not your campus.</p><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="7"><legend class="step-num"><span data-num>08 / 10</span></legend><label for="host_type">How do you know the people you'd invite?</label>
-          <select id="host_type" name="host_type" required>
-            <option value="" disabled selected>Choose one…</option>
-            <option>I go to the school</option><option>I run a chapter</option><option>I'm on the fomo campus team</option><option>I make things people watch</option><option>None of these</option>
-          </select><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="8"><legend class="step-num"><span data-num>09 / 10</span></legend><label for="guests">Who would be at your table of 12?</label><textarea id="guests" name="guests" rows="4" required></textarea><p class="help">Names, or the kind of people. This is the part we actually read.</p><p class="field-error" data-error hidden></p></fieldset>
-        <fieldset class="step" data-step="9"><legend class="step-num"><span data-num>10 / 10</span></legend><label for="why">Why this table, and why now?</label><textarea id="why" name="why" rows="4" required></textarea><p class="help">Two or three sentences. Specific beats polished.</p><p class="field-error" data-error hidden></p></fieldset>
-
-        <div class="form-controls">
-          <button type="button" class="btn btn--ghost" id="apply-back" hidden>← Back</button>
-          <button type="button" class="btn btn--primary" id="apply-next">Next →</button>
-          <button type="submit" class="btn btn--primary" id="apply-submit" hidden>Submit application</button>
-          <span class="hint" id="apply-hint"><kbd>Enter</kbd> to continue</span>
-        </div>
-        <p class="field-error" id="form-error" hidden></p>
-      </form>
-
-        <div class="done" id="apply-done" hidden>
-          <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
-          <h3>That's in.</h3>
-          <p>We read every one of these. You'll hear back within 5 days, including if the answer is not this term. Check your email — and your spam folder, just in case.</p>
-        </div>
+      <div class="apply-jump">
+        <p class="jump-k">The application</p>
+        <p class="jump-t">Ten questions on one page. You hear back within 5 days either way.</p>
+        <a class="btn btn--primary btn--lg" href="/dinners/apply">Apply to host &rarr;</a>
+        <p class="jump-s">Opens the application on its own page.</p>
       </div>
 
-      <p class="note apply-note">You hear back within 5 days either way, and applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
+      <p class="note apply-note">Applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
     </div>
   </section>
 
@@ -608,7 +561,7 @@
     <h2>Already know the table <span class="accent">you'd build?</span></h2>
     <p>Then you are most of the way through the application.</p>
     <div class="hero-cta">
-      <a class="btn btn--primary btn--lg" href="#apply">Apply to host</a>
+      <a class="btn btn--primary btn--lg" href="/dinners/apply">Apply to host</a>
       <a class="btn btn--dark btn--lg" href="https://fomo.family" target="_blank" rel="noopener">Download app</a>
     </div>
   </section>
@@ -644,7 +597,7 @@
         <li><a href="#deal">What it pays</a></li>
         <li><a href="#table">Your table</a></li>
         <li><a href="#how">How the night runs</a></li>
-        <li><a href="#apply">Apply to host</a></li>
+        <li><a href="/dinners/apply">Apply to host</a></li>
       </ul>
     </div>
     <div>
@@ -665,162 +618,5 @@
   </div>
 </footer>
 
-<script>
-(function () {
-  // ---------- stepped application, saved to the same Firebase project the crew
-  // sheet and build form use, under dinners/<key>. Rules: write-only from the web.
-  var firebaseConfig = {
-    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
-    authDomain: 'bijanizadian-84e48.firebaseapp.com',
-    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
-    projectId: 'bijanizadian-84e48'
-  };
-  var db = null;
-  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
-
-  var form = document.getElementById('apply-form');
-  var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
-  var back = document.getElementById('apply-back');
-  var next = document.getElementById('apply-next');
-  var submit = document.getElementById('apply-submit');
-  var hint = document.getElementById('apply-hint');
-  var bar = document.getElementById('progress-bar');
-  var formError = document.getElementById('form-error');
-  var done = document.getElementById('apply-done');
-  var i = 0;
-
-  function field(step) { return step.querySelector('input, select, textarea'); }
-  function errorEl(step) { return step.querySelector('[data-error]'); }
-
-  // Native email validity accepts "arya@gmail" — hold contact fields to something reachable.
-  var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
-  var TYPOS = { 'gmail.con':'gmail.com','gmail.co':'gmail.com','gmai.com':'gmail.com','gmial.com':'gmail.com','gmaill.com':'gmail.com','gnail.com':'gmail.com','yahoo.con':'yahoo.com','yaho.com':'yahoo.com','hotmail.con':'hotmail.com','hotmial.com':'hotmail.com','outlook.con':'outlook.com','icloud.con':'icloud.com' };
-  function emailError(v) {
-    v = v.trim();
-    if (!EMAIL.test(v)) return 'That is not a complete email address — it should look like you@school.edu.';
-    var d = v.split('@').pop().toLowerCase();
-    if (TYPOS[d]) return 'Did you mean @' + TYPOS[d] + '?';
-    return null;
-  }
-  function digits(v) { return String(v).replace(/[^0-9]/g, ''); }
-  function phoneError(v) {
-    var d = digits(v);
-    if (d.charAt(0) === '1' && d.length === 11) d = d.slice(1);
-    if (d.length !== 10) return 'A US mobile number is 10 digits — like 212-555-0199.';
-    if (!/^[2-9][0-9]{2}[2-9][0-9]{6}$/.test(d)) return 'That is not a real US number — check the digits.';
-    return null;
-  }
-  function formatPhone(v) {
-    var d = digits(v);
-    if (d.charAt(0) === '1' && d.length > 10) d = d.slice(1);
-    d = d.slice(0, 10);
-    if (d.length > 6) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
-    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
-    return d;
-  }
-  // "@name", "name" and a pasted profile link all land on one value.
-  function normalizeInstagram(v) {
-    var h = String(v).trim();
-    if (!h) return null;
-    var url = h.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)*instagram\.com\/([^/?#]+)/i);
-    if (url) h = url[1]; else if (/instagram\.com/i.test(h)) return null;
-    h = h.replace(/^@+/, '').replace(/\/+$/, '');
-    if (!/^[a-z0-9._]{1,30}$/i.test(h) || h.charAt(0) === '.' || h.charAt(h.length - 1) === '.' || h.indexOf('..') > -1) return null;
-    return h.toLowerCase();
-  }
-
-  function validate(step) {
-    var el = field(step), v = el.value.trim(), msg = null;
-    if (!v) msg = el.tagName === 'SELECT' ? 'Pick one to continue.' : 'This one is required.';
-    else if (el.id === 'email') msg = emailError(v);
-    else if (el.id === 'phone') msg = phoneError(v);
-    else if (el.id === 'instagram' && !normalizeInstagram(v)) msg = 'That does not look like an Instagram handle — try @yourhandle.';
-    else if ((el.id === 'guests' || el.id === 'why') && v.length < 20) msg = 'Give us a little more than that — a sentence or two.';
-    var err = errorEl(step);
-    err.textContent = msg || '';
-    err.hidden = !msg;
-    el.setAttribute('aria-invalid', msg ? 'true' : 'false');
-    return !msg;
-  }
-
-  // moveFocus is opt-out: every user-driven move should land the caret in the
-  // next field, but the initial paint must not — focusing a field halfway down
-  // the page makes the browser scroll to it, so the page would open on the
-  // application instead of the top.
-  function show(n, moveFocus) {
-    i = Math.max(0, Math.min(steps.length - 1, n));
-    steps.forEach(function (s, k) { s.classList.toggle('is-on', k === i); });
-    back.hidden = i === 0;
-    var last = i === steps.length - 1;
-    next.hidden = last;
-    submit.hidden = !last;
-    hint.innerHTML = last ? '' : '<kbd>Enter</kbd> to continue';
-    bar.style.width = ((i + 1) / steps.length * 100) + '%';
-    if (moveFocus === false) return;
-    var el = field(steps[i]);
-    setTimeout(function () { el.focus(); }, 0);
-  }
-
-  next.addEventListener('click', function () { if (validate(steps[i])) show(i + 1); });
-  back.addEventListener('click', function () { show(i - 1); });
-
-  form.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter') return;
-    var el = e.target;
-    if (el.tagName === 'TEXTAREA') return;               // newline in textareas
-    e.preventDefault();
-    if (i < steps.length - 1) { if (validate(steps[i])) show(i + 1); }
-    else form.requestSubmit ? form.requestSubmit() : submit.click();
-  });
-
-  document.getElementById('phone').addEventListener('input', function () {
-    var el = this, caret = el.selectionStart == null ? el.value.length : el.selectionStart;
-    var typed = digits(el.value.slice(0, caret)).length;
-    var f = formatPhone(el.value);
-    if (f === el.value) return;
-    el.value = f;
-    var pos = 0;
-    if (typed > 0) { pos = f.length; for (var k = 0, seen = 0; k < f.length; k++) { if (f.charAt(k) >= '0' && f.charAt(k) <= '9') seen++; if (seen === typed) { pos = k + 1; break; } } }
-    try { el.setSelectionRange(pos, pos); } catch (err) {}
-  });
-
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    formError.hidden = true;
-    for (var k = 0; k < steps.length; k++) { if (!validate(steps[k])) { show(k); return; } }
-    if (form._gotcha && form._gotcha.value) { finish(); return; }   // bot: pretend
-    var data = {};
-    steps.forEach(function (s) { var el = field(s); data[el.name] = el.value.trim(); });
-    data.instagram = normalizeInstagram(data.instagram) || data.instagram;
-    data.phone = formatPhone(data.phone);
-    data.submitted_at = new Date().toISOString();
-    data.page = location.pathname;
-    data.ua = (navigator.userAgent || '').slice(0, 160);
-
-    submit.disabled = true;
-    submit.textContent = 'Sending…';
-    if (!db) { fail('We could not reach the server. Email hello@fomo.family with your answers and we will take it from there.'); return; }
-    var key = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
-    db.ref('dinners/' + key).set(data).then(finish).catch(function () {
-      fail('That did not send. Check your connection and try again — nothing was lost.');
-    });
-  });
-
-  function fail(msg) {
-    submit.disabled = false;
-    submit.textContent = 'Submit application';
-    formError.textContent = msg;
-    formError.hidden = false;
-  }
-  function finish() {
-    form.hidden = true;
-    done.hidden = false;
-    done.setAttribute('tabindex', '-1');
-    done.focus();
-  }
-
-  show(0, false);
-})();
-</script>
 </body>
 </html>
