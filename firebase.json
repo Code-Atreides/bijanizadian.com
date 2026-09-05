@@ -13,6 +13,9 @@
       "fomo-handoff/**"
     ],
     "cleanUrls": true,
-    "trailingSlash": false
+    "trailingSlash": false,
+    "rewrites": [
+      { "source": "/", "destination": "/desktop.html" }
+    ]
   }
 }

@@ -82,7 +82,9 @@ await writeFile(join(OUT, 'firebase.json'), JSON.stringify({
     public: '.',
     ignore: ['firebase.json', '**/.*', '**/node_modules/**', 'README.md', 'database.rules.json'],
     cleanUrls: true,
-    trailingSlash: false
+    trailingSlash: false,
+    // nothing is called index.html, so / needs pointing at the contents page
+    rewrites: [{ source: '/', destination: '/start-here.html' }]
   }
 }, null, 2) + '\n');
 
@@ -98,12 +100,15 @@ for (const node of RULE_NODES) {
 await writeFile(join(OUT, 'database.rules.json'), JSON.stringify({ rules }, null, 2) + '\n');
 
 // A way in. Without this the bundle opens as a bare directory listing, which is
-// a poor first thing to hand someone. The wordmark is lifted from /campus so it
-// cannot drift from the pages it introduces.
+// a poor first thing to hand someone. It is called start-here so it says what
+// it is in a file listing, and so that no two files in the bundle — or in the
+// repo that builds it — share a name. The rewrite below serves it at / anyway.
+// The wordmark is lifted from /campus so it cannot drift from the pages it
+// introduces.
 const heroMark = (await readFile('campus.html', 'utf8'))
   .match(/<svg viewBox="0 0 352 113"[\s\S]*?<\/svg>/)[0];
-await writeFile(join(OUT, 'index.html'),
-  (await readFile('scripts/handoff-index.html', 'utf8')).replace('{{HERO_MARK}}', heroMark));
+await writeFile(join(OUT, 'start-here.html'),
+  (await readFile('scripts/handoff-start-here.html', 'utf8')).replace('{{HERO_MARK}}', heroMark));
 
 await writeFile(join(OUT, 'README.md'), `# fomo / campus — site bundle
 
@@ -119,6 +124,7 @@ Hosting with \`cleanUrls: true\`) serves \`campus.html\` at \`/campus\`.
 
 | File | Served at | |
 |---|---|---|
+| \`start-here.html\` | \`/\` | This list, as a page. Start here. |
 | \`campus.html\` | \`/campus\` | The hub. Links to everything below, and the campus-team application. |
 | \`campus/manual.html\` | \`/campus/manual\` | The internship manual — the five seats, what fomo is, the tasks that pay, the rules. |
 | \`greekwars.html\` | \`/greekwars\` | Greek Wars: the prizes, onboarding, the live map and the PnL board. |
@@ -139,6 +145,10 @@ need to be served rather than opened from disk.
 Any static server will do:
 
     npx serve .
+
+Then open \`/start-here.html\`. No file in here is called \`index.html\`, so a
+plain server shows a directory listing at \`/\` — Firebase serves the contents
+page there instead, via the rewrite in \`firebase.json\`.
 
 ## Deploying it
 
