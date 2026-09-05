@@ -97,11 +97,6 @@
   .brand svg { height: 24px; width: auto; display: block; }
   .brand span { font-size: 15px; font-weight: 700; color: var(--mark); letter-spacing: -.02em; opacity: .9; }
   .nav-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-  /* the store badges fomo.family carries in its own header: white artwork on a
-     translucent, blurred pill, so they read against the hero photo */
-  .store { display: block; border-radius: 6px; background: rgba(255,255,255,.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: opacity .15s ease, box-shadow .15s ease; }
-  .store:hover { opacity: .9; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
-  .store img { display: block; height: 40px; width: auto; }
 
   /* ---------- page shell ----------
      A contact-sales layout: the pitch on the left, the form card on the right,
@@ -114,9 +109,12 @@
       radial-gradient(700px 420px at 6% 8%, rgba(81,106,246,.10), transparent 72%);
   }
   body > * { position: relative; z-index: 1; }
+  body { min-height: 100svh; display: flex; flex-direction: column; }
+  .contact { flex: 1 0 auto; }
+  .foot { flex: none; }
 
-  .contact { max-width: var(--wrap); margin: 0 auto; padding: 128px 24px 80px; }
-  .contact-inner { display: grid; grid-template-columns: minmax(0,.86fr) minmax(0,1fr); gap: 72px; align-items: start; }
+  .contact { max-width: 1040px; margin: 0 auto; padding: 108px 24px 72px; }
+  .contact-inner { display: grid; grid-template-columns: minmax(0,.86fr) minmax(0,1fr); gap: 64px; align-items: start; }
 
   /* ---------- the pitch ---------- */
   .lockup { display: inline-flex; align-items: baseline; gap: .04em; line-height: 1; color: var(--lavender); }
@@ -125,27 +123,25 @@
   .lockup .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
   .lockup .slash .up { opacity: .5; }
 
-  .pitch h1 { margin-top: 26px; font-size: clamp(40px, 5.2vw, 68px); font-weight: 700; letter-spacing: -.045em; line-height: .98; color: var(--lavender); }
+  .pitch h1 { margin-top: 22px; font-size: clamp(38px, 4.8vw, 60px); font-weight: 700; letter-spacing: -.045em; line-height: .98; color: var(--lavender); }
   .pitch h1 .accent { display: block; color: var(--accent-bright); }
   .pitch .sub { margin-top: 20px; max-width: 44ch; font-size: 17px; color: var(--ink-soft); }
   .pitch .sub a { color: var(--accent-bright); font-weight: 600; text-underline-offset: 3px; }
 
-  .label { margin-top: 40px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
-  .ticks { margin-top: 16px; list-style: none; display: grid; gap: 15px; max-width: 46ch; }
-  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 12px; align-items: start; font-size: 14.5px; color: var(--ink-soft); }
+  .fine { margin-top: 30px; font-size: 13.5px; line-height: 1.5; color: var(--ink-faint); max-width: 40ch; }
+  .label { margin-top: 34px; font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+  .ticks { margin-top: 14px; list-style: none; display: grid; gap: 11px; max-width: 46ch; }
+  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 12px; align-items: center; font-size: 15px; color: var(--ink); }
   .ticks li strong { color: var(--ink); font-weight: 700; }
-  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
+  .ticks svg { width: 17px; height: 17px; color: var(--ok); }
 
-  .cities { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; }
-  .cities li { font-size: 13px; font-weight: 700; padding: 7px 13px; border-radius: 999px; background: var(--accent-t); color: var(--accent-bright); }
-  .cities-note { margin-top: 12px; font-size: 13.5px; color: var(--ink-faint); max-width: 42ch; }
 
   /* ---------- the form card ---------- */
   .form-panel {
     position: relative;
     background: var(--bg-2); border: 1px solid var(--line);
     border-radius: 18px; padding: 30px; box-shadow: var(--shadow);
-    display: flex; flex-direction: column; min-height: 430px;
+    display: flex; flex-direction: column; min-height: 340px;
   }
   .panel-head { display: flex; align-items: baseline; gap: 16px; }
   .panel-head h2 { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
@@ -207,7 +203,6 @@
     .form-controls .btn { flex: 1; justify-content: center; }
     .form-controls .hint { display: none; }
   }
-  @media (max-width: 480px) { .store img { height: 28px; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .btn, .progress i { transition: none; }
@@ -228,14 +223,6 @@
       </svg>
       <span>/campus</span>
     </a>
-    <div class="nav-right">
-      <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener">
-        <img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40">
-      </a>
-      <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener">
-        <img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40">
-      </a>
-    </div>
   </div>
 </div>
 
@@ -253,18 +240,15 @@
         <span class="slash"><i>/</i><span class="up">campus</span><i>/</i><span class="up">dinners</span><i>/</i>apply</span>
       </div>
       <h1>Host <span class="accent">a table.</span></h1>
-      <p class="sub">Ten questions, about two minutes. The last two decide it, so spend your time there. Not sure yet? <a href="/dinners">Read how the night runs</a> first.</p>
+      <p class="sub">Ten questions, about two minutes. Not sure yet? <a href="/dinners">read how the night runs</a>.</p>
 
-      <p class="label">What we read them for</p>
+      <p class="label">What we look for</p>
       <ul class="ticks">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Seats that carry a room.</strong> Half your table should be people who bring others — a chapter officer, a captain, whoever runs the group chat.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A list you can write today.</strong> If you can name all 11 right now, the table is real. If not, it is a plan.</span></li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A host people say yes to.</strong> Not follower count. Whether the things you organise actually fill up.</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>Seats that carry a room</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>A list you can write today</span></li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span>A host people say yes to</span></li>
       </ul>
-
-      <p class="label">Running first in</p>
-      <ul class="cities"><li>New York</li><li>Austin</li><li>Los Angeles</li></ul>
-      <p class="cities-note">Apply from anywhere and we'll tell you honestly whether we can reach your city this term. You hear back within 5 days either way, and applying commits you to nothing.</p>
+      <p class="fine">Running first in New York, Austin and Los Angeles &mdash; apply from anywhere. You hear back within 5 days, and applying commits you to nothing.</p>
     </div>
 
     <div>
@@ -318,15 +302,11 @@
 
 <footer class="foot">
   <div class="foot-inner">
-    <span>fomo — a trading app for the rest of us.</span>
+    <span>Trading involves risk, including loss of funds. No returns are guaranteed.</span>
     <span class="spacer"></span>
     <a href="/dinners" target="_blank" rel="noopener">Dinner Series</a>
-    <a href="/campus" target="_blank" rel="noopener">The campus program</a>
     <a href="https://fomo.family/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
     <a href="https://fomo.family/terms" target="_blank" rel="noopener">Terms of Service</a>
-  </div>
-  <div class="foot-inner" style="padding-top:0">
-    <span>Trading involves risk, including loss of funds. No returns are guaranteed.</span>
   </div>
 </footer>
 

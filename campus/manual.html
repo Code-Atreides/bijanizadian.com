@@ -338,6 +338,35 @@
     .foot ul { gap: 2px; }
     .foot ul a { display: inline-block; padding: 8px 0; }
   }
+
+  /* ---------- both tables, stacked for a phone ----------
+     A 640px and an 880px table inside a scroller means dragging a chopped
+     window sideways to read a row. Under 720px they stop being tables: the
+     header row goes to screen readers only and every row becomes a block. */
+  @media (max-width: 720px) {
+    .hunt .scroll-x, .wkmap .scroll-x { overflow-x: visible; margin: 0; padding: 0; }
+    .hunt table, .wkmap table { min-width: 0; }
+    .hunt thead, .wkmap thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .hunt td, .wkmap td { display: block; padding: 0; border: 0; }
+
+    /* the hunt: name and payout share a line, the proof sits under them */
+    .hunt tbody tr { display: grid; grid-template-columns: 1fr auto; gap: 0 14px; padding: 18px 0; border-top: 1px solid var(--line-soft); }
+    .hunt tbody tr:first-child { border-top: 0; padding-top: 2px; }
+    .hunt .task { grid-column: 1; grid-row: 1; }
+    .hunt .pay { grid-column: 2; grid-row: 1; text-align: right; }
+    .hunt .proof { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-soft); }
+
+    /* the goal map: one block per week, each line labelled with its seat */
+    .wkmap tbody tr { display: block; padding: 16px 0; border-top: 1px solid var(--line-soft); }
+    .wkmap tbody tr:first-child { border-top: 0; padding-top: 2px; }
+    .wkmap .wk { margin-bottom: 10px; padding-right: 0; }
+    .wkmap td[data-role] { display: grid; grid-template-columns: 88px 1fr; gap: 12px; padding: 5px 0; }
+    .wkmap td[data-role]::before {
+      content: attr(data-role); font-size: 10.5px; font-weight: 800; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--ink-faint); padding-top: 3px;
+    }
+  }
+
   @media (max-width: 480px) { .store img { height: 28px; } }
   @media (max-width: 350px) {
     .hero-title svg { height: 19px; }
@@ -692,18 +721,18 @@
             <tr><th>Week</th><th>president</th><th>growth</th><th>partnerships</th><th>content</th><th>culture</th></tr>
           </thead>
           <tbody>
-            <tr><td class="wk">wk 1</td><td>team locked, chat live, first meeting</td><td>learn the app cold</td><td>build a target list (25 orgs)</td><td>accounts live, first 3 posts</td><td>build a creator list (30 names)</td></tr>
-            <tr><td class="wk">wk 2</td><td>first campus opportunity map</td><td>25 users</td><td>first 10 outreach messages</td><td>mic arrives, first street interviews</td><td>first 10 DMs sent</td></tr>
-            <tr><td class="wk">wk 3</td><td>make sure everyone is working</td><td>group chat blitz</td><td>follow-ups + first meetings</td><td>test 3 formats</td><td>lock relationships, scout a venue</td></tr>
-            <tr><td class="wk">wk 4</td><td>month 1 review with HQ</td><td>150 users</td><td>1 partnership confirmed</td><td>1 video over 10k</td><td>dinner guest list finalised</td></tr>
-            <tr><td class="wk">wk 5</td><td>coordinate the first big activation</td><td>referral competition</td><td>deliver the first partnership</td><td>cover the activation</td><td>dinner #1</td></tr>
-            <tr><td class="wk">wk 6</td><td>double down on what worked</td><td>convert dinner + event traffic</td><td>2 more in discussion</td><td>repeat the winning format</td><td>post-dinner follow-up</td></tr>
-            <tr><td class="wk">wk 7</td><td>push toward the big event</td><td>push toward 400</td><td>lock a major campus event</td><td>biggest content week</td><td>line up dinner #2</td></tr>
-            <tr><td class="wk">wk 8</td><td>60-day report + next quarter plan</td><td>400 active users</td><td>3 confirmed total</td><td>100k+ total views</td><td>2 dinners done, roster built</td></tr>
+            <tr><td class="wk">wk 1</td><td data-role="president">team locked, chat live, first meeting</td><td data-role="growth">learn the app cold</td><td data-role="partnerships">build a target list (25 orgs)</td><td data-role="content">accounts live, first 3 posts</td><td data-role="culture">build a creator list (30 names)</td></tr>
+            <tr><td class="wk">wk 2</td><td data-role="president">first campus opportunity map</td><td data-role="growth">25 users</td><td data-role="partnerships">first 10 outreach messages</td><td data-role="content">mic arrives, first street interviews</td><td data-role="culture">first 10 DMs sent</td></tr>
+            <tr><td class="wk">wk 3</td><td data-role="president">make sure everyone is working</td><td data-role="growth">group chat blitz</td><td data-role="partnerships">follow-ups + first meetings</td><td data-role="content">test 3 formats</td><td data-role="culture">lock relationships, scout a venue</td></tr>
+            <tr><td class="wk">wk 4</td><td data-role="president">month 1 review with HQ</td><td data-role="growth">150 users</td><td data-role="partnerships">1 partnership confirmed</td><td data-role="content">1 video over 10k</td><td data-role="culture">dinner guest list finalised</td></tr>
+            <tr><td class="wk">wk 5</td><td data-role="president">coordinate the first big activation</td><td data-role="growth">referral competition</td><td data-role="partnerships">deliver the first partnership</td><td data-role="content">cover the activation</td><td data-role="culture">dinner #1</td></tr>
+            <tr><td class="wk">wk 6</td><td data-role="president">double down on what worked</td><td data-role="growth">convert dinner + event traffic</td><td data-role="partnerships">2 more in discussion</td><td data-role="content">repeat the winning format</td><td data-role="culture">post-dinner follow-up</td></tr>
+            <tr><td class="wk">wk 7</td><td data-role="president">push toward the big event</td><td data-role="growth">push toward 400</td><td data-role="partnerships">lock a major campus event</td><td data-role="content">biggest content week</td><td data-role="culture">line up dinner #2</td></tr>
+            <tr><td class="wk">wk 8</td><td data-role="president">60-day report + next quarter plan</td><td data-role="growth">400 active users</td><td data-role="partnerships">3 confirmed total</td><td data-role="content">100k+ total views</td><td data-role="culture">2 dinners done, roster built</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">Read down your own column. Week 8 is the 60-day report, and the start of the next one.</p>
+      <p class="note">Follow your own seat through the eight weeks. Week 8 is the 60-day report, and the start of the next one.</p>
     </div>
   </section>
 
