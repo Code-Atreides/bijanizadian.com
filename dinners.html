@@ -156,10 +156,6 @@
   .card { background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); box-shadow: var(--shadow); }
   .kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-bright); }
   .pill { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 10.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); background: var(--surface); }
-  .ticks { list-style: none; display: grid; gap: 15px; }
-  .ticks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; align-items: start; font-size: 14.5px; color: var(--ink-soft); }
-  .ticks li strong { color: var(--ink); }
-  .ticks svg { width: 18px; height: 18px; color: var(--ok); margin-top: 2px; }
   .note { margin-top: 16px; color: var(--ink-soft); font-size: 13.5px; border-left: 3px solid var(--accent); padding: 4px 0 4px 12px; }
   .note a { color: var(--accent-bright); font-weight: 600; }
   .note b { color: var(--ink); font-weight: 600; }
@@ -246,22 +242,11 @@
 
 
   /* ---------- application ---------- */
-  /* the application lives at /dinners/apply now; this panel is the door to it,
-     and keeps the two halves of the card the same height as the form did */
-  .apply-jump {
-    background: var(--bg-3); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 30px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 14px;
-  }
-  .jump-k { font-size: 11.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
-  .jump-t { font-size: 16px; color: var(--ink-soft); max-width: 34ch; }
-  .apply-jump .btn { margin-top: 6px; }
-  .jump-s { font-size: 12.5px; color: var(--ink-faint); }
-  .apply { padding: 30px; display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 30px 40px; }
-  .apply h2 { margin-top: 10px; font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
-  .apply h2 .accent { display: block; color: var(--accent-bright); }
-  .apply .sub { margin-top: 16px; color: var(--ink-soft); font-size: 15.5px; }
-  .apply .ticks { margin-top: 24px; }
-  .apply-note { grid-column: 1 / -1; margin-top: 0; }
+  .apply { padding: 28px 32px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 40px; }
+  .apply > div { flex: 1 1 380px; }
+  .apply h2 { margin-top: 8px; font-size: clamp(26px, 3vw, 34px); font-weight: 700; letter-spacing: -.035em; line-height: 1.02; }
+  .apply h2 .accent { color: var(--accent-bright); }
+  .apply .sub { margin-top: 10px; color: var(--ink-soft); font-size: 15.5px; max-width: 54ch; }
   .step input, .step select, .step textarea {
     display: block; width: 100%; margin-top: 14px;
     font: inherit; font-size: 16px; font-weight: 500; color: var(--ink);
@@ -294,7 +279,6 @@
 
   /* ---------- responsive ---------- */
   @media (max-width: 1020px) {
-    .apply { grid-template-columns: 1fr; gap: 26px; }
     .foot-inner { grid-template-columns: 1fr 1fr; }
   }
   /* tablet: side-by-side cards get too narrow for their body copy */
@@ -532,25 +516,11 @@
   <section id="apply" class="section" aria-labelledby="apply-title">
     <div class="card apply">
       <div>
-        <p class="eyebrow">Apply · Fall 2026</p>
+        <p class="eyebrow">Apply &middot; Fall 2026</p>
         <h2 id="apply-title">Host <span class="accent">a table.</span></h2>
-        <p class="sub">Ten questions, about two minutes. The last two decide it, so spend your time there — this is what we read them for:</p>
-        <ul class="ticks">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>Seats that carry a room.</strong> Half your table should be people who bring others — a chapter officer, a captain, whoever runs the group chat.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A list you can write today.</strong> If you can name all 11 right now, the table is real. If not, it is a plan.</span></li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg><span><strong>A host people say yes to.</strong> Not follower count. Whether the things you organise actually fill up.</span></li>
-        </ul>
+        <p class="sub">Ten questions, about two minutes. You hear back within 5 days either way, and applying commits you to nothing.</p>
       </div>
-
-
-      <div class="apply-jump">
-        <p class="jump-k">The application</p>
-        <p class="jump-t">Ten questions on one page. You hear back within 5 days either way.</p>
-        <a class="btn btn--primary btn--lg" href="/dinners/apply">Apply to host &rarr;</a>
-        <p class="jump-s">Opens the application on its own page.</p>
-      </div>
-
-      <p class="note apply-note">Applying commits you to nothing. Running first in <b>New York, Austin, Los Angeles</b> — apply from anywhere and we'll tell you honestly whether we can reach your city this term.</p>
+      <a class="btn btn--primary btn--lg" href="/dinners/apply">Apply to host &rarr;</a>
     </div>
   </section>
 
