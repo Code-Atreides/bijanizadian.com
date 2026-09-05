@@ -9,12 +9,16 @@
 // message, so the bundle degrades gracefully before it is configured rather than
 // throwing at the user.
 import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 const OUT = 'fomo-handoff';
-// campus/manual and greekwars/onboard ride along inside their parents
-const PAGES = ['campus', 'greekwars', 'gameday', 'dinners', 'crewsheet'];
-const FILES = ['fomo-favicon.svg', 'badge-app-store.svg', 'badge-google-play.svg'];
+// One file per page — the name is the clean URL. campus/ and greekwars/ survive
+// only as folders for the sub-pages and the shared art.
+const PAGES = ['campus.html', 'campus/manual.html', 'greekwars.html',
+               'greekwars/onboard.html', 'gameday.html', 'dinners.html', 'crewsheet.html'];
+const FILES = ['fomo-favicon.svg', 'badge-app-store.svg', 'badge-google-play.svg',
+               'campus/space-bg.webp', 'campus/astronaut.webp', 'campus/astronaut-mobile.webp'];
+const DIRS = ['campus/fonts'];
 // the rules the bundle ships are the live ones, minus the nodes no bundled page
 // touches — generated rather than retyped, so the two cannot drift
 const RULE_NODES = ['sheets', 'dinners', 'campus', 'greekwars', 'greekwars_onboard'];
@@ -28,8 +32,11 @@ const CONFIG = `firebaseConfig = {
 
 await rm(OUT, { recursive: true, force: true });
 await mkdir(OUT, { recursive: true });
-for (const p of PAGES) await cp(p, join(OUT, p), { recursive: true });
-for (const f of FILES) await cp(f, join(OUT, f));
+for (const d of DIRS) await cp(d, join(OUT, d), { recursive: true });
+for (const f of [...PAGES, ...FILES]) {
+  await mkdir(dirname(join(OUT, f)), { recursive: true });
+  await cp(f, join(OUT, f));
+}
 
 // rewrite every html file in the bundle
 let swapped = { config: 0, domain: 0 };
@@ -93,7 +100,7 @@ await writeFile(join(OUT, 'database.rules.json'), JSON.stringify({ rules }, null
 // A way in. Without this the bundle opens as a bare directory listing, which is
 // a poor first thing to hand someone. The wordmark is lifted from /campus so it
 // cannot drift from the pages it introduces.
-const heroMark = (await readFile('campus/index.html', 'utf8'))
+const heroMark = (await readFile('campus.html', 'utf8'))
   .match(/<svg viewBox="0 0 352 113"[\s\S]*?<\/svg>/)[0];
 await writeFile(join(OUT, 'index.html'),
   (await readFile('scripts/handoff-index.html', 'utf8')).replace('{{HERO_MARK}}', heroMark));
@@ -106,18 +113,26 @@ opens and reads correctly before it is configured — only the forms are inert.
 
 ## What is in here
 
-| Path | |
-|---|---|
-| \`campus/\` | The hub. Links to everything below, and the campus-team application. |
-| \`campus/manual/\` | The internship manual — what fomo is, the tasks that pay, the rules. |
-| \`greekwars/\` | Greek Wars: the prizes, onboarding, the live map and the PnL board. |
-| \`greekwars/onboard/\` | Chapter registration, twelve steps. |
-| \`gameday/\` | Game Day: the second scoreboard, with a simulated demo game. |
-| \`dinners/\` | The Dinner Series: funded tables of 12, and the host application. |
-| \`crewsheet/\` | The crew sheet — who is doing what for a dinner. |
+One file per page. The file name is the URL, minus the \`.html\` — a static
+host with clean URLs on (\`npx serve\` does this by default, as does Firebase
+Hosting with \`cleanUrls: true\`) serves \`campus.html\` at \`/campus\`.
 
-Shared assets live at the root: the favicon, the two store badges, and the
-Aeonik woff2 files under \`campus/fonts/\` which every page loads.
+| File | Served at | |
+|---|---|---|
+| \`campus.html\` | \`/campus\` | The hub. Links to everything below, and the campus-team application. |
+| \`campus/manual.html\` | \`/campus/manual\` | The internship manual — the five seats, what fomo is, the tasks that pay, the rules. |
+| \`greekwars.html\` | \`/greekwars\` | Greek Wars: the prizes, onboarding, the live map and the PnL board. |
+| \`greekwars/onboard.html\` | \`/greekwars/onboard\` | Chapter registration, twelve steps. |
+| \`gameday.html\` | \`/gameday\` | Game Day: the second scoreboard, with a simulated demo game. |
+| \`dinners.html\` | \`/dinners\` | The Dinner Series: funded tables of 12, and the host application. |
+| \`crewsheet.html\` | \`/crewsheet\` | The crew sheet — who is doing what for a dinner. |
+
+Shared assets live at the root: the favicon and the two store badges. The
+\`campus/\` folder holds what the pages load by path — the Aeonik woff2 files
+under \`campus/fonts/\`, and the hero art.
+
+Every page links to the others as \`/campus\`, \`/dinners\` and so on, so they
+need to be served rather than opened from disk.
 
 ## Running it
 
