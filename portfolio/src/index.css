@@ -29,7 +29,7 @@
   --radius-sm: calc(var(--radius) - 4px);
   --font-sans:
     ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  --font-mono: 'Courier New', Courier, ui-monospace, monospace;
   /* Display face, taken from the whitewalls preview. A serif against the mono
      labels is what gives the corridor its gallery-wall-text register; the
      geometric sans it replaces read like software. */
@@ -43,7 +43,11 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    /* Mono is the primary face now, not just the labels. Courier is narrow in
+       colour and wide in fit, so body copy takes a little more line height and
+       a touch of negative tracking to stop it feeling loose. */
+    font-family: var(--font-mono);
+    letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -64,8 +68,8 @@
   border-radius: 100px !important;
 }
 
-/* Headlines carry the serif. Labels stay mono, body stays sans — the same
-   three roles the preview used. */
+/* The serif is now reserved for one thing: the names of the companies on the
+   work wall. Everything else — headlines, body, labels, nav — is the mono. */
 .display {
   font-family: var(--font-serif);
   font-weight: 400;
