@@ -158,11 +158,22 @@ export function Corridor({ count, children }: { count: number; children: React.R
         const content = el.firstElementChild as HTMLElement | null;
         if (content) content.style.opacity = String(Math.pow(0.055, behind));
 
-        // Only the frame at the camera stands on a floor. A receding frame's
-        // floor line is lifted toward the vanishing point by perspective and
-        // lands across the middle of the page, where it reads as a stray rule
-        // through the copy rather than as architecture.
-        el.style.setProperty('--floor', String(Math.max(0, 1 - behind * 2.4)));
+        // Every frame keeps its floor, because the receding ones are what make
+        // this a hallway rather than a stack of panels.
+        //
+        // They are safe to draw now that the line runs outward from a frame's
+        // own edges instead of across the full width: a frame never draws over
+        // its own opening, so a receding floor can only ever appear in the ring
+        // between one doorway's edge and the next — flanking segments, never a
+        // rule through the copy. That was the real cause of the line across the
+        // middle of the page, not depth; the continuous band I had briefly was.
+        //
+        // No extra fade with depth: two things already dim a receding floor,
+        // and a third made them invisible. The frame's own opacity takes it to
+        // 88% one step back, and then the wall in front — a 62%-opaque face —
+        // is painted over the top, leaving about 9%. Measured, the line one
+        // step back was 31 against a background of 21. It draws at full
+        // strength and lets the geometry do the receding.
         el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
       }
 

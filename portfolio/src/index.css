@@ -132,9 +132,12 @@
    near-black ground.
    --------------------------------------------------------------------------- */
 .corridor-frame {
-  /* Slightly lighter than the ground it is cut into, so a wall reads as a
-     surface catching light rather than as a hole. */
-  background: rgba(19, 19, 23, 0.62);
+  /* Lighter than the ground it is cut into, so a wall reads as a surface
+     catching light rather than as a hole — but thin enough to see through.
+     At 62% the face was swallowing the corridor behind it: a floor line one
+     doorway back arrived at 42 against a background of 21, which is not a
+     hallway, it is a hint of one. */
+  background: rgba(19, 19, 23, 0.4);
   border: 2px solid rgba(255, 255, 255, 0.42);
   border-bottom: none;
   border-radius: 18px 18px 0 0;
@@ -153,9 +156,11 @@
  * Solid, at the same alpha as the wall border, so the two read as one system
  * of architectural lines rather than as a rule and a glow.
  *
- * Only the room at the camera gets one: perspective lifts a receding frame's
- * floor toward the vanishing point, and its line would cut across the copy of
- * the frame in front. `--floor` is driven from the scroll handler.
+ * Every frame keeps its floor. Because the line runs outward from a frame's
+ * own edges, a receding one can only appear in the ring between its doorway
+ * and the one in front — flanking segments that step inward as the corridor
+ * recedes, which is the hallway. It cannot reach the copy, because the copy
+ * sits inside the opening the line refuses to cross.
  */
 .corridor-frame::before,
 .corridor-frame::after {
@@ -164,8 +169,7 @@
   bottom: -2px;
   width: 100vw;
   height: 2px;
-  background: rgba(255, 255, 255, 0.42);
-  opacity: var(--floor, 1);
+  background: rgba(255, 255, 255, 0.52);
   z-index: -1;
 }
 
