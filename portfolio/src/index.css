@@ -148,9 +148,13 @@
  * pseudo-elements extending outward from the doorway's edges, which left the
  * opening itself unlined — so at any normal window width it rendered as two
  * bright fragments hard against the left and right screen edges with a gap
- * between them, which is the stray line you could see. Drawn as a single band
- * wider than the viewport, it reads as one horizon: strongest across the
- * doorway, dissolving into the dark at either side.
+ * between them. Drawn as a single band, it reads as one horizon: strongest
+ * across the doorway, dissolving into the dark at either side.
+ *
+ * Only the room you are standing in gets one. Perspective lifts a receding
+ * frame's floor toward the vanishing point, so a wall two steps back drew its
+ * horizon straight across the middle of the page. `--floor` is driven from the
+ * scroll handler and falls to zero within half a frame of depth.
  */
 .corridor-frame::before {
   content: '';
@@ -172,6 +176,7 @@
     rgba(255, 255, 255, 0.45) 85%,
     transparent 100%
   );
+  opacity: var(--floor, 1);
   z-index: -1;
 }
 

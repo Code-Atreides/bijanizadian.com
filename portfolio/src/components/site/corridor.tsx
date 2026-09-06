@@ -157,6 +157,12 @@ export function Corridor({ count, children }: { count: number; children: React.R
         el.style.opacity = String(Math.pow(0.88, behind) * fade);
         const content = el.firstElementChild as HTMLElement | null;
         if (content) content.style.opacity = String(Math.pow(0.055, behind));
+
+        // Only the frame at the camera stands on a floor. A receding frame's
+        // floor line is lifted toward the vanishing point by perspective and
+        // lands across the middle of the page, where it reads as a stray rule
+        // through the copy rather than as architecture.
+        el.style.setProperty('--floor', String(Math.max(0, 1 - behind * 2.4)));
         el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
       }
 
