@@ -115,6 +115,7 @@ export function Corridor({ count, children }: { count: number; children: React.R
 
     let raf = 0;
     let shown = -1;
+    let idle = 0;
 
     const paint = () => {
       raf = 0;
@@ -155,7 +156,7 @@ export function Corridor({ count, children }: { count: number; children: React.R
 
         el.style.opacity = String(Math.pow(0.88, behind) * fade);
         const content = el.firstElementChild as HTMLElement | null;
-        if (content) content.style.opacity = String(Math.pow(0.13, behind));
+        if (content) content.style.opacity = String(Math.pow(0.055, behind));
         el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
       }
 
@@ -166,8 +167,26 @@ export function Corridor({ count, children }: { count: number; children: React.R
       }
     };
 
+    // `will-change: transform` promotes a frame to its own compositor layer for
+    // as long as it is set, and text on a promoted layer is rendered with
+    // grayscale rather than subpixel antialiasing — which on a dark ground
+    // reads as slightly soft, exactly the fuzziness you saw. It is only worth
+    // paying while the corridor is moving, so it goes on at the first scroll
+    // event and comes off once scrolling stops.
+    const setHint = (on: boolean) => {
+      for (const el of frames.current) {
+        if (el) el.style.willChange = on ? 'transform, opacity' : 'auto';
+      }
+    };
+
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(paint);
+      if (!idle) setHint(true);
+      window.clearTimeout(idle);
+      idle = window.setTimeout(() => {
+        idle = 0;
+        setHint(false);
+      }, 140);
     };
 
     paint();
@@ -175,6 +194,7 @@ export function Corridor({ count, children }: { count: number; children: React.R
     window.addEventListener('resize', onScroll, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(idle);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
     };
@@ -264,7 +284,7 @@ export function Frame({
     <section
       id={id ?? auto}
       ref={ref as React.Ref<HTMLElement>}
-      style={{ visibility: 'hidden', willChange: 'transform, opacity' }}
+      style={{ visibility: 'hidden' }}
       className={cn(
         'corridor-frame pointer-events-auto absolute top-1/2 left-1/2',
         // Fixed, not content-sized: a corridor only reads as one if every

@@ -142,26 +142,37 @@
   isolation: isolate;
 }
 
-/* The floor line, running out of both sides of the doorway. It is brightest
-   where it leaves the wall and falls away toward the edges of the room, which
-   is how a line of light on a floor actually behaves — a flat line of even
-   weight reads as a border instead. */
-.corridor-frame::before,
-.corridor-frame::after {
+/* The floor line: where the wall meets the ground.
+ *
+ * One line spanning the room, not two stubs. It used to be a pair of
+ * pseudo-elements extending outward from the doorway's edges, which left the
+ * opening itself unlined — so at any normal window width it rendered as two
+ * bright fragments hard against the left and right screen edges with a gap
+ * between them, which is the stray line you could see. Drawn as a single band
+ * wider than the viewport, it reads as one horizon: strongest across the
+ * doorway, dissolving into the dark at either side.
+ */
+.corridor-frame::before {
   content: '';
   position: absolute;
   bottom: -2px;
+  left: 50%;
+  /* Exactly one viewport wide, so the gradient's stops map straight onto the
+     screen: full strength across the doorway, gone by both edges. At 300vw the
+     stops landed off-screen and the line was still at ~35% alpha where it got
+     clipped, which is what read as a hard edge. */
   width: 100vw;
   height: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 15%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.45) 85%,
+    transparent 100%
+  );
   z-index: -1;
-}
-.corridor-frame::before {
-  right: 100%;
-  background: linear-gradient(to left, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.06));
-}
-.corridor-frame::after {
-  left: 100%;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.06));
 }
 
 /* ---------------------------------------------------------------------------
