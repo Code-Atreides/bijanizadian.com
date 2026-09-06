@@ -1,5 +1,16 @@
 @import 'tailwindcss';
 
+/* Space Grotesk, self-hosted rather than pulled from Google's CDN: one origin,
+   no third-party request on the critical path, and it cannot disappear. Latin
+   subset only, variable 300–700, 22KB. */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/v2/fonts/space-grotesk.woff2') format('woff2-variations');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 /* shadcn's token surface, neutral base, expressed as Tailwind v4 theme vars. */
@@ -34,6 +45,11 @@
      labels is what gives the corridor its gallery-wall-text register; the
      geometric sans it replaces read like software. */
   --font-serif: 'Times New Roman', Times, 'Iowan Old Style', Georgia, serif;
+  /* Headers. Space Grotesk descends from Space Mono, so it carries the same
+     typewriter skeleton as the Courier around it while being proportional —
+     related to the body rather than a fourth unrelated voice, and wide enough
+     in the counters to hold up at display size on a dark ground. */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
@@ -68,9 +84,17 @@
   border-radius: 100px !important;
 }
 
-/* The serif is now reserved for one thing: the names of the companies on the
-   work wall. Everything else — headlines, body, labels, nav — is the mono. */
+/* Three roles, three faces.
+   .display — page headers and the name, in Space Grotesk
+   .name    — company names on the work wall, in the serif
+   everything else inherits the mono from body                                */
 .display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.name {
   font-family: var(--font-serif);
   font-weight: 400;
   letter-spacing: -0.015em;

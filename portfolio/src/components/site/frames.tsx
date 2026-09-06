@@ -16,8 +16,7 @@ import { about, art, projects, site } from '@/content';
  */
 
 const LABEL = 'font-mono text-[10.5px] tracking-[0.26em] text-muted-foreground uppercase';
-const HEADLINE =
-  'mt-5 text-[clamp(1.6rem,3.1vw,2.5rem)] leading-[1.15] tracking-[-0.02em] text-balance';
+const HEADLINE = 'display mt-5 text-[clamp(1.9rem,3.9vw,3.2rem)] leading-[1.06] text-balance';
 const BODY = 'mt-5 max-w-[46ch] text-[13.5px] leading-[1.8] text-muted-foreground';
 
 function Split({ left, right }: { left: React.ReactNode; right?: React.ReactNode }) {
@@ -46,7 +45,7 @@ export function HeroFrame() {
     <Frame index={0} id="top">
       <div className="text-center">
         <p className={LABEL}>{site.location}</p>
-        <h1 className="mt-6 text-[clamp(2.1rem,6.4vw,4.6rem)] leading-[1.02] tracking-[-0.035em]">
+        <h1 className="display mt-6 text-[clamp(2.6rem,8vw,5.8rem)] leading-[0.98]">
           {site.name}
         </h1>
         <p className="mx-auto mt-7 max-w-[44ch] text-[clamp(0.95rem,1.35vw,1.05rem)] text-muted-foreground">
@@ -84,7 +83,7 @@ export function WorkFrame({ index }: { index: number }) {
         {projects.map((p) => (
           <li key={p.id} className="grid gap-3 py-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12">
             <div>
-              <h3 className="display flex items-center gap-2.5 text-[clamp(1.3rem,2.3vw,1.85rem)] leading-tight">
+              <h3 className="name flex items-center gap-2.5 text-[clamp(1.45rem,2.5vw,2rem)] leading-tight">
                 {p.mark === 'whitewalls' && (
                   <WhitewallsMark className="size-[0.68em] shrink-0 text-foreground/70" />
                 )}
