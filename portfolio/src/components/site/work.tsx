@@ -3,16 +3,15 @@ import { ArrowUpRight } from 'lucide-react';
 import { LABEL, SECTION, WRAP } from '@/components/site/sections';
 import { Reveal } from '@/components/ui/reveal';
 import { WhitewallsMark } from '@/components/ui/whitewalls-mark';
-import { art, pages, work } from '@/content';
+import { art, projects, type Project } from '@/content';
 
 /**
- * One project, stated once.
+ * Three bodies of work, one row each.
  *
- * This was a two-column block, four detail bullets and an eight-row table with
- * a note beside every row. The notes mostly restated the page names, and the
- * bullets said in four sentences what one paragraph says. What is left: the
- * name, a paragraph, the disciplines, and the eight pages as a row of links —
- * which is the fastest way for a reader to get into the actual work.
+ * Deliberately not the accordion this started as: with three entries of
+ * genuinely different size, hiding two behind a click makes a reader work to
+ * find out there is anything besides fomo. Everything is open, and the only
+ * entry carrying an index beneath it is the only one that has eight pages.
  */
 export function Work() {
   return (
@@ -21,110 +20,102 @@ export function Work() {
         <Reveal>
           <div className="flex items-baseline justify-between border-b border-white/[0.07] pb-4">
             <p className={LABEL}>Selected work</p>
-            <p className={LABEL}>{work.year}</p>
+            <p className={LABEL}>{projects.length} projects</p>
           </div>
         </Reveal>
 
-        <Reveal delay={60}>
-          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2">
-            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
-              {work.name}
-            </h2>
-            <p className={LABEL}>{work.role}</p>
-          </div>
-        </Reveal>
-
-        <Reveal delay={110}>
-          <p className="mt-5 max-w-[62ch] text-[15px] leading-[1.7] text-muted-foreground">
-            {work.summary}
-          </p>
-        </Reveal>
-
-        <Reveal delay={160}>
-          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <a
-              href={work.href}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-            >
-              Open the site
-              <ArrowUpRight size={13} className="opacity-70" />
-            </a>
-          </div>
-        </Reveal>
-
-        {/* the eight surfaces, as one line rather than a table */}
-        <Reveal delay={210}>
-          <ul className="mt-9 flex flex-wrap items-center gap-x-1.5 gap-y-2 border-t border-white/[0.07] pt-6">
-            {pages.map((pg, i) => (
-              <li key={pg.href} className="flex items-center gap-1.5">
-                {i > 0 && (
-                  <span aria-hidden className="text-muted-foreground/25">
-                    ·
-                  </span>
-                )}
-                <a
-                  href={pg.href}
-                  className="font-mono text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {pg.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+        <div className="divide-y divide-white/[0.07]">
+          {projects.map((p, i) => (
+            <Reveal key={p.id} delay={i * 70}>
+              <Entry project={p} />
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
+function Entry({ project }: { project: Project }) {
+  return (
+    <article className="py-9">
+      <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+        <h3 className="flex items-center gap-3 text-[clamp(1.4rem,2.7vw,2rem)] font-medium tracking-[-0.035em]">
+          {project.mark === 'whitewalls' && (
+            <WhitewallsMark className="size-[0.72em] shrink-0 text-foreground/75" />
+          )}
+          {project.name}
+        </h3>
+        <p className={LABEL}>{project.role}</p>
+        {project.year && <p className={`${LABEL} ml-auto`}>{project.year}</p>}
+      </div>
+
+      <p className="mt-4 max-w-[62ch] text-[14.5px] leading-[1.7] text-muted-foreground">
+        {project.summary}
+      </p>
+
+      {project.href && (
+        <a
+          href={project.href}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+        >
+          Open the site
+          <ArrowUpRight size={13} className="opacity-70" />
+        </a>
+      )}
+
+      {project.pages && (
+        <ul className="mt-6 flex flex-wrap items-center gap-x-1.5 gap-y-2">
+          {project.pages.map((pg, i) => (
+            <li key={pg.href} className="flex items-center gap-1.5">
+              {i > 0 && (
+                <span aria-hidden className="text-muted-foreground/25">
+                  ·
+                </span>
+              )}
+              <a
+                href={pg.href}
+                className="font-mono text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
+              >
+                {pg.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </article>
+  );
+}
+
 /**
- * Art-world work. Renders nothing until content.art.body is written, so the
- * live page never carries a placeholder.
+ * The art practice — his own work, as distinct from the gallery clients above.
+ *
+ * No images yet, so the section hangs empty frames on a wall line and captions
+ * them as such: portrait, square, landscape, so the row has the rhythm of a
+ * real hang rather than a grid.
  */
 export function Art() {
-  if (!art.body) return null;
+  const frames = art.gallery.length
+    ? art.gallery.map((g, i) => ({ ...g, ratio: ['4 / 5', '1 / 1', '3 / 4'][i % 3] }))
+    : [{ ratio: '4 / 5' }, { ratio: '1 / 1' }, { ratio: '3 / 4' }];
 
   return (
     <section id="art" className={SECTION}>
       <div className={WRAP}>
         <Reveal>
-          <div className="flex items-baseline justify-between border-b border-white/[0.07] pb-4">
-            <p className={LABEL}>Art</p>
-            {art.year && <p className={LABEL}>{art.year}</p>}
-          </div>
+          <p className={`${LABEL} border-b border-white/[0.07] pb-4`}>Art</p>
         </Reveal>
 
         <Reveal delay={60}>
-          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2">
-            {art.logo ? (
-              <img src={art.logo} alt={art.org} className="h-7 w-auto opacity-85 grayscale" loading="lazy" />
-            ) : (
-              <h2 className="flex items-center gap-3 text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
-                <WhitewallsMark className="size-[0.78em] shrink-0 text-foreground/75" />
-                {art.org}
-              </h2>
-            )}
-            {art.role && <p className={LABEL}>{art.role}</p>}
-          </div>
-        </Reveal>
-
-        <Reveal delay={110}>
-          <p className="mt-5 max-w-[62ch] text-[15px] leading-[1.7] text-muted-foreground">
+          <p className="mt-8 max-w-[52ch] text-[clamp(1.05rem,1.8vw,1.3rem)] leading-[1.55]">
             {art.body}
           </p>
         </Reveal>
 
-        {/* The hang. Three frames on a wall line — empty until there are
-            images, and captioned so the emptiness reads as deliberate rather
-            than broken. Proportions are portrait / square / landscape so the
-            row has the rhythm of an actual wall rather than a grid. */}
-        <Reveal delay={200}>
-          <div className="mt-12">
+        <Reveal delay={130}>
+          <div className="mt-11">
             <div className="flex items-end gap-4 sm:gap-7">
-              {(art.gallery.length
-                ? art.gallery.map((g, i) => ({ ...g, ratio: ['4 / 5', '1 / 1', '3 / 4'][i % 3] }))
-                : [{ ratio: '4 / 5' }, { ratio: '1 / 1' }, { ratio: '3 / 4' }]
-              ).map((frame, i) => (
+              {frames.map((frame, i) => (
                 <figure
                   key={i}
                   style={{ aspectRatio: frame.ratio }}
@@ -141,27 +132,13 @@ export function Art() {
                 </figure>
               ))}
             </div>
-            {/* the wall line the frames hang against */}
+            {/* the wall the frames hang on */}
             <div className="mt-4 border-t border-white/[0.07]" />
             <p className={`${LABEL} mt-3`}>
               {art.gallery.length ? 'Own work' : 'Own work — not up yet'}
             </p>
           </div>
         </Reveal>
-
-        {art.href && (
-          <Reveal delay={160}>
-            <a
-              href={art.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-7 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-            >
-              Open
-              <ArrowUpRight size={13} className="opacity-70" />
-            </a>
-          </Reveal>
-        )}
       </div>
     </section>
   );

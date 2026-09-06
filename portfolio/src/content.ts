@@ -31,61 +31,75 @@ export const site = {
 
 export type Page = { name: string; href: string };
 
-/**
- * One project, not four.
- *
- * Greek Wars, the Dinner Series and Game Day are not separate clients — they
- * are surfaces of the same campus programme, built in the same language on the
- * same weekend afternoons. Listing them as four entries padded a portfolio that
- * is stronger described honestly: one body of work, eight live pages.
- */
-export const work = {
-  name: 'fomo / campus',
-  role: 'Brand · Copy · Front end',
-  year: '2026',
-  href: '/campus',
-  summary:
-    'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages on one design language: a twelve-section internship manual, three stepped applications wired to Firebase, and a national chapter map built without a mapping library.',
-  tags: ['Brand', 'Copywriting', 'Front end', 'Firebase', 'Data viz'],
-} as const;
+export type Project = {
+  id: string;
+  name: string;
+  role: string;
+  year?: string;
+  href?: string;
+  summary: string;
+  /** Draws the whitewalls mark before the name. */
+  mark?: 'whitewalls';
+  /** Only fomo/campus has an index of surfaces beneath it. */
+  pages?: Page[];
+};
 
-/** The surfaces, as links. Every href is live. */
-export const pages: Page[] = [
-  { name: 'campus', href: '/campus' },
-  { name: 'manual', href: '/campus/manual' },
-  { name: 'greekwars', href: '/greekwars' },
-  { name: 'onboard', href: '/greekwars/onboard' },
-  { name: 'dinners', href: '/dinners' },
-  { name: 'apply', href: '/dinners/apply' },
-  { name: 'gameday', href: '/gameday' },
-  { name: 'crewsheet', href: '/crewsheet' },
+/**
+ * Work, newest first.
+ *
+ * The fomo entry is one project with eight pages under it, not eight projects.
+ * The two gallery entries are separate bodies of work for separate clients,
+ * which is why they get their own rows.
+ */
+export const projects: Project[] = [
+  {
+    id: 'fomo',
+    name: 'fomo / campus',
+    role: 'Brand · Copy · Front end',
+    year: '2026',
+    href: '/campus',
+    summary:
+      'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages on one design language: a twelve-section internship manual, three stepped applications wired to Firebase, and a national chapter map built without a mapping library.',
+    pages: [
+      { name: 'campus', href: '/campus' },
+      { name: 'manual', href: '/campus/manual' },
+      { name: 'greekwars', href: '/greekwars' },
+      { name: 'onboard', href: '/greekwars/onboard' },
+      { name: 'dinners', href: '/dinners' },
+      { name: 'apply', href: '/dinners/apply' },
+      { name: 'gameday', href: '/gameday' },
+      { name: 'crewsheet', href: '/crewsheet' },
+    ],
+  },
+  {
+    id: 'whitewalls',
+    name: 'whitewalls',
+    role: 'Product · Front end',
+    year: '2025',
+    mark: 'whitewalls',
+    // TODO: a link, and a line on what it actually handles day to day.
+    summary:
+      'A CRM built for an art gallery in the autumn of 2025 — the system a gallery runs on rather than the one it shows.',
+  },
+  {
+    id: 'cyrus',
+    name: 'Cyrus Collective',
+    role: 'Backend · Gallery systems',
+    // TODO: dates. I have left the year off rather than guess at it.
+    summary:
+      'The gallery side of the work: backend systems for art galleries, built to be run daily rather than demonstrated. Kept broad on purpose — the galleries are not mine to name.',
+  },
 ];
 
 /**
- * Art-world work.
+ * My own practice, as opposed to the gallery work above.
  *
- * whitewalls is Bijan's own project, not a client logo — which is why the mark
- * is redrawn as geometry in components/ui/whitewalls-mark.tsx rather than
- * placed as the source screenshot. The reference image lives in
- * portfolio/reference/, outside anything Firebase serves.
- *
- * TODO: add a link if the CRM is reachable, and a line or two of specifics
- * about what it does — I only know that it is a gallery CRM built in the
- * autumn of 2025, and would rather say that plainly than invent features.
+ * No images yet, so the section hangs empty frames and says so. Add entries to
+ * `gallery` and they replace the frames in place.
  */
 export const art = {
-  org: 'whitewalls',
-  role: 'Product · Front end',
-  year: '2025',
-  href: '', // TODO: a live URL or case study, if there is one
-  body: 'A CRM built for an art gallery in the autumn of 2025. The art world is the other half of what I do, and whitewalls is where it met the software half.',
-  /** Set only if you would rather place a file than use the drawn mark. */
-  logo: '',
-  /**
-   * Your own work. Empty for now, which is the point: the section hangs three
-   * empty frames and says so, rather than pretending the wall is full. Add
-   * entries and they replace the frames in place, same sizes, same wall line.
-   */
+  body:
+    'The art world is the other half of what I do. My own work is not online yet — the wall below is where it goes.',
   gallery: [] as Array<{ src: string; title?: string; year?: string }>,
 };
 
