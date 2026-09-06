@@ -138,16 +138,19 @@
      At 62% the face swallowed what was behind it: a floor line one doorway
      back arrived at 42 against a background of 21, a hint of a hallway rather
      than one.
-     It fades out toward the bottom because a flat face ends at the frame's
-     edge, and a tonal step across the full width of a doorway is a line
-     whether you drew one or not — a second floor line, sitting on the real
-     one. Falling to nothing means the wall dissolves into its own floor, which
-     is also how a lit wall behaves. */
+     It fades to nothing at the bottom, because a flat face has to stop
+     somewhere and a tonal step across the width of a doorway is a line whether
+     you drew one or not.
+     But the fade is held to the last sixth. Taken any higher it stops masking:
+     the face is what mutes the corridor behind, and where it thins, a receding
+     frame's own floor and border come through the wall and cross the copy in
+     front of them. Solid where the reading happens, dissolving only where it
+     meets the floor. */
   background: linear-gradient(
     to bottom,
-    rgba(22, 22, 27, 0.58) 0%,
-    rgba(21, 21, 26, 0.46) 42%,
-    rgba(19, 19, 23, 0.2) 80%,
+    rgba(22, 22, 27, 0.62) 0%,
+    rgba(21, 21, 26, 0.6) 72%,
+    rgba(20, 20, 25, 0.5) 88%,
     rgba(19, 19, 23, 0) 100%
   );
   border: 2px solid rgba(255, 255, 255, 0.42);
@@ -182,6 +185,7 @@
   width: 100vw;
   height: 2px;
   background: rgba(255, 255, 255, 0.52);
+  opacity: var(--floor, 1);
   z-index: -1;
 }
 

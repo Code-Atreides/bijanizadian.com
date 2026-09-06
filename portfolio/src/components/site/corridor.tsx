@@ -168,12 +168,14 @@ export function Corridor({ count, children }: { count: number; children: React.R
         // rule through the copy. That was the real cause of the line across the
         // middle of the page, not depth; the continuous band I had briefly was.
         //
-        // No extra fade with depth: two things already dim a receding floor,
-        // and a third made them invisible. The frame's own opacity takes it to
-        // 88% one step back, and then the wall in front — a 62%-opaque face —
-        // is painted over the top, leaving about 9%. Measured, the line one
-        // step back was 31 against a background of 21. It draws at full
-        // strength and lets the geometry do the receding.
+        // A receding floor line lands in the ring between its own doorway and
+        // the one in front — 253px of it on either side at this spacing, which
+        // is exactly where the wall in front puts its copy. Left at full
+        // strength it read 67 against a background of 21: not depth, a rule
+        // drawn through the text. Dimmed to a third it still marks the floor
+        // of the room behind without competing with the words in front of it,
+        // and the nested doorway outlines carry the hallway.
+        el.style.setProperty('--floor', String(Math.max(0, 1 - behind * 0.66)));
         el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
       }
 
