@@ -87,7 +87,11 @@ export function About() {
             ))}
 
             <Reveal delay={200}>
-              <p className={`${LABEL} mt-9`}>{site.disciplines.join(' · ')}</p>
+              <div className="mt-9 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <p className={LABEL}>{site.disciplines.join(' · ')}</p>
+                <span aria-hidden className="text-muted-foreground/30">/</span>
+                <p className={LABEL}>{site.education}</p>
+              </div>
             </Reveal>
 
             <Reveal delay={260}>

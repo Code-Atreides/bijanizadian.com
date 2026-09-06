@@ -19,11 +19,13 @@ export const site = {
   email: 'hello@bijanizadian.com',
   /** Shown as a quiet inline list; these are disciplines, not selling points. */
   disciplines: ['Brand', 'Copy', 'Front end', 'Forms & data'],
+  /** From the indexed LinkedIn headline: "Student at the University of Oregon".
+   *  It is the only field the profile exposes publicly — the rest is behind an
+   *  authwall, so nothing else here is sourced from it. */
+  education: 'University of Oregon',
   links: {
-    // TODO: replace with your real profile URLs — placeholders inherited from
-    // the current landing page.
-    github: 'https://github.com/',
-    linkedin: 'https://www.linkedin.com/in/',
+    linkedin: 'https://www.linkedin.com/in/bijan-izadian-848123265/',
+    github: 'https://github.com/', // TODO: still a placeholder
     resume: '/resume.pdf', // TODO: not on the server yet (404)
   },
 } as const;
@@ -104,8 +106,8 @@ export const projects: Project[] = [
 ];
 
 export const about = [
-  'I work on growth, brand and product for early-stage companies. Right now that is fomo’s campus programme — a student team in every school, and the site that recruits them.',
-  // TODO: add a line about what you did before fomo — I have nothing in the
-  // repo to source it from, and would only be guessing.
-  'Most of what I make gets shipped rather than presented: forms that take real submissions, boards that read live data, manuals people actually follow.',
+  'fomo’s campus programme is the bulk of it: a five-person student team inside every school, and the eight pages that recruit them, run the competitions and take the applications. I did the brand, the copy and the front end.',
+  'Most of what I make gets shipped rather than presented — forms that take real submissions, boards that read live data, manuals people actually follow.',
+  // TODO: a line about what you did before fomo. I have nothing to source it
+  // from: your LinkedIn is behind an authwall and the repo does not say.
 ] as const;
