@@ -64,22 +64,29 @@ export const pages: Page[] = [
 /**
  * Art-world work.
  *
- * Empty on purpose. I have nothing to source it from, and inventing a role at
- * a real organisation is the same mistake as the Polymarket line. Fill `body`
- * and the section renders itself — until then it stays hidden, so the live
- * page never shows a placeholder.
+ * whitewalls is Bijan's own project, not a client logo — which is why the mark
+ * is redrawn as geometry in components/ui/whitewalls-mark.tsx rather than
+ * placed as the source screenshot. The reference image lives in
+ * portfolio/reference/, outside anything Firebase serves.
  *
- * `logo` takes a path to a file dropped in portfolio/public/, served as
- * '/v2/whitewall.svg'. I have not drawn one: approximating someone else's
- * trademark is worse than the text credit the section falls back to.
+ * TODO: add a link if the CRM is reachable, and a line or two of specifics
+ * about what it does — I only know that it is a gallery CRM built in the
+ * autumn of 2025, and would rather say that plainly than invent features.
  */
 export const art = {
-  org: 'Whitewall', // TODO: which Whitewall — the magazine, the printer, or the galleries?
-  role: '', // TODO: e.g. 'Editorial · Social'
-  year: '', // TODO
-  href: '', // TODO: link to the work, or to the organisation
-  body: '', // TODO: two sentences on what you did. The section appears once this is set.
-  logo: '', // TODO: optional path to an SVG/PNG you add
+  org: 'whitewalls',
+  role: 'Product · Front end',
+  year: '2025',
+  href: '', // TODO: a live URL or case study, if there is one
+  body: 'A CRM built for an art gallery in the autumn of 2025. The art world is the other half of what I do, and whitewalls is where it met the software half.',
+  /** Set only if you would rather place a file than use the drawn mark. */
+  logo: '',
+  /**
+   * Your own work. Empty for now, which is the point: the section hangs three
+   * empty frames and says so, rather than pretending the wall is full. Add
+   * entries and they replace the frames in place, same sizes, same wall line.
+   */
+  gallery: [] as Array<{ src: string; title?: string; year?: string }>,
 };
 
 export const about = [

@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 
 import { LABEL, SECTION, WRAP } from '@/components/site/sections';
 import { Reveal } from '@/components/ui/reveal';
+import { WhitewallsMark } from '@/components/ui/whitewalls-mark';
 import { art, pages, work } from '@/content';
 
 /**
@@ -48,7 +49,6 @@ export function Work() {
               Open the site
               <ArrowUpRight size={13} className="opacity-70" />
             </a>
-            <p className={LABEL}>{work.tags.join(' · ')}</p>
           </div>
         </Reveal>
 
@@ -97,16 +97,10 @@ export function Art() {
         <Reveal delay={60}>
           <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2">
             {art.logo ? (
-              // Sized and desaturated to sit in the same register as the type
-              // around it, rather than importing a brand's own colour.
-              <img
-                src={art.logo}
-                alt={art.org}
-                className="h-6 w-auto opacity-85 grayscale"
-                loading="lazy"
-              />
+              <img src={art.logo} alt={art.org} className="h-7 w-auto opacity-85 grayscale" loading="lazy" />
             ) : (
-              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
+              <h2 className="flex items-center gap-3 text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
+                <WhitewallsMark className="size-[0.78em] shrink-0 text-foreground/75" />
                 {art.org}
               </h2>
             )}
@@ -118,6 +112,41 @@ export function Art() {
           <p className="mt-5 max-w-[62ch] text-[15px] leading-[1.7] text-muted-foreground">
             {art.body}
           </p>
+        </Reveal>
+
+        {/* The hang. Three frames on a wall line — empty until there are
+            images, and captioned so the emptiness reads as deliberate rather
+            than broken. Proportions are portrait / square / landscape so the
+            row has the rhythm of an actual wall rather than a grid. */}
+        <Reveal delay={200}>
+          <div className="mt-12">
+            <div className="flex items-end gap-4 sm:gap-7">
+              {(art.gallery.length
+                ? art.gallery.map((g, i) => ({ ...g, ratio: ['4 / 5', '1 / 1', '3 / 4'][i % 3] }))
+                : [{ ratio: '4 / 5' }, { ratio: '1 / 1' }, { ratio: '3 / 4' }]
+              ).map((frame, i) => (
+                <figure
+                  key={i}
+                  style={{ aspectRatio: frame.ratio }}
+                  className="w-[26%] max-w-[190px] min-w-0 border border-white/[0.13] bg-white/[0.015]"
+                >
+                  {'src' in frame && frame.src ? (
+                    <img
+                      src={frame.src}
+                      alt={('title' in frame && frame.title) || ''}
+                      className="size-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+            {/* the wall line the frames hang against */}
+            <div className="mt-4 border-t border-white/[0.07]" />
+            <p className={`${LABEL} mt-3`}>
+              {art.gallery.length ? 'Own work' : 'Own work — not up yet'}
+            </p>
+          </div>
         </Reveal>
 
         {art.href && (

@@ -5,6 +5,7 @@ import { site } from '@/content';
 
 const LINKS = [
   { href: '#work', label: 'Work' },
+  { href: '#art', label: 'Art' },
   { href: '#about', label: 'About' },
   { href: '#contact', label: 'Contact' },
 ] as const;
