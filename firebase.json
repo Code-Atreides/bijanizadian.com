@@ -10,7 +10,8 @@
       "**/node_modules/**",
       "bijanizadian.com.txt",
       "brand/**",
-      "fomo-handoff/**"
+      "fomo-handoff/**",
+      "portfolio/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
