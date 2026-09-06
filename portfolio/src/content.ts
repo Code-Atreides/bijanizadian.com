@@ -100,7 +100,7 @@ export const projects: Project[] = [
  */
 export const art = {
   body:
-    'The art world is the other half of what I do. My own work is not online yet — the wall below is where it goes.',
+    'The art world is the other half of what I do. My own work is not online yet; the wall beside this is where it goes.',
   gallery: [] as Array<{ src: string; title?: string; year?: string }>,
 };
 

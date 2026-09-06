@@ -1,6 +1,5 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ThemeProvider } from 'next-themes';
 
 import App from './App';
 import './index.css';
@@ -8,13 +7,10 @@ import './index.css';
 const el = document.getElementById('root');
 if (!el) throw new Error('#root missing');
 
-// DottedSurface reads useTheme(), so the provider is required rather than
-// optional. Despite the package name, next-themes is plain React and works
-// outside Next: it writes a class onto <html> and remembers the choice.
+// next-themes went with the dot field: it existed only so DottedSurface could
+// read a theme, and this site is dark-only.
 createRoot(el).render(
   <StrictMode>
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
-      <App />
-    </ThemeProvider>
+    <App />
   </StrictMode>,
 );

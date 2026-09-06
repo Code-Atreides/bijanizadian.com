@@ -16,3 +16,4 @@ fomo-handoff.zip
 # portfolio app build artifacts (source lives in portfolio/, output in v2/)
 portfolio/dist/
 portfolio/.vite/
+preview-final.html

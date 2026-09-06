@@ -1,0 +1,261 @@
+import { ArrowUpRight, Mail } from 'lucide-react';
+
+import { Frame } from '@/components/site/corridor';
+import { LiquidMetalButton } from '@/components/ui/liquid-metal-button';
+import { WhitewallsMark } from '@/components/ui/whitewalls-mark';
+import { about, art, projects, site } from '@/content';
+
+/**
+ * The seven panels of the corridor.
+ *
+ * Structure is borrowed from the whitewalls preview: a small caps label, a
+ * headline, a paragraph, and — where there is something worth showing — a
+ * second column beside it. The register is this site's: near-black ground,
+ * one accent-free palette, mono labels, and the metal pill as the only
+ * material object.
+ */
+
+const LABEL = 'font-mono text-[10.5px] tracking-[0.26em] text-muted-foreground uppercase';
+const HEADLINE =
+  'mt-5 text-[clamp(1.7rem,3.4vw,2.9rem)] leading-[1.06] font-medium tracking-[-0.04em] text-balance';
+const BODY = 'mt-5 max-w-[46ch] text-[15px] leading-[1.7] text-muted-foreground';
+
+function Split({ left, right }: { left: React.ReactNode; right?: React.ReactNode }) {
+  return (
+    <div
+      className={
+        right
+          ? 'grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-16'
+          : 'max-w-[52ch]'
+      }
+    >
+      <div>{left}</div>
+      {right && <div className="min-w-0">{right}</div>}
+    </div>
+  );
+}
+
+/* ── 01 ─────────────────────────────────────────────────────────────────── */
+
+export function HeroFrame() {
+  return (
+    <Frame index={0} id="top">
+      <div className="text-center">
+        <p className={LABEL}>{site.location}</p>
+        <h1 className="mt-6 text-[clamp(2.6rem,8vw,6rem)] leading-[0.9] font-medium tracking-[-0.05em]">
+          {site.name}
+        </h1>
+        <p className="mx-auto mt-7 max-w-[44ch] text-[clamp(0.95rem,1.35vw,1.05rem)] text-muted-foreground">
+          {site.tagline}
+          <span className="mt-1 block text-muted-foreground/70">{site.now}</span>
+        </p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <LiquidMetalButton label="View the work" href="#work" />
+          <LiquidMetalButton label="Get in touch" href="#contact" />
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+/* ── 02–04 · the work ───────────────────────────────────────────────────── */
+
+export function WorkFrames() {
+  return (
+    <>
+      {projects.map((p, i) => (
+        <Frame key={p.id} index={i + 1} id={i === 0 ? 'work' : p.id}>
+          <Split
+            left={
+              <>
+                <div className="flex items-baseline gap-4">
+                  <p className={LABEL}>Selected work</p>
+                  <p className={`${LABEL} ml-auto`}>
+                    {String(i + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+                  </p>
+                </div>
+
+                <h2 className={`${HEADLINE} flex items-center gap-3`}>
+                  {p.mark === 'whitewalls' && (
+                    <WhitewallsMark className="size-[0.7em] shrink-0 text-foreground/75" />
+                  )}
+                  {p.name}
+                </h2>
+
+                <p className={`${LABEL} mt-4`}>
+                  {p.role}
+                  {p.year && ` · ${p.year}`}
+                </p>
+
+                <p className={BODY}>{p.summary}</p>
+
+                {p.href && (
+                  <a
+                    href={p.href}
+                    className="mt-7 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+                  >
+                    Open the site
+                    <ArrowUpRight size={13} className="opacity-70" />
+                  </a>
+                )}
+              </>
+            }
+            right={
+              p.pages && (
+                <ul className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
+                  {p.pages.map((pg) => (
+                    <li key={pg.href}>
+                      <a
+                        href={pg.href}
+                        className="group flex items-baseline gap-4 py-2.5 transition-colors hover:bg-white/[0.02]"
+                      >
+                        <span className="font-mono text-[12.5px] text-foreground/80 transition-colors group-hover:text-foreground">
+                          {pg.name}
+                        </span>
+                        <ArrowUpRight
+                          size={12}
+                          className="ml-auto shrink-0 self-center opacity-0 transition-opacity group-hover:opacity-60"
+                        />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )
+            }
+          />
+        </Frame>
+      ))}
+    </>
+  );
+}
+
+/* ── 05 · art ───────────────────────────────────────────────────────────── */
+
+export function ArtFrame({ index }: { index: number }) {
+  const frames = art.gallery.length
+    ? art.gallery.map((g, i) => ({ ...g, ratio: ['4 / 5', '1 / 1', '3 / 4'][i % 3] }))
+    : [{ ratio: '4 / 5' }, { ratio: '1 / 1' }, { ratio: '3 / 4' }];
+
+  return (
+    <Frame index={index} id="art">
+      <Split
+        left={
+          <>
+            <p className={LABEL}>Art</p>
+            <h2 className={HEADLINE}>The other half of the work</h2>
+            <p className={BODY}>{art.body}</p>
+          </>
+        }
+        right={
+          <div>
+            <div className="flex items-end gap-4 sm:gap-6">
+              {frames.map((f, i) => (
+                <figure
+                  key={i}
+                  style={{ aspectRatio: f.ratio }}
+                  className="w-[30%] max-w-[160px] min-w-0 border border-white/[0.14] bg-white/[0.015]"
+                >
+                  {'src' in f && f.src ? (
+                    <img
+                      src={f.src}
+                      alt={('title' in f && f.title) || ''}
+                      className="size-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : null}
+                </figure>
+              ))}
+            </div>
+            <div className="mt-4 border-t border-white/[0.07]" />
+            <p className={`${LABEL} mt-3`}>
+              {art.gallery.length ? 'Own work' : 'Own work — not up yet'}
+            </p>
+          </div>
+        }
+      />
+    </Frame>
+  );
+}
+
+/* ── 06 · about ─────────────────────────────────────────────────────────── */
+
+export function AboutFrame({ index }: { index: number }) {
+  return (
+    <Frame index={index} id="about">
+      <Split
+        left={
+          <>
+            <p className={LABEL}>About</p>
+            <p className="mt-6 text-[clamp(1.05rem,1.9vw,1.35rem)] leading-[1.5]">{about[0]}</p>
+            {about[1] && <p className={BODY}>{about[1]}</p>}
+          </>
+        }
+        right={
+          <div className="md:pt-2">
+            <p className={LABEL}>{site.disciplines.join(' · ')}</p>
+            <p className={`${LABEL} mt-2`}>{site.education}</p>
+            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
+              <Out href={site.links.linkedin}>LinkedIn</Out>
+              <Out href={site.links.github}>GitHub</Out>
+              <Out href={site.links.resume}>Résumé</Out>
+            </div>
+          </div>
+        }
+      />
+    </Frame>
+  );
+}
+
+function Out({ href, children }: { href: string; children: React.ReactNode }) {
+  const external = href.startsWith('http');
+  return (
+    <a
+      href={href}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      className="group inline-flex items-center gap-1.5 text-[13.5px] text-muted-foreground transition-colors hover:text-foreground"
+    >
+      {children}
+      <ArrowUpRight size={12} className="opacity-50 transition-opacity group-hover:opacity-90" />
+    </a>
+  );
+}
+
+/* ── 07 · contact ───────────────────────────────────────────────────────── */
+
+export function ContactFrame({ index }: { index: number }) {
+  return (
+    <Frame index={index} id="contact">
+      <div className="rounded-3xl border border-white/[0.09] bg-[#0a0a0c]/70 p-9 backdrop-blur-md md:p-12">
+        <p className={LABEL}>Contact</p>
+        <h2 className={HEADLINE}>A role, freelance, or something you want built.</h2>
+        <p className={BODY}>
+          Email is the fastest way to reach me. If you have a web app in mind and want scope,
+          timing and cost back, send it through the intake form instead.
+        </p>
+
+        <div className="mt-9 flex flex-wrap items-center gap-4">
+          <LiquidMetalButton label="Email me" href={`mailto:${site.email}`} />
+          <a
+            href="/build"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-[13.5px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+          >
+            Send a build request
+            <ArrowUpRight size={14} className="opacity-70" />
+          </a>
+        </div>
+
+        <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-2 border-t border-white/[0.07] pt-6 text-[13px] text-muted-foreground">
+          <span className="flex items-center gap-2">
+            <Mail size={13} className="opacity-60" />
+            <a className="transition-colors hover:text-foreground" href={`mailto:${site.email}`}>
+              {site.email}
+            </a>
+          </span>
+          <span className="ml-auto">
+            © {new Date().getFullYear()} {site.name} · {site.location}
+          </span>
+        </div>
+      </div>
+    </Frame>
+  );
+}

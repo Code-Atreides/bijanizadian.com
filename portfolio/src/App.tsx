@@ -1,32 +1,28 @@
-import { Suspense, lazy } from 'react';
+import { Corridor } from '@/components/site/corridor';
+import {
+  AboutFrame,
+  ArtFrame,
+  ContactFrame,
+  HeroFrame,
+  WorkFrames,
+} from '@/components/site/frames';
+import { Nav } from '@/components/site/nav';
+import { projects } from '@/content';
 
-import { Footer, Nav } from '@/components/site/nav';
-import { Scrim } from '@/components/site/scrim';
-import { About, Contact, Hero } from '@/components/site/sections';
-import { Art, Work } from '@/components/site/work';
-
-// Three.js is ~570kB and paints nothing the reader needs in order to read.
-const DottedSurface = lazy(() =>
-  import('@/components/ui/dotted-surface').then((m) => ({ default: m.DottedSurface })),
-);
+// hero + one frame per project + art + about + contact
+const COUNT = 1 + projects.length + 3;
 
 export default function App() {
   return (
     <>
-      <Suspense fallback={null}>
-        <DottedSurface size={6} opacity={0.55} speed={1.2} />
-      </Suspense>
-      <Scrim />
-
       <Nav />
-      <main>
-        <Hero />
-        <Work />
-        <Art />
-        <About />
-        <Contact />
-      </main>
-      <Footer />
+      <Corridor count={COUNT}>
+        <HeroFrame />
+        <WorkFrames />
+        <ArtFrame index={1 + projects.length} />
+        <AboutFrame index={2 + projects.length} />
+        <ContactFrame index={3 + projects.length} />
+      </Corridor>
     </>
   );
 }

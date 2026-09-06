@@ -1,104 +1,76 @@
 import { useEffect, useState } from 'react';
 
+import { goToFrame } from '@/components/site/corridor';
+import { projects, site } from '@/content';
 import { cn } from '@/lib/utils';
-import { site } from '@/content';
-
-const LINKS = [
-  { href: '#work', label: 'Work' },
-  { href: '#art', label: 'Art' },
-  { href: '#about', label: 'About' },
-  { href: '#contact', label: 'Contact' },
-] as const;
 
 /**
- * Fixed chrome. It starts transparent over the hero and takes on its glass only
- * once the page has moved, so the first screen is the dot field and the name
- * and nothing else.
+ * Fixed chrome over the corridor.
+ *
+ * The links move the corridor rather than jumping the document. An anchor would
+ * scroll to a frame's position in the document, which in a fixed 3D scene is
+ * the same position for every frame — so #contact would go nowhere. Each link
+ * scrolls to the offset that brings its frame to the camera plane, and the
+ * reader flies there instead of teleporting.
  */
+const LINKS = [
+  { label: 'Work', frame: 1 },
+  { label: 'Art', frame: 1 + projects.length },
+  { label: 'About', frame: 2 + projects.length },
+  { label: 'Contact', frame: 3 + projects.length },
+] as const;
+
 export function Nav() {
-  const [scrolled, setScrolled] = useState(false);
-  const [active, setActive] = useState<string>('');
+  const [moved, setMoved] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setMoved(window.scrollY > 40);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Highlight the section currently in the middle of the viewport.
+  // Deep links have to be mapped for the same reason.
   useEffect(() => {
-    const ids = LINKS.map((l) => l.href.slice(1));
-    const sections = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el));
-    if (!sections.length) return;
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActive(visible.target.id);
-      },
-      { rootMargin: '-45% 0px -50% 0px', threshold: [0, 0.25, 0.5] },
-    );
-    for (const s of sections) io.observe(s);
-    return () => io.disconnect();
+    const hash = window.location.hash.slice(1).toLowerCase();
+    if (!hash) return;
+    if (hash === 'top') return void requestAnimationFrame(() => goToFrame(0));
+    const target = LINKS.find((l) => l.label.toLowerCase() === hash);
+    if (target) requestAnimationFrame(() => goToFrame(target.frame));
   }, []);
 
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500',
-        scrolled
+        'fixed inset-x-0 top-0 z-40 transition-[background-color,border-color,backdrop-filter] duration-500',
+        moved
           ? 'border-b border-white/[0.07] bg-black/55 backdrop-blur-xl'
           : 'border-b border-transparent bg-transparent',
       )}
     >
       <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-6">
-        <a
-          href="#top"
+        <button
+          type="button"
+          onClick={() => goToFrame(0)}
           className="text-[15px] font-medium tracking-[-0.02em] transition-opacity hover:opacity-70"
         >
           {site.name}
-        </a>
+        </button>
 
-        <ul className="ml-auto flex items-center gap-1">
+        <ul className="ml-auto flex items-center gap-0.5 sm:gap-1">
           {LINKS.map((l) => (
-            <li key={l.href}>
-              <a
-                href={l.href}
-                className={cn(
-                  'rounded-full px-3 py-1.5 text-[13.5px] transition-colors',
-                  active === l.href.slice(1)
-                    ? 'text-foreground'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
+            <li key={l.label}>
+              <button
+                type="button"
+                onClick={() => goToFrame(l.frame)}
+                className="rounded-full px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:px-3 sm:text-[13.5px]"
               >
                 {l.label}
-              </a>
+              </button>
             </li>
           ))}
         </ul>
-
       </nav>
     </header>
-  );
-}
-
-export function Footer() {
-  return (
-    <footer className="relative border-t border-white/[0.07]">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-8 text-[13px] text-muted-foreground">
-        <span>
-          © {new Date().getFullYear()} {site.name}
-        </span>
-        <span className="hidden sm:inline">{site.location}</span>
-        <a className="ml-auto transition-colors hover:text-foreground" href={`mailto:${site.email}`}>
-          {site.email}
-        </a>
-      </div>
-    </footer>
   );
 }
