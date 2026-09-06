@@ -21,6 +21,7 @@ const LINKS = [
   { label: 'Contact', frame: FRAMES.contact },
 ] as const;
 
+
 export function Nav() {
   const [moved, setMoved] = useState(false);
 
@@ -46,7 +47,7 @@ export function Nav() {
       <nav className="flex h-14 items-center gap-6 px-5 sm:px-6">
         <button
           type="button"
-          onClick={() => goToFrame(0)}
+          onClick={() => goToFrame(FRAMES.hero.index, FRAMES.hero.id)}
           className="text-[13.5px] tracking-[-0.01em] transition-opacity hover:opacity-70"
         >
           {site.domain}
@@ -57,7 +58,7 @@ export function Nav() {
             <li key={l.label}>
               <button
                 type="button"
-                onClick={() => goToFrame(l.frame)}
+                onClick={() => goToFrame(l.frame.index, l.frame.id)}
                 className="font-mono text-[12px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
               >
                 {l.label}

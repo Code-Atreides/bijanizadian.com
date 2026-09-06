@@ -1,6 +1,7 @@
 import { ArrowUpRight, Mail } from 'lucide-react';
 
-import { Frame } from '@/components/site/corridor';
+import { Frame, goToFrame } from '@/components/site/corridor';
+import { FRAMES } from '@/site-map';
 import { LiquidMetalButton } from '@/components/ui/liquid-metal-button';
 import { WhitewallsMark } from '@/components/ui/whitewalls-mark';
 import { about, art, projects, site } from '@/content';
@@ -52,9 +53,18 @@ export function HeroFrame() {
           {site.tagline}
           <span className="mt-1 block text-muted-foreground/70">{site.now}</span>
         </p>
+        {/* Not #work / #contact. Every frame sits at the same document
+            position inside the fixed scene, so an anchor scrolls nowhere —
+            these two pills did nothing at all in the corridor. */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <LiquidMetalButton label="View the work" href="#work" />
-          <LiquidMetalButton label="Get in touch" href="#contact" />
+          <LiquidMetalButton
+            label="View the work"
+            onClick={() => goToFrame(FRAMES.work.index, FRAMES.work.id)}
+          />
+          <LiquidMetalButton
+            label="Get in touch"
+            onClick={() => goToFrame(FRAMES.contact.index, FRAMES.contact.id)}
+          />
         </div>
       </div>
     </Frame>

@@ -329,14 +329,32 @@ function Counter({ current, total }: { current: number; total: number }) {
 }
 
 /**
- * Scrolls the corridor to a frame. Exported so the nav can drive it.
+ * Goes to a frame, in whichever layout is running.
  *
- * `instant` is for arriving on a deep link: flying the reader from the first
- * frame to the seventh on page load is a long trip through content they did not
- * ask to see, and smooth-scrolling before first layout gets cancelled anyway.
+ * The two need opposite things and getting it wrong fails silently either way.
+ * In the corridor every frame sits at the same document position inside a fixed
+ * scene, so an #id anchor scrolls nowhere — it has to be a scroll offset. In
+ * the flat layout the offsets are meaningless, because the sections are laid
+ * out by their own heights — About and Contact both landed within 5px of each
+ * other when the nav used offsets there.
+ *
+ * `instant` is for arriving on a deep link: flying a reader from the first
+ * frame to the last on page load is a long trip through content they did not
+ * ask for, and a smooth scroll issued before first layout is dropped anyway.
  */
-export function goToFrame(index: number, instant = false) {
-  const smooth =
-    !instant && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.scrollTo({ top: index * SCROLL_PER_FRAME, behavior: smooth ? 'smooth' : 'auto' });
+export function goToFrame(index: number, id?: string, instant = false) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior: ScrollBehavior = !instant && !reduced ? 'smooth' : 'auto';
+
+  if (window.matchMedia(FLAT).matches) {
+    const el = id ? document.getElementById(id) : null;
+    if (el) {
+      el.scrollIntoView({ behavior, block: 'start' });
+      return;
+    }
+    window.scrollTo({ top: 0, behavior });
+    return;
+  }
+
+  window.scrollTo({ top: index * SCROLL_PER_FRAME, behavior });
 }

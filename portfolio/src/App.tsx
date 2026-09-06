@@ -15,10 +15,10 @@ export default function App() {
       <Nav />
       <Corridor count={FRAME_COUNT}>
         <HeroFrame />
-        <WorkFrame index={FRAMES.work} />
-        <ArtFrame index={FRAMES.art} />
-        <AboutFrame index={FRAMES.about} />
-        <ContactFrame index={FRAMES.contact} />
+        <WorkFrame index={FRAMES.work.index} />
+        <ArtFrame index={FRAMES.art.index} />
+        <AboutFrame index={FRAMES.about.index} />
+        <ContactFrame index={FRAMES.contact.index} />
       </Corridor>
     </>
   );
