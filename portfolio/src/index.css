@@ -132,28 +132,58 @@
    near-black ground.
    --------------------------------------------------------------------------- */
 .corridor-frame {
-  background: rgba(11, 11, 14, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.34);
+  /* Slightly lighter than the ground it is cut into, so a wall reads as a
+     surface catching light rather than as a hole. */
+  background: rgba(19, 19, 23, 0.62);
+  border: 2px solid rgba(255, 255, 255, 0.42);
   border-bottom: none;
   border-radius: 18px 18px 0 0;
   box-shadow: 0 0 0 5000px #08080a;
   isolation: isolate;
 }
 
-/* the floor, running out of both sides of the doorway */
+/* The floor line, running out of both sides of the doorway. It is brightest
+   where it leaves the wall and falls away toward the edges of the room, which
+   is how a line of light on a floor actually behaves — a flat line of even
+   weight reads as a border instead. */
 .corridor-frame::before,
 .corridor-frame::after {
   content: '';
   position: absolute;
-  bottom: -1px;
+  bottom: -2px;
   width: 100vw;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.34);
+  height: 2px;
   z-index: -1;
 }
 .corridor-frame::before {
   right: 100%;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.06));
 }
 .corridor-frame::after {
   left: 100%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.06));
+}
+
+/* ---------------------------------------------------------------------------
+   The light on the floor.
+
+   This has to sit *above* the scene, not behind it. Every frame paints a
+   5000px ring of ground colour to become an aperture in a wall, and that ring
+   covers the whole viewport — so anything layered underneath is invisible.
+   As a wash on top it lights the lower half of the room instead: a pool
+   gathering at the near edge of the floor and falling off toward the vanishing
+   point, plus a cool lift across the very bottom. The walls above stay dark,
+   which is what makes them read as walls.
+
+   Kept off the top 45% entirely, so headline text never sits in it.
+   --------------------------------------------------------------------------- */
+.corridor-floor {
+  background:
+    radial-gradient(
+      132% 62% at 50% 104%,
+      rgba(214, 222, 255, 0.085) 0%,
+      rgba(190, 200, 235, 0.035) 38%,
+      transparent 66%
+    ),
+    linear-gradient(to bottom, transparent 52%, rgba(226, 232, 255, 0.03) 82%, rgba(226, 232, 255, 0.055) 100%);
 }

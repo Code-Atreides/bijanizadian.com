@@ -212,6 +212,9 @@ export function Corridor({ count, children }: { count: number; children: React.R
         tail, so you could keep scrolling after the last wall and watch it fly
         past into an empty room.
       */}
+      {/* the light lying on the floor — over the scene, see .corridor-floor */}
+      <div aria-hidden className="corridor-floor pointer-events-none fixed inset-0 z-20" />
+
       <div
         aria-hidden
         style={{ height: `calc(${(count - 1) * SCROLL_PER_FRAME}px + 100svh)` }}

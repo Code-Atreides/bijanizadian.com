@@ -9,7 +9,8 @@
  */
 
 export const site = {
-  name: 'Bijan Izadian',
+  /** Always lowercase — it is set as a mark, not as a proper noun. */
+  name: 'bijan izadian',
   /** What the top-left corner says. */
   domain: 'bijanizadian.com',
   location: 'New York City',
