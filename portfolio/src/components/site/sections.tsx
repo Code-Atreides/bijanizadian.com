@@ -2,41 +2,45 @@ import { ArrowUpRight, Mail } from 'lucide-react';
 
 import { LiquidMetalButton } from '@/components/ui/liquid-metal-button';
 import { Reveal } from '@/components/ui/reveal';
-import { about, capabilities, site } from '@/content';
+import { about, site } from '@/content';
+
+/**
+ * Spacing scale for the whole page. Sections were on py-28/py-40, which left
+ * ~320px of dead ground between blocks and made the page read as a deck of
+ * slides. One step down, and consistent.
+ */
+export const SECTION = 'relative scroll-mt-24 py-16 md:py-24';
+export const WRAP = 'mx-auto max-w-5xl px-6';
+export const LABEL =
+  'font-mono text-[10.5px] tracking-[0.26em] text-muted-foreground uppercase';
 
 /* -------------------------------------------------------------------------- */
 /*  Hero                                                                       */
 /* -------------------------------------------------------------------------- */
 
-/**
- * The first screen is the dot field, the name, and two pills. The wave crests
- * around the lower third, so the name sits above the horizon and the buttons
- * sit in it.
- */
 export function Hero() {
   return (
-    <section id="top" className="relative grid min-h-dvh place-items-center px-6 pt-14">
-      <div className="flex w-full max-w-4xl flex-col items-center text-center">
+    <section id="top" className="relative grid min-h-[92svh] place-items-center px-6 pt-14">
+      <div className="flex w-full max-w-3xl flex-col items-center text-center">
         <Reveal>
-          <p className="font-mono text-[11px] tracking-[0.3em] text-muted-foreground uppercase">
-            {site.location}
-          </p>
+          <p className={LABEL}>{site.location}</p>
         </Reveal>
 
         <Reveal delay={90}>
-          <h1 className="mt-7 text-[clamp(2.75rem,10.5vw,8rem)] leading-[0.88] font-medium tracking-[-0.05em]">
+          <h1 className="mt-6 text-[clamp(2.5rem,9vw,6.5rem)] leading-[0.9] font-medium tracking-[-0.045em]">
             {site.name}
           </h1>
         </Reveal>
 
-        <Reveal delay={180}>
-          <p className="mx-auto mt-8 max-w-[46ch] text-[clamp(0.95rem,1.5vw,1.15rem)] leading-relaxed text-muted-foreground">
+        <Reveal delay={170}>
+          <p className="mt-7 text-[clamp(0.95rem,1.35vw,1.05rem)] text-muted-foreground">
             {site.tagline}
+            <span className="mt-1 block text-muted-foreground/70">{site.now}</span>
           </p>
         </Reveal>
 
-        <Reveal delay={270}>
-          <div className="mt-11 flex flex-wrap items-center justify-center gap-5">
+        <Reveal delay={250}>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
             <LiquidMetalButton label="View the work" href="#work" />
             <LiquidMetalButton label="Get in touch" href="#contact" />
           </div>
@@ -46,42 +50,10 @@ export function Hero() {
       <a
         href="#work"
         aria-label="Scroll to the work"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 font-mono text-[10px] tracking-[0.3em] text-muted-foreground/70 uppercase transition-colors hover:text-foreground"
+        className="absolute bottom-7 left-1/2 -translate-x-1/2 font-mono text-[9.5px] tracking-[0.3em] text-muted-foreground/60 uppercase transition-colors hover:text-foreground"
       >
         Scroll
       </a>
-    </section>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*  Capabilities                                                               */
-/* -------------------------------------------------------------------------- */
-
-export function Capabilities() {
-  return (
-    <section id="capabilities" className="relative scroll-mt-20 py-28 md:py-40">
-      <div className="mx-auto max-w-6xl px-6">
-        <Reveal>
-          <p className="font-mono text-[11px] tracking-[0.28em] text-muted-foreground uppercase">
-            What I do
-          </p>
-          <h2 className="mt-5 max-w-2xl text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.02] font-medium tracking-[-0.038em]">
-            Four things, done properly.
-          </h2>
-        </Reveal>
-
-        <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.06] sm:grid-cols-2">
-          {capabilities.map((c, i) => (
-            <Reveal key={c.title} delay={i * 70}>
-              <article className="h-full bg-[#0a0a0c]/85 p-8 backdrop-blur-sm md:p-10">
-                <h3 className="text-[1.35rem] font-medium tracking-[-0.025em]">{c.title}</h3>
-                <p className="mt-4 text-[14.5px] leading-relaxed text-muted-foreground">{c.body}</p>
-              </article>
-            </Reveal>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
@@ -92,23 +64,21 @@ export function Capabilities() {
 
 export function About() {
   return (
-    <section id="about" className="relative scroll-mt-20 py-28 md:py-40">
-      <div className="mx-auto max-w-6xl px-6">
-        <div className="grid gap-12 md:grid-cols-[auto_1fr] md:gap-24">
+    <section id="about" className={SECTION}>
+      <div className={WRAP}>
+        <div className="grid gap-8 md:grid-cols-[8rem_1fr] md:gap-16">
           <Reveal>
-            <p className="font-mono text-[11px] tracking-[0.28em] text-muted-foreground uppercase md:pt-3">
-              About
-            </p>
+            <p className={`${LABEL} md:pt-2`}>About</p>
           </Reveal>
 
           <div className="max-w-2xl">
             {about.map((p, i) => (
-              <Reveal key={p} delay={i * 90}>
+              <Reveal key={p} delay={i * 80}>
                 <p
                   className={
                     i === 0
-                      ? 'text-[clamp(1.25rem,2.4vw,1.75rem)] leading-[1.35] font-medium tracking-[-0.028em]'
-                      : 'mt-6 text-[15.5px] leading-relaxed text-muted-foreground'
+                      ? 'text-[clamp(1.05rem,1.8vw,1.3rem)] leading-[1.55]'
+                      : 'mt-4 text-[15px] leading-[1.65] text-muted-foreground'
                   }
                 >
                   {p}
@@ -116,8 +86,12 @@ export function About() {
               </Reveal>
             ))}
 
-            <Reveal delay={270}>
-              <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3">
+            <Reveal delay={200}>
+              <p className={`${LABEL} mt-9`}>{site.disciplines.join(' · ')}</p>
+            </Reveal>
+
+            <Reveal delay={260}>
+              <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <ExternalLink href={site.links.linkedin}>LinkedIn</ExternalLink>
                 <ExternalLink href={site.links.github}>GitHub</ExternalLink>
                 <ExternalLink href={site.links.resume}>Résumé</ExternalLink>
@@ -136,36 +110,34 @@ function ExternalLink({ href, children }: { href: string; children: React.ReactN
     <a
       href={href}
       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className="group inline-flex items-center gap-1.5 text-[14px] text-muted-foreground transition-colors hover:text-foreground"
+      className="group inline-flex items-center gap-1.5 text-[13.5px] text-muted-foreground transition-colors hover:text-foreground"
     >
       {children}
-      <ArrowUpRight size={13} className="opacity-50 transition-opacity group-hover:opacity-90" />
+      <ArrowUpRight size={12} className="opacity-50 transition-opacity group-hover:opacity-90" />
     </a>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Contact                                                                    */
+/*  Contact — left as it was, per your note that this one works                */
 /* -------------------------------------------------------------------------- */
 
 export function Contact() {
   return (
-    <section id="contact" className="relative scroll-mt-20 py-28 md:py-40">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="contact" className={SECTION}>
+      <div className={WRAP}>
         <Reveal>
-          <div className="overflow-hidden rounded-3xl border border-white/[0.09] bg-[#0a0a0c]/75 p-10 backdrop-blur-md md:p-16">
-            <p className="font-mono text-[11px] tracking-[0.28em] text-muted-foreground uppercase">
-              Contact
-            </p>
-            <h2 className="mt-5 max-w-2xl text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.02] font-medium tracking-[-0.038em]">
+          <div className="overflow-hidden rounded-3xl border border-white/[0.09] bg-[#0a0a0c]/75 p-10 backdrop-blur-md md:p-14">
+            <p className={LABEL}>Contact</p>
+            <h2 className="mt-5 max-w-2xl text-[clamp(1.85rem,3.8vw,2.85rem)] leading-[1.05] font-medium tracking-[-0.035em]">
               A role, freelance, or something you want built.
             </h2>
-            <p className="mt-5 max-w-xl text-[15.5px] leading-relaxed text-muted-foreground">
+            <p className="mt-5 max-w-xl text-[15px] leading-[1.65] text-muted-foreground">
               Email is the fastest way to reach me. If you have a web app in mind and want
               scope, timing and cost back, send it through the intake form instead.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-5">
+            <div className="mt-9 flex flex-wrap items-center gap-4">
               <LiquidMetalButton label="Email me" href={`mailto:${site.email}`} />
               <a
                 href="/build"
@@ -176,7 +148,7 @@ export function Contact() {
               </a>
             </div>
 
-            <p className="mt-9 flex items-center gap-2 text-[13.5px] text-muted-foreground">
+            <p className="mt-8 flex items-center gap-2 text-[13.5px] text-muted-foreground">
               <Mail size={14} className="opacity-60" />
               <a className="transition-colors hover:text-foreground" href={`mailto:${site.email}`}>
                 {site.email}

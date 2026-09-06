@@ -1,40 +1,39 @@
 import { ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 
+import { LABEL, SECTION, WRAP } from '@/components/site/sections';
 import { Reveal } from '@/components/ui/reveal';
 import { projects, type Project } from '@/content';
 import { cn } from '@/lib/utils';
 
 /**
- * The work, as a selectable list rather than a wall of cards.
+ * The work, as an index rather than a pitch.
  *
- * A portfolio's problem is that every project looks equally important in a
- * grid. A list with one expanded record borrows the shape of a case file: the
- * reader scans four names, picks one, and gets its detail without leaving the
- * section or losing the others.
+ * There is no headline and no framing paragraph above it on purpose — a
+ * statement like "shipped, not presented" is a slogan, and a slogan turns a
+ * showcase into an advert. The label, the four names and the years are enough
+ * for someone to know what they are looking at.
+ *
+ * One row is expanded at a time: four projects in a grid all claim equal
+ * weight, whereas a list lets a reader scan the names and open the one they
+ * care about.
  */
 export function Work() {
   const [openId, setOpenId] = useState<string>(projects[0].id);
 
   return (
-    <section id="work" className="relative scroll-mt-20 py-28 md:py-40">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="work" className={SECTION}>
+      <div className={WRAP}>
         <Reveal>
-          <p className="font-mono text-[11px] tracking-[0.28em] text-muted-foreground uppercase">
-            Selected work
-          </p>
-          <h2 className="mt-5 max-w-2xl text-[clamp(2rem,4.4vw,3.25rem)] leading-[1.02] font-medium tracking-[-0.038em]">
-            Shipped, not presented.
-          </h2>
-          <p className="mt-5 max-w-xl text-[15.5px] leading-relaxed text-muted-foreground">
-            Every project below is live. The links go to the real page, not a case-study
-            screenshot of one.
-          </p>
+          <div className="flex items-baseline justify-between">
+            <p className={LABEL}>Selected work</p>
+            <p className={LABEL}>{projects.length} projects</p>
+          </div>
         </Reveal>
 
-        <ul className="mt-14 divide-y divide-white/[0.07] border-y border-white/[0.07]">
+        <ul className="mt-8 border-t border-white/[0.07]">
           {projects.map((p, i) => (
-            <Reveal as="li" key={p.id} delay={i * 70}>
+            <Reveal as="li" key={p.id} delay={i * 60} className="border-b border-white/[0.07]">
               <Row project={p} open={openId === p.id} onOpen={() => setOpenId(p.id)} index={i} />
             </Reveal>
           ))}
@@ -58,40 +57,36 @@ function Row({
   const panelId = `work-panel-${project.id}`;
 
   return (
-    <div className={cn('group transition-colors', open && 'bg-white/[0.015]')}>
+    <div className="group">
       <button
         type="button"
         onClick={onOpen}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-baseline gap-5 px-1 py-7 text-left md:gap-8 md:px-3"
+        className="flex w-full items-baseline gap-4 py-5 text-left md:gap-7"
       >
-        <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+        <span className="font-mono text-[10.5px] text-muted-foreground/70 tabular-nums">
           {String(index + 1).padStart(2, '0')}
         </span>
 
-        <span className="min-w-0 flex-1">
-          <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <span
-              className={cn(
-                'text-[clamp(1.35rem,2.6vw,2rem)] font-medium tracking-[-0.03em] transition-colors',
-                open ? 'text-foreground' : 'text-foreground/70 group-hover:text-foreground',
-              )}
-            >
-              {project.name}
-            </span>
-            <span className="font-mono text-[10.5px] tracking-[0.16em] text-muted-foreground uppercase">
-              {project.role}
-            </span>
+        <span className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-4 gap-y-1">
+          <span
+            className={cn(
+              'text-[clamp(1.15rem,2vw,1.6rem)] font-medium tracking-[-0.028em] transition-colors',
+              open ? 'text-foreground' : 'text-foreground/65 group-hover:text-foreground',
+            )}
+          >
+            {project.name}
           </span>
+          <span className={LABEL}>{project.role}</span>
         </span>
 
-        <span className="hidden font-mono text-[11px] text-muted-foreground tabular-nums sm:block">
+        <span className="hidden font-mono text-[10.5px] text-muted-foreground/70 tabular-nums sm:block">
           {project.year}
         </span>
       </button>
 
-      {/* Grid-rows 0fr→1fr animates height without measuring it. */}
+      {/* grid-rows 0fr→1fr animates height without measuring it */}
       <div
         id={panelId}
         className={cn(
@@ -100,46 +95,36 @@ function Row({
         )}
       >
         <div className="overflow-hidden">
-          <div className="grid gap-8 px-1 pb-10 md:grid-cols-[1.1fr_1fr] md:gap-14 md:px-3">
+          <div className="grid gap-6 pb-8 md:grid-cols-[1fr_1fr] md:gap-12 md:pl-[calc(0.65rem+1.75rem)]">
             <div>
-              <p className="max-w-prose text-[15.5px] leading-relaxed text-muted-foreground">
+              <p className="max-w-[46ch] text-[14.5px] leading-[1.65] text-muted-foreground">
                 {project.summary}
               </p>
-              <div className="mt-7 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-wrap items-center gap-3">
                 <a
                   href={project.href}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13.5px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[12.5px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
                 >
-                  Open {project.name}
-                  <ArrowUpRight size={14} className="opacity-70" />
+                  Open
+                  <ArrowUpRight size={12} className="opacity-70" />
                 </a>
-                {project.meta && (
-                  <span className="font-mono text-[10.5px] tracking-[0.14em] text-muted-foreground uppercase">
-                    {project.meta}
-                  </span>
-                )}
+                {project.meta && <span className={LABEL}>{project.meta}</span>}
               </div>
             </div>
 
             <div>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {project.detail.map((d) => (
-                  <li key={d} className="flex gap-3 text-[14px] leading-relaxed text-muted-foreground">
-                    <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-white/35" />
+                  <li
+                    key={d}
+                    className="flex gap-2.5 text-[13.5px] leading-[1.6] text-muted-foreground"
+                  >
+                    <span aria-hidden className="mt-[0.55em] size-[3px] shrink-0 rounded-full bg-white/30" />
                     {d}
                   </li>
                 ))}
               </ul>
-              <ul className="mt-6 flex flex-wrap gap-2">
-                {project.tags.map((t) => (
-                  <li
-                    key={t}
-                    className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] tracking-[0.12em] text-muted-foreground uppercase"
-                  >
-                    {t}
-                  </li>
-                ))}
-              </ul>
+              <p className={`${LABEL} mt-5`}>{project.tags.join(' · ')}</p>
             </div>
           </div>
         </div>
