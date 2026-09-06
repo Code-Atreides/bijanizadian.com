@@ -36,8 +36,6 @@ import { cn } from '@/lib/utils';
 const SPACING = 1600;
 /** scroll distance that advances the corridor by one frame. */
 const SCROLL_PER_FRAME = 780;
-/** how far past the last frame the corridor keeps going, so it can exit. */
-const TAIL = 0.9;
 /** the visible window, in frames, relative to the camera. */
 const NEAR = 0.55; // past this it has gone by
 const FAR = 2.3; // before this it is too far to see
@@ -206,9 +204,17 @@ export function Corridor({ count, children }: { count: number; children: React.R
         </div>
       </div>
 
+      {/*
+        The spacer is the only thing in flow, so it alone decides how far the
+        page scrolls. Its height is the offset that brings the *last* frame to
+        the camera, plus one viewport — which makes the maximum scroll position
+        exactly that offset. The corridor used to carry an extra 0.9 frames of
+        tail, so you could keep scrolling after the last wall and watch it fly
+        past into an empty room.
+      */}
       <div
         aria-hidden
-        style={{ height: `calc(${(count - 1 + TAIL) * SCROLL_PER_FRAME}px + 100svh)` }}
+        style={{ height: `calc(${(count - 1) * SCROLL_PER_FRAME}px + 100svh)` }}
       />
 
       <Counter current={current} total={count} />
