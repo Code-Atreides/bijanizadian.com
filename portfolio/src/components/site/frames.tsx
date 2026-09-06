@@ -25,7 +25,11 @@ function Split({ left, right }: { left: React.ReactNode; right?: React.ReactNode
       className={
         right
           ? 'grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-16'
-          : 'max-w-[52ch]'
+          // A doorway is a fixed 85vw wide. A single column pinned to its left
+          // edge leaves most of the opening empty and the frame looks broken
+          // rather than spare, so single-column frames centre in it — the same
+          // move the reference makes with .frame--single.
+          : 'mx-auto max-w-[58ch]'
       }
     >
       <div>{left}</div>

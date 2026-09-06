@@ -105,7 +105,7 @@
    --------------------------------------------------------------------------- */
 .corridor-frame {
   background: rgba(11, 11, 14, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.17);
+  border: 1px solid rgba(255, 255, 255, 0.34);
   border-bottom: none;
   border-radius: 18px 18px 0 0;
   box-shadow: 0 0 0 5000px #08080a;
@@ -120,7 +120,7 @@
   bottom: -1px;
   width: 100vw;
   height: 1px;
-  background: rgba(255, 255, 255, 0.17);
+  background: rgba(255, 255, 255, 0.34);
   z-index: -1;
 }
 .corridor-frame::before {

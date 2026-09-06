@@ -48,13 +48,13 @@ export function Nav() {
           {site.name}
         </button>
 
-        <ul className="ml-auto flex items-center gap-0.5 sm:gap-1">
+        <ul className="ml-auto flex items-center gap-6 pr-14 sm:gap-8">
           {LINKS.map((l) => (
             <li key={l.label}>
               <button
                 type="button"
                 onClick={() => goToFrame(l.frame)}
-                className="rounded-full px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:px-3 sm:text-[13.5px]"
+                className="font-mono text-[12px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
               >
                 {l.label}
               </button>

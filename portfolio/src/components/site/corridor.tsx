@@ -258,18 +258,24 @@ export function Frame({
       style={{ visibility: 'hidden', willChange: 'transform, opacity' }}
       className={cn(
         'corridor-frame pointer-events-auto absolute top-1/2 left-1/2',
-        'w-[86vw] max-w-[1040px] px-10 pt-12 pb-14 md:px-14',
+        // Fixed, not content-sized: a corridor only reads as one if every
+        // doorway is the same opening. Sizing to content gave each frame its
+        // own width and height, so the walls stepped in and out.
+        'h-[70vh] w-[85vw] max-w-[1200px] px-10 md:px-16',
       )}
     >
-      <div>{children}</div>
+      <div className="flex h-full flex-col justify-center">{children}</div>
     </section>
   );
 }
 
 function Counter({ current, total }: { current: number; total: number }) {
   return (
-    <p className="pointer-events-none fixed bottom-6 left-1/2 z-30 -translate-x-1/2 font-mono text-[10.5px] tracking-[0.28em] text-muted-foreground/70 tabular-nums">
-      {String(current).padStart(2, '0')} / {String(total).padStart(2, '0')}
+    <p
+      data-counter
+      className="pointer-events-none fixed top-[18px] right-6 z-50 font-mono text-[12px] text-muted-foreground tabular-nums"
+    >
+      {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
     </p>
   );
 }
