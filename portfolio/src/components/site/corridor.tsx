@@ -279,7 +279,7 @@ function Counter({ current, total }: { current: number; total: number }) {
   return (
     <p
       data-counter
-      className="pointer-events-none fixed top-[18px] right-6 z-50 font-mono text-[12px] text-muted-foreground tabular-nums"
+      className="pointer-events-none fixed top-[18px] right-5 z-50 text-[12px] text-muted-foreground tabular-nums sm:right-6"
     >
       {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
     </p>

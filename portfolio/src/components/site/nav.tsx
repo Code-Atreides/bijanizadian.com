@@ -40,16 +40,19 @@ export function Nav() {
           : 'border-b border-transparent bg-transparent',
       )}
     >
-      <nav className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-6">
+      {/* 900px, not a Tailwind stop: it is the width at which the corridor
+          takes over from the flat layout, and therefore the width at which a
+          counter appears in the top-right corner and needs room. */}
+      <nav className="flex h-14 items-center gap-6 px-5 sm:px-6">
         <button
           type="button"
           onClick={() => goToFrame(0)}
-          className="text-[15px] font-medium tracking-[-0.02em] transition-opacity hover:opacity-70"
+          className="text-[13.5px] tracking-[-0.01em] transition-opacity hover:opacity-70"
         >
-          {site.name}
+          {site.domain}
         </button>
 
-        <ul className="ml-auto flex items-center gap-6 pr-14 sm:gap-8">
+        <ul className="ml-auto flex items-center gap-5 sm:gap-8 min-[900px]:pr-16">
           {LINKS.map((l) => (
             <li key={l.label}>
               <button

@@ -10,6 +10,8 @@
 
 export const site = {
   name: 'Bijan Izadian',
+  /** What the top-left corner says. */
+  domain: 'bijanizadian.com',
   location: 'New York City',
   /** Plain description of the work. Not a pitch. */
   tagline: 'Brand, copy and front-end for early-stage companies.',
