@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
 import { goToFrame } from '@/components/site/corridor';
-import { projects, site } from '@/content';
+import { site } from '@/content';
+import { FRAMES } from '@/site-map';
 import { cn } from '@/lib/utils';
 
 /**
@@ -14,10 +15,10 @@ import { cn } from '@/lib/utils';
  * reader flies there instead of teleporting.
  */
 const LINKS = [
-  { label: 'Work', frame: 1 },
-  { label: 'Art', frame: 1 + projects.length },
-  { label: 'About', frame: 2 + projects.length },
-  { label: 'Contact', frame: 3 + projects.length },
+  { label: 'Work', frame: FRAMES.work },
+  { label: 'Art', frame: FRAMES.art },
+  { label: 'About', frame: FRAMES.about },
+  { label: 'Contact', frame: FRAMES.contact },
 ] as const;
 
 export function Nav() {

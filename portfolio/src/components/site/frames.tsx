@@ -61,74 +61,77 @@ export function HeroFrame() {
   );
 }
 
-/* ── 02–04 · the work ───────────────────────────────────────────────────── */
+/* ── 02 · the work, all of it on one wall ───────────────────────────────── */
 
-export function WorkFrames() {
+/**
+ * Three projects, one doorway.
+ *
+ * They had a frame each, which made the corridor claim the gallery work was
+ * three times the journey it is, and forced a reader to fly past two walls to
+ * learn there were only three. On one wall they can be compared at a glance:
+ * name and discipline on the left, what it is on the right, ruled apart.
+ */
+export function WorkFrame({ index }: { index: number }) {
   return (
-    <>
-      {projects.map((p, i) => (
-        <Frame key={p.id} index={i + 1} id={i === 0 ? 'work' : p.id}>
-          <Split
-            left={
-              <>
-                <div className="flex items-baseline gap-4">
-                  <p className={LABEL}>Selected work</p>
-                  <p className={`${LABEL} ml-auto`}>
-                    {String(i + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
-                  </p>
-                </div>
+    <Frame index={index} id="work">
+      <div className="flex items-baseline justify-between border-b border-white/[0.16] pb-4">
+        <p className={LABEL}>Selected work</p>
+        <p className={LABEL}>{String(projects.length).padStart(2, '0')}</p>
+      </div>
 
-                <h2 className={`${HEADLINE} flex items-center gap-3`}>
-                  {p.mark === 'whitewalls' && (
-                    <WhitewallsMark className="size-[0.7em] shrink-0 text-foreground/75" />
-                  )}
-                  {p.name}
-                </h2>
-
-                <p className={`${LABEL} mt-4`}>
-                  {p.role}
-                  {p.year && ` · ${p.year}`}
-                </p>
-
-                <p className={BODY}>{p.summary}</p>
-
-                {p.href && (
-                  <a
-                    href={p.href}
-                    className="mt-7 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-                  >
-                    Open the site
-                    <ArrowUpRight size={13} className="opacity-70" />
-                  </a>
+      <ul className="divide-y divide-white/[0.09]">
+        {projects.map((p) => (
+          <li key={p.id} className="grid gap-3 py-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12">
+            <div>
+              <h3 className="display flex items-center gap-2.5 text-[clamp(1.3rem,2.3vw,1.85rem)] leading-tight">
+                {p.mark === 'whitewalls' && (
+                  <WhitewallsMark className="size-[0.68em] shrink-0 text-foreground/70" />
                 )}
-              </>
-            }
-            right={
-              p.pages && (
-                <ul className="divide-y divide-white/[0.07] border-y border-white/[0.07]">
-                  {p.pages.map((pg) => (
-                    <li key={pg.href}>
+                {p.name}
+              </h3>
+              <p className={`${LABEL} mt-2`}>
+                {p.role}
+                {p.year && ` · ${p.year}`}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-[13.5px] leading-[1.65] text-muted-foreground">{p.summary}</p>
+
+              {p.pages && (
+                <ul className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  {p.pages.map((pg, k) => (
+                    <li key={pg.href} className="flex items-center gap-1.5">
+                      {k > 0 && (
+                        <span aria-hidden className="text-muted-foreground/25">
+                          ·
+                        </span>
+                      )}
                       <a
                         href={pg.href}
-                        className="group flex items-baseline gap-4 py-2.5 transition-colors hover:bg-white/[0.02]"
+                        className="font-mono text-[11.5px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
                       >
-                        <span className="font-mono text-[12.5px] text-foreground/80 transition-colors group-hover:text-foreground">
-                          {pg.name}
-                        </span>
-                        <ArrowUpRight
-                          size={12}
-                          className="ml-auto shrink-0 self-center opacity-0 transition-opacity group-hover:opacity-60"
-                        />
+                        {pg.name}
                       </a>
                     </li>
                   ))}
                 </ul>
-              )
-            }
-          />
-        </Frame>
-      ))}
-    </>
+              )}
+
+              {p.href && (
+                <a
+                  href={p.href}
+                  className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11.5px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+                >
+                  Open the site
+                  <ArrowUpRight size={11} className="opacity-70" />
+                </a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Frame>
   );
 }
 

@@ -4,24 +4,21 @@ import {
   ArtFrame,
   ContactFrame,
   HeroFrame,
-  WorkFrames,
+  WorkFrame,
 } from '@/components/site/frames';
 import { Nav } from '@/components/site/nav';
-import { projects } from '@/content';
-
-// hero + one frame per project + art + about + contact
-const COUNT = 1 + projects.length + 3;
+import { FRAMES, FRAME_COUNT } from '@/site-map';
 
 export default function App() {
   return (
     <>
       <Nav />
-      <Corridor count={COUNT}>
+      <Corridor count={FRAME_COUNT}>
         <HeroFrame />
-        <WorkFrames />
-        <ArtFrame index={1 + projects.length} />
-        <AboutFrame index={2 + projects.length} />
-        <ContactFrame index={3 + projects.length} />
+        <WorkFrame index={FRAMES.work} />
+        <ArtFrame index={FRAMES.art} />
+        <AboutFrame index={FRAMES.about} />
+        <ContactFrame index={FRAMES.contact} />
       </Corridor>
     </>
   );

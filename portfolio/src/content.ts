@@ -58,8 +58,10 @@ export const projects: Project[] = [
     role: 'Brand · Copy · Front end',
     year: '2026',
     href: '/campus',
+    // Trimmed for the wall: three projects share one doorway now, so each gets
+    // a couple of lines rather than a paragraph.
     summary:
-      'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages on one design language: a twelve-section internship manual, three stepped applications wired to Firebase, and a national chapter map built without a mapping library.',
+      'A five-person student team inside every school. Eight pages on one design language — a twelve-section manual, three Firebase-backed applications, and a national chapter map with no mapping library.',
     pages: [
       { name: 'campus', href: '/campus' },
       { name: 'manual', href: '/campus/manual' },
