@@ -79,13 +79,18 @@ export function WorkFrame({ index }: { index: number }) {
         <p className={LABEL}>{String(projects.length).padStart(2, '0')}</p>
       </div>
 
-      <ul className="divide-y divide-white/[0.09]">
+      <ul>
         {projects.map((p) => (
-          <li key={p.id} className="grid gap-3 py-6 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12">
+          <li
+            key={p.id}
+            className="grid gap-3 py-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12"
+          >
             <div>
-              <h3 className="name flex items-center gap-2.5 text-[clamp(1.45rem,2.5vw,2rem)] leading-tight">
+              <h3 className="name relative flex items-center gap-2.5 text-[clamp(1.45rem,2.5vw,2rem)] leading-tight">
                 {p.mark === 'whitewalls' && (
-                  <WhitewallsMark className="size-[0.68em] shrink-0 text-foreground/70" />
+                  <WhitewallsMark
+                    className="size-[0.68em] shrink-0 text-foreground/70 md:absolute md:top-[0.2em] md:right-full md:mr-2.5"
+                  />
                 )}
                 {p.name}
               </h3>
