@@ -30,79 +30,42 @@ export const site = {
   },
 } as const;
 
-export type Project = {
-  id: string;
-  name: string;
-  role: string;
-  year: string;
-  href: string;
-  summary: string;
-  detail: string[];
-  tags: readonly string[];
-  meta?: string;
-};
+export type Page = { name: string; href: string; note: string };
 
-/** Every href is a page in this repo that is live today. */
-export const projects: Project[] = [
-  {
-    id: 'campus',
-    name: 'fomo / campus',
-    role: 'Brand · Copy · Front end',
-    year: '2026',
-    href: '/campus',
-    summary:
-      'The recruiting site for fomo’s campus programme — a five-person student team inside every school, with the application and the internship manual behind it.',
-    detail: [
-      'Twelve-section manual: the five seats, an eight-week goal map, and the rules that are not up to the reader',
-      'Stepped application writing to Firebase, validated harder than the browser does',
-      'Aeonik, a four-step spacing scale and one button set, which the six pages around it inherit',
-    ],
-    tags: ['Brand', 'Copywriting', 'Front end', 'Firebase'],
-    meta: 'Six pages',
-  },
-  {
-    id: 'greekwars',
-    name: 'Greek Wars',
-    role: 'Product · Front end',
-    year: '2026',
-    href: '/greekwars',
-    summary:
-      'A semester-long chapter trading competition: a national map of who has qualified, a raw-PnL board, and twelve-step chapter registration.',
-    detail: [
-      'US map with no mapping library and no runtime fetch — TopoJSON decoded and Albers-projected at build time into a 27KB inline path',
-      'Standings read from Firebase, falling back to a labelled sample season when the node is empty',
-      'A custom combobox for school and chapter, replacing the native datalist',
-    ],
-    tags: ['Data viz', 'Front end', 'Firebase'],
-    meta: '27KB map',
-  },
-  {
-    id: 'dinners',
-    name: 'Dinner Series',
-    role: 'Brand · Copy · Front end',
-    year: '2026',
-    href: '/dinners',
-    summary:
-      'fomo funds a table of twelve; the host picks the room and the people. The programme page and the ten-question host application.',
-    detail: [
-      'The application sits on its own page, measured against a reference layout on fifteen spacing metrics',
-      'Phone formatting, Instagram normalising, and an email check that rejects what the browser accepts',
-      'Tables stack on a phone rather than scrolling sideways',
-    ],
-    tags: ['Brand', 'Copywriting', 'Forms'],
-    meta: 'Ten questions',
-  },
-  {
-    id: 'gameday',
-    name: 'Game Day',
-    role: 'Product · Front end',
-    year: '2026',
-    href: '/gameday',
-    summary:
-      'A second scoreboard: two schools trade against each other while their teams play, running a simulated game so the mechanic is legible before the season is.',
-    detail: ['Live scoreboard and trade feed', 'Simulated game on load, so the page moves with no real data behind it'],
-    tags: ['Product', 'Front end'],
-  },
+/**
+ * One project, not four.
+ *
+ * Greek Wars, the Dinner Series and Game Day are not separate clients — they
+ * are surfaces of the same campus programme, built in the same language on the
+ * same weekend afternoons. Listing them as four entries padded a portfolio that
+ * is stronger described honestly: one body of work, eight live pages.
+ */
+export const work = {
+  name: 'fomo / campus',
+  role: 'Brand · Copy · Front end',
+  year: '2026',
+  href: '/campus',
+  summary:
+    'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages that recruit the team, run the competitions and take the applications, on one design language.',
+  detail: [
+    'A twelve-section internship manual: the five seats, an eight-week goal map, and the rules that are not up to the reader',
+    'Three stepped applications writing to Firebase, validated harder than the browser does — phone formatting, Instagram normalising, an email check that rejects what the browser accepts',
+    'A national chapter map with no mapping library and no runtime fetch: TopoJSON decoded and Albers-projected at build time into a 27KB inline path',
+    'Aeonik, a four-step spacing scale and one button set, which every page inherits',
+  ],
+  tags: ['Brand', 'Copywriting', 'Front end', 'Firebase', 'Data viz'],
+} as const;
+
+/** The surfaces. Every href is live — these are not screenshots. */
+export const pages: Page[] = [
+  { name: 'campus', href: '/campus', note: 'The hub, and the campus-team application' },
+  { name: 'manual', href: '/campus/manual', note: 'Twelve sections: the seats, the map, the rules' },
+  { name: 'greekwars', href: '/greekwars', note: 'Chapter competition — live map and PnL board' },
+  { name: 'onboard', href: '/greekwars/onboard', note: 'Chapter registration, twelve steps' },
+  { name: 'dinners', href: '/dinners', note: 'A funded table of twelve' },
+  { name: 'apply', href: '/dinners/apply', note: 'Host application, ten questions' },
+  { name: 'gameday', href: '/gameday', note: 'Two schools trading through a game' },
+  { name: 'crewsheet', href: '/crewsheet', note: 'Who is doing what, shared by code' },
 ];
 
 export const about = [
