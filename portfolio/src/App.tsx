@@ -3,7 +3,7 @@ import { Suspense, lazy } from 'react';
 import { Footer, Nav } from '@/components/site/nav';
 import { Scrim } from '@/components/site/scrim';
 import { About, Contact, Hero } from '@/components/site/sections';
-import { Work } from '@/components/site/work';
+import { Art, Work } from '@/components/site/work';
 
 // Three.js is ~570kB and paints nothing the reader needs in order to read.
 const DottedSurface = lazy(() =>
@@ -22,6 +22,7 @@ export default function App() {
       <main>
         <Hero />
         <Work />
+        <Art />
         <About />
         <Contact />
       </main>

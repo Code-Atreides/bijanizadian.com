@@ -2,99 +2,137 @@ import { ArrowUpRight } from 'lucide-react';
 
 import { LABEL, SECTION, WRAP } from '@/components/site/sections';
 import { Reveal } from '@/components/ui/reveal';
-import { pages, work } from '@/content';
+import { art, pages, work } from '@/content';
 
 /**
- * One project, given the room a single project deserves.
+ * One project, stated once.
  *
- * The accordion this replaced existed to rank four entries against each other.
- * With one body of work there is nothing to rank, so the section reads as a
- * record instead: what it is, what is in it, and an index of the eight live
- * surfaces — each of which a reader can open and poke at, which is worth more
- * than four names in a list.
+ * This was a two-column block, four detail bullets and an eight-row table with
+ * a note beside every row. The notes mostly restated the page names, and the
+ * bullets said in four sentences what one paragraph says. What is left: the
+ * name, a paragraph, the disciplines, and the eight pages as a row of links —
+ * which is the fastest way for a reader to get into the actual work.
  */
 export function Work() {
   return (
     <section id="work" className={SECTION}>
       <div className={WRAP}>
         <Reveal>
-          <div className="flex items-baseline justify-between border-b border-white/[0.07] pb-5">
+          <div className="flex items-baseline justify-between border-b border-white/[0.07] pb-4">
             <p className={LABEL}>Selected work</p>
             <p className={LABEL}>{work.year}</p>
           </div>
         </Reveal>
 
         <Reveal delay={60}>
-          <div className="mt-9 flex flex-wrap items-baseline gap-x-5 gap-y-2">
-            <h2 className="text-[clamp(1.6rem,3.4vw,2.6rem)] font-medium tracking-[-0.035em]">
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2">
+            <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
               {work.name}
             </h2>
             <p className={LABEL}>{work.role}</p>
           </div>
         </Reveal>
 
-        <div className="mt-8 grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
-          <Reveal delay={110}>
-            <p className="max-w-[48ch] text-[15px] leading-[1.7] text-muted-foreground">
-              {work.summary}
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <a
-                href={work.href}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-              >
-                Open the site
-                <ArrowUpRight size={13} className="opacity-70" />
-              </a>
-              <span className={LABEL}>{pages.length} pages</span>
-            </div>
-          </Reveal>
-
-          <Reveal delay={170}>
-            <ul className="space-y-3">
-              {work.detail.map((d) => (
-                <li key={d} className="flex gap-3 text-[13.5px] leading-[1.65] text-muted-foreground">
-                  <span aria-hidden className="mt-[0.6em] size-[3px] shrink-0 rounded-full bg-white/30" />
-                  {d}
-                </li>
-              ))}
-            </ul>
-            <p className={`${LABEL} mt-6`}>{work.tags.join(' · ')}</p>
-          </Reveal>
-        </div>
-
-        {/* the surfaces — an index, not a gallery */}
-        <Reveal delay={220}>
-          <p className={`${LABEL} mt-14`}>The pages</p>
+        <Reveal delay={110}>
+          <p className="mt-5 max-w-[62ch] text-[15px] leading-[1.7] text-muted-foreground">
+            {work.summary}
+          </p>
         </Reveal>
 
-        {/* One Reveal for the whole index rather than eight. Revealing rows
-            individually left the ones below the fold as invisible placeholders
-            holding open a column of empty space. */}
-        <Reveal delay={240}>
-          <ul className="mt-4 border-t border-white/[0.07]">
+        <Reveal delay={160}>
+          <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <a
+              href={work.href}
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+            >
+              Open the site
+              <ArrowUpRight size={13} className="opacity-70" />
+            </a>
+            <p className={LABEL}>{work.tags.join(' · ')}</p>
+          </div>
+        </Reveal>
+
+        {/* the eight surfaces, as one line rather than a table */}
+        <Reveal delay={210}>
+          <ul className="mt-9 flex flex-wrap items-center gap-x-1.5 gap-y-2 border-t border-white/[0.07] pt-6">
             {pages.map((pg, i) => (
-              <li key={pg.href}>
+              <li key={pg.href} className="flex items-center gap-1.5">
+                {i > 0 && (
+                  <span aria-hidden className="text-muted-foreground/25">
+                    ·
+                  </span>
+                )}
                 <a
                   href={pg.href}
-                  className="group flex items-baseline gap-4 border-b border-white/[0.07] py-3.5 transition-colors hover:bg-white/[0.02] md:gap-6"
-              >
-                  <span className="font-mono text-[10.5px] text-muted-foreground/60 tabular-nums">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="w-[7.5rem] shrink-0 font-mono text-[12.5px] text-foreground/85 transition-colors group-hover:text-foreground">
-                    {pg.name}
-                  </span>
-                  <span className="min-w-0 flex-1 text-[13.5px] text-muted-foreground">{pg.note}</span>
-                  <ArrowUpRight
-                    size={13}
-                    className="shrink-0 opacity-0 transition-opacity group-hover:opacity-60"
-                  />
+                  className="font-mono text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {pg.name}
                 </a>
               </li>
             ))}
           </ul>
         </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Art-world work. Renders nothing until content.art.body is written, so the
+ * live page never carries a placeholder.
+ */
+export function Art() {
+  if (!art.body) return null;
+
+  return (
+    <section id="art" className={SECTION}>
+      <div className={WRAP}>
+        <Reveal>
+          <div className="flex items-baseline justify-between border-b border-white/[0.07] pb-4">
+            <p className={LABEL}>Art</p>
+            {art.year && <p className={LABEL}>{art.year}</p>}
+          </div>
+        </Reveal>
+
+        <Reveal delay={60}>
+          <div className="mt-8 flex flex-wrap items-baseline gap-x-5 gap-y-2">
+            {art.logo ? (
+              // Sized and desaturated to sit in the same register as the type
+              // around it, rather than importing a brand's own colour.
+              <img
+                src={art.logo}
+                alt={art.org}
+                className="h-6 w-auto opacity-85 grayscale"
+                loading="lazy"
+              />
+            ) : (
+              <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-medium tracking-[-0.035em]">
+                {art.org}
+              </h2>
+            )}
+            {art.role && <p className={LABEL}>{art.role}</p>}
+          </div>
+        </Reveal>
+
+        <Reveal delay={110}>
+          <p className="mt-5 max-w-[62ch] text-[15px] leading-[1.7] text-muted-foreground">
+            {art.body}
+          </p>
+        </Reveal>
+
+        {art.href && (
+          <Reveal delay={160}>
+            <a
+              href={art.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-7 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-[13px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
+            >
+              Open
+              <ArrowUpRight size={13} className="opacity-70" />
+            </a>
+          </Reveal>
+        )}
       </div>
     </section>
   );

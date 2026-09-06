@@ -63,7 +63,7 @@ export function Nav() {
           {site.name}
         </a>
 
-        <ul className="ml-auto hidden items-center gap-1 md:flex">
+        <ul className="ml-auto flex items-center gap-1">
           {LINKS.map((l) => (
             <li key={l.href}>
               <a
@@ -81,17 +81,6 @@ export function Nav() {
           ))}
         </ul>
 
-        <span className="ml-auto flex items-center gap-2 md:ml-0">
-          <span className="relative flex size-1.5">
-            {site.status.available && (
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400/70 [animation-duration:2.6s] motion-reduce:hidden" />
-            )}
-            <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-          </span>
-          <span className="font-mono text-[10.5px] tracking-[0.16em] text-muted-foreground uppercase">
-            {site.status.label}
-          </span>
-        </span>
       </nav>
     </header>
   );

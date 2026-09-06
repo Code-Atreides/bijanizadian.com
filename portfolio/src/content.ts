@@ -11,7 +11,6 @@
 export const site = {
   name: 'Bijan Izadian',
   location: 'New York City',
-  status: { label: 'Open to work', available: true },
   /** Plain description of the work. Not a pitch. */
   tagline: 'Brand, copy and front-end for early-stage companies.',
   /** One line of context under it. */
@@ -30,7 +29,7 @@ export const site = {
   },
 } as const;
 
-export type Page = { name: string; href: string; note: string };
+export type Page = { name: string; href: string };
 
 /**
  * One project, not four.
@@ -46,27 +45,42 @@ export const work = {
   year: '2026',
   href: '/campus',
   summary:
-    'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages that recruit the team, run the competitions and take the applications, on one design language.',
-  detail: [
-    'A twelve-section internship manual: the five seats, an eight-week goal map, and the rules that are not up to the reader',
-    'Three stepped applications writing to Firebase, validated harder than the browser does — phone formatting, Instagram normalising, an email check that rejects what the browser accepts',
-    'A national chapter map with no mapping library and no runtime fetch: TopoJSON decoded and Albers-projected at build time into a 27KB inline path',
-    'Aeonik, a four-step spacing scale and one button set, which every page inherits',
-  ],
+    'The recruiting site for fomo’s campus programme — a five-person student team inside every school. Eight pages on one design language: a twelve-section internship manual, three stepped applications wired to Firebase, and a national chapter map built without a mapping library.',
   tags: ['Brand', 'Copywriting', 'Front end', 'Firebase', 'Data viz'],
 } as const;
 
-/** The surfaces. Every href is live — these are not screenshots. */
+/** The surfaces, as links. Every href is live. */
 export const pages: Page[] = [
-  { name: 'campus', href: '/campus', note: 'The hub, and the campus-team application' },
-  { name: 'manual', href: '/campus/manual', note: 'Twelve sections: the seats, the map, the rules' },
-  { name: 'greekwars', href: '/greekwars', note: 'Chapter competition — live map and PnL board' },
-  { name: 'onboard', href: '/greekwars/onboard', note: 'Chapter registration, twelve steps' },
-  { name: 'dinners', href: '/dinners', note: 'A funded table of twelve' },
-  { name: 'apply', href: '/dinners/apply', note: 'Host application, ten questions' },
-  { name: 'gameday', href: '/gameday', note: 'Two schools trading through a game' },
-  { name: 'crewsheet', href: '/crewsheet', note: 'Who is doing what, shared by code' },
+  { name: 'campus', href: '/campus' },
+  { name: 'manual', href: '/campus/manual' },
+  { name: 'greekwars', href: '/greekwars' },
+  { name: 'onboard', href: '/greekwars/onboard' },
+  { name: 'dinners', href: '/dinners' },
+  { name: 'apply', href: '/dinners/apply' },
+  { name: 'gameday', href: '/gameday' },
+  { name: 'crewsheet', href: '/crewsheet' },
 ];
+
+/**
+ * Art-world work.
+ *
+ * Empty on purpose. I have nothing to source it from, and inventing a role at
+ * a real organisation is the same mistake as the Polymarket line. Fill `body`
+ * and the section renders itself — until then it stays hidden, so the live
+ * page never shows a placeholder.
+ *
+ * `logo` takes a path to a file dropped in portfolio/public/, served as
+ * '/v2/whitewall.svg'. I have not drawn one: approximating someone else's
+ * trademark is worse than the text credit the section falls back to.
+ */
+export const art = {
+  org: 'Whitewall', // TODO: which Whitewall — the magazine, the printer, or the galleries?
+  role: '', // TODO: e.g. 'Editorial · Social'
+  year: '', // TODO
+  href: '', // TODO: link to the work, or to the organisation
+  body: '', // TODO: two sentences on what you did. The section appears once this is set.
+  logo: '', // TODO: optional path to an SVG/PNG you add
+};
 
 export const about = [
   'fomo’s campus programme is the bulk of it: a five-person student team inside every school, and the eight pages that recruit them, run the competitions and take the applications. I did the brand, the copy and the front end.',
