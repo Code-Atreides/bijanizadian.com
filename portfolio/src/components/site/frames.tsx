@@ -79,11 +79,17 @@ export function WorkFrame({ index }: { index: number }) {
         <p className={LABEL}>{String(projects.length).padStart(2, '0')}</p>
       </div>
 
-      <ul>
+      {/* Row spacing scales with the height available. At a fixed py-7 this wall
+          needed 471px inside a 448px doorway on a 640px-tall screen and spilled
+          out of the frame; the vh term gives it back on short screens without
+          tightening anything on a normal one. first/last trim the outer padding
+          so the block's ink is centred — with it, the wall sat 26px high at
+          every size. */}
+      <ul className="mt-6">
         {projects.map((p) => (
           <li
             key={p.id}
-            className="grid gap-3 py-7 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12"
+            className="grid gap-3 py-[clamp(0.7rem,2.4vh,1.75rem)] first:pt-0 last:pb-0 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12"
           >
             <div>
               <h3 className="name relative flex items-center gap-2.5 text-[clamp(1.45rem,2.5vw,2rem)] leading-tight">
@@ -101,7 +107,13 @@ export function WorkFrame({ index }: { index: number }) {
             </div>
 
             <div>
-              <p className="text-[13px] leading-[1.75] text-muted-foreground">{p.summary}</p>
+              {/* Capped in characters, not pixels. The column is wide enough for 76
+                  characters of Courier, which is a long way to track back to the
+                  start of the next line, and every other paragraph on the site
+                  sets around 46. */}
+              <p className="max-w-[60ch] text-[13px] leading-[1.75] text-muted-foreground">
+                {p.summary}
+              </p>
 
               {p.pages && (
                 <ul className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1">
