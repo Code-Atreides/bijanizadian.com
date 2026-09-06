@@ -79,15 +79,16 @@ export const projects: Project[] = [
     mark: 'whitewalls',
     // TODO: a link, and a line on what it actually handles day to day.
     summary:
-      'A CRM built for an art gallery in the autumn of 2025 — the system a gallery runs on rather than the one it shows.',
+      'A CRM built for an art gallery in the autumn of 2025 — the system it runs on day to day.',
   },
   {
     id: 'cyrus',
     name: 'Cyrus Collective',
     role: 'Backend · Gallery systems',
-    // TODO: dates. I have left the year off rather than guess at it.
+    // TODO: dates, and a line on what the systems actually handle. Broad for
+    // now because that is all I have, not as a stylistic choice.
     summary:
-      'The gallery side of the work: backend systems for art galleries, built to be run daily rather than demonstrated. Kept broad on purpose — the galleries are not mine to name.',
+      'Backend work for art galleries, across the gallery business — the systems behind the front desk.',
   },
 ];
 
