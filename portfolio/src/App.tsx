@@ -1,29 +1,34 @@
-import { LiquidMetalButton } from '@/components/ui/liquid-metal-button';
+import { Suspense, lazy } from 'react';
 
-/**
- * Scaffold check, not the portfolio. This exists to prove the toolchain and the
- * shader component work end to end before any design language is committed to.
- */
+import { Footer, Nav } from '@/components/site/nav';
+import { Scrim } from '@/components/site/scrim';
+import { About, Capabilities, Contact, Hero } from '@/components/site/sections';
+import { Work } from '@/components/site/work';
+
+// Three.js is ~570kB of the bundle and paints nothing the reader needs in order
+// to read. Splitting it out lets the type and the buttons arrive first; the
+// wave fades in a moment later, over ground that already looks intentional.
+const DottedSurface = lazy(() =>
+  import('@/components/ui/dotted-surface').then((m) => ({ default: m.DottedSurface })),
+);
+
 export default function App() {
   return (
-    <main className="grid min-h-dvh place-items-center gap-10 p-8">
-      <div className="flex flex-col items-center gap-3">
-        <p className="font-mono text-[11px] tracking-[0.18em] text-muted-foreground uppercase">
-          scaffold check
-        </p>
-        <h1 className="text-4xl font-semibold tracking-tight">Bijan Izadian</h1>
-      </div>
+    <>
+      <Suspense fallback={null}>
+        <DottedSurface size={6} opacity={0.55} speed={1.2} />
+      </Suspense>
+      <Scrim />
 
-      <div className="flex flex-wrap items-center justify-center gap-8">
-        <LiquidMetalButton label="Get Started" />
-        <LiquidMetalButton label="View the work" />
-        <LiquidMetalButton viewMode="icon" ariaLabel="Sparkles" />
-      </div>
-
-      <p className="max-w-prose text-center text-sm text-muted-foreground">
-        React 19 · Vite · TypeScript · Tailwind v4 · shadcn structure. The pill faces are
-        live WebGL, running at reduced idle speed.
-      </p>
-    </main>
+      <Nav />
+      <main>
+        <Hero />
+        <Work />
+        <Capabilities />
+        <About />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 }
