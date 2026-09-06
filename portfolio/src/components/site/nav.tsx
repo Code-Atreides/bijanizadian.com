@@ -30,15 +30,6 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Deep links have to be mapped for the same reason.
-  useEffect(() => {
-    const hash = window.location.hash.slice(1).toLowerCase();
-    if (!hash) return;
-    if (hash === 'top') return void requestAnimationFrame(() => goToFrame(0));
-    const target = LINKS.find((l) => l.label.toLowerCase() === hash);
-    if (target) requestAnimationFrame(() => goToFrame(target.frame));
-  }, []);
-
   return (
     <header
       className={cn(

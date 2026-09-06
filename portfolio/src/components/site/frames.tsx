@@ -16,8 +16,7 @@ import { about, art, projects, site } from '@/content';
  */
 
 const LABEL = 'font-mono text-[10.5px] tracking-[0.26em] text-muted-foreground uppercase';
-const HEADLINE =
-  'mt-5 text-[clamp(1.7rem,3.4vw,2.9rem)] leading-[1.06] font-medium tracking-[-0.04em] text-balance';
+const HEADLINE = 'display mt-5 text-[clamp(1.9rem,3.8vw,3.1rem)] leading-[1.08] text-balance';
 const BODY = 'mt-5 max-w-[46ch] text-[15px] leading-[1.7] text-muted-foreground';
 
 function Split({ left, right }: { left: React.ReactNode; right?: React.ReactNode }) {
@@ -42,7 +41,7 @@ export function HeroFrame() {
     <Frame index={0} id="top">
       <div className="text-center">
         <p className={LABEL}>{site.location}</p>
-        <h1 className="mt-6 text-[clamp(2.6rem,8vw,6rem)] leading-[0.9] font-medium tracking-[-0.05em]">
+        <h1 className="display mt-6 text-[clamp(2.8rem,8.5vw,6.2rem)] leading-[0.95]">
           {site.name}
         </h1>
         <p className="mx-auto mt-7 max-w-[44ch] text-[clamp(0.95rem,1.35vw,1.05rem)] text-muted-foreground">
@@ -186,7 +185,7 @@ export function AboutFrame({ index }: { index: number }) {
         left={
           <>
             <p className={LABEL}>About</p>
-            <p className="mt-6 text-[clamp(1.05rem,1.9vw,1.35rem)] leading-[1.5]">{about[0]}</p>
+            <p className="display mt-6 text-[clamp(1.2rem,2.1vw,1.6rem)] leading-[1.45]">{about[0]}</p>
             {about[1] && <p className={BODY}>{about[1]}</p>}
           </>
         }

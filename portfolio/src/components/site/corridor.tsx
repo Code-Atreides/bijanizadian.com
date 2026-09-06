@@ -85,6 +85,33 @@ export function Corridor({ count, children }: { count: number; children: React.R
   // frame the corridor froze with everything inert and the front frame stuck.
   const ctx = useMemo(() => ({ register, reduced }), [register, reduced]);
 
+  // Where the corridor opens.
+  //
+  // Two things fight for that decision and both get it wrong. The browser
+  // restores the previous scrollY on reload, which in a corridor means opening
+  // on whichever frame you happened to be looking at — it reads as landing on
+  // the wrong page. And a #hash makes the browser scroll that element into
+  // view, but every frame sits at the same document position inside a fixed
+  // scene, so it lands on nothing.
+  //
+  // This effect settles it. It runs after the Frame effects have registered
+  // their elements (children before parents), so the frame carrying the hash
+  // can be found by id and turned into the scroll offset that actually brings
+  // it to the camera.
+  useEffect(() => {
+    if (reduced) return;
+    const prior = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+
+    const hash = window.location.hash.slice(1).toLowerCase();
+    const i = hash ? frames.current.findIndex((f) => f?.id.toLowerCase() === hash) : -1;
+    window.scrollTo({ top: i > 0 ? i * SCROLL_PER_FRAME : 0, behavior: 'auto' });
+
+    return () => {
+      history.scrollRestoration = prior;
+    };
+  }, [reduced]);
+
   useEffect(() => {
     if (reduced) return;
 
@@ -114,20 +141,23 @@ export function Corridor({ count, children }: { count: number; children: React.R
         }
         if (!visible) continue;
 
-        // Depth needs atmosphere, not just distance. A linear fade left the
-        // frame one step back at high opacity, sitting on top of the front
-        // frame's paragraph and making both unreadable. Opacity now falls off
-        // geometrically — each frame back is ~16% of the one in front — and
-        // distance blurs, which is what actually reads as air between panels.
+        // Depth is applied to the frame and to its contents separately, and
+        // that split is the whole trick on a dark ground.
+        //
+        // The architecture — border, floor line, and the wall of ground colour
+        // the box-shadow paints — stays at full strength going back, so the
+        // corridor keeps its shape. The *text* inside recedes hard, because
+        // white type at 45% through a translucent frame face is still bright
+        // enough to fight the headline in front of it. Fading the whole element
+        // instead would dissolve the walls and collapse the corridor; fading
+        // nothing would bury the frame you are meant to be reading.
         const behind = Math.max(0, -d);
         const passing = Math.max(0, d);
-        const fade = passing > 0 ? Math.pow(Math.max(0, 1 - passing / NEAR), 1.9) : 1;
+        const fade = passing > 0 ? Math.pow(Math.max(0, 1 - passing / NEAR), 1.6) : 1;
 
-        el.style.opacity = String(Math.pow(0.16, behind) * fade);
-        el.style.filter =
-          behind > 0.02 || passing > 0.02
-            ? `blur(${Math.min(7, behind * 2.4 + passing * 6).toFixed(2)}px)`
-            : 'none';
+        el.style.opacity = String(Math.pow(0.88, behind) * fade);
+        const content = el.firstElementChild as HTMLElement | null;
+        if (content) content.style.opacity = String(Math.pow(0.13, behind));
         el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
       }
 
@@ -225,13 +255,13 @@ export function Frame({
     <section
       id={id ?? auto}
       ref={ref as React.Ref<HTMLElement>}
-      style={{ visibility: 'hidden', willChange: 'transform, opacity, filter' }}
+      style={{ visibility: 'hidden', willChange: 'transform, opacity' }}
       className={cn(
-        'pointer-events-auto absolute top-1/2 left-1/2 w-[86vw] max-w-[980px]',
-        'max-h-[78vh] overflow-y-auto overscroll-contain',
+        'corridor-frame pointer-events-auto absolute top-1/2 left-1/2',
+        'w-[86vw] max-w-[1040px] px-10 pt-12 pb-14 md:px-14',
       )}
     >
-      {children}
+      <div>{children}</div>
     </section>
   );
 }
@@ -244,10 +274,15 @@ function Counter({ current, total }: { current: number; total: number }) {
   );
 }
 
-/** Scrolls the corridor to a frame. Exported so the nav can drive it. */
-export function goToFrame(index: number) {
-  window.scrollTo({
-    top: index * SCROLL_PER_FRAME,
-    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-  });
+/**
+ * Scrolls the corridor to a frame. Exported so the nav can drive it.
+ *
+ * `instant` is for arriving on a deep link: flying the reader from the first
+ * frame to the seventh on page load is a long trip through content they did not
+ * ask to see, and smooth-scrolling before first layout gets cancelled anyway.
+ */
+export function goToFrame(index: number, instant = false) {
+  const smooth =
+    !instant && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: index * SCROLL_PER_FRAME, behavior: smooth ? 'smooth' : 'auto' });
 }

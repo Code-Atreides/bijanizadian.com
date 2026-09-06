@@ -30,6 +30,10 @@
   --font-sans:
     ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+  /* Display face, taken from the whitewalls preview. A serif against the mono
+     labels is what gives the corridor its gallery-wall-text register; the
+     geometric sans it replaces read like software. */
+  --font-serif: 'Times New Roman', Times, 'Iowan Old Style', Georgia, serif;
 }
 
 @layer base {
@@ -60,6 +64,14 @@
   border-radius: 100px !important;
 }
 
+/* Headlines carry the serif. Labels stay mono, body stays sans — the same
+   three roles the preview used. */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+
 @keyframes lmb-ripple {
   0% {
     transform: translate(-50%, -50%) scale(0);
@@ -78,4 +90,42 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   The corridor's architecture.
+
+   Each frame is a doorway rather than a floating panel: bordered, open at the
+   bottom, standing on a floor line that runs off to either horizon. The huge
+   box-shadow is the trick that makes it read as a corridor at all — a solid
+   ring of ground colour around every frame turns it into an aperture in an
+   infinite wall, so a frame occludes everything behind it except what shows
+   through its opening. Taken from the whitewalls preview, recoloured for a
+   near-black ground.
+   --------------------------------------------------------------------------- */
+.corridor-frame {
+  background: rgba(11, 11, 14, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.17);
+  border-bottom: none;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 0 0 5000px #08080a;
+  isolation: isolate;
+}
+
+/* the floor, running out of both sides of the doorway */
+.corridor-frame::before,
+.corridor-frame::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  width: 100vw;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.17);
+  z-index: -1;
+}
+.corridor-frame::before {
+  right: 100%;
+}
+.corridor-frame::after {
+  left: 100%;
 }
