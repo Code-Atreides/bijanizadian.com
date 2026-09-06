@@ -144,40 +144,37 @@
 
 /* The floor line: where the wall meets the ground.
  *
- * One line spanning the room, not two stubs. It used to be a pair of
- * pseudo-elements extending outward from the doorway's edges, which left the
- * opening itself unlined — so at any normal window width it rendered as two
- * bright fragments hard against the left and right screen edges with a gap
- * between them. Drawn as a single band, it reads as one horizon: strongest
- * across the doorway, dissolving into the dark at either side.
+ * It runs *outward* from the doorway's two edges to the sides of the screen,
+ * and never across the opening — the opening is a hole in a wall, and a line
+ * drawn across it closes the room. I had it as one continuous band for a
+ * while, which killed exactly that: the corridor stopped reading as something
+ * you could walk into.
  *
- * Only the room you are standing in gets one. Perspective lifts a receding
- * frame's floor toward the vanishing point, so a wall two steps back drew its
- * horizon straight across the middle of the page. `--floor` is driven from the
- * scroll handler and falls to zero within half a frame of depth.
+ * Solid, at the same alpha as the wall border, so the two read as one system
+ * of architectural lines rather than as a rule and a glow.
+ *
+ * Only the room at the camera gets one: perspective lifts a receding frame's
+ * floor toward the vanishing point, and its line would cut across the copy of
+ * the frame in front. `--floor` is driven from the scroll handler.
  */
-.corridor-frame::before {
+.corridor-frame::before,
+.corridor-frame::after {
   content: '';
   position: absolute;
   bottom: -2px;
-  left: 50%;
-  /* Exactly one viewport wide, so the gradient's stops map straight onto the
-     screen: full strength across the doorway, gone by both edges. At 300vw the
-     stops landed off-screen and the line was still at ~35% alpha where it got
-     clipped, which is what read as a hard edge. */
   width: 100vw;
   height: 2px;
-  transform: translateX(-50%);
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    rgba(255, 255, 255, 0.45) 15%,
-    rgba(255, 255, 255, 0.5) 50%,
-    rgba(255, 255, 255, 0.45) 85%,
-    transparent 100%
-  );
+  background: rgba(255, 255, 255, 0.42);
   opacity: var(--floor, 1);
   z-index: -1;
+}
+
+.corridor-frame::before {
+  right: 100%;
+}
+
+.corridor-frame::after {
+  left: 100%;
 }
 
 /* ---------------------------------------------------------------------------
