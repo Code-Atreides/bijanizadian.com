@@ -4,6 +4,7 @@
   },
   "hosting": {
     "public": ".",
+    "predeploy": ["node scripts/check-fomo-links.mjs"],
     "ignore": [
       "firebase.json",
       "**/.*",

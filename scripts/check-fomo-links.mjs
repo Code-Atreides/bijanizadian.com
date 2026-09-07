@@ -9,6 +9,12 @@ const pages = ['campus/landing.html','campus/directory.html'];
 const external = new Set();
 let failures = 0, checked = 0, journeyChecks = 0;
 function fail(message) { failures++; console.error(message); }
+// Firebase's **/.* pattern excludes dotfiles, not all files inside dot-directories.
+// Keep explicit recursive exclusions: a previous deployment included .git contents.
+const hosting = JSON.parse(fs.readFileSync(path.join(root, 'firebase.json'), 'utf8')).hosting;
+for (const required of ['**/.*', '**/.*/**', '.git/**', '.firebase/**', '**/*.log', 'scripts/**', 'AGENTS.md', 'portfolio/**', 'database.rules.json']) {
+  if (!hosting.ignore?.includes(required)) fail(`firebase.json: missing protected-path exclusion ${required}`);
+}
 function assertJourney(condition, message) {
   journeyChecks++;
   if (!condition) fail(`campus/landing.html: ${message}`);

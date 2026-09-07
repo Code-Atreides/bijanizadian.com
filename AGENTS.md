@@ -24,3 +24,7 @@ project be pushed to GitHub and published to their domain by default.
   output is `v2/` and must be committed with its source.
 - Check the affected layouts and navigation, and run `git diff --check` before
   publishing. Firebase serves the repository root with clean URLs.
+- The Hosting predeploy hook checks links and protected-path exclusions. Do not
+  rely on `**/.*` alone: retain recursive hidden-directory exclusions. After a
+  release, confirm `/.git/HEAD` and `/.git/config` return 404 and the upload
+  manifest contains no hidden paths. Never deploy credentials or Git metadata.
