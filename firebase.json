@@ -7,6 +7,9 @@
     "ignore": [
       "firebase.json",
       "**/.*",
+      "**/.*/**",
+      ".git/**",
+      ".firebase/**",
       "**/node_modules/**",
       "**/*.log",
       "bijanizadian.com.txt",
@@ -16,6 +19,7 @@
       "preview-final.html",
       "scripts/**",
       "AGENTS.md",
+      "database.rules.json",
       "portfolio/**"
     ],
     "cleanUrls": true,
