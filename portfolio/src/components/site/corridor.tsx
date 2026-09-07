@@ -4,56 +4,54 @@ import {
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
-
-/**
- * A corridor of frames you move through by scrolling.
- *
- * The version this replaces put every frame on one z-axis and drove it by
- * rewriting document.body.style.height at runtime. Three problems followed:
- *
- *  1. The nav frames sat at z −30000/−35000/−40000 while the corridor ended at
- *     −21000, so reaching the last one meant scrolling 19,000px of empty
- *     corridor. The fix is not a bigger number — it is that depth should be
- *     derived from the frame's index, not authored per frame.
- *  2. Because body height was mutated to reach those depths and shrunk again
- *     afterwards, a reload restored a scroll position that no longer meant
- *     anything, which is what the `restoredScroll > 21000` guard was patching.
- *     Height here is a function of frame count and never changes.
- *  3. Frames only translated; they never faded. A panel arrived at full opacity
- *     from nowhere and passed through the camera at full opacity. Depth without
- *     atmosphere reads as popping, so opacity is now a curve over distance.
- *
- * Everything the reader sees is one linear map: scrollY → progress → z.
- */
-
-/** z-distance between neighbouring frames. */
+/** Native page scrolling moves the camera through equally spaced walls. */
 const SPACING = 1600;
-/** scroll distance that advances the corridor by one frame. */
+const PERSPECTIVE = 2200;
 const SCROLL_PER_FRAME = 780;
-/** the visible window, in frames, relative to the camera. */
-const NEAR = 0.55; // past this it has gone by
-const FAR = 2.3; // before this it is too far to see
+const NEAR = 0.55;
+const FAR = 3.4;
 
-type Ctx = { register: (el: HTMLElement | null, index: number) => void; reduced: boolean };
+// Keep the matching media query in index.css in sync.
+const FLAT = '(prefers-reduced-motion: reduce), (max-width: 899px), (max-height: 599px)';
+const NAVIGATE_EVENT = 'corridor:navigate';
+const LABELS: Record<string, string> = {
+  top: 'Introduction',
+  work: 'Selected work',
+  art: 'Art',
+  about: 'About',
+  contact: 'Contact',
+};
+
+type Ctx = { register: (el: HTMLElement | null, index: number) => void; flat: boolean };
 const CorridorCtx = createContext<Ctx | null>(null);
 
-/**
- * Whether to fly the corridor or lay the frames out as a document.
- *
- * Two reasons to fall back. Reduced motion is the obvious one — moving the
- * whole page through depth is exactly what that setting exists to stop. The
- * second is phones: a frame taller than the screen has to scroll internally,
- * and a scroll inside a scroll-driven corridor means every swipe is ambiguous.
- * Under 900px the same content reads as an ordinary page, which on a phone is
- * not a downgrade.
- */
-const FLAT = '(prefers-reduced-motion: reduce), (max-width: 899px)';
+let activeFrame = 0;
+const subscribers = new Set<() => void>();
+let pendingFocus: { index: number; expires: number } | null = null;
+
+function subscribe(listener: () => void) {
+  subscribers.add(listener);
+  return () => { subscribers.delete(listener); };
+}
+
+/** Zero-based visible section, shared with navigation outside the scene. */
+export function useCurrentFrame() {
+  return useSyncExternalStore(subscribe, () => activeFrame, () => 0);
+}
+
+function publishFrame(index: number) {
+  if (activeFrame === index) return;
+  activeFrame = index;
+  subscribers.forEach((listener) => listener());
+}
 
 function useFlatLayout() {
   const [flat, setFlat] = useState(
@@ -61,143 +59,149 @@ function useFlatLayout() {
   );
   useEffect(() => {
     const mq = window.matchMedia(FLAT);
-    const on = () => setFlat(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
+    const onChange = () => setFlat(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
   }, []);
   return flat;
 }
 
+function hashId() {
+  try {
+    return decodeURIComponent(window.location.hash.slice(1)).toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function frameElement(index: number, id?: string) {
+  return (id ? document.getElementById(id) : null)
+    ?? document.querySelector<HTMLElement>(`[data-frame-index="${index}"]`);
+}
+
+function scrollToFrame(index: number, el: HTMLElement | null | undefined, behavior: ScrollBehavior) {
+  if (window.matchMedia(FLAT).matches) {
+    if (el) el.scrollIntoView({ behavior, block: 'start' });
+    else window.scrollTo({ top: 0, behavior });
+  } else {
+    window.scrollTo({ top: index * SCROLL_PER_FRAME, behavior });
+  }
+}
+
 export function Corridor({ count, children }: { count: number; children: React.ReactNode }) {
-  const reduced = useFlatLayout();
+  const flat = useFlatLayout();
+  const current = useCurrentFrame();
   const frames = useRef<Array<HTMLElement | null>>([]);
-  const [current, setCurrent] = useState(1);
+  const previousLayout = useRef<boolean | null>(null);
 
   const register = useCallback((el: HTMLElement | null, index: number) => {
     frames.current[index] = el;
   }, []);
+  const ctx = useMemo(() => ({ register, flat }), [register, flat]);
 
-  // The counter re-renders Corridor on every frame change. Without memoising
-  // this, the context value is a new object each time, every Frame's effect
-  // re-runs, and each one resets itself to hidden+inert — so past the third
-  // frame the corridor froze with everything inert and the front frame stuck.
-  const ctx = useMemo(() => ({ register, reduced }), [register, reduced]);
-
-  // Where the corridor opens.
-  //
-  // Two things fight for that decision and both get it wrong. The browser
-  // restores the previous scrollY on reload, which in a corridor means opening
-  // on whichever frame you happened to be looking at — it reads as landing on
-  // the wrong page. And a #hash makes the browser scroll that element into
-  // view, but every frame sits at the same document position inside a fixed
-  // scene, so it lands on nothing.
-  //
-  // This effect settles it. It runs after the Frame effects have registered
-  // their elements (children before parents), so the frame carrying the hash
-  // can be found by id and turned into the scroll offset that actually brings
-  // it to the camera.
   useEffect(() => {
-    if (reduced) return;
     const prior = history.scrollRestoration;
     history.scrollRestoration = 'manual';
+    return () => { history.scrollRestoration = prior; };
+  }, []);
 
-    const hash = window.location.hash.slice(1).toLowerCase();
-    const i = hash ? frames.current.findIndex((f) => f?.id.toLowerCase() === hash) : -1;
-    window.scrollTo({ top: i > 0 ? i * SCROLL_PER_FRAME : 0, behavior: 'auto' });
-
-    return () => {
-      history.scrollRestoration = prior;
-    };
-  }, [reduced]);
-
-  useEffect(() => {
-    if (reduced) return;
-
+  useLayoutEffect(() => {
     let raf = 0;
-    let shown = -1;
     let idle = 0;
+    const clampIndex = (index: number) => Math.min(count - 1, Math.max(0, index));
 
     const paint = () => {
       raf = 0;
-      const p = window.scrollY / SCROLL_PER_FRAME;
+      if (flat) {
+        const readingLine = Math.min(window.innerHeight * 0.35, 260);
+        let index = 0;
+        frames.current.forEach((el, i) => {
+          if (el && el.getBoundingClientRect().top <= readingLine) index = i;
+        });
+        if (window.scrollY > 0
+          && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+          index = count - 1;
+        }
+        publishFrame(clampIndex(index));
+        return;
+      }
+
+      const progress = Math.max(0, Math.min(count - 1, window.scrollY / SCROLL_PER_FRAME));
+      const index = clampIndex(Math.round(progress));
+      const front = frames.current[index];
+
+      // Receding walls stay visible, but only the closest wall is interactive.
+      // Activate the new wall before transferring focus out of the old one.
+      if (front && front.dataset.active !== '1') {
+        // End/Home and history can jump to a wall that was fully hidden.
+        // It must be visible before focus can leave the departing wall.
+        front.style.visibility = 'visible';
+        front.removeAttribute('inert');
+        front.removeAttribute('aria-hidden');
+        const focused = document.activeElement;
+        if (focused instanceof HTMLElement && frames.current.some(
+          (el, i) => i !== index && el?.contains(focused),
+        )) {
+          front.focus({ preventScroll: true });
+        }
+      }
 
       for (let i = 0; i < frames.current.length; i++) {
         const el = frames.current[i];
         if (!el) continue;
+        const distance = progress - i;
+        const visible = distance > -FAR && distance < NEAR;
+        const interactive = i === index;
 
-        const d = p - i; // 0 = at the camera plane, negative = still ahead
-        const visible = d > -FAR && d < NEAR;
-
-        // `data-on` is the source of truth for the current state. Frames are
-        // born hidden and inert (see Frame below), so this flips only on a
-        // genuine change and never writes to the DOM on every frame.
-        const wasOn = el.dataset.on === '1';
-        if (visible !== wasOn) {
-          el.dataset.on = visible ? '1' : '0';
+        const visibilityState = visible ? '1' : '0';
+        if (el.dataset.on !== visibilityState) {
+          el.dataset.on = visibilityState;
           el.style.visibility = visible ? 'visible' : 'hidden';
-          // inert keeps links in frames you cannot see out of the tab order
-          el.toggleAttribute('inert', !visible);
+        }
+        const activeState = interactive ? '1' : '0';
+        if (el.dataset.active !== activeState) {
+          el.dataset.active = activeState;
+          el.style.pointerEvents = interactive ? 'auto' : 'none';
+          el.toggleAttribute('inert', !interactive);
+          if (!interactive) el.setAttribute('aria-hidden', 'true');
         }
         if (!visible) continue;
 
-        // Depth is applied to the frame and to its contents separately, and
-        // that split is the whole trick on a dark ground.
-        //
-        // The architecture — border, floor line, and the wall of ground colour
-        // the box-shadow paints — stays at full strength going back, so the
-        // corridor keeps its shape. The *text* inside recedes hard, because
-        // white type at 45% through a translucent frame face is still bright
-        // enough to fight the headline in front of it. Fading the whole element
-        // instead would dissolve the walls and collapse the corridor; fading
-        // nothing would bury the frame you are meant to be reading.
-        const behind = Math.max(0, -d);
-        const passing = Math.max(0, d);
+        const behind = Math.max(0, -distance);
+        const passing = Math.max(0, distance);
         const fade = passing > 0 ? Math.pow(Math.max(0, 1 - passing / NEAR), 1.6) : 1;
 
-        el.style.opacity = String(Math.pow(0.88, behind) * fade);
+        // Let the next three doorways read through the current wall, with a
+        // soft far edge. Their typography still disappears a full room away.
+        const farFade = Math.min(1, Math.max(0, (FAR - behind) / 0.6));
+        el.style.opacity = String(Math.pow(0.9, behind) * fade * farFade);
         const content = el.firstElementChild as HTMLElement | null;
-        if (content) content.style.opacity = String(Math.pow(0.055, behind));
-
-        // Every frame keeps its floor, because the receding ones are what make
-        // this a hallway rather than a stack of panels.
-        //
-        // They are safe to draw now that the line runs outward from a frame's
-        // own edges instead of across the full width: a frame never draws over
-        // its own opening, so a receding floor can only ever appear in the ring
-        // between one doorway's edge and the next — flanking segments, never a
-        // rule through the copy. That was the real cause of the line across the
-        // middle of the page, not depth; the continuous band I had briefly was.
-        //
-        // A receding floor line lands in the ring between its own doorway and
-        // the one in front — 253px of it on either side at this spacing, which
-        // is exactly where the wall in front puts its copy. Left at full
-        // strength it read 67 against a background of 21: not depth, a rule
-        // drawn through the text. Dimmed to a third it still marks the floor
-        // of the room behind without competing with the words in front of it,
-        // and the nested doorway outlines carry the hallway.
-        el.style.setProperty('--floor', String(Math.max(0, 1 - behind * 0.66)));
-        el.style.transform = `translate(-50%, -50%) translateZ(${d * SPACING}px)`;
+        if (content) content.style.opacity = String(Math.pow(Math.max(0, 1 - behind), 3));
+        // Exponential falloff leaves each room a floor. The former linear
+        // curve reached zero before the second doorway and cut the hall off.
+        el.style.setProperty('--floor', String(Math.pow(0.76, behind)));
+        // Keep a one-pixel projected line; depth should dim the floor through
+        // opacity, rather than also shrinking it to a disappearing subpixel.
+        el.style.setProperty('--floor-width', `${1 + behind * SPACING / PERSPECTIVE}px`);
+        el.style.transform = `translate(-50%, -50%) translateZ(${distance * SPACING}px)`;
       }
 
-      const n = Math.min(count, Math.max(1, Math.round(p) + 1));
-      if (n !== shown) {
-        shown = n;
-        setCurrent(n);
+      if (pendingFocus) {
+        if (performance.now() > pendingFocus.expires) pendingFocus = null;
+        else if (Math.abs(progress - pendingFocus.index) < 0.04) {
+          frames.current[pendingFocus.index]?.focus({ preventScroll: true });
+          pendingFocus = null;
+        }
       }
+      publishFrame(index);
     };
 
-    // `will-change: transform` promotes a frame to its own compositor layer for
-    // as long as it is set, and text on a promoted layer is rendered with
-    // grayscale rather than subpixel antialiasing — which on a dark ground
-    // reads as slightly soft, exactly the fuzziness you saw. It is only worth
-    // paying while the corridor is moving, so it goes on at the first scroll
-    // event and comes off once scrolling stops.
-    const setHint = (on: boolean) => {
+    const setHint = (moving: boolean) => {
+      if (flat) return;
       for (const el of frames.current) {
-        if (el) el.style.willChange = on ? 'transform, opacity' : 'auto';
+        if (el) el.style.willChange = moving ? 'transform, opacity' : 'auto';
       }
     };
-
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(paint);
       if (!idle) setHint(true);
@@ -207,59 +211,67 @@ export function Corridor({ count, children }: { count: number; children: React.R
         setHint(false);
       }, 140);
     };
+    const restoreHash = () => {
+      const hash = hashId();
+      const index = hash ? frames.current.findIndex((el) => el?.id.toLowerCase() === hash) : 0;
+      if (index < 0) return;
+      pendingFocus = null;
+      scrollToFrame(index, frames.current[index], 'auto');
+      if (!raf) raf = requestAnimationFrame(paint);
+    };
 
+    // Resizing or changing motion preferences preserves the section being read.
+    if (previousLayout.current !== null && previousLayout.current !== flat) {
+      const index = clampIndex(activeFrame);
+      pendingFocus = null;
+      scrollToFrame(index, frames.current[index], 'auto');
+    } else if (previousLayout.current === null) {
+      if (window.location.hash) restoreHash();
+      else window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    previousLayout.current = flat;
+    cancelAnimationFrame(raf);
     paint();
+
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    window.addEventListener('hashchange', restoreHash);
+    window.addEventListener('popstate', restoreHash);
+    window.addEventListener(NAVIGATE_EVENT, onScroll);
     return () => {
       cancelAnimationFrame(raf);
       window.clearTimeout(idle);
+      setHint(false);
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      window.removeEventListener('hashchange', restoreHash);
+      window.removeEventListener('popstate', restoreHash);
+      window.removeEventListener(NAVIGATE_EVENT, onScroll);
     };
-  }, [reduced, count]);
-
-  // Reduced motion gets the same content as an ordinary document. A corridor
-  // that moves the whole page in depth is exactly what that setting is for.
-  if (reduced) {
-    return (
-      <CorridorCtx.Provider value={ctx}>
-        <div className="mx-auto max-w-5xl divide-y divide-white/[0.07] px-6 pt-24 pb-16">
-          {children}
-        </div>
-      </CorridorCtx.Provider>
-    );
-  }
+  }, [flat, count]);
 
   return (
     <CorridorCtx.Provider value={ctx}>
-      {/* the scene is fixed; the spacer below is what actually scrolls */}
-      <div
-        className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
-        style={{ perspective: '2200px', perspectiveOrigin: '50% 48%' }}
-      >
-        <div className="relative size-full" style={{ transformStyle: 'preserve-3d' }}>
-          {children}
-        </div>
-      </div>
-
-      {/*
-        The spacer is the only thing in flow, so it alone decides how far the
-        page scrolls. Its height is the offset that brings the *last* frame to
-        the camera, plus one viewport — which makes the maximum scroll position
-        exactly that offset. The corridor used to carry an extra 0.9 frames of
-        tail, so you could keep scrolling after the last wall and watch it fly
-        past into an empty room.
-      */}
-      {/* the light lying on the floor — over the scene, see .corridor-floor */}
-      <div aria-hidden className="corridor-floor pointer-events-none fixed inset-0 z-20" />
-
-      <div
-        aria-hidden
-        style={{ height: `calc(${(count - 1) * SCROLL_PER_FRAME}px + 100svh)` }}
-      />
-
-      <Counter current={current} total={count} />
+      {flat ? (
+        <div className="corridor-flat">{children}</div>
+      ) : (
+        <>
+          <div
+            className="corridor-scene pointer-events-none fixed inset-0 z-10 overflow-hidden"
+            style={{ perspective: `${PERSPECTIVE}px`, perspectiveOrigin: '50% 48%' }}
+          >
+            <div className="relative size-full" style={{ transformStyle: 'preserve-3d' }}>
+              {children}
+            </div>
+          </div>
+          <div aria-hidden className="corridor-floor pointer-events-none fixed inset-0 z-20" />
+          <div
+            aria-hidden
+            style={{ height: `calc(${(count - 1) * SCROLL_PER_FRAME}px + 100svh)` }}
+          />
+          <Progress current={current} total={count} frames={frames.current} />
+        </>
+      )}
     </CorridorCtx.Provider>
   );
 }
@@ -274,87 +286,96 @@ export function Frame({
   id?: string;
 }) {
   const ctx = useContext(CorridorCtx);
-  const ref = useRef<HTMLElement>(null);
   const auto = useId();
-
-  useEffect(() => {
-    const el = ref.current;
-    ctx?.register(el, index);
-    if (el && !ctx?.reduced) {
-      el.dataset.on = '0';
-      el.setAttribute('inert', '');
-    }
-    return () => ctx?.register(null, index);
-  }, [ctx, index]);
-
-  if (ctx?.reduced) {
-    return (
-      <section
-        id={id ?? auto}
-        ref={ref as React.Ref<HTMLElement>}
-        className="scroll-mt-20 py-14 first:pt-0"
-      >
-        {children}
-      </section>
-    );
-  }
+  const register = ctx?.register;
+  const attach = useCallback((el: HTMLElement | null) => register?.(el, index), [register, index]);
+  const flat = ctx?.flat ?? true;
 
   return (
     <section
       id={id ?? auto}
-      ref={ref as React.Ref<HTMLElement>}
-      style={{ visibility: 'hidden' }}
-      className={cn(
-        'corridor-frame pointer-events-auto absolute top-1/2 left-1/2',
-        // Fixed, not content-sized: a corridor only reads as one if every
-        // doorway is the same opening. Sizing to content gave each frame its
-        // own width and height, so the walls stepped in and out.
-        'h-[70vh] w-[85vw] max-w-[1200px] px-10 md:px-16',
-      )}
+      ref={attach}
+      data-frame-index={index}
+      data-active={flat ? '1' : undefined}
+      tabIndex={-1}
+      inert={!flat}
+      aria-hidden={flat ? undefined : true}
+      style={flat ? undefined : { visibility: 'hidden' }}
+      className={flat ? 'corridor-section' : 'corridor-frame absolute top-1/2 left-1/2'}
     >
-      <div className="flex h-full flex-col justify-center">{children}</div>
+      <div className="corridor-content">{children}</div>
     </section>
   );
 }
 
-function Counter({ current, total }: { current: number; total: number }) {
+function Progress({
+  current,
+  total,
+  frames,
+}: {
+  current: number;
+  total: number;
+  frames: Array<HTMLElement | null>;
+}) {
+  const atEnd = current === total - 1;
+  const next = atEnd ? 0 : current + 1;
+  const label = (index: number) => LABELS[frames[index]?.id ?? ''] ?? Object.values(LABELS)[index] ?? `Section ${index + 1}`;
+
   return (
-    <p
-      data-counter
-      className="pointer-events-none fixed top-[18px] right-5 z-50 text-[12px] text-muted-foreground tabular-nums sm:right-6"
-    >
-      {String(current).padStart(2, '0')}/{String(total).padStart(2, '0')}
-    </p>
+    <nav className="corridor-progress" aria-label="Portfolio sections">
+      <div className="corridor-progress-position">
+        <span className="corridor-progress-index" aria-hidden="true">
+          <span>{String(current + 1).padStart(2, '0')}</span>
+          <span> / {String(total).padStart(2, '0')}</span>
+        </span>
+        <span className="corridor-progress-label">{label(current)}</span>
+      </div>
+      <ol className="corridor-progress-track">
+        {Array.from({ length: total }, (_, index) => (
+          <li key={index}>
+            <button
+              type="button"
+              className="corridor-progress-step"
+              aria-label={`Go to ${label(index)}`}
+              aria-current={current === index ? 'step' : undefined}
+              data-past={index < current ? 'true' : undefined}
+              onClick={() => goToFrame(index, frames[index]?.id)}
+            >
+              <span />
+            </button>
+          </li>
+        ))}
+      </ol>
+      <button
+        type="button"
+        className="corridor-progress-next"
+        onClick={() => goToFrame(next, frames[next]?.id)}
+      >
+        <span>{atEnd ? 'Back to start' : current === 0 ? 'Scroll to explore' : `Next: ${label(next)}`}</span>
+        {atEnd ? <ArrowUp size={13} aria-hidden /> : <ArrowDown size={13} aria-hidden />}
+      </button>
+    </nav>
   );
 }
 
-/**
- * Goes to a frame, in whichever layout is running.
- *
- * The two need opposite things and getting it wrong fails silently either way.
- * In the corridor every frame sits at the same document position inside a fixed
- * scene, so an #id anchor scrolls nowhere — it has to be a scroll offset. In
- * the flat layout the offsets are meaningless, because the sections are laid
- * out by their own heights — About and Contact both landed within 5px of each
- * other when the nav used offsets there.
- *
- * `instant` is for arriving on a deep link: flying a reader from the first
- * frame to the last on page load is a long trip through content they did not
- * ask for, and a smooth scroll issued before first layout is dropped anyway.
- */
+/** Navigate in either layout, retaining ordinary deep links and browser history. */
 export function goToFrame(index: number, id?: string, instant = false) {
+  const el = frameElement(index, id);
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const behavior: ScrollBehavior = !instant && !reduced ? 'smooth' : 'auto';
-
-  if (window.matchMedia(FLAT).matches) {
-    const el = id ? document.getElementById(id) : null;
-    if (el) {
-      el.scrollIntoView({ behavior, block: 'start' });
-      return;
-    }
-    window.scrollTo({ top: 0, behavior });
-    return;
+  const behavior: ScrollBehavior = instant || reduced ? 'auto' : 'smooth';
+  const targetId = el?.id ?? id;
+  if (targetId) {
+    const url = new URL(window.location.href);
+    url.hash = targetId;
+    if (url.hash !== window.location.hash) history.pushState(history.state, '', url);
   }
 
-  window.scrollTo({ top: index * SCROLL_PER_FRAME, behavior });
+  if (window.matchMedia(FLAT).matches) {
+    pendingFocus = null;
+    el?.focus({ preventScroll: true });
+  } else {
+    pendingFocus = { index, expires: performance.now() + 2500 };
+  }
+  scrollToFrame(index, el, behavior);
+  window.dispatchEvent(new Event(NAVIGATE_EVENT));
 }

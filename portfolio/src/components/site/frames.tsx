@@ -1,158 +1,90 @@
-import { ArrowUpRight, Mail } from 'lucide-react';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
 
 import { Frame, goToFrame } from '@/components/site/corridor';
-import { FRAMES } from '@/site-map';
 import { LiquidMetalButton } from '@/components/ui/liquid-metal-button';
 import { WhitewallsMark } from '@/components/ui/whitewalls-mark';
 import { about, art, projects, site } from '@/content';
+import { FRAMES } from '@/site-map';
 
-/**
- * The seven panels of the corridor.
- *
- * Structure is borrowed from the whitewalls preview: a small caps label, a
- * headline, a paragraph, and — where there is something worth showing — a
- * second column beside it. The register is this site's: near-black ground,
- * one accent-free palette, mono labels, and the metal pill as the only
- * material object.
- */
-
-const LABEL = 'font-mono text-[10.5px] tracking-[0.26em] text-muted-foreground uppercase';
-const HEADLINE = 'display mt-5 text-[clamp(1.9rem,3.9vw,3.2rem)] leading-[1.06] text-balance';
-const BODY = 'mt-5 max-w-[46ch] text-[13.5px] leading-[1.8] text-muted-foreground';
-
-function Split({ left, right }: { left: React.ReactNode; right?: React.ReactNode }) {
-  return (
-    <div
-      className={
-        right
-          ? 'grid items-center gap-10 md:grid-cols-[1.05fr_0.95fr] md:gap-16'
-          // A doorway is a fixed 85vw wide. A single column pinned to its left
-          // edge leaves most of the opening empty and the frame looks broken
-          // rather than spare, so single-column frames centre in it — the same
-          // move the reference makes with .frame--single.
-          : 'mx-auto max-w-[58ch]'
-      }
-    >
-      <div>{left}</div>
-      {right && <div className="min-w-0">{right}</div>}
-    </div>
-  );
+// The project demonstrations live on the main site, including during local preview.
+function siteHref(href: string) {
+  return href.startsWith('/') ? `https://${site.domain}${href}` : href;
 }
 
-/* ── 01 ─────────────────────────────────────────────────────────────────── */
+function WallLabel({ number, children }: { number: string; children: React.ReactNode }) {
+  return (
+    <p className="wall-label">
+      <span className="wall-label-number" aria-hidden="true">{number}</span>
+      {children}
+    </p>
+  );
+}
 
 export function HeroFrame() {
   return (
     <Frame index={0} id="top">
-      <div className="text-center">
-        <p className={LABEL}>{site.location}</p>
-        <h1 className="display mt-6 text-[clamp(2.6rem,8vw,5.8rem)] leading-[0.98]">
-          {site.name}
-        </h1>
-        <p className="mx-auto mt-7 max-w-[44ch] text-[clamp(0.95rem,1.35vw,1.05rem)] text-muted-foreground">
-          {site.tagline}
-          <span className="mt-1 block text-muted-foreground/70">{site.now}</span>
-        </p>
-        {/* Not #work / #contact. Every frame sits at the same document
-            position inside the fixed scene, so an anchor scrolls nowhere —
-            these two pills did nothing at all in the corridor. */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <LiquidMetalButton
-            label="View the work"
-            onClick={() => goToFrame(FRAMES.work.index, FRAMES.work.id)}
-          />
-          <LiquidMetalButton
-            label="Get in touch"
-            onClick={() => goToFrame(FRAMES.contact.index, FRAMES.contact.id)}
-          />
+      <div className="hero-layout">
+        <div className="hero-identity">
+          <WallLabel number="01">Personal portfolio</WallLabel>
+          <h1 className="hero-name display" aria-label={site.name}>
+            <span>bijan</span>
+            <span>izadian</span>
+          </h1>
+        </div>
+        <div className="hero-intro">
+          <p className="eyebrow hero-location"><span aria-hidden="true" />{site.location}</p>
+          <p className="hero-description">Brand, copy<br /> &amp; front end.</p>
+          <p className="body-copy hero-context">For early-stage companies.<br />{site.now}</p>
+          <div className="hero-actions">
+            <LiquidMetalButton
+              label="View the work"
+              onClick={() => goToFrame(FRAMES.work.index, FRAMES.work.id)}
+            />
+            <a href="#contact" className="text-link" onClick={(event) => {
+              event.preventDefault();
+              goToFrame(FRAMES.contact.index, FRAMES.contact.id);
+            }}>
+              Get in touch <ArrowUpRight size={14} aria-hidden="true" />
+            </a>
+          </div>
         </div>
       </div>
     </Frame>
   );
 }
 
-/* ── 02 · the work, all of it on one wall ───────────────────────────────── */
-
-/**
- * Three projects, one doorway.
- *
- * They had a frame each, which made the corridor claim the gallery work was
- * three times the journey it is, and forced a reader to fly past two walls to
- * learn there were only three. On one wall they can be compared at a glance:
- * name and discipline on the left, what it is on the right, ruled apart.
- */
 export function WorkFrame({ index }: { index: number }) {
   return (
     <Frame index={index} id="work">
-      <div className="flex items-baseline justify-between border-b border-white/[0.16] pb-4">
-        <p className={LABEL}>Selected work</p>
-        <p className={LABEL}>{String(projects.length).padStart(2, '0')}</p>
+      <div className="work-heading">
+        <WallLabel number="02">Selected work</WallLabel>
+        <span className="eyebrow work-count">{String(projects.length).padStart(2, '0')} projects</span>
       </div>
-
-      {/* Row spacing scales with the height available. At a fixed py-7 this wall
-          needed 471px inside a 448px doorway on a 640px-tall screen and spilled
-          out of the frame; the vh term gives it back on short screens without
-          tightening anything on a normal one. first/last trim the outer padding
-          so the block's ink is centred — with it, the wall sat 26px high at
-          every size. */}
-      <ul className="mt-6">
-        {projects.map((p) => (
-          <li
-            key={p.id}
-            className="grid gap-3 py-[clamp(0.7rem,2.4vh,1.75rem)] first:pt-0 last:pb-0 md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] md:gap-12"
-          >
-            <div>
-              <h3 className="name relative flex items-center gap-2.5 text-[clamp(1.45rem,2.5vw,2rem)] leading-tight">
-                {p.mark === 'whitewalls' && (
-                  <WhitewallsMark
-                    className="size-[0.68em] shrink-0 text-foreground/70 md:absolute md:top-[0.2em] md:right-full md:mr-2.5"
-                  />
-                )}
-                {p.name}
-              </h3>
-              <p className={`${LABEL} mt-2`}>
-                {p.role}
-                {p.year && ` · ${p.year}`}
-              </p>
+      <ul className="project-list">
+        {projects.map((project, index) => (
+          <li key={project.id} className="project-row">
+            <div className="project-identity">
+              <span className="project-index" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+              <h2 className="project-name name">
+                {project.mark === 'whitewalls' && <WhitewallsMark className="project-mark" />}
+                {project.href ? (
+                  <a href={siteHref(project.href)} target="_blank" rel="noopener noreferrer" className="project-title-link">
+                    {project.name}<ArrowUpRight className="project-arrow" size={21} aria-hidden="true" />
+                  </a>
+                ) : project.name}
+              </h2>
+              <p className="project-role">{project.role}{project.year && <span> / {project.year}</span>}</p>
             </div>
-
-            <div>
-              {/* Capped in characters, not pixels. The column is wide enough for 76
-                  characters of Courier, which is a long way to track back to the
-                  start of the next line, and every other paragraph on the site
-                  sets around 46. */}
-              <p className="max-w-[60ch] text-[13px] leading-[1.75] text-muted-foreground">
-                {p.summary}
-              </p>
-
-              {p.pages && (
-                <ul className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                  {p.pages.map((pg, k) => (
-                    <li key={pg.href} className="flex items-center gap-1.5">
-                      {k > 0 && (
-                        <span aria-hidden className="text-muted-foreground/25">
-                          ·
-                        </span>
-                      )}
-                      <a
-                        href={pg.href}
-                        className="font-mono text-[11.5px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                      >
-                        {pg.name}
-                      </a>
+            <div className="project-detail">
+              <p className="body-copy">{project.summary}</p>
+              {project.pages && (
+                <ul className="project-pages" aria-label={`${project.name} pages`}>
+                  {project.pages.map((page) => (
+                    <li key={page.href}>
+                      <a href={siteHref(page.href)} target="_blank" rel="noopener noreferrer">{page.name}</a>
                     </li>
                   ))}
                 </ul>
-              )}
-
-              {p.href && (
-                <a
-                  href={p.href}
-                  className="mt-3 inline-flex items-center gap-1.5 font-mono text-[11.5px] text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
-                >
-                  Open the site
-                  <ArrowUpRight size={11} className="opacity-70" />
-                </a>
               )}
             </div>
           </li>
@@ -162,133 +94,89 @@ export function WorkFrame({ index }: { index: number }) {
   );
 }
 
-/* ── 05 · art ───────────────────────────────────────────────────────────── */
-
 export function ArtFrame({ index }: { index: number }) {
-  const frames = art.gallery.length
-    ? art.gallery.map((g, i) => ({ ...g, ratio: ['4 / 5', '1 / 1', '3 / 4'][i % 3] }))
-    : [{ ratio: '4 / 5' }, { ratio: '1 / 1' }, { ratio: '3 / 4' }];
-
   return (
     <Frame index={index} id="art">
-      <Split
-        left={
-          <>
-            <p className={LABEL}>Art</p>
-            <h2 className={HEADLINE}>The other half of the work</h2>
-            <p className={BODY}>{art.body}</p>
-          </>
-        }
-        right={
-          <div>
-            <div className="flex items-end gap-4 sm:gap-6">
-              {frames.map((f, i) => (
-                <figure
-                  key={i}
-                  style={{ aspectRatio: f.ratio }}
-                  className="w-[30%] max-w-[160px] min-w-0 border border-white/[0.14] bg-white/[0.015]"
-                >
-                  {'src' in f && f.src ? (
-                    <img
-                      src={f.src}
-                      alt={('title' in f && f.title) || ''}
-                      className="size-full object-cover"
-                      loading="lazy"
-                    />
-                  ) : null}
-                </figure>
-              ))}
-            </div>
-            <div className="mt-4 border-t border-white/[0.07]" />
-            <p className={`${LABEL} mt-3`}>
-              {art.gallery.length ? 'Own work' : 'Own work — not up yet'}
-            </p>
+      <div className="wall-split art-layout">
+        <div className="wall-copy">
+          <WallLabel number="03">Art</WallLabel>
+          <h2 className="wall-title display">Away from<br />the screen.</h2>
+          <p className="body-copy">{art.body}</p>
+        </div>
+        <div className="art-display">
+          <div className="art-frames" aria-label={art.gallery.length ? 'Personal artwork' : 'Space reserved for upcoming artwork'}>
+            {art.gallery.length ? art.gallery.map((item, i) => (
+              <figure key={item.src} className={`art-piece art-piece-${i % 3 + 1}`}>
+                <img src={item.src} alt={item.title || 'Personal artwork'} loading="lazy" />
+                {item.title && <figcaption>{item.title}{item.year && ` / ${item.year}`}</figcaption>}
+              </figure>
+            )) : [1, 2, 3].map((number) => (
+              <div key={number} className={`art-piece art-piece-${number}`} aria-hidden="true">
+                <span className="art-mat" />
+                <span className="art-piece-number">0{number}</span>
+              </div>
+            ))}
           </div>
-        }
-      />
+          <p className="art-caption eyebrow">{art.gallery.length ? 'Personal collection' : 'Personal work · Coming soon'}</p>
+        </div>
+      </div>
     </Frame>
   );
 }
 
-/* ── 06 · about ─────────────────────────────────────────────────────────── */
-
 export function AboutFrame({ index }: { index: number }) {
   return (
     <Frame index={index} id="about">
-      <Split
-        left={
-          <>
-            <p className={LABEL}>About</p>
-            <p className="mt-6 text-[clamp(1rem,1.6vw,1.2rem)] leading-[1.6]">{about[0]}</p>
-            {about[1] && <p className={BODY}>{about[1]}</p>}
-          </>
-        }
-        right={
-          <div className="md:pt-2">
-            <p className={LABEL}>{site.disciplines.join(' · ')}</p>
-            <p className={`${LABEL} mt-2`}>{site.education}</p>
-            <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-2">
-              <Out href={site.links.linkedin}>LinkedIn</Out>
-              <Out href={site.links.github}>GitHub</Out>
-              <Out href={site.links.resume}>Résumé</Out>
-            </div>
+      <div className="wall-split about-layout">
+        <div className="wall-copy">
+          <WallLabel number="04">About</WallLabel>
+          <h2 className="wall-title display">A little<br />context.</h2>
+          <p className="body-copy">{about[0]}</p>
+          {about[1] && <p className="body-copy">{about[1]}</p>}
+        </div>
+        <div className="about-details">
+          <dl>
+            <div><dt className="eyebrow">Practice</dt><dd>{site.disciplines.join(' / ')}</dd></div>
+            <div><dt className="eyebrow">Based in</dt><dd>{site.location}</dd></div>
+            <div><dt className="eyebrow">Education</dt><dd>{site.education}<span className="education-detail">{site.educationDetail}</span></dd></div>
+          </dl>
+          <div className="about-links">
+            <Out href={site.links.linkedin}>LinkedIn</Out>
+            {site.links.github && <Out href={site.links.github}>GitHub</Out>}
+            {site.links.resume && <Out href={site.links.resume}>Résumé</Out>}
           </div>
-        }
-      />
+        </div>
+      </div>
     </Frame>
   );
 }
 
 function Out({ href, children }: { href: string; children: React.ReactNode }) {
-  const external = href.startsWith('http');
-  return (
-    <a
-      href={href}
-      {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className="group inline-flex items-center gap-1.5 text-[13.5px] text-muted-foreground transition-colors hover:text-foreground"
-    >
-      {children}
-      <ArrowUpRight size={12} className="opacity-50 transition-opacity group-hover:opacity-90" />
-    </a>
-  );
+  return <a href={siteHref(href)} target="_blank" rel="noopener noreferrer" className="text-link">
+    {children}<ArrowUpRight size={14} aria-hidden="true" />
+  </a>;
 }
-
-/* ── 07 · contact ───────────────────────────────────────────────────────── */
 
 export function ContactFrame({ index }: { index: number }) {
   return (
     <Frame index={index} id="contact">
-      <div className="rounded-3xl border border-white/[0.09] bg-[#0a0a0c]/70 p-9 backdrop-blur-md md:p-12">
-        <p className={LABEL}>Contact</p>
-        <h2 className={HEADLINE}>A role, freelance, or something you want built.</h2>
-        <p className={BODY}>
-          Email is the fastest way to reach me. If you have a web app in mind and want scope,
-          timing and cost back, send it through the intake form instead.
-        </p>
-
-        <div className="mt-9 flex flex-wrap items-center gap-4">
+      <div className="contact-card">
+        <WallLabel number="05">Contact</WallLabel>
+        <h2 className="contact-title display">Something in mind?</h2>
+        <p className="body-copy contact-copy">A role, a collaboration, or something you want built.<br className="desktop-break" /> Email is the best place to start.</p>
+        <div className="contact-actions">
           <LiquidMetalButton label="Email me" href={`mailto:${site.email}`} />
-          <a
-            href="/build"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.04] px-5 py-3 text-[13.5px] font-medium transition-colors hover:border-white/30 hover:bg-white/[0.08]"
-          >
-            Send a build request
-            <ArrowUpRight size={14} className="opacity-70" />
-          </a>
+          <Out href="/build">Send a build request</Out>
         </div>
-
-        <div className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-2 border-t border-white/[0.07] pt-6 text-[13px] text-muted-foreground">
-          <span className="flex items-center gap-2">
-            <Mail size={13} className="opacity-60" />
-            <a className="transition-colors hover:text-foreground" href={`mailto:${site.email}`}>
-              {site.email}
-            </a>
-          </span>
-          <span className="ml-auto">
-            © {new Date().getFullYear()} {site.name} · {site.location}
-          </span>
+        <div className="contact-footer">
+          <a className="contact-email" href={`mailto:${site.email}`}>{site.email}<ArrowUpRight size={14} aria-hidden="true" /></a>
+          <span className="contact-colophon">© {new Date().getFullYear()} {site.name}</span>
         </div>
       </div>
+      <a href="#top" className="mobile-back-top text-link" onClick={(event) => {
+        event.preventDefault();
+        goToFrame(FRAMES.hero.index, FRAMES.hero.id);
+      }}>Back to the beginning <ArrowDown size={13} className="rotate-180" aria-hidden="true" /></a>
     </Frame>
   );
 }

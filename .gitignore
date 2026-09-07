@@ -4,6 +4,11 @@
 # Dependencies
 node_modules/
 
+# Local credentials and environment settings
+.env
+.env.*
+*.local
+
 # OS / editor cruft
 .DS_Store
 Thumbs.db

@@ -1,11 +1,8 @@
 @import 'tailwindcss';
 
-/* Space Grotesk, self-hosted rather than pulled from Google's CDN: one origin,
-   no third-party request on the critical path, and it cannot disappear. Latin
-   subset only, variable 300–700, 22KB. */
 @font-face {
   font-family: 'Space Grotesk';
-  src: url('/v2/fonts/space-grotesk.woff2') format('woff2-variations');
+  src: url('/fonts/space-grotesk.woff2') format('woff2');
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
@@ -13,17 +10,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* shadcn's token surface, neutral base, expressed as Tailwind v4 theme vars. */
 :root {
+  color-scheme: dark;
+  --background: #0b0c0c;
+  --foreground: #eeeee8;
+  --muted-foreground: #a5a7a2;
+  --card: #121313;
+  --card-foreground: var(--foreground);
+  --muted: #282a28;
+  --border: rgb(238 238 232 / 12%);
+  --ring: #c0c2b8;
   --radius: 0.75rem;
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.185 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --ring: oklch(0.556 0 0);
 }
 
 @theme inline {
@@ -38,185 +35,303 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-  --font-sans:
-    ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
-  --font-mono: 'Courier New', Courier, ui-monospace, monospace;
-  /* Display face, taken from the whitewalls preview. A serif against the mono
-     labels is what gives the corridor its gallery-wall-text register; the
-     geometric sans it replaces read like software. */
-  --font-serif: 'Times New Roman', Times, 'Iowan Old Style', Georgia, serif;
-  /* Headers. Space Grotesk descends from Space Mono, so it carries the same
-     typewriter skeleton as the Courier around it while being proportional —
-     related to the body rather than a fourth unrelated voice, and wide enough
-     in the counters to hold up at display size on a dark ground. */
+  --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Courier New', Courier, ui-monospace, monospace;
+  --font-serif: 'Times New Roman', Times, Georgia, serif;
 }
 
 @layer base {
-  * {
-    border-color: var(--border);
-  }
+  * { border-color: var(--border); }
+  html { scrollbar-width: thin; scrollbar-color: #434640 var(--background); }
   body {
-    background-color: var(--background);
+    margin: 0;
+    background: var(--background);
     color: var(--foreground);
-    /* Mono is the primary face now, not just the labels. Courier is narrow in
-       colour and wide in fit, so body copy takes a little more line height and
-       a touch of negative tracking to stop it feeling loose. */
     font-family: var(--font-mono);
-    letter-spacing: -0.005em;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-}
-
-/* ---------------------------------------------------------------------------
-   LiquidMetalButton
-   The component as supplied injected these rules into <head> at runtime and
-   guarded against injecting twice. They are static, so they live here instead:
-   no DOM mutation on mount, and no duplicate-injection bookkeeping.
-   --------------------------------------------------------------------------- */
-.lmb-shader canvas {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-  border-radius: 100px !important;
-}
-
-/* Three roles, three faces.
-   .display — page headers and the name, in Space Grotesk
-   .name    — company names on the work wall, in the serif
-   everything else inherits the mono from body                                */
-.display {
-  font-family: var(--font-display);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-}
-
-.name {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  letter-spacing: -0.015em;
-}
-
-@keyframes lmb-ripple {
-  0% {
-    transform: translate(-50%, -50%) scale(0);
-    opacity: 0.6;
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button { cursor: pointer; }
+  a { text-decoration: none; }
+  a:focus-visible, button:focus-visible {
+    outline: 1px solid var(--ring);
+    outline-offset: 6px;
+    border-radius: 2px;
   }
-  100% {
-    transform: translate(-50%, -50%) scale(4);
-    opacity: 0;
-  }
+  ::selection { background: #d5d7cb; color: #0b0c0c; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+.display { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.055em; }
+.name { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.025em; }
+.eyebrow, .wall-label {
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
+.wall-label { display: flex; align-items: center; gap: 17px; }
+.wall-label-number { color: #777c74; font-size: 10px; letter-spacing: 0; }
+.body-copy { max-width: 47ch; color: var(--muted-foreground); font-size: 13px; line-height: 1.85; }
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  min-height: 36px;
+  color: #c2c5bc;
+  font-size: 12px;
+  line-height: 1.5;
+  transition: color 180ms;
+}
+.text-link svg { opacity: 0.6; transition: transform 200ms, opacity 200ms; }
+.text-link:hover { color: var(--foreground); }
+.text-link:hover svg { opacity: 1; transform: translate(2px, -2px); }
 
-/* ---------------------------------------------------------------------------
-   The corridor's architecture.
+/* The navigation sits outside the architecture, like a gallery's wayfinding. */
+.site-header { position: fixed; inset: 0 0 auto; z-index: 40; }
+.site-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+  padding-inline: clamp(24px, 3.4vw, 56px);
+}
+.site-signature { display: inline-flex; align-items: center; gap: 12px; font: 400 15px var(--font-display); letter-spacing: -0.035em; }
+.signature-dot { width: 3px; height: 3px; background: #a9b19e; border-radius: 50%; }
+.signature-short { display: none; }
+.nav-links { display: flex; align-items: center; gap: clamp(24px, 2.8vw, 46px); }
+.nav-links a { position: relative; display: flex; align-items: center; min-height: 44px; color: #8f948b; font-size: 11px; transition: color 180ms; }
+.nav-links a::after { content: ''; position: absolute; inset: auto 0 7px; height: 1px; background: #d1d5c9; transform: scaleX(0); transform-origin: left; transition: transform 200ms; }
+.nav-links a:hover, .nav-links a[aria-current] { color: var(--foreground); }
+.nav-links a[aria-current]::after { transform: scaleX(1); }
 
-   Each frame is a doorway rather than a floating panel: bordered, open at the
-   bottom, standing on a floor line that runs off to either horizon. The huge
-   box-shadow is the trick that makes it read as a corridor at all — a solid
-   ring of ground colour around every frame turns it into an aperture in an
-   infinite wall, so a frame occludes everything behind it except what shows
-   through its opening. Taken from the whitewalls preview, recoloured for a
-   near-black ground.
-   --------------------------------------------------------------------------- */
+/* Open doorways: floors extend outwards and never close the opening. */
+.corridor-scene { overflow: clip; }
 .corridor-frame {
-  /* The wall's face.
-     Lighter than the ground it is cut into, so it reads as a surface catching
-     light rather than as a hole — but thin enough to see the corridor through.
-     At 62% the face swallowed what was behind it: a floor line one doorway
-     back arrived at 42 against a background of 21, a hint of a hallway rather
-     than one.
-     It fades to nothing at the bottom, because a flat face has to stop
-     somewhere and a tonal step across the width of a doorway is a line whether
-     you drew one or not.
-     But the fade is held to the last sixth. Taken any higher it stops masking:
-     the face is what mutes the corridor behind, and where it thins, a receding
-     frame's own floor and border come through the wall and cross the copy in
-     front of them. Solid where the reading happens, dissolving only where it
-     meets the floor. */
-  background: linear-gradient(
-    to bottom,
-    rgba(22, 22, 27, 0.62) 0%,
-    rgba(21, 21, 26, 0.6) 72%,
-    rgba(20, 20, 25, 0.5) 88%,
-    rgba(19, 19, 23, 0) 100%
-  );
-  border: 2px solid rgba(255, 255, 255, 0.42);
+  height: 73svh;
+  width: min(85vw, 1240px);
+  padding-inline: clamp(40px, 4.7vw, 76px);
+  background: linear-gradient(to bottom, rgb(22 23 23 / 48%) 0%, rgb(21 22 22 / 46%) 73%, rgb(20 21 21 / 38%) 89%, rgb(19 20 20 / 0%) 100%);
+  border: 1px solid rgb(232 232 225 / 46%);
   border-bottom: none;
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 0 0 5000px #08080a;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 0 0 5000px #0a0b0b;
   isolation: isolate;
 }
-
-/* The floor line: where the wall meets the ground.
- *
- * It runs *outward* from the doorway's two edges to the sides of the screen,
- * and never across the opening — the opening is a hole in a wall, and a line
- * drawn across it closes the room. I had it as one continuous band for a
- * while, which killed exactly that: the corridor stopped reading as something
- * you could walk into.
- *
- * Solid, at the same alpha as the wall border, so the two read as one system
- * of architectural lines rather than as a rule and a glow.
- *
- * Every frame keeps its floor. Because the line runs outward from a frame's
- * own edges, a receding one can only appear in the ring between its doorway
- * and the one in front — flanking segments that step inward as the corridor
- * recedes, which is the hallway. It cannot reach the copy, because the copy
- * sits inside the opening the line refuses to cross.
- */
-.corridor-frame::before,
-.corridor-frame::after {
+.corridor-content { display: flex; height: 100%; flex-direction: column; justify-content: center; }
+/* A little local ground behind the ink keeps brighter receding floors from
+   cutting through letters, without making the whole wall opaque again. */
+.corridor-frame .corridor-content { text-shadow: 0 0 3px #141616, 0 0 7px #141616; }
+.corridor-frame::before, .corridor-frame::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: calc(-1 * var(--floor-width, 1px));
   width: 100vw;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.52);
+  height: var(--floor-width, 1px);
+  background: rgb(232 232 225 / 48%);
   opacity: var(--floor, 1);
   z-index: -1;
 }
-
-.corridor-frame::before {
-  right: 100%;
-}
-
-.corridor-frame::after {
-  left: 100%;
-}
-
-/* ---------------------------------------------------------------------------
-   The light on the floor.
-
-   This has to sit *above* the scene, not behind it. Every frame paints a
-   5000px ring of ground colour to become an aperture in a wall, and that ring
-   covers the whole viewport — so anything layered underneath is invisible.
-   As a wash on top it lights the lower half of the room instead: a pool
-   gathering at the near edge of the floor and falling off toward the vanishing
-   point, plus a cool lift across the very bottom. The walls above stay dark,
-   which is what makes them read as walls.
-
-   Kept off the top 45% entirely, so headline text never sits in it.
-   --------------------------------------------------------------------------- */
+.corridor-frame::before { right: 100%; }
+.corridor-frame::after { left: 100%; }
 .corridor-floor {
-  background:
-    radial-gradient(
-      132% 62% at 50% 104%,
-      rgba(214, 222, 255, 0.085) 0%,
-      rgba(190, 200, 235, 0.035) 38%,
-      transparent 66%
-    ),
-    linear-gradient(to bottom, transparent 52%, rgba(226, 232, 255, 0.03) 82%, rgba(226, 232, 255, 0.055) 100%);
+  background: radial-gradient(100% 58% at 50% 108%, rgb(197 213 189 / 7%), rgb(179 194 177 / 2.5%) 48%, transparent 76%), linear-gradient(transparent 63%, rgb(210 221 203 / 2.5%));
+}
+
+/* One type scale, with a larger signature in the entrance room. */
+.hero-layout { display: grid; grid-template-columns: 1.15fr 1fr; align-items: center; gap: clamp(40px, 6vw, 90px); }
+.hero-name { margin: 30px 0 0 -0.065em; font-size: clamp(78px, 8.8vw, 132px); line-height: 0.91; letter-spacing: -0.07em; }
+.hero-name span { display: block; }
+.hero-intro { padding-top: 31px; }
+.hero-location { display: flex; align-items: center; gap: 9px; font-size: 9px; }
+.hero-location > span { height: 4px; width: 4px; border: 1px solid #a5ad9e; border-radius: 50%; }
+.hero-description { margin-top: 24px; font-family: var(--font-serif); font-size: clamp(29px, 3.1vw, 43px); line-height: 1.1; letter-spacing: -0.025em; }
+.hero-context { margin-top: 19px; font-size: clamp(12px, 0.82vw, 13px); max-width: 37ch; }
+.hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 24px; margin-top: 28px; }
+.hero-actions > .text-link { font-size: 11px; }
+.wall-split { display: grid; grid-template-columns: 1fr 0.96fr; align-items: center; gap: clamp(50px, 7vw, 110px); }
+.wall-title { margin-block: 26px 22px; font-size: clamp(38px, 4.3vw, 60px); line-height: 1.02; }
+.wall-copy > .body-copy + .body-copy { margin-top: 14px; }
+
+/* Project names share a baseline and a left edge; the mark hangs in the gutter. */
+.work-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: clamp(24px, 4.4vh, 42px); }
+.work-count { font-size: 9px; color: #777e72; letter-spacing: 0.1em; }
+.project-list { display: flex; flex-direction: column; gap: clamp(21px, 4vh, 37px); }
+.project-row { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(32px, 4.7vw, 72px); align-items: start; }
+.project-identity { position: relative; padding-left: 32px; }
+.project-index { position: absolute; top: 10px; left: 0; color: #71776d; font-size: 9px; }
+.project-name { position: relative; font-size: clamp(26px, 2.6vw, 37px); line-height: 1.15; }
+.project-title-link { display: flex; align-items: center; gap: 13px; width: fit-content; }
+.project-arrow { color: #92998b; transition: transform 200ms, color 200ms; }
+.project-title-link:hover .project-arrow { transform: translate(3px, -3px); color: var(--foreground); }
+.project-mark { position: absolute; right: calc(100% + 10px); top: 8px; width: 16px; height: 16px; color: #b2b9aa; }
+.project-identity:has(.project-mark) .project-index { display: none; }
+.project-role { margin-top: 10px; font-size: 9px; line-height: 1.6; letter-spacing: 0.045em; color: #9ba192; }
+.project-role > span { color: #737b6b; }
+.project-detail { padding-top: 2px; }
+.project-detail .body-copy { font-size: clamp(12px, 0.88vw, 13px); line-height: 1.75; max-width: 54ch; }
+.project-pages { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 10px; }
+.project-pages a { display: block; min-height: 23px; padding-block: 3px; color: #a0a897; font-size: 10px; text-decoration: underline; text-decoration-color: #525a49; text-underline-offset: 4px; transition: color 180ms, text-decoration-color 180ms; }
+.project-pages a:hover { color: var(--foreground); text-decoration-color: var(--foreground); }
+
+/* Empty mats are explicitly a space for future artwork, never fabricated work. */
+.art-frames { display: flex; align-items: end; gap: 14px; padding-bottom: 26px; }
+.art-piece { position: relative; flex: 1; min-width: 0; border: 1px solid #535b4b; background: linear-gradient(140deg, rgb(195 210 180 / 5%), transparent 70%); box-shadow: 4px 8px 20px rgb(0 0 0 / 18%), inset 0 0 0 3px rgb(204 218 192 / 2%); }
+.art-piece-1 { aspect-ratio: 0.74; margin-bottom: 14px; }
+.art-piece-2 { aspect-ratio: 0.85; margin-bottom: 54px; }
+.art-piece-3 { aspect-ratio: 0.68; }
+.art-mat { position: absolute; inset: 10px; border: 1px solid rgb(190 205 176 / 9%); }
+.art-piece-number { position: absolute; bottom: -23px; left: 0; color: #6e7863; font-size: 8px; letter-spacing: 0.1em; }
+.art-piece img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.art-piece figcaption { color: var(--muted-foreground); font-size: 9px; margin-top: 10px; }
+.art-caption { margin-top: 19px; font-size: 8px; letter-spacing: 0.11em; color: #808a74; }
+.about-details { padding: 24px 0 8px 34px; border-left: 1px solid rgb(202 214 190 / 14%); }
+.about-details dl { display: flex; flex-direction: column; gap: 28px; }
+.about-details dt { font-size: 8px; color: #89947c; }
+.about-details dd { margin-top: 9px; color: #c1c8b8; font-size: 12px; line-height: 1.8; max-width: 28ch; }
+.education-detail { display: block; margin-top: 5px; color: var(--muted-foreground); font-size: 10px; line-height: 1.7; }
+.about-links { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 24px; }
+
+.contact-card { padding: clamp(30px, 3.2vw, 48px); border: 1px solid rgb(209 220 196 / 16%); border-radius: 16px; background: linear-gradient(120deg, rgb(18 21 17 / 94%), rgb(12 15 12 / 86%)); }
+.contact-title { margin-top: 24px; font-size: clamp(37px, 4.5vw, 65px); line-height: 1.08; }
+.contact-copy { margin-top: 20px; max-width: 64ch; font-size: 12px; }
+.contact-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 17px 30px; margin-top: 28px; }
+.contact-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 31px; padding-top: 21px; border-top: 1px solid rgb(220 228 211 / 10%); }
+.contact-email { display: inline-flex; align-items: center; gap: 10px; color: #b9c3ad; font-size: 11px; }
+.contact-email svg { opacity: 0.5; }
+.contact-colophon { align-self: center; color: #89957b; font-size: 9px; }
+.mobile-back-top { display: none; }
+
+/* Section position, five tactile stops, and a clear invitation to continue. */
+.corridor-progress { position: fixed; z-index: 40; inset: auto 0 23px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 24px; padding-inline: clamp(24px, 3.4vw, 56px); font-size: 10px; }
+.corridor-progress-position { display: flex; align-items: center; gap: 20px; }
+.corridor-progress-index { display: flex; gap: 7px; font-size: 10px; color: #b8c0ad; font-variant-numeric: tabular-nums; }
+.corridor-progress-index > span:last-child { color: #68735e; }
+.corridor-progress-label { color: #8e9a81; font-size: 9px; }
+.corridor-progress-track { display: flex; gap: 8px; }
+.corridor-progress-step { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; }
+.corridor-progress-step > span { display: block; width: 100%; height: 1px; background: #4b5640; transition: height 180ms, background 180ms; font-size: 0; }
+.corridor-progress-step:hover > span { background: #a2af92; }
+.corridor-progress-step[aria-current] > span { height: 2px; background: #d4dfc7; }
+.corridor-progress-step[data-past='true'] > span { background: #859774; }
+.corridor-progress-next { justify-self: end; display: inline-flex; align-items: center; gap: 14px; min-height: 36px; color: #a3b095; font-size: 10px; transition: color 180ms; }
+.corridor-progress-next:hover { color: var(--foreground); }
+.corridor-progress-next svg { height: 13px; width: 13px; transition: transform 180ms; }
+.corridor-progress-next:hover svg { transform: translateY(3px); }
+
+.lmb-shader canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; display: block !important; border-radius: 100px !important; }
+.metal-button-control:focus-visible { outline: 1px solid #d8dfcf; outline-offset: 5px; }
+@keyframes lmb-ripple {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+}
+
+@media (min-width: 900px) and (min-height: 600px) and (max-height: 730px) {
+  .hero-name { font-size: clamp(78px, 8vw, 114px); }
+  .hero-intro { padding-top: 20px; }
+  .project-list { gap: 22px; }
+  .work-heading { margin-bottom: 26px; }
+  .wall-title { margin-block: 21px 18px; font-size: clamp(38px, 4vw, 52px); }
+  .contact-card { padding-block: 28px; }
+  .contact-title { margin-top: 20px; font-size: clamp(37px, 4vw, 55px); }
+  .contact-footer { margin-top: 25px; padding-top: 18px; }
+}
+
+/* The same gallery becomes a readable document when depth would clip content. */
+@media (prefers-reduced-motion: reduce), (max-width: 899px), (max-height: 599px) {
+  .site-header { background: rgb(11 12 12 / 94%); border-bottom: 1px solid rgb(238 238 232 / 7%); }
+  .site-nav { height: 68px; padding-inline: 24px; }
+  .corridor-flat { max-width: 900px; margin-inline: auto; padding: 112px 40px 28px; }
+  .corridor-section { scroll-margin-top: 98px; padding-block: 64px; border-top: 1px solid rgb(238 238 232 / 10%); }
+  .corridor-section:first-child { padding-top: 20px; padding-bottom: 80px; border: 0; }
+  .corridor-section:last-child { padding-bottom: 20px; }
+  .hero-layout { gap: 40px; }
+  .hero-name { font-size: clamp(68px, 12vw, 100px); }
+  .hero-intro { padding-top: 25px; }
+  .hero-description { font-size: 32px; }
+  .hero-actions { gap: 8px 20px; }
+  .hero-context { font-size: 12px; }
+  .wall-split { gap: 48px; }
+  .wall-title { font-size: 44px; }
+  .project-row { grid-template-columns: 0.8fr 1.2fr; gap: 35px; }
+  .project-list { gap: 36px; }
+  .project-name { font-size: 30px; }
+  .project-role { max-width: 24ch; }
+  .about-details { padding-left: 26px; }
+  .contact-card { padding: 32px; }
+  .contact-title { font-size: 44px; }
+  .mobile-back-top { display: inline-flex; margin-top: 28px; font-size: 10px; }
+  .project-pages a { min-height: 29px; padding-block: 6px; }
+}
+
+@media (min-width: 600px) and (max-width: 767px) {
+  .project-row { grid-template-columns: 1fr; gap: 14px; }
+  .project-detail { padding-left: 32px; }
+  .project-role { max-width: none; }
+  .project-detail .body-copy { font-size: 13px; }
+  .project-pages { margin-top: 12px; }
+}
+
+@media (max-width: 599px) {
+  .site-nav { height: 64px; padding-inline: 24px; }
+  .signature-full, .signature-dot { display: none; }
+  .signature-short { display: inline; font-size: 22px; letter-spacing: -0.07em; }
+  .nav-links { gap: 24px; }
+  .nav-links a { font-size: 10px; }
+  .corridor-flat { padding: 102px 24px 24px; }
+  .corridor-section { padding-block: 52px; scroll-margin-top: 87px; }
+  .corridor-section:first-child { padding-top: 8px; padding-bottom: 56px; }
+  .wall-label { font-size: 9px; gap: 12px; }
+  .hero-layout { grid-template-columns: 1fr; gap: 35px; }
+  .hero-name { font-size: clamp(76px, 22vw, 116px); margin-top: 25px; }
+  .hero-intro { padding: 0; }
+  .hero-location { margin-bottom: 20px; font-size: 8px; }
+  .hero-description { margin-top: 0; font-size: 32px; }
+  .hero-description br { display: none; }
+  .hero-context { margin-top: 13px; font-size: 12px; line-height: 1.85; }
+  .hero-actions { gap: 15px 24px; margin-top: 24px; }
+  .wall-split { grid-template-columns: 1fr; gap: 40px; }
+  .wall-title { font-size: 43px; margin-block: 23px 20px; }
+  .body-copy { font-size: 13px; }
+  .work-heading { margin-bottom: 34px; }
+  .work-count { font-size: 8px; }
+  .project-list { gap: 36px; }
+  .project-row { grid-template-columns: 1fr; gap: 13px; }
+  .project-name { font-size: 33px; }
+  .project-role { max-width: none; font-size: 8px; margin-top: 8px; }
+  .project-detail { padding-left: 32px; padding-top: 0; }
+  .project-detail .body-copy { font-size: 13px; }
+  .project-pages { gap: 1px 16px; }
+  .project-pages a { font-size: 10px; }
+  .art-display { padding: 0 4px; max-width: 400px; }
+  .art-frames { gap: 17px; }
+  .art-caption { font-size: 8px; }
+  .about-details { padding: 0; border: none; }
+  .about-details dl { gap: 21px; }
+  .about-details dl > div { display: grid; grid-template-columns: 84px 1fr; gap: 22px; }
+  .about-details dt { padding-top: 4px; }
+  .about-details dd { margin-top: 0; font-size: 12px; max-width: 30ch; }
+  .about-links { margin-top: 21px; }
+  .contact-card { padding: 27px 23px; border-radius: 12px; }
+  .contact-title { font-size: 39px; margin-top: 25px; max-width: 10ch; }
+  .contact-copy { font-size: 12px; margin-top: 18px; }
+  .desktop-break { display: none; }
+  .contact-actions { align-items: start; flex-direction: column; gap: 14px; margin-top: 24px; }
+  .contact-footer { margin-top: 23px; padding-top: 22px; gap: 17px; flex-direction: column; }
+  .contact-email { font-size: 11px; gap: 7px; }
+  .contact-colophon { font-size: 9px; align-self: start; }
+}
+
+@media (max-width: 359px) {
+  .nav-links { gap: 18px; }
+  .hero-name { font-size: 76px; }
+  .hero-actions { gap: 10px 16px; }
+  .contact-card { padding-inline: 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

@@ -3,28 +3,13 @@ import { Sparkles } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-/**
- * A pill button whose face is a live liquid-metal WebGL shader.
- *
- * Two deviations from the component as supplied, both deliberate:
- *
- * 1. Teardown calls `dispose()`, not `destroy()`. @paper-design/shaders exposes
- *    `dispose: () => void` on ShaderMount — there is no `destroy`. Because the
- *    original guarded with optional chaining (`shaderMount.current?.destroy`),
- *    the call silently never fired and every unmounted button leaked its WebGL
- *    context. Browsers cap live contexts at roughly 16, after which new ones
- *    fail, so a page that mounts and unmounts these eventually renders bare
- *    pills. `destroy` is still tried first in case a future version renames it.
- *
- * 2. Ripple timeouts and the speed-restore timeout are tracked and cleared on
- *    unmount, so a button removed mid-animation cannot setState afterwards.
- */
+/** A liquid-metal pill that only animates while its corridor wall is active. */
 
 export interface LiquidMetalButtonProps {
   label?: string;
   onClick?: () => void;
   viewMode?: 'text' | 'icon';
-  /** Rendered instead of the label — lets the pill act as a link. */
+  /** Render the control as a link, with the same visible label. */
   href?: string;
   className?: string;
   ariaLabel?: string;
@@ -46,6 +31,7 @@ export function LiquidMetalButton({
   const [isHovered, setIsHovered] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<Ripple[]>([]);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   const shaderRef = useRef<HTMLDivElement>(null);
   const shaderMount = useRef<ShaderMount | null>(null);
@@ -53,6 +39,14 @@ export function LiquidMetalButton({
   const rippleId = useRef(0);
   const timers = useRef<number[]>([]);
   const hoveredRef = useRef(false);
+  const requestedSpeed = useRef<number>(SPEED.idle);
+  const animationAllowed = useRef(false);
+  const motionReduced = useRef(false);
+
+  const setSpeed = useCallback((speed: number) => {
+    requestedSpeed.current = speed;
+    shaderMount.current?.setSpeed(animationAllowed.current ? speed : 0);
+  }, []);
 
   const dimensions = useMemo(
     () =>
@@ -75,6 +69,36 @@ export function LiquidMetalButton({
     const el = shaderRef.current;
     if (!el) return;
 
+    const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const frame = el.closest<HTMLElement>('section');
+
+    const syncAnimation = () => {
+      // A receding wall still intersects the viewport, but its content is a
+      // ghost. The corridor owns that distinction; the shader itself already
+      // pauses when offscreen or when the browser tab is hidden.
+      const active = !frame?.classList.contains('corridor-frame') || (
+        frame.dataset.active !== undefined
+          ? frame.dataset.active === '1'
+          : frame.dataset.on === '1' && !frame.hasAttribute('inert')
+      );
+      motionReduced.current = preference.matches;
+      animationAllowed.current = active && !preference.matches;
+      shaderMount.current?.setSpeed(animationAllowed.current ? requestedSpeed.current : 0);
+    };
+    const onMotionChange = () => {
+      setReducedMotion(preference.matches);
+      if (preference.matches) setRipples([]);
+      syncAnimation();
+    };
+
+    onMotionChange();
+    preference.addEventListener('change', onMotionChange);
+    const observer = frame ? new MutationObserver(syncAnimation) : null;
+    if (frame) observer?.observe(frame, {
+      attributes: true,
+      attributeFilter: ['class', 'data-active', 'data-on', 'inert'],
+    });
+
     let mount: ShaderMount | null = null;
     try {
       mount = new ShaderMount(
@@ -94,25 +118,26 @@ export function LiquidMetalButton({
           u_offsetY: -0.1,
         },
         undefined,
-        SPEED.idle,
+        0,
       );
       shaderMount.current = mount;
+      syncAnimation();
     } catch (error) {
       // No WebGL (locked-down browser, some headless contexts). The pill still
-      // renders — it just sits on the black gradient underneath.
+      // has a static metallic rim and its accessible control remains usable.
       console.warn('LiquidMetalButton: shader unavailable, falling back', error);
     }
 
     return () => {
+      observer?.disconnect();
+      preference.removeEventListener('change', onMotionChange);
+      animationAllowed.current = false;
       for (const t of timers.current) window.clearTimeout(t);
       timers.current = [];
-      const m = shaderMount.current as (ShaderMount & { destroy?: () => void }) | null;
-      m?.destroy?.() ?? m?.dispose?.();
+      mount?.dispose();
       shaderMount.current = null;
     };
   }, []);
-
-  const setSpeed = (speed: number) => shaderMount.current?.setSpeed?.(speed);
 
   const handleEnter = () => {
     hoveredRef.current = true;
@@ -132,9 +157,13 @@ export function LiquidMetalButton({
     later(() => setSpeed(hoveredRef.current ? SPEED.hover : SPEED.idle), 300);
 
     const host = buttonRef.current;
-    if (host) {
+    if (host && !motionReduced.current) {
       const rect = host.getBoundingClientRect();
-      const ripple = { x: e.clientX - rect.left, y: e.clientY - rect.top, id: rippleId.current++ };
+      const ripple = {
+        x: e.detail === 0 ? rect.width / 2 : e.clientX - rect.left,
+        y: e.detail === 0 ? rect.height / 2 : e.clientY - rect.top,
+        id: rippleId.current++,
+      };
       setRipples((prev) => [...prev, ripple]);
       later(() => setRipples((prev) => prev.filter((r) => r.id !== ripple.id)), 600);
     }
@@ -142,8 +171,9 @@ export function LiquidMetalButton({
     onClick?.();
   };
 
-  const press = isPressed ? 'translateY(1px) scale(0.98)' : 'translateY(0) scale(1)';
-  const spring = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  const press = isPressed && !reducedMotion ? 'translateY(1px) scale(0.98)' : 'translateY(0) scale(1)';
+  const spring = reducedMotion ? 'none' : 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  const shadowTransition = reducedMotion ? 'none' : `${spring}, box-shadow .15s cubic-bezier(.4,0,.2,1)`;
   const box = { width: dimensions.width, height: dimensions.height };
 
   const shadow = isPressed
@@ -152,14 +182,44 @@ export function LiquidMetalButton({
       ? '0 0 0 1px rgba(0,0,0,.4), 0 12px 6px rgba(0,0,0,.05), 0 8px 5px rgba(0,0,0,.1), 0 4px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.2)'
       : '0 0 0 1px rgba(0,0,0,.3), 0 36px 14px rgba(0,0,0,.02), 0 20px 12px rgba(0,0,0,.08), 0 9px 9px rgba(0,0,0,.12), 0 2px 5px rgba(0,0,0,.15)';
 
-  const Interactive = (href ? 'a' : 'button') as 'a';
+  const controlProps = {
+    ref: (node: HTMLButtonElement | HTMLAnchorElement | null) => { buttonRef.current = node; },
+    className: 'metal-button-control',
+    onClick: handleActivate,
+    onMouseEnter: handleEnter,
+    onMouseLeave: handleLeave,
+    onMouseDown: () => setIsPressed(true),
+    onMouseUp: () => setIsPressed(false),
+    onFocus: handleEnter,
+    onBlur: handleLeave,
+    'aria-label': ariaLabel ?? label,
+    style: {
+      position: 'absolute', inset: 0, ...box,
+      background: 'transparent', border: 'none', cursor: 'pointer',
+      zIndex: 40, transformStyle: 'preserve-3d', transform: 'translateZ(25px)',
+      transition: spring, overflow: 'hidden', borderRadius: 100,
+      display: 'block',
+    } satisfies React.CSSProperties,
+  };
+  const rippleElements = ripples.map((r) => (
+    <span
+      key={r.id}
+      aria-hidden="true"
+      style={{
+        position: 'absolute', left: r.x, top: r.y, width: 20, height: 20, borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 70%)',
+        pointerEvents: 'none', animation: 'lmb-ripple .6s ease-out',
+      }}
+    />
+  ));
 
   return (
-    <div className={cnLite('relative inline-block', className)}>
+    <div className={cnLite('metal-button relative inline-block', className)}>
       <div style={{ perspective: 1000, perspectiveOrigin: '50% 50%' }}>
         <div style={{ position: 'relative', ...box, transformStyle: 'preserve-3d', transition: spring }}>
           {/* face: the label rides above the glass */}
           <div
+            aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, ...box,
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
@@ -183,6 +243,7 @@ export function LiquidMetalButton({
 
           {/* the dark bezel */}
           <div
+            aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, ...box, transformStyle: 'preserve-3d',
               transform: `translateZ(10px) ${press}`, transition: spring, zIndex: 20,
@@ -193,57 +254,36 @@ export function LiquidMetalButton({
                 width: dimensions.innerWidth, height: dimensions.innerHeight, margin: 2, borderRadius: 100,
                 background: 'linear-gradient(180deg, #202020 0%, #000 100%)',
                 boxShadow: isPressed ? 'inset 0 2px 4px rgba(0,0,0,.4), inset 0 1px 2px rgba(0,0,0,.3)' : 'none',
-                transition: `${spring}, box-shadow .15s cubic-bezier(.4,0,.2,1)`,
+                transition: shadowTransition,
               }}
             />
           </div>
 
           {/* the shader itself */}
           <div
+            aria-hidden="true"
             style={{
               position: 'absolute', inset: 0, ...box, transformStyle: 'preserve-3d',
               transform: `translateZ(0px) ${press}`, transition: spring, zIndex: 10,
             }}
           >
-            <div style={{ ...box, borderRadius: 100, boxShadow: shadow, transition: `${spring}, box-shadow .15s cubic-bezier(.4,0,.2,1)` }}>
+            <div style={{ ...box, borderRadius: 100, boxShadow: shadow, transition: shadowTransition }}>
               <div
                 ref={shaderRef}
                 className="lmb-shader"
-                style={{ ...box, maxWidth: dimensions.width, borderRadius: 100, overflow: 'hidden', position: 'relative' }}
+                style={{
+                  ...box, maxWidth: dimensions.width, borderRadius: 100, overflow: 'hidden', position: 'relative',
+                  background: 'linear-gradient(120deg, #444 0%, #ddd 22%, #555 44%, #c4c4c4 66%, #333 86%, #aaa 100%)',
+                }}
               />
             </div>
           </div>
 
-          <Interactive
-            ref={buttonRef as React.Ref<HTMLAnchorElement>}
-            {...(href ? { href } : { type: 'button' as const })}
-            onClick={handleActivate}
-            onMouseEnter={handleEnter}
-            onMouseLeave={handleLeave}
-            onMouseDown={() => setIsPressed(true)}
-            onMouseUp={() => setIsPressed(false)}
-            onFocus={handleEnter}
-            onBlur={handleLeave}
-            aria-label={ariaLabel ?? label}
-            style={{
-              position: 'absolute', inset: 0, ...box,
-              background: 'transparent', border: 'none', cursor: 'pointer', outline: 'none',
-              zIndex: 40, transformStyle: 'preserve-3d', transform: 'translateZ(25px)',
-              transition: spring, overflow: 'hidden', borderRadius: 100,
-              display: 'block',
-            }}
-          >
-            {ripples.map((r) => (
-              <span
-                key={r.id}
-                style={{
-                  position: 'absolute', left: r.x, top: r.y, width: 20, height: 20, borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(255,255,255,.4) 0%, rgba(255,255,255,0) 70%)',
-                  pointerEvents: 'none', animation: 'lmb-ripple .6s ease-out',
-                }}
-              />
-            ))}
-          </Interactive>
+          {href ? (
+            <a {...controlProps} href={href}>{rippleElements}</a>
+          ) : (
+            <button {...controlProps} type="button">{rippleElements}</button>
+          )}
         </div>
       </div>
     </div>
