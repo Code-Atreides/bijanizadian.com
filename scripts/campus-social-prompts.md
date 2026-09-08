@@ -19,7 +19,7 @@ Exact text:
 "80% onboarded"
 "18+ · Eligibility & final rules apply."
 "Trading involves risk."
-"bijanizadian.com/greekwars/invite"
+"fomo.family/greekwars/invite"
 Composition: headline across upper middle, $500 large and blue-lavender across lower middle with "for any chapter with" and "80% onboarded" directly attached on two lines, and the other lines clearly arranged underneath. Jupiter illuminates the upper-right background. The amount is the user-confirmed chapter onboarding reward, not a trading return.
 
 Correction edit prompt: In the existing Greek Wars graphic, replace only the two lines immediately below "$500" with "for any chapter with" and "80% onboarded". Preserve all other text, artwork, typography, colors and layout.
@@ -39,7 +39,7 @@ Exact text:
 "per verified task"
 "Build the brand at your school."
 "One claim per task, per person, per term."
-"bijanizadian.com/campus/manual"
+"fomo.family/campus/manual"
 Composition: the five roles are clearly readable in two short rows, not a dense paragraph. Large blue-lavender $20–$250 amount below, with per verified task directly below and clearly attached. Money is task rewards, not salary, so do not add salary claims. A slightly darker Jupiter crescent remains in the upper-right background. All names and dollar amounts must match exactly.
 
 ## 03-dinner-series
@@ -57,5 +57,7 @@ Exact text:
 "covered per approved table"
 "Restaurant paid directly."
 "18+ · Hosting approval required."
-"bijanizadian.com/dinners"
+"fomo.family/dinners"
 Composition: preserve the same space/Jupiter background, with a warm copper glow subtly recalling candlelight. UP TO immediately above very large blue-lavender $1,200, with covered per approved table clearly attached below. It is a dinner budget paid to a restaurant, not cash earnings, and that distinction must remain clear. No people or food photographs, just powerful typography and restrained cosmic imagery.
+
+Footer-domain edit prompt: In each existing graphic, change only the printed footer domain from "bijanizadian.com" to "fomo.family", preserving its path: "/greekwars/invite", "/campus/manual" or "/dinners". Preserve all other text, artwork, typography, colors and layout, including the Greek Wars reward "$500 / for any chapter with / 80% onboarded".
