@@ -198,6 +198,9 @@
   .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-content: center; }
   .stat b { display: block; font-size: clamp(26px, 3vw, 36px); font-weight: 700; letter-spacing: -.04em; line-height: 1.05; }
   .stat span { font-size: 12px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-faint); }
+  .stat .stat-source { display: block; margin-top: 6px; font-size: 11.5px; font-weight: 500; line-height: 1.5; color: var(--ink-soft); }
+  .stat-source a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+  .stat-source a:hover { color: var(--accent-bright); text-decoration-color: currentColor; }
 
   /* ---------- the hunt ---------- */
   .hunt { margin-top: var(--gap-head); padding: 20px 26px 22px; }
@@ -473,7 +476,7 @@
           <p class="tenure">2 mos</p>
         </div>
         <div class="line">
-          <p>campus lead for fomo, a venture-backed social trading app (<b>$75M raised</b>). ran user acquisition and brand strategy on a <mark>[X],000</mark>-student campus as part of a five-person growth team.</p>
+          <p>campus lead for fomo, a venture-backed social trading app (<b>$94M in disclosed funding</b>). ran user acquisition and brand strategy on a <mark>[X],000</mark>-student campus as part of a five-person growth team.</p>
           <ul>
             <li><mark>[400]</mark> active users acquired in 60 days</li>
             <li><mark>[3]</mark> org partnerships closed, reaching <mark>[1,200]</mark>+ students</li>
@@ -593,10 +596,13 @@
         </ul>
       </div>
       <div class="stats">
-        <span class="stat"><b>625,000+</b><span>people in the first year</span></span>
-        <span class="stat"><b>$4B+</b><span>traded through the app</span></span>
-        <span class="stat"><b>$75M</b><span>Series B, led by Index Ventures</span></span>
-        <span class="stat"><b>110M+</b><span>social interactions on it</span></span>
+        <!-- Company-reported figures, verified September 8, 2026. Keep each
+             reporting date: monthly volume projections are not cumulative totals.
+             Disclosed funding sums $19M through Series A and the $75M Series B. -->
+        <span class="stat"><b>1.9M+</b><span>users on fomo</span><small class="stat-source"><a href="https://www.globenewswire.com/news-release/2026/08/31/3353368/0/en/fomo-acquires-mobula-technology-to-bring-critical-on-chain-infrastructure-in-house.html" target="_blank" rel="noopener">Reported Aug 31, 2026</a></small></span>
+        <span class="stat"><b>$4B+</b><span>cumulative trading volume</span><small class="stat-source"><a href="https://fomo.family/blog/fomo-series-b" target="_blank" rel="noopener">Reported Jun 22, 2026</a></small></span>
+        <span class="stat"><b>$94M</b><span>total disclosed funding</span><small class="stat-source"><a href="https://fomo.family/blog/series-a" target="_blank" rel="noopener">$19M through Series A</a> + <a href="https://fomo.family/blog/fomo-series-b" target="_blank" rel="noopener">$75M Series B</a></small></span>
+        <span class="stat"><b>110M+</b><span>unique social interactions</span><small class="stat-source"><a href="https://fomo.family/blog/fomo-series-b" target="_blank" rel="noopener">Reported Jun 22, 2026</a></small></span>
       </div>
     </div>
     <p class="legalese">Trading involves risk, including loss of funds. No returns are guaranteed. Product access and promotional participation are subject to eligibility.</p>
