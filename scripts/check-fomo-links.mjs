@@ -90,7 +90,7 @@ for (const cssFile of ['assets/campus-landing.css','assets/campus-directory.css'
     if (asset.startsWith('/') && !localFile(new URL(asset,'https://bijanizadian.com'))) fail(`${cssFile}: missing ${asset}`);
   }
 }
-for (const jsFile of ['assets/manual-header.js']) {
+for (const jsFile of ['assets/manual-header.js','assets/greekwars-invite.js']) {
   try { new vm.Script(fs.readFileSync(path.join(root,jsFile),'utf8'), { filename: jsFile }); }
   catch(e) { fail(`${jsFile}: ${e.message}`); }
 }
