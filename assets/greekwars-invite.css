@@ -1,0 +1,33 @@
+@font-face {
+  font-family: Aeonik;
+  src: url('/campus/fonts/Aeonik-Bold.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #060510;
+  color: #EAEDFF;
+  font-family: Aeonik, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+
+/* One invitation, using the manual's shared cover at viewport height. */
+.greekwars-invite { min-height: 100svh; }
+.greekwars-invite h1 {
+  max-width: 13ch;
+  font-size: clamp(48px, 6.4vw, 96px);
+}
+.greekwars-invite .manual-description {
+  max-width: 43ch;
+  font-size: clamp(17px, 1.4vw, 22px);
+}
+
+@media (max-width: 760px) {
+  .greekwars-invite h1 { font-size: clamp(44px, 9.5vw, 72px); }
+  .greekwars-invite .manual-description { max-width: 33ch; }
+}

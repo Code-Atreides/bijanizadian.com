@@ -5,7 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const pages = ['campus/landing.html','campus/directory.html','campus/manual.html'];
+const pages = ['campus/landing.html','campus/directory.html','campus/manual.html','greekwars/invite.html'];
 const external = new Set();
 let failures = 0, checked = 0, journeyChecks = 0;
 function fail(message) { failures++; console.error(message); }
@@ -84,7 +84,7 @@ for (const page of pages) {
     }
   }
 }
-for (const cssFile of ['assets/campus-landing.css','assets/campus-directory.css','assets/fomo-system.css','assets/manual-header.css']) {
+for (const cssFile of ['assets/campus-landing.css','assets/campus-directory.css','assets/fomo-system.css','assets/manual-header.css','assets/greekwars-invite.css']) {
   const css = fs.readFileSync(path.join(root,cssFile),'utf8');
   for (const [,asset] of css.matchAll(/url\(['"]?([^'"\)]+)['"]?\)/g)) {
     if (asset.startsWith('/') && !localFile(new URL(asset,'https://bijanizadian.com'))) fail(`${cssFile}: missing ${asset}`);
