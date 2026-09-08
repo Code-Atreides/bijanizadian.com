@@ -258,13 +258,24 @@
   /* ---------- the line this puts on a resume ---------- */
   .resume { margin-top: var(--gap-block); padding: 24px 26px 26px; }
   .resume h3 { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--accent-bright); }
-  .resume .role { margin-top: 14px; font-size: 18px; font-weight: 700; letter-spacing: -.025em; }
-  .resume .meta { margin-top: 2px; font-size: 13px; color: var(--ink-faint); }
-  .resume .line { margin-top: 16px; padding: 16px 18px; background: var(--bg-3); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); font-size: 14.5px; color: var(--ink-soft); }
-  .resume .line ul { margin-top: 12px; list-style: none; display: grid; gap: 7px; }
-  .resume .line ul li { position: relative; padding-left: 17px; font-size: 14px; }
-  .resume .line ul li::before { content: ""; position: absolute; left: 0; top: 8px; width: 6px; height: 6px; border-radius: 99px; background: var(--ink-faint); }
-  .resume mark { background: var(--accent-t); color: var(--accent-bright); border-radius: 4px; padding: 0 5px; font-weight: 700; }
+  .linkedin-experience { margin-top: 18px; padding: 24px; display: grid; grid-template-columns: 48px minmax(0,1fr); column-gap: 16px; background: #fff; color: rgba(0,0,0,.9); border: 1px solid #e0dfdc; border-radius: 8px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 400; line-height: 1.45; letter-spacing: normal; }
+  .linkedin-company-logo { display: grid; place-items: center; width: 48px; height: 48px; background: #516AF6; border-radius: 2px; }
+  .linkedin-company-logo img { width: 48px; height: 48px; display: block; }
+  .linkedin-experience .role { font-size: 16px; font-weight: 600; line-height: 1.5; letter-spacing: normal; }
+  .linkedin-experience .company { margin-top: 1px; }
+  .linkedin-experience .tenure { margin-top: 2px; color: rgba(0,0,0,.6); }
+  .linkedin-experience .line { grid-column: 2; margin-top: 12px; }
+  .linkedin-experience .line ul { margin-top: 8px; padding-left: 20px; list-style: disc; }
+  .linkedin-experience .line li { padding-left: 1px; margin-top: 3px; }
+  .linkedin-experience b, .linkedin-experience strong { font-weight: 600; }
+  .linkedin-experience mark { background: #edf3f8; color: #0a66c2; border-radius: 2px; padding: 0 2px; font-weight: 600; }
+  .linkedin-skills { grid-column: 2; display: flex; align-items: flex-start; gap: 6px; margin-top: 12px; font-weight: 600; }
+  .linkedin-skills svg { width: 16px; height: 16px; flex: 0 0 16px; margin-top: 2px; color: rgba(0,0,0,.75); }
+  @media (max-width: 600px) {
+    .linkedin-experience { padding: 18px 14px; grid-template-columns: 40px minmax(0,1fr); column-gap: 12px; }
+    .linkedin-company-logo, .linkedin-company-logo img { width: 40px; height: 40px; }
+    .linkedin-experience .line, .linkedin-skills { grid-column: 1 / -1; }
+  }
 
   /* ---------- the eight-week goal map ---------- */
   .wkmap { margin-top: var(--gap-head); padding: 20px 26px 22px; }
@@ -451,19 +462,29 @@
       <li><i>03</i><b>budget and autonomy</b><small>real money for events, dinners and prizes. you decide how to spend it.</small></li>
       <li><i>04</i><b>a foot in the door</b><small>top performers get referred internally for internships and full-time roles.</small></li>
     </ol>
-    <div class="card resume">
+    <div class="card resume" id="resume">
       <h3>the line it puts on your r&eacute;sum&eacute;</h3>
-      <p class="role">Campus Lead &middot; fomo</p>
-      <p class="meta">Contract &middot; skills: growth marketing &middot; partnerships &middot; content strategy &middot; events</p>
-      <div class="line">
-        <p>campus lead for fomo, a venture-backed social trading app (<b>$75M raised</b>). ran user acquisition and brand strategy on a <mark>[X],000</mark>-student campus as part of a five-person growth team.</p>
-        <ul>
-          <li><mark>[400]</mark> active users acquired in 60 days</li>
-          <li><mark>[3]</mark> org partnerships closed, reaching <mark>[1,200]</mark>+ students</li>
-          <li><mark>[100k]</mark> views on the campus social account</li>
-          <li>managed a <mark>[$X]</mark> event budget</li>
-        </ul>
-      </div>
+      <article class="linkedin-experience" aria-label="Example LinkedIn experience">
+        <div class="linkedin-company-logo"><img src="/assets/fomo-logo-white.svg" alt="fomo" width="48" height="48" loading="lazy"></div>
+        <div class="linkedin-position">
+          <h4 class="role">Campus Lead</h4>
+          <p class="company">fomo &middot; Contract</p>
+          <p class="tenure">2 mos</p>
+        </div>
+        <div class="line">
+          <p>campus lead for fomo, a venture-backed social trading app (<b>$75M raised</b>). ran user acquisition and brand strategy on a <mark>[X],000</mark>-student campus as part of a five-person growth team.</p>
+          <ul>
+            <li><mark>[400]</mark> active users acquired in 60 days</li>
+            <li><mark>[3]</mark> org partnerships closed, reaching <mark>[1,200]</mark>+ students</li>
+            <li><mark>[100k]</mark> views on the campus social account</li>
+            <li>managed a <mark>[$X]</mark> event budget</li>
+          </ul>
+        </div>
+        <p class="linkedin-skills">
+          <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4 3h8l2 3-6 7-6-7 2-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.6"/></svg>
+          <span>Growth Marketing, Partnerships, Content Strategy and Events</span>
+        </p>
+      </article>
       <p class="note">Swap the brackets for your own numbers at the end of the term. Most people do not touch work like this until two years into a real job.</p>
     </div>
 
