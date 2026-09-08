@@ -2,7 +2,7 @@
 
 Generated with the built-in imagegen tool. Final PNGs are in `assets/campus-social/`.
 
-The Greek Wars graphic marks the $500 prize as proposed because official rules are pending in the existing project copy. Campus team amounts are task payments; dinner coverage is paid directly to the restaurant.
+The Greek Wars graphic uses the user-confirmed $500 chapter onboarding reward for any chapter with 80% onboarded. Campus team amounts are task payments; dinner coverage is paid directly to the restaurant.
 
 ## 01-greek-wars
 
@@ -15,12 +15,14 @@ Exact text:
 "vs. everyone."
 "A trading competition for fraternities and sororities."
 "$500"
-"proposed top-trader prize"
-"Top trader in each qualifying chapter."
+"for any chapter with"
+"80% onboarded"
 "18+ · Eligibility & final rules apply."
 "Trading involves risk."
 "bijanizadian.com/greekwars/invite"
-Composition: headline across upper middle, $500 large and blue-lavender across lower middle with proposed top-trader prize directly attached, and the other lines clearly arranged underneath. Jupiter illuminates the upper-right background. Keep proposed status visible; do not write guaranteed or imply investment returns. Poster is an invitation concept using the current campus manual's proposed prize, with final rules pending.
+Composition: headline across upper middle, $500 large and blue-lavender across lower middle with "for any chapter with" and "80% onboarded" directly attached on two lines, and the other lines clearly arranged underneath. Jupiter illuminates the upper-right background. The amount is the user-confirmed chapter onboarding reward, not a trading return.
+
+Correction edit prompt: In the existing Greek Wars graphic, replace only the two lines immediately below "$500" with "for any chapter with" and "80% onboarded". Preserve all other text, artwork, typography, colors and layout.
 
 ## 02-campus-team
 
