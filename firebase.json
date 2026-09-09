@@ -20,6 +20,7 @@
       "preview-final.html",
       "scripts/**",
       "AGENTS.md",
+      "DISCORD.md",
       "database.rules.json",
       "portfolio/**"
     ],
