@@ -4,7 +4,9 @@
   },
   "hosting": {
     "public": ".",
-    "predeploy": ["node scripts/check-fomo-links.mjs"],
+    "predeploy": [
+      "node scripts/check-fomo-links.mjs"
+    ],
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -27,19 +29,11 @@
     ],
     "cleanUrls": true,
     "trailingSlash": false,
-    "redirects": [
+    "rewrites": [
       {
         "source": "/hq",
-        "destination": "https://fomo-hq-visits.lebron2423.chatgpt.site",
-        "type": 302
+        "destination": "/hq/index.html"
       },
-      {
-        "source": "/hq/**",
-        "destination": "https://fomo-hq-visits.lebron2423.chatgpt.site",
-        "type": 302
-      }
-    ],
-    "rewrites": [
       {
         "source": "/",
         "destination": "/desktop.html"
