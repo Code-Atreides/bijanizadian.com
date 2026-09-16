@@ -17,7 +17,7 @@
   function renderPhoto(index) {
     photoIndex = (index + photos.length) % photos.length;
     const [file, caption, alt] = photos[photoIndex];
-    galleryImage.src = `/housepitch/images/${file}.webp`;
+    galleryImage.src = `/housepitch/images/${file}-clean.jpg`;
     galleryImage.alt = alt;
     document.querySelector('#gallery-caption').textContent = caption;
     document.querySelector('#gallery-counter').textContent = `${String(photoIndex + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}`;
