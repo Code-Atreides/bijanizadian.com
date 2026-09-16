@@ -22,10 +22,23 @@
       "AGENTS.md",
       "DISCORD.md",
       "database.rules.json",
-      "portfolio/**"
+      "portfolio/**",
+      "fomo-hq-portal/**"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/hq",
+        "destination": "https://fomo-hq-visits.lebron2423.chatgpt.site",
+        "type": 302
+      },
+      {
+        "source": "/hq/**",
+        "destination": "https://fomo-hq-visits.lebron2423.chatgpt.site",
+        "type": 302
+      }
+    ],
     "rewrites": [
       {
         "source": "/",

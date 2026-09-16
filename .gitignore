@@ -22,3 +22,6 @@ fomo-handoff.zip
 portfolio/dist/
 portfolio/.vite/
 preview-final.html
+
+# Independently versioned Sites portal
+fomo-hq-portal/
