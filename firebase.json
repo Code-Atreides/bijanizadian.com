@@ -31,6 +31,10 @@
     "trailingSlash": false,
     "rewrites": [
       {
+        "source": "/LAhousepitch",
+        "destination": "/housepitch/index.html"
+      },
+      {
         "source": "/hqvisitform",
         "destination": "/hqvisitform/index.html"
       },
