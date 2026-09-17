@@ -17,17 +17,44 @@
     ['kitchen', 'Where the evening begins.', 'Renovated kitchen connecting to the main living space'],
     ['aerial', 'The whole picture.', 'Overhead listing photograph showing the home, terraces, and pool']
   ];
+  const media = photos.map(([file, caption, alt]) => ({
+    type: 'image', caption, alt,
+    src: isNewYork ? `/housepitch/images/tribeca/${file}.webp` : `/housepitch/images/${file}-clean.jpg`
+  }));
+  if (isNewYork) media.push(
+    { type: 'video', src: '/housepitch/media/tribeca-podcast.mp4', poster: '/housepitch/images/tribeca/video-poster.jpg', caption: 'Conversations at the loft · Chipped × Bran', alt: 'Chipped and Bran podcast clip at the Tribeca loft' },
+    { type: 'video', src: '/housepitch/media/tribeca-loft.mp4', poster: '/housepitch/images/tribeca/loft-video-poster.jpg', caption: 'Inside the loft · A walkthrough', alt: 'Walkthrough of the Tribeca loft' }
+  );
   const gallery = document.querySelector('#gallery');
   const galleryImage = document.querySelector('#gallery-image');
+  const galleryVideo = document.querySelector('#gallery-video');
+  const galleryCredit = document.querySelector('.viewer-credit');
+  const photoCredit = galleryCredit.textContent;
   let photoIndex = 0;
   let galleryTrigger;
   function renderPhoto(index) {
-    photoIndex = (index + photos.length) % photos.length;
-    const [file, caption, alt] = photos[photoIndex];
-    galleryImage.src = isNewYork ? `/housepitch/images/tribeca/${file}.webp` : `/housepitch/images/${file}-clean.jpg`;
-    galleryImage.alt = alt;
-    document.querySelector('#gallery-caption').textContent = caption;
-    document.querySelector('#gallery-counter').textContent = `${String(photoIndex + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}`;
+    photoIndex = (index + media.length) % media.length;
+    const item = media[photoIndex];
+    if (galleryVideo) {
+      galleryVideo.pause();
+      galleryVideo.hidden = item.type !== 'video';
+      if (item.type === 'video') {
+        galleryVideo.poster = item.poster;
+        galleryVideo.src = item.src;
+        galleryVideo.setAttribute('aria-label', item.alt);
+      } else {
+        galleryVideo.removeAttribute('src');
+      }
+      galleryVideo.load();
+    }
+    galleryImage.hidden = item.type === 'video';
+    if (item.type === 'image') {
+      galleryImage.src = item.src;
+      galleryImage.alt = item.alt;
+    }
+    galleryCredit.textContent = item.type === 'video' ? 'Video supplied for this proposal' : photoCredit;
+    document.querySelector('#gallery-caption').textContent = item.caption;
+    document.querySelector('#gallery-counter').textContent = `${String(photoIndex + 1).padStart(2, '0')} / ${String(media.length).padStart(2, '0')}`;
   }
   document.querySelectorAll('[data-photo]').forEach(button => {
     button.addEventListener('click', () => {
@@ -42,6 +69,7 @@
   document.querySelector('#gallery-prev').addEventListener('click', () => renderPhoto(photoIndex - 1));
   document.querySelector('#gallery-next').addEventListener('click', () => renderPhoto(photoIndex + 1));
   gallery.addEventListener('keydown', event => {
+    if (event.target.closest('video')) return;
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
       renderPhoto(photoIndex + (event.key === 'ArrowLeft' ? -1 : 1));
@@ -53,6 +81,7 @@
     if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) gallery.close();
   });
   gallery.addEventListener('close', () => {
+    galleryVideo?.pause();
     document.body.classList.remove('modal-open');
     galleryTrigger?.focus({ preventScroll: true });
   });
@@ -80,8 +109,4 @@
   window.addEventListener('hashchange', () => revealDetails());
   revealDetails();
 
-  const videos = [...document.querySelectorAll('video')];
-  videos.forEach(video => video.addEventListener('play', () => {
-    videos.forEach(other => { if (other !== video) other.pause(); });
-  }));
 })();

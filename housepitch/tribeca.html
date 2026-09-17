@@ -16,8 +16,8 @@
   <link rel="icon" href="/fomo-favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/campus/fonts/Aeonik-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/housepitch/images/tribeca/photo-1.webp" as="image">
-  <link rel="stylesheet" href="/housepitch/style.css?v=tribeca-1">
-  <script src="/housepitch/script.js?v=tribeca-1" defer></script>
+  <link rel="stylesheet" href="/housepitch/style.css?v=gallery-media-1">
+  <script src="/housepitch/script.js?v=gallery-media-1" defer></script>
 </head>
 <body data-location="new-york">
   <a class="skip" href="#main">Skip to content</a>
@@ -32,32 +32,13 @@
     <div class="listing-context" id="top"><p>New York <span aria-hidden="true">/</span> Tribeca</p><span class="proposal-tag"><i aria-hidden="true"></i> A home base for fomo</span></div>
 
     <section class="photo-grid" aria-label="Property photos">
-      <button class="photo-main" data-photo="0" aria-label="Open photo gallery"><img src="/housepitch/images/tribeca/photo-1.webp" alt="Open loft living space with lounge seating and colorful lighting" width="1200" height="1600" fetchpriority="high"><span class="photo-caption">Tribeca Loft</span></button>
+      <button class="photo-main" data-photo="0" aria-label="Open photo and video gallery"><img src="/housepitch/images/tribeca/photo-1.webp" alt="Open loft living space with lounge seating and colorful lighting" width="1200" height="1600" fetchpriority="high"><span class="photo-caption">Tribeca Loft</span></button>
       <button data-photo="1" aria-label="Enlarge primary bedroom photo"><img src="/housepitch/images/tribeca/photo-2.webp" alt="Primary bedroom with exposed brick and pink bedside lighting" width="1200" height="1600"></button>
       <button data-photo="2" aria-label="Enlarge podcast studio photo"><img src="/housepitch/images/tribeca/photo-5.webp" alt="Guests recording a podcast in the loft studio" width="1600" height="864"></button>
       <button data-photo="3" aria-label="Enlarge en suite bathroom photo"><img src="/housepitch/images/tribeca/photo-3.webp" alt="Tiled en suite bathroom with a floating vanity" width="1200" height="1600"></button>
       <button data-photo="4" aria-label="Enlarge shower photo"><img src="/housepitch/images/tribeca/photo-4.webp" alt="Glass shower in the loft bathroom" width="1200" height="1600"></button>
-      <button class="all-photos" data-photo="0"><span aria-hidden="true">▦</span> See all 5 photos</button>
+      <button class="all-photos" data-photo="0"><span aria-hidden="true">▦</span> See all 5 photos + 2 videos</button>
     </section>
-
-    <div class="property-videos">
-    <section class="property-video" id="video" aria-labelledby="video-title">
-      <div class="video-heading"><h2 id="video-title">Conversations at the loft</h2><span class="mini-label">Chipped × Bran</span></div>
-      <video controls playsinline preload="metadata" poster="/housepitch/images/tribeca/video-poster.jpg" aria-label="Chipped and Bran podcast clip at the Tribeca loft">
-        <source src="/housepitch/media/tribeca-podcast.mp4" type="video/mp4">
-        <p><a href="/housepitch/media/tribeca-podcast.mp4">Watch the podcast clip</a>.</p>
-      </video>
-      <p class="video-caption">A look at the studio in use — a conversation, a brand, and a place to create.</p>
-    </section>
-    <section class="property-video loft-tour" aria-labelledby="tour-title">
-      <div class="video-heading"><h2 id="tour-title">Inside the loft</h2><span class="mini-label">A walkthrough</span></div>
-      <video controls playsinline preload="metadata" poster="/housepitch/images/tribeca/loft-video-poster.jpg" aria-label="Walkthrough of the Tribeca loft">
-        <source src="/housepitch/media/tribeca-loft.mp4" type="video/mp4">
-        <p><a href="/housepitch/media/tribeca-loft.mp4">Watch the loft walkthrough</a>.</p>
-      </video>
-      <p class="video-caption">Explore the living space, bedroom, and bathroom.</p>
-    </section>
-    </div>
 
     <div class="listing-layout">
       <div class="listing-main">
@@ -141,6 +122,6 @@
     </div>
     <footer><p>An independent proposal for <a href="https://fomo.family/" target="_blank" rel="noopener noreferrer">fomo ↗</a></p><p>Property photography and background: cloutbnb presentation. Podcast video supplied for this proposal.</p></footer>
   </main>
-  <dialog id="gallery" aria-labelledby="gallery-title"><div class="viewer-top"><p id="gallery-title">Tribeca Loft <span id="gallery-counter">01 / 05</span></p><button id="gallery-close" aria-label="Close photo gallery">Close <span aria-hidden="true">×</span></button></div><div class="viewer-image"><img id="gallery-image" src="/housepitch/images/tribeca/photo-1.webp" alt="Open living space in the Tribeca loft" width="960" height="720"></div><div class="viewer-bottom"><button id="gallery-prev" aria-label="Previous photo">←</button><p id="gallery-caption">The loft, after hours.</p><button id="gallery-next" aria-label="Next photo">→</button></div><p class="viewer-credit">Property photography · cloutbnb</p></dialog>
+  <dialog id="gallery" aria-labelledby="gallery-title"><div class="viewer-top"><p id="gallery-title">Tribeca Loft <span id="gallery-counter">01 / 07</span></p><button id="gallery-close" aria-label="Close photo and video gallery">Close <span aria-hidden="true">×</span></button></div><div class="viewer-image"><img id="gallery-image" src="/housepitch/images/tribeca/photo-1.webp" alt="Open living space in the Tribeca loft" width="960" height="720"><video id="gallery-video" controls playsinline preload="none" hidden aria-label="Loft video"></video></div><div class="viewer-bottom"><button id="gallery-prev" aria-label="Previous photo or video">←</button><p id="gallery-caption" aria-live="polite">The loft, after hours.</p><button id="gallery-next" aria-label="Next photo or video">→</button></div><p class="viewer-credit">Property photography · cloutbnb</p></dialog>
 </body>
 </html>

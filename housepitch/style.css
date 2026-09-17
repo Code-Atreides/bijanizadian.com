@@ -30,15 +30,8 @@ p{line-height:1.6}
 .pitch-tabs a[aria-current="page"]{color:var(--blue);border-color:var(--blue)}
 .pitch-tabs a:hover{color:var(--blue)}
 .pitch-tabs span{font-size:10px;margin-left:7px}
-.property-video{margin-top:18px;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;scroll-margin-top:90px}
-.property-videos{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,.36fr);gap:16px}
-.property-videos .property-video video{height:clamp(260px,32vw,460px);aspect-ratio:auto}
-.video-heading{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:15px 19px}
-.video-heading h2{font-size:16px;letter-spacing:-.02em}
-.property-video video{display:block;width:100%;max-height:540px;aspect-ratio:16/9;background:#171725;object-fit:contain}
-.video-caption{padding:12px 19px;font-size:11px;color:var(--muted)}
 .case-study-copy{font-size:13px;color:#666674;margin-top:16px}
-@media(max-width:760px){.pitch-tabs{gap:22px;padding-top:4px}.pitch-tabs a{font-size:12px;padding:14px 0 12px}.pitch-tabs span{font-size:9px;margin-left:5px}.property-videos{grid-template-columns:1fr;gap:0}.video-heading{padding:13px}.video-heading h2{font-size:14px}.video-heading .mini-label{font-size:8px}.video-caption{padding:10px 13px;font-size:10px}.property-videos .property-video video{height:auto;aspect-ratio:16/9}.property-videos .loft-tour video{aspect-ratio:9/16;max-height:500px}}
+@media(max-width:760px){.pitch-tabs{gap:22px;padding-top:4px}.pitch-tabs a{font-size:12px;padding:14px 0 12px}.pitch-tabs span{font-size:9px;margin-left:5px}}
 .listing-context{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:23px 0 18px;scroll-margin-top:76px}
 .listing-context p{font-size:12px;color:#686877}
 .listing-context p span{color:#b0b0bc;margin:0 10px}
@@ -153,7 +146,7 @@ dialog::backdrop{background:rgba(245,245,250,.92);backdrop-filter:blur(8px)}
 .viewer-top button{padding:10px 0 10px 14px;background:none;font-size:12px}
 .viewer-top button span{font-size:24px;vertical-align:-2px;margin-left:12px}
 .viewer-image{margin:15px 0;background:#fafafc}
-.viewer-image img{width:100%;height:min(65svh,650px);object-fit:contain}
+.viewer-image img,.viewer-image video{width:100%;height:min(65svh,650px);object-fit:contain}
 .viewer-bottom button{background:var(--lavender);color:#5964df;width:44px;height:42px;font-size:22px;border-radius:5px}
 .viewer-bottom button:hover{background:#e1e4ff}
 .viewer-bottom p{text-align:center;font-size:14px}
@@ -185,8 +178,12 @@ dialog::backdrop{background:rgba(245,245,250,.92);backdrop-filter:blur(8px)}
   .budget-summary{gap:15px;padding:16px;grid-template-columns:1fr}.budget-summary strong{font-size:30px}.budget-summary p{font-size:12px}
   .test-criteria{gap:11px 14px;font-size:10px}.data-table tbody th{font-size:12px}.data-table td{font-size:19px}.spec-list{font-size:11px}.spec-list>div{gap:14px}
   footer{flex-direction:column;gap:10px;margin-top:28px;padding:22px 0}footer>p:last-child{text-align:left}
-  dialog{padding:14px;max-width:96vw}.viewer-top p{font-size:12px}.viewer-top p span{margin-left:10px}.viewer-image img{height:55svh}.viewer-bottom p{font-size:12px}.viewer-credit{font-size:8px}
+  dialog{padding:14px;max-width:96vw}.viewer-top p{font-size:12px}.viewer-top p span{margin-left:10px}.viewer-image img,.viewer-image video{height:55svh}.viewer-bottom p{font-size:12px}.viewer-credit{font-size:8px}
 }
 @media(max-width:420px){.photo-grid{height:265px}.photo-grid .photo-main img{object-position:52% 50%}.proposal-tag{font-size:8px}.listing-context p{font-size:9px}h1{font-size:26px}.quick-specs{gap:12px}.quick-specs>span+span{padding-left:12px}}
 @media(max-width:350px){.brand img{width:66px}.brand span{font-size:16px}.header-location{font-size:10px}.proposal-tag{display:none}.photo-grid{height:235px}.rent{font-size:31px}h1{font-size:24px}.quick-specs{font-size:12px}.quick-specs strong{font-size:14px}.amenities{gap:5px}.amenities li{padding:6px 8px}.card-rent{font-size:10px}.card-rent strong{font-size:11px}.spec-list{font-size:10px}.test-criteria{grid-template-columns:1fr}.data-table thead th{font-size:9px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important;animation:none!important}}
+
+.viewer-image [hidden]{display:none}
+.viewer-image video{display:block;background:#171725}
+.viewer-image video[hidden]{display:none}
