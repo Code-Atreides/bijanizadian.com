@@ -1,6 +1,13 @@
 'use strict';
 (() => {
-  const photos = [
+  const isNewYork = document.body.dataset.location === 'new-york';
+  const photos = isNewYork ? [
+    ['photo-1', 'The loft, after hours.', 'Open loft living space with lounge seating and colorful lighting'],
+    ['photo-2', 'A place to settle in.', 'Primary bedroom with exposed brick and pink bedside lighting'],
+    ['photo-5', 'Conversations, in good company.', 'Two guests recording a podcast in the loft studio'],
+    ['photo-3', 'The en suite.', 'Tiled en suite bathroom with a floating vanity'],
+    ['photo-4', 'The details, considered.', 'Glass shower in the loft bathroom']
+  ] : [
     ['living-dusk', 'The A-frame, at dusk.', 'Glass-fronted A-frame living room opening onto the terrace at sunset'],
     ['terrace-dusk', 'The city, from here.', 'Outdoor lounge terrace overlooking Los Angeles at sunset'],
     ['exterior-dusk', 'An unmistakable silhouette.', 'A-frame architecture above the curved lower level at dusk'],
@@ -17,7 +24,7 @@
   function renderPhoto(index) {
     photoIndex = (index + photos.length) % photos.length;
     const [file, caption, alt] = photos[photoIndex];
-    galleryImage.src = `/housepitch/images/${file}-clean.jpg`;
+    galleryImage.src = isNewYork ? `/housepitch/images/tribeca/${file}.webp` : `/housepitch/images/${file}-clean.jpg`;
     galleryImage.alt = alt;
     document.querySelector('#gallery-caption').textContent = caption;
     document.querySelector('#gallery-counter').textContent = `${String(photoIndex + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}`;
@@ -72,4 +79,9 @@
   });
   window.addEventListener('hashchange', () => revealDetails());
   revealDetails();
+
+  const videos = [...document.querySelectorAll('video')];
+  videos.forEach(video => video.addEventListener('play', () => {
+    videos.forEach(other => { if (other !== video) other.pause(); });
+  }));
 })();

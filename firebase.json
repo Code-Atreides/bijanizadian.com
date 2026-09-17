@@ -25,7 +25,8 @@
       "DISCORD.md",
       "database.rules.json",
       "portfolio/**",
-      "fomo-hq-portal/**"
+      "fomo-hq-portal/**",
+      "housepitch/**/*.mov"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
@@ -33,6 +34,10 @@
       {
         "source": "/LAhousepitch",
         "destination": "/housepitch/index.html"
+      },
+      {
+        "source": "/NYhousepitch",
+        "destination": "/housepitch/tribeca.html"
       },
       {
         "source": "/hqvisitform",
