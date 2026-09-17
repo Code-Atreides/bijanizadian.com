@@ -23,7 +23,8 @@
   }));
   if (isNewYork) media.push(
     { type: 'video', src: '/housepitch/media/tribeca-podcast.mp4', poster: '/housepitch/images/tribeca/video-poster.jpg', caption: 'Conversations at the loft · Chipped × Bran', alt: 'Chipped and Bran podcast clip at the Tribeca loft' },
-    { type: 'video', src: '/housepitch/media/tribeca-loft.mp4', poster: '/housepitch/images/tribeca/loft-video-poster.jpg', caption: 'Inside the loft · A walkthrough', alt: 'Walkthrough of the Tribeca loft' }
+    { type: 'video', src: '/housepitch/media/tribeca-loft.mp4', poster: '/housepitch/images/tribeca/loft-video-poster.jpg', caption: 'Inside the loft · A walkthrough', alt: 'Walkthrough of the Tribeca loft' },
+    { type: 'video', src: '/housepitch/media/tribeca-riki-2.mp4', poster: '/housepitch/images/tribeca/riki-2-video-poster.jpg', caption: 'Olivia & Tabs · Riki #2', alt: 'Olivia and Tabs, Riki clip number two' }
   );
   const gallery = document.querySelector('#gallery');
   const galleryImage = document.querySelector('#gallery-image');
