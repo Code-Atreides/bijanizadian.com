@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Visit a friend | fomo campus</title>
+<meta name="description" content="Got a friend at another fomo school? Go see them. Tell us where and when, and fomo pays for the trip.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Visit a friend at another fomo school">
+<meta property="og:description" content="Tell us where and when, and fomo pays for the trip.">
+<meta property="og:url" content="https://bijanizadian.com/campus/visit">
+<meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
+<link rel="canonical" href="https://bijanizadian.com/campus/visit">
+<meta name="robots" content="index,follow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<!--
+  Campus trips: someone on a fomo campus asks fomo to pay for a trip to see a
+  friend at another fomo school. Built in the /hqvisitform design language.
+  Nothing is stored here — submitting opens the visitor's email app with the
+  request addressed to TEAM_EMAIL (see the script), and the team confirms the
+  trip and how it is paid for by replying.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+  /* The /hqvisitform palette: brand-kit fomo blue, ink and pale lavender, with
+     the cool greys that page uses for secondary text and hairlines. */
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --day: #f1f3ff; --day-hover: #dee4ff;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --input: #d9ddea; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a, input, select, textarea { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+  h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  .site-shell { max-width: 1160px; margin: auto; padding: 0 40px; }
+
+  /* ---------- header ---------- */
+  .site-header { height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 90px; height: auto; }
+  .brand > span { font-size: 27px; letter-spacing: -.8px; color: var(--muted); }
+  .where { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--muted); }
+
+  /* ---------- the card ---------- */
+  main { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); margin-top: 24px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
+
+  .invitation { padding: 40px 32px; background: var(--lavender); }
+  .eyebrow { display: block; font-size: 12px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  h1 { font-size: 48px; line-height: 1.1; font-weight: 500; letter-spacing: -1.8px; margin: 24px 0; }
+  h1 > span { color: var(--blue); }
+  .benefits { font-size: 16px; line-height: 1.65; color: #50566e; }
+  .info { display: grid; gap: 23px; margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--panel-rule); }
+  .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.5; }
+  .info svg { color: var(--blue); flex-shrink: 0; margin-top: 2px; }
+  .info small { display: block; font-size: 13px; font-weight: 400; color: #68708d; line-height: 1.55; margin-top: 3px; }
+  .invitation-note { font-size: 14px; color: #636b87; line-height: 1.6; margin-top: 37px; }
+
+  .booking { padding: 35px 34px 27px; background: #fff; min-width: 0; }
+  h2 { font-size: 27px; font-weight: 500; letter-spacing: -.7px; line-height: 1.2; margin-bottom: 9px; }
+  .subtitle { font-size: 15px; line-height: 1.5; color: var(--muted); }
+  .steps { display: flex; align-items: center; gap: 13px; margin: 24px 0 27px; color: var(--muted-2); font-size: 14px; }
+  .steps > span { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+  .steps i { font-style: normal; background: var(--chip); border: 1px solid var(--line); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+  .steps .active { color: var(--blue-text); font-weight: 500; }
+  .steps .active i, .steps .complete i { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .steps .step-line { height: 1px; width: 24px; background: #e0e4f0; }
+
+  /* ---------- fields ---------- */
+  .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { min-width: 0; margin-bottom: 19px; }
+  .field > label { display: block; font-size: 14px; font-weight: 500; }
+  .field > label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
+  .field input, .field select, .field textarea {
+    display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 10px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    border: 1px solid var(--input); border-radius: 7px; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field textarea { resize: vertical; min-height: 88px; line-height: 1.5; }
+  .field select { appearance: none; -webkit-appearance: none; padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23656779' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 11px center; background-size: 16px; }
+  .field select:invalid { color: #8990a4; }
+  .field input::placeholder, .field textarea::placeholder { color: #8990a4; font-size: 14px; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .field [aria-invalid="true"] { border-color: #d0574b; }
+  .money { position: relative; }
+  .money::before { content: "$"; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 16px; pointer-events: none; }
+  .money input { padding-left: 24px; margin-top: 0; }
+  .field .money { margin-top: 8px; }
+  .field-error { margin-top: 7px; font-size: 13px; color: #9b362e; }
+
+  /* the onboarding page's markup combobox, restyled as a light popover */
+  .combo { position: relative; }
+  .combo-list {
+    position: absolute; z-index: 20; left: 0; right: 0; top: calc(100% + 6px);
+    max-height: 184px; overflow-y: auto; overscroll-behavior: contain;
+    list-style: none; padding: 4px; background: #fff;
+    border: 1px solid var(--option-line); border-radius: 10px;
+    box-shadow: 0 12px 32px -12px rgba(11,9,31,.22);
+    scrollbar-width: thin;
+  }
+  .combo-list li { padding: 9px 11px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #50566e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .combo-list li:hover { background: var(--tint); color: var(--ink); }
+  .combo-list li[aria-selected="true"] { background: var(--lavender); color: var(--ink); }
+  .combo-list mark { background: none; color: var(--blue-text); font-weight: 500; }
+
+  /* ---------- calendar + how you're getting there ---------- */
+  .calendar-layout { display: grid; grid-template-columns: minmax(0, 1fr) 134px; gap: 25px; margin-top: 4px; }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+  .cal-head strong { font-size: 16px; font-weight: 500; }
+  .cal-nav { width: 32px; height: 32px; display: grid; place-items: center; border: 0; background: none; border-radius: 7px; color: var(--ink); }
+  .cal-nav:hover:not(:disabled) { background: var(--chip); }
+  .cal-nav:disabled { opacity: .3; cursor: default; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px 2px; }
+  .cal-dow { font-size: 12px; color: #747b95; text-align: center; padding-bottom: 4px; }
+  .day { height: 40px; border: 0; border-radius: 7px; background: var(--day); color: var(--ink); font: inherit; font-size: 14px; font-weight: 500; transition: background .15s; }
+  .day:hover:not(:disabled) { background: var(--day-hover); }
+  .day:disabled { background: transparent; opacity: .38; cursor: default; font-weight: 400; }
+  .day.in-range { background: var(--day-hover); color: var(--blue-text); }
+  .day.is-start, .day.is-end { background: var(--blue); color: #fff; }
+  .day:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  .modes { border-left: 1px solid #e8eaf3; padding-left: 20px; }
+  .modes h3 { font-size: 14px; font-weight: 500; line-height: 1.4; margin: 3px 0; }
+  .modes-caption { font-size: 12px; color: var(--muted-2); display: block; margin-bottom: 13px; line-height: 1.5; }
+  .mode-options { display: grid; gap: 6px; border: 0; }
+  .mode-option { border: 1px solid var(--option-line); border-radius: 6px; min-height: 34px; display: flex; justify-content: center; align-items: center; gap: 7px; position: relative; cursor: pointer; font-size: 14px; color: var(--blue-text); font-weight: 500; transition: background .15s, border-color .15s; }
+  .mode-option input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; margin: 0; cursor: pointer; }
+  .mode-option:hover { background: var(--lavender); }
+  .mode-option.selected { background: var(--blue); color: #fff; border-color: var(--blue); }
+  .mode-option:has(:focus-visible) { outline: 3px solid var(--blue); outline-offset: 2px; }
+
+  .range-line { display: flex; gap: 7px; font-size: 13px; color: #666e85; align-items: center; margin: 20px 0; }
+  .range-line svg { flex-shrink: 0; }
+  .range-line b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- actions ---------- */
+  .primary-action {
+    display: flex; width: 100%; height: 45px; align-items: center; justify-content: center; gap: 12px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; text-decoration: none;
+    font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action:disabled { color: #7b829b; background: #edf0f9; cursor: default; }
+  .option-btn {
+    display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; min-height: 42px; margin-top: 8px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    font: inherit; font-size: 14px; font-weight: 500; transition: background .15s;
+  }
+  .option-btn:hover { background: var(--lavender); }
+  .under-button { font-size: 12px; color: var(--muted-2); text-align: center; margin-top: 10px; line-height: 1.5; }
+  .back-button { margin: 16px auto 0; display: flex; align-items: center; gap: 7px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 6px; }
+  .back-button:hover { background: var(--chip); }
+
+  .selection-summary { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 23px; gap: 10px; }
+  .selection-summary > div { display: flex; align-items: center; gap: 11px; min-width: 0; }
+  .selection-summary svg { color: var(--blue); flex-shrink: 0; }
+  .selection-summary strong { display: block; font-size: 14px; font-weight: 500; }
+  .selection-summary small { display: block; font-size: 12px; color: #6a728c; margin-top: 4px; }
+  .edit-button { border: 0; background: none; font: inherit; font-size: 13px; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; }
+  .edit-button:hover { background: var(--lavender); }
+  .form-error { font-size: 14px; line-height: 1.5; background: #fff1ef; padding: 12px; border-radius: 6px; color: #9b362e; margin-bottom: 15px; }
+  .privacy-note { font-size: 12px; color: var(--muted-2); line-height: 1.6; margin: 0 0 20px; }
+
+  /* ---------- sent ---------- */
+  .success { text-align: center; padding: 28px 6px; }
+  .success-icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--lavender); color: var(--blue); margin: 0 auto 22px; }
+  .kicker { display: block; font-size: 12px; letter-spacing: 1.3px; color: #647094; margin-bottom: 12px; }
+  .success h2 { font-size: 32px; line-height: 1.15; letter-spacing: -.9px; }
+  .success > p { font-size: 16px; line-height: 1.65; color: var(--muted); margin-top: 18px; }
+  .success > p b { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
+  .receipt { margin: 25px 0; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 23px; }
+  .receipt > span:first-child { display: block; font-size: 12px; letter-spacing: 1px; color: var(--muted-2); margin-bottom: 12px; }
+  .receipt > strong { display: block; font-size: 20px; font-weight: 500; }
+  .receipt > p { color: var(--muted); font-size: 14px; margin: 7px 0 15px; }
+  .pending { font-size: 12px; background: #e2e8ff; border-radius: 4px; padding: 5px 10px; color: #3b4c9b; }
+  .success > .under-button { font-size: 12px; color: var(--muted-2); line-height: 1.5; margin-top: 10px; min-height: 18px; }
+
+  .site-footer { text-align: center; font-size: 12px; color: var(--faint); padding: 23px 0 30px; line-height: 1.7; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 28px; }
+    main { grid-template-columns: minmax(0, 290px) minmax(0, 1fr); }
+    .invitation { padding: 34px 27px; }
+    h1 { font-size: 43px; }
+    .booking { padding: 32px 25px 25px; }
+    .calendar-layout { grid-template-columns: minmax(0, 1fr) 116px; gap: 16px; }
+    .modes { padding-left: 14px; }
+  }
+  @media (max-width: 850px) {
+    .site-shell { max-width: 680px; padding: 0 24px; }
+    .site-header { height: 80px; }
+    main { grid-template-columns: 1fr; margin-top: 10px; }
+    .invitation { padding: 27px 28px; border-bottom: 1px solid #dfe4fa; }
+    h1 { font-size: 36px; letter-spacing: -1.1px; margin: 13px 0; }
+    .info { margin-top: 22px; padding-top: 20px; gap: 16px; }
+    .invitation-note { display: none; }
+    .booking { padding: 27px 28px; }
+    .calendar-layout { grid-template-columns: minmax(0, 1fr) 140px; gap: 25px; }
+    .modes { padding-left: 20px; }
+  }
+  @media (max-width: 480px) {
+    .site-shell { padding: 0 16px; }
+    .site-header { height: 72px; }
+    .brand svg { width: 80px; }
+    .brand > span { font-size: 24px; }
+    .where { font-size: 12px; }
+    main { margin-top: 6px; border-radius: 12px; }
+    .invitation { padding: 23px 20px; }
+    h1 { font-size: 33px; }
+    .eyebrow { font-size: 11px; }
+    .benefits { font-size: 15px; }
+    .booking { padding: 24px 20px; }
+    h2 { font-size: 25px; }
+    .subtitle { font-size: 14px; }
+    .steps { margin: 20px 0 24px; }
+    .form-pair { grid-template-columns: 1fr; gap: 0; }
+    .calendar-layout { display: block; }
+    .day { height: clamp(34px, 9vw, 40px); }
+    .modes { border: 0; padding: 0; margin-top: 23px; }
+    .modes h3 { display: inline; margin-right: 9px; }
+    .modes-caption { display: inline; }
+    .mode-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
+    .mode-option { min-height: 42px; font-size: 13px; }
+    .success { padding: 15px 0; }
+    .success h2 { font-size: 30px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg viewBox="0 0 352 113" fill="none" aria-hidden="true">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+      </svg>
+      <span>/campus</span>
+    </a>
+    <span class="where">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+      Campus to campus
+    </span>
+  </header>
+
+  <main>
+    <section class="invitation" aria-labelledby="invite-title">
+      <span class="eyebrow">CAMPUS TRIPS</span>
+      <h1 id="invite-title">See a friend.<br><span>On fomo.</span></h1>
+      <p class="benefits">Got a friend at another fomo school? Go see them. Tell us where and when, and fomo pays for the trip.</p>
+      <div class="info">
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+          <span>Your trip, paid for<small>fomo covers it once the team confirms your trip.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Any fomo campus<small>Visit a friend at another school in the program.</small></span>
+        </div>
+      </div>
+      <p class="invitation-note">Pick your dates.<br>We'll confirm the trip together.</p>
+    </section>
+
+    <section class="booking" aria-label="Request a paid trip to another fomo school">
+      <!-- step 1 · where and when -->
+      <div id="step-trip">
+        <h2 tabindex="-1" id="trip-title">Plan your trip</h2>
+        <p class="subtitle">Where you're going and when. We'll confirm before you book.</p>
+        <div class="steps" aria-label="Step 1 of 2"><span class="active"><i>1</i>Your trip</span><span class="step-line"></span><span><i>2</i>Your details</span></div>
+
+        <div class="form-pair">
+          <div class="field">
+            <label for="from">Your school</label>
+            <div class="combo"><input id="from" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="from-list" placeholder="Where you're coming from"><ul class="combo-list" id="from-list" role="listbox" aria-label="Schools" hidden></ul></div>
+          </div>
+          <div class="field">
+            <label for="to">Their school</label>
+            <div class="combo"><input id="to" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="to-list" aria-describedby="to-error" placeholder="Where your friend is"><ul class="combo-list" id="to-list" role="listbox" aria-label="Schools" hidden></ul></div>
+            <p class="field-error" id="to-error" hidden>That's your own school — pick where your friend is.</p>
+          </div>
+        </div>
+
+        <div class="calendar-layout">
+          <div>
+            <div class="cal-head">
+              <button type="button" class="cal-nav" id="cal-prev" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
+              <strong id="cal-title" aria-live="polite"></strong>
+              <button type="button" class="cal-nav" id="cal-next" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
+            </div>
+            <div class="cal-grid" aria-hidden="true"><span class="cal-dow">Su</span><span class="cal-dow">Mo</span><span class="cal-dow">Tu</span><span class="cal-dow">We</span><span class="cal-dow">Th</span><span class="cal-dow">Fr</span><span class="cal-dow">Sa</span></div>
+            <div class="cal-grid" id="cal-days" role="group" aria-label="Trip dates. Pick the day you leave, then the day you're back." style="margin-top:7px"></div>
+          </div>
+          <div class="modes">
+            <h3 id="modes-title">Getting there</h3>
+            <span class="modes-caption">How you'll travel</span>
+            <div class="mode-options" role="radiogroup" aria-labelledby="modes-title">
+              <label class="mode-option"><input type="radio" name="mode" value="Fly"><span>Fly</span></label>
+              <label class="mode-option"><input type="radio" name="mode" value="Train"><span>Train</span></label>
+              <label class="mode-option"><input type="radio" name="mode" value="Bus"><span>Bus</span></label>
+              <label class="mode-option"><input type="radio" name="mode" value="Drive"><span>Drive</span></label>
+            </div>
+          </div>
+        </div>
+
+        <p class="range-line"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="range-text" aria-live="polite">Pick the day you leave.</span></p>
+        <button type="button" class="primary-action" id="continue" disabled>Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <p class="under-button">Don't book anything yet — the team confirms your trip first.</p>
+      </div>
+
+      <!-- step 2 · who you are -->
+      <div id="step-details" hidden>
+        <h2 tabindex="-1" id="details-title">Your details</h2>
+        <p class="subtitle">So the team knows who's going and how to reach you.</p>
+        <div class="steps" aria-label="Step 2 of 2"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i>Your trip</span><span class="step-line"></span><span class="active"><i>2</i>Your details</span></div>
+
+        <div class="selection-summary">
+          <div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><strong id="sum-route"></strong><small id="sum-dates"></small></span>
+          </div>
+          <button type="button" class="edit-button" id="edit-trip" aria-label="Change your trip">Edit</button>
+        </div>
+
+        <form id="details-form" novalidate>
+          <div class="form-pair">
+            <div class="field"><label for="name">Your name</label><input id="name" autocomplete="name" placeholder="First and last name" maxlength="100"></div>
+            <div class="field"><label for="email">Email address</label><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@school.edu" maxlength="200"></div>
+          </div>
+          <div class="form-pair">
+            <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="212-555-0199" maxlength="12"></div>
+            <div class="field"><label for="role">Your role</label>
+              <select id="role" required>
+                <option value="" disabled selected>Choose one…</option>
+                <option>Campus President</option><option>Growth</option><option>Partnerships</option><option>Content</option><option>Culture</option><option>Something else</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-pair">
+            <div class="field"><label for="friend">Who you're visiting</label><input id="friend" autocomplete="off" placeholder="Your friend's name" maxlength="100"></div>
+            <div class="field"><label for="cost">Rough cost <span>Best guess</span></label><div class="money"><input id="cost" inputmode="decimal" autocomplete="off" placeholder="Travel and a bed, e.g. 180" maxlength="8"></div></div>
+          </div>
+          <div class="field"><label for="notes">What are you two getting up to? <span>Optional</span></label><textarea id="notes" rows="3" maxlength="800" placeholder="A game, a dinner, meeting their campus team, or just hanging out…"></textarea></div>
+          <p class="privacy-note">This opens your email app with the request filled in, addressed to the fomo team. Nothing is saved on this page.</p>
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+          <button type="submit" class="primary-action">Email my request<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <p class="under-button">The team confirms the trip and how it's paid for before you book.</p>
+        </form>
+        <button type="button" class="back-button" id="back-trip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your trip</button>
+      </div>
+
+      <!-- step 3 · hand-off to email -->
+      <div id="step-sent" class="success" hidden>
+        <span class="success-icon"><svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
+        <span class="kicker">REQUEST READY</span>
+        <h2 tabindex="-1" id="sent-title">Now hit send.</h2>
+        <p>Your email app should have opened with the trip filled in, addressed to <b id="team-email"></b>. Send it and the team will get back to you.</p>
+        <div class="receipt">
+          <span>YOUR TRIP</span>
+          <strong id="rc-route"></strong>
+          <p id="rc-dates"></p>
+          <span class="pending">Pending approval</span>
+        </div>
+        <a class="primary-action" id="mail-again">Open the email again</a>
+        <button type="button" class="option-btn" id="copy-request">Copy the request instead</button>
+        <p class="under-button" id="copy-status" role="status" aria-live="polite">No email app? Copy it and send it from your inbox.</p>
+        <button type="button" class="back-button" id="start-over">Plan another trip</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · campus · <a href="/campus">Back to the campus program</a>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // Where requests go. Submitting opens the visitor's email app addressed here.
+  var TEAM_EMAIL = 'hello@fomo.family';
+
+  var SCHOOLS = ["Arizona State University","Auburn University","Clemson University","Florida State University","Georgia Institute of Technology","Indiana University Bloomington","Louisiana State University","Michigan State University","New York University","Ohio State University","Penn State University","Purdue University","Southern Methodist University","Syracuse University","Texas A&M University","Texas Christian University","The George Washington University","Tulane University","University of Alabama","University of Arizona","University of Arkansas","University of California, Los Angeles","University of Colorado Boulder","University of Florida","University of Georgia","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Miami","University of Michigan","University of Mississippi","University of Missouri","University of Nebraska","University of North Carolina at Chapel Hill","University of Oklahoma","University of Oregon","University of South Carolina","University of Southern California","University of Tennessee","University of Texas at Austin","University of Virginia","University of Washington","University of Wisconsin-Madison","Vanderbilt University","Villanova University","Virginia Tech","Wake Forest University","Washington University in St. Louis"];
+
+  // ---------- school suggestions, ranked as on the onboarding page: whole-string
+  // prefix first, then a word starting with what you typed, then anything containing it
+  function rank(items, q) {
+    q = q.trim().toLowerCase();
+    if (!q) return items.slice();
+    var starts = [], word = [], has = [];
+    for (var k = 0; k < items.length; k++) {
+      var v = items[k], lv = v.toLowerCase(), at = lv.indexOf(q);
+      if (at < 0) continue;
+      if (at === 0) starts.push(v);
+      else if (/[\s(]/.test(lv.charAt(at - 1))) word.push(v);
+      else has.push(v);
+    }
+    return starts.concat(word, has);
+  }
+  function highlight(li, value, q) {
+    var at = q ? value.toLowerCase().indexOf(q.trim().toLowerCase()) : -1;
+    if (at < 0) { li.textContent = value; return; }
+    var n = q.trim().length;
+    li.appendChild(document.createTextNode(value.slice(0, at)));
+    var mark = document.createElement('mark');
+    mark.textContent = value.slice(at, at + n);
+    li.appendChild(mark);
+    li.appendChild(document.createTextNode(value.slice(at + n)));
+  }
+  function combobox(input, list, items, onPick) {
+    var open = false, active = -1, shown = [];
+    function close() {
+      open = false; active = -1;
+      list.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+    }
+    function paint() {
+      list.textContent = '';
+      shown = rank(items, input.value);
+      if (!shown.length) { close(); return; }
+      shown.forEach(function (v, k) {
+        var li = document.createElement('li');
+        li.id = list.id + '-' + k;
+        li.setAttribute('role', 'option');
+        li.setAttribute('aria-selected', 'false');
+        highlight(li, v, input.value);
+        // mousedown, not click: blur would close the list before click landed
+        li.addEventListener('mousedown', function (e) { e.preventDefault(); pick(k); });
+        list.appendChild(li);
+      });
+      open = true; active = -1;
+      list.hidden = false;
+      list.scrollTop = 0;
+      input.setAttribute('aria-expanded', 'true');
+    }
+    function mark(k) {
+      var kids = list.children;
+      if (active >= 0 && kids[active]) kids[active].setAttribute('aria-selected', 'false');
+      active = k;
+      if (active < 0) { input.removeAttribute('aria-activedescendant'); return; }
+      var el = kids[active];
+      el.setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', el.id);
+      var top = el.offsetTop - list.clientTop, bottom = top + el.offsetHeight;
+      if (top < list.scrollTop) list.scrollTop = top - 4;
+      else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 4;
+    }
+    function pick(k) { input.value = shown[k]; close(); input.focus(); onPick(); }
+    input.addEventListener('input', function () { paint(); onPick(); });
+    input.addEventListener('focus', function () { if (!open) paint(); });
+    input.addEventListener('blur', function () { setTimeout(close, 0); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!open) { paint(); if (!open) return; }
+        var n = shown.length;
+        mark(e.key === 'ArrowDown' ? (active + 1) % n : (active <= 0 ? n - 1 : active - 1));
+        return;
+      }
+      if (e.key === 'Escape') { if (open) { e.stopPropagation(); close(); } return; }
+      if (e.key === 'Enter') {
+        if (open && active >= 0) { e.preventDefault(); pick(active); }
+        else close();
+      }
+    });
+  }
+
+  // ---------- dates. All local calendar days; a trip can start tomorrow at the
+  // earliest and runs up to 90 days out, the same window as the HQ visit form.
+  function day(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function same(a, b) { return !!a && !!b && a.getTime() === b.getTime(); }
+  function fmt(d, long) { return d.toLocaleDateString('en-US', long ? { weekday: 'long', month: 'long', day: 'numeric' } : { weekday: 'short', month: 'short', day: 'numeric' }); }
+  function nights(a, b) { return Math.round((b - a) / 864e5); }
+  var minDate = addDays(day(new Date()), 1), maxDate = addDays(minDate, 89);
+  var view = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+  var focusDate = minDate;
+  var trip = { start: null, end: null, mode: '' };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var from = $('from'), to = $('to'), toError = $('to-error');
+  var calTitle = $('cal-title'), calDays = $('cal-days'), prev = $('cal-prev'), next = $('cal-next');
+  var rangeText = $('range-text'), cont = $('continue');
+  var modeInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="mode"]'));
+
+  function renderCal() {
+    var y = view.getFullYear(), m = view.getMonth();
+    calTitle.textContent = view.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    prev.disabled = view <= new Date(minDate.getFullYear(), minDate.getMonth(), 1);
+    next.disabled = view >= new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    // keep the one tabbable day inside the month on screen
+    if (focusDate.getMonth() !== m || focusDate.getFullYear() !== y || focusDate < minDate || focusDate > maxDate) {
+      focusDate = new Date(y, m, 1) < minDate ? minDate : new Date(y, m, 1);
+    }
+    calDays.textContent = '';
+    for (var b = new Date(y, m, 1).getDay(); b > 0; b--) calDays.appendChild(document.createElement('span'));
+    for (var d = 1, n = new Date(y, m + 1, 0).getDate(); d <= n; d++) {
+      var date = new Date(y, m, d), btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'day'; btn.textContent = d;
+      btn.setAttribute('data-t', date.getTime());
+      btn.disabled = date < minDate || date > maxDate;
+      var isStart = same(date, trip.start), isEnd = same(date, trip.end);
+      var inRange = trip.start && trip.end && date > trip.start && date < trip.end;
+      if (isStart) btn.classList.add('is-start');
+      if (isEnd) btn.classList.add('is-end');
+      if (inRange) btn.classList.add('in-range');
+      btn.setAttribute('aria-pressed', isStart || isEnd || inRange ? 'true' : 'false');
+      btn.setAttribute('aria-label', fmt(date, true) + (isStart ? ', leaving' : isEnd ? ', back' : ''));
+      btn.tabIndex = same(date, focusDate) ? 0 : -1;
+      calDays.appendChild(btn);
+    }
+  }
+  function focusDay() {
+    var b = calDays.querySelector('button[tabindex="0"]');
+    if (b) b.focus();
+  }
+  function choose(date) {
+    // first tap sets the day you leave; the next tap on or after it sets the day
+    // you're back; tapping earlier, or after a full range, starts over
+    if (!trip.start || trip.end || date < trip.start) { trip.start = date; trip.end = null; }
+    else trip.end = date;
+    focusDate = date;
+    renderCal(); focusDay(); refresh();
+  }
+  calDays.addEventListener('click', function (e) {
+    var b = e.target.closest('button.day');
+    if (b && !b.disabled) choose(new Date(+b.getAttribute('data-t')));
+  });
+  calDays.addEventListener('keydown', function (e) {
+    var step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }[e.key];
+    if (!step) return;
+    e.preventDefault();
+    var t = addDays(focusDate, step);
+    if (t < minDate || t > maxDate) return;
+    focusDate = t;
+    view = new Date(t.getFullYear(), t.getMonth(), 1);
+    renderCal(); focusDay();
+  });
+  prev.addEventListener('click', function () { view = new Date(view.getFullYear(), view.getMonth() - 1, 1); renderCal(); });
+  next.addEventListener('click', function () { view = new Date(view.getFullYear(), view.getMonth() + 1, 1); renderCal(); });
+
+  modeInputs.forEach(function (r) {
+    r.addEventListener('change', function () {
+      trip.mode = r.value;
+      modeInputs.forEach(function (o) { o.parentNode.classList.toggle('selected', o.checked); });
+      refresh();
+    });
+  });
+
+  function datesText() {
+    var n = nights(trip.start, trip.end);
+    return fmt(trip.start) + ' – ' + fmt(trip.end) + ' · ' + (n === 0 ? 'day trip' : n + (n === 1 ? ' night' : ' nights'));
+  }
+  function route() { return from.value.trim() + ' to ' + to.value.trim(); }
+
+  function refresh() {
+    var f = from.value.trim(), t = to.value.trim();
+    var sameSchool = f.length >= 2 && f.toLowerCase() === t.toLowerCase();
+    toError.hidden = !sameSchool;
+    to.setAttribute('aria-invalid', sameSchool ? 'true' : 'false');
+    rangeText.textContent = '';
+    if (!trip.start) rangeText.textContent = 'Pick the day you leave.';
+    else {
+      var b = document.createElement('b');
+      b.textContent = trip.end ? datesText() : fmt(trip.start);
+      if (!trip.end) rangeText.appendChild(document.createTextNode('Leaving '));
+      rangeText.appendChild(b);
+      if (!trip.end) rangeText.appendChild(document.createTextNode(' — now pick the day you’re back.'));
+    }
+    cont.disabled = !(f.length >= 2 && t.length >= 2 && !sameSchool && trip.start && trip.end && trip.mode);
+  }
+  combobox(from, $('from-list'), SCHOOLS, refresh);
+  combobox(to, $('to-list'), SCHOOLS, refresh);
+
+  // ---------- steps
+  var stepTrip = $('step-trip'), stepDetails = $('step-details'), stepSent = $('step-sent');
+  function show(el, heading) {
+    [stepTrip, stepDetails, stepSent].forEach(function (s) { s.hidden = s !== el; });
+    if (heading) $(heading).focus();
+  }
+  cont.addEventListener('click', function () {
+    if (cont.disabled) return;
+    $('sum-route').textContent = route();
+    $('sum-dates').textContent = datesText() + ' · ' + trip.mode + ' · Pending approval';
+    show(stepDetails, 'details-title');
+  });
+  $('edit-trip').addEventListener('click', function () { show(stepTrip, 'trip-title'); });
+  $('back-trip').addEventListener('click', function () { show(stepTrip, 'trip-title'); });
+
+  // ---------- details, checked the way the onboarding page checks them
+  var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
+  var TYPOS = { 'gmail.con':'gmail.com','gmail.co':'gmail.com','gmai.com':'gmail.com','gmial.com':'gmail.com','yahoo.con':'yahoo.com','hotmail.con':'hotmail.com','icloud.con':'icloud.com' };
+  function digits(v) { return String(v).replace(/[^0-9]/g, ''); }
+  function formatPhone(v) {
+    var d = digits(v);
+    if (d.charAt(0) === '1' && d.length > 10) d = d.slice(1);
+    d = d.slice(0, 10);
+    if (d.length > 6) return d.slice(0, 3) + '-' + d.slice(3, 6) + '-' + d.slice(6);
+    if (d.length > 3) return d.slice(0, 3) + '-' + d.slice(3);
+    return d;
+  }
+  $('phone').addEventListener('input', function () {
+    var f = formatPhone(this.value);
+    if (f !== this.value) this.value = f;
+  });
+  // the field already shows a "$", so keep only the number
+  $('cost').addEventListener('input', function () {
+    var v = this.value.replace(/[^0-9.]/g, '');
+    if (v !== this.value) this.value = v;
+  });
+  function check() {
+    var name = $('name').value.trim(), email = $('email').value.trim(), phone = digits($('phone').value);
+    if (phone.charAt(0) === '1' && phone.length === 11) phone = phone.slice(1);
+    var cost = $('cost').value.trim().replace(/[$,\s]/g, '');
+    var domain = email.split('@').pop().toLowerCase();
+    if (name.length < 2) return ['name', 'Add your name.'];
+    if (!EMAIL.test(email)) return ['email', 'That email isn’t complete — it should look like you@school.edu.'];
+    if (TYPOS[domain]) return ['email', 'Did you mean @' + TYPOS[domain] + '?'];
+    if (!/^[2-9][0-9]{2}[2-9][0-9]{6}$/.test(phone)) return ['phone', 'A US mobile number is 10 digits — like 212-555-0199.'];
+    if (!$('role').value) return ['role', 'Pick your role on the campus team.'];
+    if ($('friend').value.trim().length < 2) return ['friend', 'Who are you going to see?'];
+    if (!/^[0-9]+(\.[0-9]{1,2})?$/.test(cost)) return ['cost', 'Give a rough cost in dollars — a best guess is fine.'];
+    return null;
+  }
+
+  var request = null, formError = $('form-error');
+  $('details-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    ['name', 'email', 'phone', 'role', 'friend', 'cost'].forEach(function (id) { $(id).setAttribute('aria-invalid', 'false'); });
+    var bad = check();
+    if (bad) {
+      formError.textContent = bad[1];
+      formError.hidden = false;
+      $(bad[0]).setAttribute('aria-invalid', 'true');
+      $(bad[0]).focus();
+      return;
+    }
+    formError.hidden = true;
+    var name = $('name').value.trim(), cost = $('cost').value.trim().replace(/[$,\s]/g, '');
+    var lines = [
+      'Campus trip request',
+      '',
+      'Name: ' + name,
+      'Email: ' + $('email').value.trim(),
+      'Phone: ' + formatPhone($('phone').value),
+      'Role: ' + $('role').value,
+      '',
+      'From: ' + from.value.trim(),
+      'To: ' + to.value.trim(),
+      'Visiting: ' + $('friend').value.trim(),
+      'Dates: ' + datesText(),
+      'Getting there: ' + trip.mode,
+      'Rough cost: $' + cost
+    ];
+    var notes = $('notes').value.trim();
+    if (notes) lines.push('', 'What we’re doing: ' + notes);
+    lines.push('', 'Sent from bijanizadian.com/campus/visit');
+    var subject = 'Campus trip: ' + route() + ', ' + fmt(trip.start) + ' – ' + fmt(trip.end) + ' (' + name + ')';
+    request = {
+      text: 'To: ' + TEAM_EMAIL + '\nSubject: ' + subject + '\n\n' + lines.join('\n'),
+      href: 'mailto:' + TEAM_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'))
+    };
+    $('team-email').textContent = TEAM_EMAIL;
+    $('rc-route').textContent = route();
+    $('rc-dates').textContent = datesText() + ' · ' + trip.mode + ' · ~$' + cost;
+    $('mail-again').href = request.href;
+    show(stepSent, 'sent-title');
+    window.location.href = request.href;
+  });
+
+  var copyStatus = $('copy-status');
+  $('copy-request').addEventListener('click', function () {
+    if (!request) return;
+    function ok() { copyStatus.textContent = 'Copied — paste it into an email to ' + TEAM_EMAIL + '.'; }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = request.text; ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var worked = false;
+      try { worked = document.execCommand('copy'); } catch (err) {}
+      document.body.removeChild(ta);
+      copyStatus.textContent = worked ? 'Copied — paste it into an email to ' + TEAM_EMAIL + '.' : 'Copying is blocked here — email ' + TEAM_EMAIL + ' with your trip details.';
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(request.text).then(ok, fallback);
+    else fallback();
+  });
+  $('start-over').addEventListener('click', function () {
+    trip.start = trip.end = null;
+    renderCal(); refresh();
+    show(stepTrip, 'trip-title');
+  });
+
+  renderCal();
+  refresh();
+})();
+</script>
+</body>
+</html>
