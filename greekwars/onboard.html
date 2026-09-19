@@ -116,6 +116,9 @@
   .hero-title .slash .up { opacity: .5; }
   .hero h1 { margin-top: 26px; font-size: clamp(28px, 3.4vw, 44px); font-weight: 700; letter-spacing: -.05em; line-height: 1.12; color: var(--lavender); }
   .hero .lede { margin-top: 10px; max-width: 52ch; color: rgba(209,216,255,.65); font-size: clamp(16px, 1.6vw, 20px); line-height: 1.3; letter-spacing: -.025em; }
+  /* shown only when the page was opened from another chapter's referral link */
+  .ref-chip { margin-top: 16px; padding: 7px 14px; border-radius: 99px; font-size: 14px; color: var(--lavender); background: rgba(81,106,246,.22); border: 1px solid rgba(172,184,249,.3); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .ref-chip b { font-weight: 700; }
   @media (min-width: 800px) { .hero-inner { padding: 132px 24px 34px; } }
 
   /* ---------- the registration card ---------- */
@@ -194,7 +197,7 @@
   .done p { color: var(--ink-soft); font-size: 15px; }
   .done .ok-mark { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: rgba(33,201,94,.14); color: var(--ok); margin-bottom: 6px; }
   .done .ok-mark svg { width: 22px; height: 22px; }
-  .done .btn { margin-top: 12px; justify-self: start; }
+  .done-actions { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 10px; }
 
   /* ---------- what happens next ---------- */
   .after { margin-top: 16px; padding: 24px 26px 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
@@ -268,6 +271,7 @@
     </div>
     <h1>onboard your chapter.</h1>
     <p class="lede">Two minutes. Your chapter becomes a clan, and you get the link to send everyone else.</p>
+    <p class="ref-chip" id="ref-chip" hidden></p>
   </div>
 </header>
 
@@ -325,7 +329,10 @@
         <span class="ok-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg></span>
         <h3>Your clan is in.</h3>
         <p>We'll be in touch with what your chapter needs to do next, including the link to send everyone. Check your email — and your spam folder, just in case.</p>
-        <a class="btn btn--dark" href="/greekwars#board">See the board →</a>
+        <div class="done-actions">
+          <a class="btn btn--primary" id="refer-next" href="/greekwars/refer" hidden>Refer a fraternity — $250 →</a>
+          <a class="btn btn--dark" href="/greekwars#board">See the board →</a>
+        </div>
       </div>
     </div>
   </div>
@@ -467,6 +474,39 @@
   combobox(document.getElementById('school'), document.getElementById('school-list'), SCHOOLS);
   combobox(document.getElementById('chapter'), document.getElementById('chapter-list'), CHAPTERS);
 
+  // ---------- fraternity referrals
+  // /greekwars/refer builds links of the form ?ref=<fraternity>.<school>. The
+  // code is stored on this registration, which is what the referring chapter's
+  // $250 is settled against. These three functions must match the refer page.
+  function slug(s) {
+    return String(s).toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
+  }
+  function chapterCode(name) {
+    var m = String(name).match(/\(([^)]+)\)\s*$/);
+    return slug(m ? m[1] : name);
+  }
+  var FILLER = { the: 1, university: 1, of: 1, at: 1, 'in': 1 };
+  function schoolCode(name) {
+    var words = slug(name).split('-').filter(function (w) { return w && !FILLER[w]; });
+    return words.length ? words.join('-') : slug(name);
+  }
+  var ref = null;
+  try { ref = (new URLSearchParams(location.search).get('ref') || '').trim().toLowerCase(); } catch (e) {}
+  if (!ref || ref.length > 121 || !/^[a-z0-9]+(-[a-z0-9]+)*\.[a-z0-9]+(-[a-z0-9]+)*$/.test(ref)) ref = null;
+  if (ref) {
+    // Show the referring chapter by its real name where the lists know it.
+    var parts = ref.split('.');
+    var who = CHAPTERS.filter(function (c) { return chapterCode(c) === parts[0]; })[0] || parts[0].replace(/-/g, ' ');
+    var where = SCHOOLS.filter(function (s) { return schoolCode(s) === parts[1]; })[0] || parts[1].replace(/-/g, ' ');
+    var chip = document.getElementById('ref-chip');
+    var b = document.createElement('b');
+    b.textContent = who;
+    chip.appendChild(document.createTextNode('Sent by '));
+    chip.appendChild(b);
+    chip.appendChild(document.createTextNode(' at ' + where));
+    chip.hidden = false;
+  }
+
   var form = document.getElementById('onboard-form');
   var steps = Array.prototype.slice.call(form.querySelectorAll('.step'));
   var back = document.getElementById('onboard-back');
@@ -592,6 +632,7 @@
     // the number the chapter is actually chasing, worked out once here so it is
     // the same everywhere it gets quoted back to them
     data.target = String(Math.ceil(parseInt(data.actives, 10) * 0.8));
+    if (ref) data.ref = ref;
     data.submitted_at = new Date().toISOString();
     data.page = location.pathname;
     data.ua = (navigator.userAgent || '').slice(0, 160);
@@ -612,6 +653,13 @@
     formError.hidden = false;
   }
   function finish() {
+    // A fraternity that just registered can refer the next one straight away:
+    // hand its school and letters to the refer page so the link is ready.
+    if (form.org_type.value === 'Fraternity') {
+      var referNext = document.getElementById('refer-next');
+      referNext.href = '/greekwars/refer?school=' + encodeURIComponent(form.school.value.trim()) + '&chapter=' + encodeURIComponent(form.chapter.value.trim());
+      referNext.hidden = false;
+    }
     form.hidden = true;
     done.hidden = false;
     done.setAttribute('tabindex', '-1');
