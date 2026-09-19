@@ -19,8 +19,9 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <!--
   Campus trips: someone on a fomo campus asks fomo to pay for a trip to see a
-  friend at another fomo school. The trip is earned with deliverables, on one of
-  two routes:
+  friend at another fomo school. The trip is earned with deliverables that the
+  team sets with each person after verifying them; the form only shows what
+  each route involves. There are two routes:
     - content route: their Instagram or TikTok following meets the bar
       (CONTENT_ROUTE_MIN in the script, a placeholder until the team sets it);
     - on-campus route: everyone else, shaped by whether they hold a current role
@@ -169,36 +170,18 @@
   .route-card.is-empty svg { color: #9399af; }
   .route-card.is-empty strong { color: var(--muted-2); font-weight: 400; }
 
-  /* ---------- deliverables: tap what you can do, then plan each one ---------- */
+  /* ---------- what you'll do: a read-only look at the route ---------- */
+  .ideas-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .ideas { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .ideas li { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .ideas b { display: block; font-size: 14px; font-weight: 500; }
+  .ideas span { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted-2); }
+  .own-idea { margin: 10px 0 20px; font-size: 12.5px; line-height: 1.5; color: var(--muted-2); }
   .guide { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 14px 16px; margin-bottom: 20px; }
   .guide h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; }
   .guide ul { list-style: none; display: grid; gap: 6px; }
   .guide li { display: grid; grid-template-columns: 16px 1fr; gap: 8px; font-size: 13px; line-height: 1.5; color: #50566e; }
   .guide li svg { color: var(--blue); margin-top: 3px; }
-  .deliver-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0 18px; }
-  .deliver-option { min-height: 38px; padding: 6px 10px; border: 1px solid var(--option-line); border-radius: 6px; background: #fff; color: var(--blue-text); font: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; transition: background .15s, border-color .15s; }
-  .deliver-option:hover { background: var(--lavender); }
-  .deliver-option[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .deliverables { display: grid; gap: 10px; margin-bottom: 18px; }
-  .deliver-empty { font-size: 13px; line-height: 1.5; color: var(--muted-2); border: 1px dashed var(--option-line); border-radius: 8px; padding: 16px; text-align: center; }
-  .deliverable { border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
-  .deliverable-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .deliverable-head strong { font-size: 14px; font-weight: 500; }
-  .deliverable-head strong small { font-size: 12px; font-weight: 400; color: var(--muted-2); margin-left: 6px; }
-  .deliverable .spec { margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted-2); }
-  .qty { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-2); flex-shrink: 0; }
-  .qty button { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--option-line); border-radius: 6px; background: #fff; color: var(--blue-text); font: inherit; font-size: 16px; line-height: 1; }
-  .qty button:hover:not(:disabled) { background: var(--lavender); }
-  .qty button:disabled { opacity: .4; cursor: default; }
-  .qty output { min-width: 18px; text-align: center; font-size: 14px; font-weight: 500; color: var(--ink); }
-  .deliverable input {
-    display: block; width: 100%; min-height: 44px; margin-top: 10px; padding: 10px 12px;
-    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
-    border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
-  }
-  .deliverable input::placeholder { color: #8990a4; font-size: 14px; }
-  .deliverable input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
-  .deliverable input[aria-invalid="true"] { border-color: #d0574b; }
 
   /* ---------- actions ---------- */
   .primary-action {
@@ -302,6 +285,7 @@
     .mode-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin-top: 12px; }
     .mode-option { min-height: 42px; font-size: 13px; }
     .yesno { max-width: none; }
+    .ideas { grid-template-columns: 1fr; }
     .success { padding: 15px 0; }
     .success h2 { font-size: 30px; }
   }
@@ -338,10 +322,10 @@
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
-          <span>Your trip, paid for<small>Once the team verifies you and signs off on your plan.</small></span>
+          <span>Your trip, paid for<small>Once the team verifies you and sets your deliverables with you.</small></span>
         </div>
       </div>
-      <p class="invitation-note">Pick your dates, add your socials and lay out your deliverables.<br>We'll confirm the trip together.</p>
+      <p class="invitation-note">Pick your dates and add your socials.<br>Once you're verified, we'll set your deliverables together.</p>
     </section>
 
     <section class="booking" aria-label="Request a paid trip to another fomo school">
@@ -349,7 +333,7 @@
       <div id="step-trip">
         <h2 tabindex="-1" id="trip-title">Plan your trip</h2>
         <p class="subtitle">Where you're going and when. We'll confirm before you book.</p>
-        <div class="steps" aria-label="Step 1 of 4"><span class="active"><i>1</i><em>Your trip</em></span><span class="step-line"></span><span><i>2</i><em>Socials</em></span><span class="step-line"></span><span><i>3</i><em>Deliverables</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
+        <div class="steps" aria-label="Step 1 of 4"><span class="active"><i>1</i><em>Your trip</em></span><span class="step-line"></span><span><i>2</i><em>Socials</em></span><span class="step-line"></span><span><i>3</i><em>What you'll do</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
 
         <div class="form-pair">
           <div class="field">
@@ -394,7 +378,7 @@
       <div id="step-socials" hidden>
         <h2 tabindex="-1" id="socials-title">Your socials</h2>
         <p class="subtitle">The team uses these to verify you and to set how you earn the trip.</p>
-        <div class="steps" aria-label="Step 2 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Socials</em></span><span class="step-line"></span><span><i>3</i><em>Deliverables</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
+        <div class="steps" aria-label="Step 2 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Socials</em></span><span class="step-line"></span><span><i>3</i><em>What you'll do</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
 
         <div class="selection-summary">
           <div>
@@ -437,27 +421,30 @@
         <button type="button" class="back-button" data-go="trip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your trip</button>
       </div>
 
-      <!-- step 3 · what earns the trip -->
+      <!-- step 3 · what the route involves. Read-only: the team sets the actual
+           deliverables with each person once their application is verified. -->
       <div id="step-deliver" hidden>
-        <h2 tabindex="-1" id="deliver-title">Your deliverables</h2>
+        <h2 tabindex="-1" id="deliver-title">What you'll do</h2>
         <p class="subtitle" id="deliver-sub"></p>
-        <div class="steps" aria-label="Step 3 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Socials</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Deliverables</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
+        <div class="steps" aria-label="Step 3 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Socials</em></span><span class="step-line"></span><span class="active"><i>3</i><em>What you'll do</em></span><span class="step-line"></span><span><i>4</i><em>Your details</em></span></div>
 
         <div class="selection-summary">
           <div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            <svg data-sum-icon="content" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+            <svg data-sum-icon="campus" hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
             <span><strong class="sum-route-name"></strong><small class="sum-socials"></small></span>
           </div>
           <button type="button" class="edit-button" data-go="socials" aria-label="Change your socials or route">Edit</button>
         </div>
 
-        <div class="guide" id="guide"><h3 id="guide-title"></h3><ul id="guide-list"></ul></div>
-        <div id="deliver-groups"></div>
-        <div class="deliverables" id="deliverables" aria-live="polite"></div>
+        <span class="ideas-label" id="ideas-label"></span>
+        <ul class="ideas" id="ideas" aria-labelledby="ideas-label"></ul>
+        <p class="own-idea">Got your own idea? Bring it up once you're verified.</p>
 
-        <p class="form-error" id="deliver-error" role="alert" hidden></p>
-        <button type="button" class="primary-action" id="to-details">Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-        <p class="under-button">The team signs off on your plan before you book anything.</p>
+        <div class="guide"><h3 id="guide-title"></h3><ul id="guide-list"></ul></div>
+
+        <button type="button" class="primary-action" id="to-details">Sounds good<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <p class="under-button">Nothing to pick now — once you're verified, the team sets your deliverables with you.</p>
         <button type="button" class="back-button" data-go="socials"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your socials</button>
       </div>
 
@@ -465,7 +452,7 @@
       <div id="step-details" hidden>
         <h2 tabindex="-1" id="details-title">Your details</h2>
         <p class="subtitle">So the team knows who's going and how to reach you.</p>
-        <div class="steps" aria-label="Step 4 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Socials</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Deliverables</em></span><span class="step-line"></span><span class="active"><i>4</i><em>Your details</em></span></div>
+        <div class="steps" aria-label="Step 4 of 4"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Socials</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>What you'll do</em></span><span class="step-line"></span><span class="active"><i>4</i><em>Your details</em></span></div>
 
         <div class="selection-summary">
           <div>
@@ -500,7 +487,7 @@
         <span class="success-icon"><svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
         <span class="kicker">REQUEST READY</span>
         <h2 tabindex="-1" id="sent-title">Now hit send.</h2>
-        <p>Your email app should have opened with everything filled in, addressed to <b id="team-email"></b>. Once it's sent, the team verifies your socials and role, then confirms your route, your deliverables and the trip. Don't book anything until you hear back.</p>
+        <p>Your email app should have opened with everything filled in, addressed to <b id="team-email"></b>. Once it's sent, the team verifies your socials and role, then sets your deliverables with you and confirms the trip. Don't book anything until you hear back.</p>
         <div class="receipt">
           <span>YOUR TRIP</span>
           <strong id="rc-route"></strong>
@@ -532,25 +519,28 @@
   var CONTENT_ROUTE_MIN = 5000;
   var FOLLOWERS = [['Under 1k', 0], ['1k–5k', 1000], ['5k–10k', 5000], ['10k–50k', 10000], ['50k+', 50000]];
 
-  // The deliverables on each route. `spec` is the defined version of the ask;
-  // the visitor adds one line on how they'd do it (`hint` is the example).
-  var KINDS = [
-    { id: 'fit', route: 'content', name: 'Merch fit video', spec: 'A TikTok or Reel wearing fomo merch at their school, 15–45 seconds.', hint: 'e.g. Fit check outside their stadium before kickoff' },
-    { id: 'versus', route: 'content', name: 'School vs school', spec: 'A video putting your school up against theirs: campus, people, who takes Greek Wars.', hint: 'e.g. Michigan vs Texas A&M, rated on five things' },
-    { id: 'vlog', route: 'content', name: 'Trip vlog', spec: 'A day-in-the-life Reel or TikTok from the trip, 30–90 seconds, with fomo on screen.', hint: 'e.g. Saturday from the tailgate to the final whistle' },
-    { id: 'dump', route: 'content', name: 'Photo dump', spec: 'An Instagram carousel of five or more trip photos, at least two in fomo merch.', hint: 'e.g. The weekend in ten photos' },
-    { id: 'stories', route: 'content', name: 'Story set', spec: 'Three or more stories across the trip, with a fomo link on at least one.', hint: 'e.g. A story from each day, link on the last one' },
-    { id: 'own-content', route: 'content', name: 'Your own content idea', spec: 'Something that fits your account. Pitch it in one line.', hint: 'Tell us the idea' },
-    { id: 'table', route: 'campus', name: 'Tabling', spec: 'Two hours or more at their quad or student center, getting people signed up to fomo.', hint: 'e.g. Friday 11–2 outside the student union' },
-    { id: 'info', route: 'campus', name: 'Greek Wars info session', spec: 'Twenty minutes at an IFC or chapter meeting, walking their chapters through Greek Wars.', hint: 'e.g. Their IFC meeting on Sunday night' },
-    { id: 'watch', route: 'campus', name: 'Game-day watch party', spec: 'Host or co-host a watch party at their school and get the room onto fomo.', hint: 'e.g. The Saturday game at a house off campus' },
-    { id: 'meetup', route: 'campus', name: 'Campus team meetup', spec: 'An hour with their campus team, trading what’s working at each school.', hint: 'e.g. Coffee with their Campus President and Growth lead' },
-    { id: 'club', route: 'campus', name: 'Club talk', spec: 'A fifteen-minute fomo intro at a finance, investing or entrepreneurship club.', hint: 'e.g. Their investing club’s Thursday meeting' },
-    { id: 'chalk', route: 'campus', name: 'Chalk or flyer drop', spec: 'Chalk or flyers on their busiest walkways with a fomo sign-up link, where the school allows it.', hint: 'e.g. The main quad on Friday morning' },
-    { id: 'own-campus', route: 'campus', name: 'Your own campus idea', spec: 'Anything that gets their campus onto fomo. Pitch it in one line.', hint: 'Tell us the idea' }
-  ];
+  // What each route involves, shown on the "What you'll do" step. These are
+  // examples, not a menu: the team sets each person's actual deliverables
+  // with them once their application is verified.
+  var IDEAS = {
+    content: [
+      ['Merch fit video', 'A TikTok or Reel wearing fomo merch at their school.'],
+      ['School vs school', 'A video putting your school up against theirs: campus, people, who takes Greek Wars.'],
+      ['Trip vlog', 'A day-in-the-life Reel or TikTok from the trip, with fomo on screen.'],
+      ['Photo dump', 'An Instagram carousel from the trip, with a few shots in fomo merch.'],
+      ['Story set', 'Stories across the trip, with a fomo link on at least one.']
+    ],
+    campus: [
+      ['Tabling', 'A few hours at their quad or student center, getting people signed up to fomo.'],
+      ['Greek Wars info session', 'Walking their chapters through Greek Wars at an IFC or chapter meeting.'],
+      ['Game-day watch party', 'Hosting or co-hosting a watch party and getting the room onto fomo.'],
+      ['Campus team meetup', 'Time with their campus team, trading what’s working at each school.'],
+      ['Club talk', 'A short fomo intro at a finance, investing or entrepreneurship club.'],
+      ['Chalk or flyer drop', 'Their busiest walkways, with a fomo sign-up link, where the school allows it.']
+    ]
+  };
 
-  // The instructions shown on the deliverables step, per route.
+  // The ground rules shown on the "What you'll do" step, per route.
   var GUIDES = {
     content: ['How the content route works', [
       'Post from the account you listed, and tag fomo.',
@@ -567,7 +557,6 @@
       'Send the team a recap afterwards, with how many people signed up.'
     ]]
   };
-  var EXTRAS_NOTE = 'On-campus extras follow the on-campus rules: clear them with the school and get photos.';
 
   var SCHOOLS = ["Arizona State University","Auburn University","Clemson University","Florida State University","Georgia Institute of Technology","Indiana University Bloomington","Louisiana State University","Michigan State University","New York University","Ohio State University","Penn State University","Purdue University","Southern Methodist University","Syracuse University","Texas A&M University","Texas Christian University","The George Washington University","Tulane University","University of Alabama","University of Arizona","University of Arkansas","University of California, Los Angeles","University of Colorado Boulder","University of Florida","University of Georgia","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Miami","University of Michigan","University of Mississippi","University of Missouri","University of Nebraska","University of North Carolina at Chapel Hill","University of Oklahoma","University of Oregon","University of South Carolina","University of Southern California","University of Tennessee","University of Texas at Austin","University of Virginia","University of Washington","University of Wisconsin-Madison","Vanderbilt University","Villanova University","Virginia Tech","Wake Forest University","Washington University in St. Louis"];
 
@@ -806,7 +795,7 @@
   function route() { return meetsBar() && !preferCampus ? 'content' : 'campus'; }
   function routeName(r) { return r === 'content' ? 'Content route' : 'On-campus route'; }
   function routeWhy() {
-    if (route() === 'content') return 'Your following meets the bar, so you earn the trip with content. You can add on-campus deliverables too.';
+    if (route() === 'content') return 'Your following meets the bar, so you’d earn the trip with content.';
     if (meetsBar()) return 'Your following meets the bar for content, but you’ve chosen to earn the trip on the ground at their school.';
     if (hasRole === 'yes') return 'You’ll earn the trip on the ground at their school, backed by your role at yours.';
     return 'You’ll earn the trip on the ground at their school. Without a current role, the team looks at your request case by case while they verify you.';
@@ -857,114 +846,33 @@
     return null;
   }
 
-  // ---------- step 3 · deliverables for the route
-  var picked = [];   // [{ id, count, plan }] in the order they were tapped
-  var deliverGroups = $('deliver-groups'), deliverList = $('deliverables'), deliverError = $('deliver-error');
-  function kind(id) { return KINDS.filter(function (k) { return k.id === id; })[0]; }
-  function allowed(k) { return route() === 'content' || k.route === 'campus'; }
-
-  function renderGuide() {
-    var g = GUIDES[route()], list = $('guide-list');
+  // ---------- step 3 · what the route involves (read-only)
+  function renderRoutePage() {
+    var r = route();
+    $('deliver-sub').textContent = r === 'content'
+      ? 'You’d earn the trip by making content at their school. Here’s the kind of thing that means.'
+      : 'You’d earn the trip by doing things on the ground at their school. Here’s the kind of thing that means.';
+    $('ideas-label').textContent = r === 'content' ? 'The kind of content you’d make' : 'The kind of thing you’d do on campus';
+    var ideas = $('ideas');
+    ideas.textContent = '';
+    IDEAS[r].forEach(function (idea) {
+      var li = document.createElement('li'), b = document.createElement('b'), s = document.createElement('span');
+      b.textContent = idea[0]; s.textContent = idea[1];
+      li.appendChild(b); li.appendChild(s);
+      ideas.appendChild(li);
+    });
+    var g = GUIDES[r], list = $('guide-list');
     $('guide-title').textContent = g[0];
     list.textContent = '';
-    var lines = g[1].slice();
-    if (route() === 'content' && picked.some(function (p) { return kind(p.id).route === 'campus'; })) lines.push(EXTRAS_NOTE);
-    lines.forEach(function (t) {
+    g[1].forEach(function (t) {
       var li = document.createElement('li');
       li.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span></span>';
       li.querySelector('span').textContent = t;
       list.appendChild(li);
     });
-  }
-  function renderGroups() {
-    deliverGroups.textContent = '';
-    var groups = route() === 'content'
-      ? [['content', 'Content', 'Pick at least one'], ['campus', 'On campus', 'Optional extras']]
-      : [['campus', 'On campus', 'Pick everything you’ll do']];
-    groups.forEach(function (g) {
-      var label = document.createElement('span');
-      label.className = 'group-label';
-      label.id = 'group-' + g[0];
-      label.appendChild(document.createTextNode(g[1]));
-      var hint = document.createElement('span'); hint.textContent = g[2]; label.appendChild(hint);
-      var box = document.createElement('div');
-      box.className = 'deliver-options';
-      box.setAttribute('role', 'group');
-      box.setAttribute('aria-labelledby', label.id);
-      KINDS.filter(function (k) { return k.route === g[0]; }).forEach(function (k) {
-        var b = document.createElement('button');
-        b.type = 'button'; b.className = 'deliver-option'; b.textContent = k.name;
-        b.setAttribute('data-kind', k.id);
-        b.setAttribute('aria-pressed', picked.some(function (p) { return p.id === k.id; }) ? 'true' : 'false');
-        b.addEventListener('click', function () {
-          var at = picked.map(function (p) { return p.id; }).indexOf(k.id);
-          if (at > -1) picked.splice(at, 1); else picked.push({ id: k.id, count: 1, plan: '' });
-          b.setAttribute('aria-pressed', at > -1 ? 'false' : 'true');
-          deliverError.hidden = true;
-          renderDeliverables(); renderGuide();
-          if (at < 0) $('plan-' + k.id).focus();
-        });
-        box.appendChild(b);
-      });
-      deliverGroups.appendChild(label);
-      deliverGroups.appendChild(box);
-    });
-  }
-  function renderDeliverables() {
-    deliverList.textContent = '';
-    if (!picked.length) {
-      var empty = document.createElement('p');
-      empty.className = 'deliver-empty';
-      empty.textContent = 'Tap what you’ll do above, then add a line on how you’d do each one.';
-      deliverList.appendChild(empty);
-      return;
-    }
-    picked.forEach(function (p) {
-      var k = kind(p.id), box = document.createElement('div');
-      box.className = 'deliverable';
-      box.innerHTML =
-        '<div class="deliverable-head"><strong></strong>' +
-        '<span class="qty"><span>How many</span><button type="button" data-step="-1">−</button><output></output><button type="button" data-step="1">+</button></span></div>' +
-        '<p class="spec"></p><input maxlength="140" autocomplete="off">';
-      var title = box.querySelector('strong');
-      title.textContent = k.name;
-      if (route() === 'content' && k.route === 'campus') { var tag = document.createElement('small'); tag.textContent = 'On campus'; title.appendChild(tag); }
-      box.querySelector('.spec').textContent = k.spec;
-      var out = box.querySelector('output'), minus = box.querySelector('[data-step="-1"]'), plus = box.querySelector('[data-step="1"]');
-      function paintCount() { out.textContent = p.count; minus.disabled = p.count <= 1; plus.disabled = p.count >= 20; }
-      minus.setAttribute('aria-label', 'Fewer: ' + k.name);
-      plus.setAttribute('aria-label', 'More: ' + k.name);
-      [minus, plus].forEach(function (btn) {
-        btn.addEventListener('click', function () { p.count = Math.max(1, Math.min(20, p.count + +btn.getAttribute('data-step'))); paintCount(); });
-      });
-      paintCount();
-      var input = box.querySelector('input');
-      input.id = 'plan-' + p.id;
-      input.value = p.plan;
-      input.placeholder = k.hint;
-      input.setAttribute('aria-label', k.name + ': how you’d do it');
-      input.addEventListener('input', function () { p.plan = input.value; input.setAttribute('aria-invalid', 'false'); deliverError.hidden = true; });
-      deliverList.appendChild(box);
-    });
-  }
-  function deliverText(sep) {
-    return picked.map(function (p) { return p.count + '× ' + kind(p.id).name; }).join(sep);
-  }
-  function deliverCount() {
-    var n = picked.reduce(function (s, p) { return s + p.count; }, 0);
-    return n + (n === 1 ? ' deliverable' : ' deliverables');
-  }
-  function checkDeliverables() {
-    if (!picked.length) return [null, 'Pick at least one deliverable — it’s what earns the trip.'];
-    if (route() === 'content' && !picked.some(function (p) { return kind(p.id).route === 'content'; })) {
-      return [null, 'The content route needs at least one content deliverable. Rather do on-campus only? Switch routes on the socials step.'];
-    }
-    var bad = null;
-    picked.some(function (p) {
-      if (p.plan.trim().length < 8) { bad = ['plan-' + p.id, 'Add a line on how you’d do ' + kind(p.id).name + ' — what, where, and roughly when.']; return true; }
-      return false;
-    });
-    return bad;
+    each('.sum-route-name', function (el) { el.textContent = routeName(r); });
+    each('[data-sum-icon]', function (svg) { svg.hidden = svg.getAttribute('data-sum-icon') !== r; });
+    each('.sum-socials', function (el) { el.textContent = socialsText(' · '); });
   }
 
   // ---------- moving between steps
@@ -991,25 +899,11 @@
     var bad = checkSocials();
     if (bad) { fail($('socials-error'), bad); return; }
     $('socials-error').hidden = true;
-    // a route change drops deliverables the new route doesn't offer
-    picked = picked.filter(function (p) { return allowed(kind(p.id)); });
-    $('deliver-sub').textContent = route() === 'content'
-      ? 'This is what earns the trip. Pick what you’ll make, and say how you’d do each one.'
-      : 'This is what earns the trip. Pick what you’ll do at their school, and say how.';
-    each('.sum-route-name', function (el) { el.textContent = routeName(route()); });
-    each('.sum-socials', function (el) { el.textContent = socialsText(' · '); });
-    renderGuide(); renderGroups(); renderDeliverables();
+    renderRoutePage();
     show('deliver');
   });
   $('to-details').addEventListener('click', function () {
-    var bad = checkDeliverables();
-    if (bad) {
-      if (bad[0]) fail(deliverError, bad);
-      else { deliverError.textContent = bad[1]; deliverError.hidden = false; var first = deliverGroups.querySelector('button'); if (first) first.focus(); }
-      return;
-    }
-    deliverError.hidden = true;
-    $('sum-all').textContent = datesText() + ' · ' + routeName(route()) + ' · ' + deliverCount();
+    $('sum-all').textContent = datesText() + ' · ' + routeName(route()) + ' · Deliverables set after verification';
     show('details');
   });
   each('[data-go]', function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-go')); }); });
@@ -1077,11 +971,7 @@
     ];
     socialsText('\n').split('\n').forEach(function (s) { lines.push('- ' + s); });
     lines.push('Campus role: ' + (hasRole === 'yes' ? role.value.trim() : 'none'));
-    lines.push('', 'Deliverables (what earns the trip):');
-    picked.forEach(function (p) {
-      var k = kind(p.id);
-      lines.push('- ' + p.count + 'x ' + k.name + (k.route === 'campus' && r === 'content' ? ' (on campus)' : '') + ': ' + p.plan.trim());
-    });
+    lines.push('', 'Deliverables: to be set by the team once this application is verified.');
     lines.push('', 'Sent from bijanizadian.com/campus/visit');
     var subject = 'Campus trip (' + (r === 'content' ? 'content' : 'on-campus') + ' route): ' + tripText() + ', ' + fmt(trip.start) + ' – ' + fmt(trip.end) + ' (' + name + ')';
     request = {
@@ -1092,7 +982,7 @@
     $('rc-route').textContent = tripText();
     $('rc-dates').textContent = datesText() + ' · ' + trip.mode + ' · ~$' + cost;
     $('rc-path').textContent = routeName(r) + ' · ' + socialsText(' · ');
-    $('rc-deliver').textContent = deliverText(' · ');
+    $('rc-deliver').textContent = 'Deliverables set with you after verification';
     $('mail-again').href = request.href;
     show('sent');
     window.location.href = request.href;
@@ -1117,7 +1007,6 @@
   });
   $('start-over').addEventListener('click', function () {
     trip.start = trip.end = null;
-    picked = [];
     renderCal(); refreshTrip();
     show('trip');
   });
