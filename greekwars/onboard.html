@@ -330,7 +330,6 @@
         <h3>Your clan is in.</h3>
         <p>We'll be in touch with what your chapter needs to do next, including the link to send everyone. Check your email — and your spam folder, just in case.</p>
         <div class="done-actions">
-          <a class="btn btn--primary" id="refer-next" href="/greekwars/refer" hidden>Refer a fraternity — $250 →</a>
           <a class="btn btn--dark" href="/greekwars#board">See the board →</a>
         </div>
       </div>
@@ -474,36 +473,23 @@
   combobox(document.getElementById('school'), document.getElementById('school-list'), SCHOOLS);
   combobox(document.getElementById('chapter'), document.getElementById('chapter-list'), CHAPTERS);
 
-  // ---------- fraternity referrals
-  // /greekwars/refer builds links of the form ?ref=<fraternity>.<school>. The
-  // code is stored on this registration, which is what the referring chapter's
-  // $250 is settled against. These three functions must match the refer page.
-  function slug(s) {
-    return String(s).toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
-  }
-  function chapterCode(name) {
-    var m = String(name).match(/\(([^)]+)\)\s*$/);
-    return slug(m ? m[1] : name);
-  }
-  var FILLER = { the: 1, university: 1, of: 1, at: 1, 'in': 1 };
-  function schoolCode(name) {
-    var words = slug(name).split('-').filter(function (w) { return w && !FILLER[w]; });
-    return words.length ? words.join('-') : slug(name);
-  }
-  var ref = null;
+  // ---------- referrals
+  // /greekwars/refer gives each referrer — someone outside Greek life, or on the
+  // campus team — a link of the form ?ref=<instagram handle>. The handle is
+  // stored on this registration; it is who the $250 is paid to. Anything else
+  // that arrives as ?ref (links built before referrers were people) is still
+  // stored so no attribution is lost, but only a real handle is shown back.
+  var ref = null, refHandle = null;
   try { ref = (new URLSearchParams(location.search).get('ref') || '').trim().toLowerCase(); } catch (e) {}
-  if (!ref || ref.length > 121 || !/^[a-z0-9]+(-[a-z0-9]+)*\.[a-z0-9]+(-[a-z0-9]+)*$/.test(ref)) ref = null;
-  if (ref) {
-    // Show the referring chapter by its real name where the lists know it.
-    var parts = ref.split('.');
-    var who = CHAPTERS.filter(function (c) { return chapterCode(c) === parts[0]; })[0] || parts[0].replace(/-/g, ' ');
-    var where = SCHOOLS.filter(function (s) { return schoolCode(s) === parts[1]; })[0] || parts[1].replace(/-/g, ' ');
+  if (ref) refHandle = normalizeInstagram(ref);
+  if (!ref || ref.length > 121 || !/^@?[a-z0-9._-]+$/.test(ref)) ref = null;
+  if (ref && refHandle) {
+    ref = refHandle;
     var chip = document.getElementById('ref-chip');
     var b = document.createElement('b');
-    b.textContent = who;
+    b.textContent = '@' + refHandle;
     chip.appendChild(document.createTextNode('Sent by '));
     chip.appendChild(b);
-    chip.appendChild(document.createTextNode(' at ' + where));
     chip.hidden = false;
   }
 
@@ -653,13 +639,6 @@
     formError.hidden = false;
   }
   function finish() {
-    // A fraternity that just registered can refer the next one straight away:
-    // hand its school and letters to the refer page so the link is ready.
-    if (form.org_type.value === 'Fraternity') {
-      var referNext = document.getElementById('refer-next');
-      referNext.href = '/greekwars/refer?school=' + encodeURIComponent(form.school.value.trim()) + '&chapter=' + encodeURIComponent(form.chapter.value.trim());
-      referNext.hidden = false;
-    }
     form.hidden = true;
     done.hidden = false;
     done.setAttribute('tabindex', '-1');

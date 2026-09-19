@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>Refer a fraternity | Greek Wars</title>
-<meta name="description" content="Refer another fraternity to Greek Wars. Your chapter gets $250 for every fraternity that onboards through your link.">
+<meta name="description" content="Not in Greek life? Get $250 for every fraternity that joins Greek Wars through your link.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Refer a fraternity — Greek Wars">
-<meta property="og:description" content="Your chapter gets $250 for every fraternity that onboards through your link.">
+<meta property="og:description" content="Not in Greek life? Get $250 for every fraternity that joins Greek Wars through your link.">
 <meta property="og:url" content="https://bijanizadian.com/greekwars/refer">
 <meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
 <link rel="canonical" href="https://bijanizadian.com/greekwars/refer">
@@ -19,11 +19,12 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <!--
   Greek Wars fraternity referrals, in the /hqvisitform design language: a light
-  page, a small header, and one split card. A chapter builds its link here; the
-  link points at /greekwars/onboard?ref=<fraternity>.<school>, and the
-  onboarding page stores that code on the referred chapter's registration.
-  Nothing is written from this page — attribution lives on the registration it
-  produces, and the referring chapter is paid through its own registration.
+  page, a small header, and one split card. Referrers are individuals — people
+  outside Greek life, and anyone on the campus team — not chapters. A referrer
+  builds a link here that points at /greekwars/onboard?ref=<instagram handle>;
+  the onboarding page stores the handle on the referred chapter's registration,
+  and the team pays the referrer by reaching them on Instagram. Nothing is
+  written from this page.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -86,6 +87,9 @@
   .field { min-width: 0; margin-bottom: 19px; }
   .field > label { display: block; font-size: 14px; font-weight: 500; }
   .field > label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
+  .help { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted-2); }
+  .field-error { margin-top: 7px; font-size: 13px; color: #9b362e; }
+  .field input[aria-invalid="true"] { border-color: #d0574b; }
   .field input {
     display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 10px 12px;
     font: inherit; font-size: 16px; color: var(--ink); background: #fff;
@@ -203,45 +207,51 @@
 
   <main>
     <section class="invitation" aria-labelledby="invite-title">
-      <span class="eyebrow">FRATERNITY REFERRALS</span>
+      <span class="eyebrow">GREEK WARS REFERRALS</span>
       <h1 id="invite-title">Refer a frat.<br><span>Get $250.</span></h1>
-      <p class="benefits">Bring another fraternity into Greek Wars through your chapter's link. When they onboard, your chapter gets $250 — for every house you bring in.</p>
+      <p class="benefits">Not in Greek life? You can still get in on it. Bring a fraternity into Greek Wars through your link, and you get $250 when they onboard — for every house you bring in.</p>
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-          <span>$250 per fraternity<small>Paid to your chapter once they onboard 80% of their actives.</small></span>
+          <span>$250 per fraternity<small>Paid to you once they onboard 80% of their actives.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>One link for the whole house<small>Anyone in your chapter can send it.</small></span>
+          <span>No letters needed<small>For anyone outside Greek life, and anyone on the campus team.</small></span>
         </div>
       </div>
-      <p class="invitation-note">Build your link and send it to another house.<br>The credit travels with the link.</p>
+      <p class="invitation-note">Build your link and send it to a house.<br>The credit travels with the link.</p>
     </section>
 
     <section class="builder" aria-labelledby="builder-title">
       <h2 id="builder-title">Build your link</h2>
-      <p class="subtitle">Pick your school and fraternity. Your link builds as you go.</p>
+      <p class="subtitle">Your Instagram goes in the link — it's how we credit you and pay you.</p>
       <div class="steps" id="steps" aria-label="Step 1 of 2">
-        <span class="active" id="step-1"><i>1</i>Your chapter</span>
+        <span class="active" id="step-1"><i>1</i>You</span>
         <span class="step-line"></span>
         <span id="step-2"><i>2</i>Share it</span>
       </div>
 
       <div class="form-pair">
         <div class="field">
-          <label for="school">Your school</label>
-          <div class="combo"><input id="school" name="school" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="school-list" placeholder="Start typing your school"><ul class="combo-list" id="school-list" role="listbox" aria-label="Schools" hidden></ul></div>
+          <label for="first">First name</label>
+          <input id="first" name="first" type="text" autocomplete="given-name" maxlength="40" placeholder="So they know who sent it">
         </div>
         <div class="field">
-          <label for="chapter">Your fraternity <span>Nicknames are fine</span></label>
-          <div class="combo"><input id="chapter" name="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" placeholder="SAE, FIJI, Sigma Chi…"><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Fraternities" hidden></ul></div>
+          <label for="school">Your school <span>Optional</span></label>
+          <div class="combo"><input id="school" name="school" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="school-list" placeholder="Start typing your school"><ul class="combo-list" id="school-list" role="listbox" aria-label="Schools" hidden></ul></div>
         </div>
+      </div>
+      <div class="field">
+        <label for="instagram">Your Instagram</label>
+        <input id="instagram" name="instagram" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="80" placeholder="@yourhandle" aria-describedby="instagram-help">
+        <p class="help" id="instagram-help">Houses see who sent them, and the team messages you here to pay you.</p>
+        <p class="field-error" id="instagram-error" hidden>That doesn't look like an Instagram handle — try @yourhandle.</p>
       </div>
 
       <div class="summary is-empty" id="summary">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <div><strong id="ref-link">Your link appears here</strong><small id="ref-owner">Pick your school and fraternity first.</small></div>
+        <div><strong id="ref-link">Your link appears here</strong><small id="ref-owner">Add your first name and Instagram first.</small></div>
       </div>
 
       <div id="msg-wrap" hidden>
@@ -258,9 +268,9 @@
         <a class="option" id="text-it">Text it</a>
         <button type="button" class="option" id="share-it" hidden>Share…</button>
       </div>
-      <p class="under-button" id="status" role="status" aria-live="polite">Your chapter is credited when they register through this link.</p>
+      <p class="under-button" id="status" role="status" aria-live="polite">You're credited when a house registers through this link.</p>
 
-      <p class="fine-print">Your chapter has to be registered for Greek Wars too — that is who gets paid. The fraternity you refer must be new to Greek Wars and register through your link. The first link a chapter registers through takes the credit, and your own chapter doesn't count. <a href="/greekwars/onboard">Not registered? Onboard your chapter</a></p>
+      <p class="fine-print">Anyone can refer — you don't need to be in Greek life. The fraternity you refer must be new to Greek Wars and register through your link; the first link a chapter registers through takes the credit. Referring a chapter you're a member of doesn't count. When a house you sent hits 80%, the team reaches out on Instagram to pay you. <a href="/greekwars">What's Greek Wars?</a></p>
     </section>
   </main>
 
@@ -273,33 +283,28 @@
 <script>
 (function () {
   // ---------- the link
-  // /greekwars/onboard?ref=<fraternity>.<school>. The code is readable so a
-  // chapter can see whose link it is, and the onboarding page decodes it with
-  // the same three functions. Keep them in step with greekwars/onboard.html.
+  // /greekwars/onboard?ref=<instagram handle>. Referrers are people, not
+  // chapters — anyone outside Greek life, or anyone on the campus team — so the
+  // link carries the one thing that is unique to a person and lets the team
+  // reach them to pay: their Instagram handle. The onboarding page stores it on
+  // the registration and shows it back as "Sent by @handle".
   var BASE = 'https://bijanizadian.com/greekwars/onboard?ref=';
-  function slug(s) {
-    return String(s).toLowerCase().replace(/&/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
-  }
-  // "Sigma Alpha Epsilon (SAE)" -> "sae"; "Sigma Chi" -> "sigma-chi"
-  function chapterCode(name) {
-    var m = String(name).match(/\(([^)]+)\)\s*$/);
-    return slug(m ? m[1] : name);
-  }
-  // "University of Michigan" -> "michigan"; "Michigan State University" -> "michigan-state"
-  var FILLER = { the: 1, university: 1, of: 1, at: 1, 'in': 1 };
-  function schoolCode(name) {
-    var words = slug(name).split('-').filter(function (w) { return w && !FILLER[w]; });
-    return words.length ? words.join('-') : slug(name);
-  }
-  function shortName(name) {
-    var m = String(name).match(/\(([^)]+)\)\s*$/);
-    return (m ? m[1] : String(name)).trim();
+
+  // "@name", "name" and a pasted profile link all land on one value — the same
+  // rules the onboarding page applies to its own Instagram question.
+  function normalizeInstagram(v) {
+    var h = String(v).trim();
+    if (!h) return null;
+    var url = h.match(/^(?:https?:\/\/)?(?:[a-z0-9-]+\.)*instagram\.com\/([^/?#]+)/i);
+    if (url) h = url[1]; else if (/instagram\.com/i.test(h)) return null;
+    h = h.replace(/^@+/, '').replace(/\/+$/, '');
+    if (!/^[a-z0-9._]{1,30}$/i.test(h) || h.charAt(0) === '.' || h.charAt(h.length - 1) === '.' || h.indexOf('..') > -1) return null;
+    return h.toLowerCase();
   }
 
   var SCHOOLS = ["Arizona State University","Auburn University","Clemson University","Florida State University","Georgia Institute of Technology","Indiana University Bloomington","Louisiana State University","Michigan State University","New York University","Ohio State University","Penn State University","Purdue University","Southern Methodist University","Syracuse University","Texas A&M University","Texas Christian University","The George Washington University","Tulane University","University of Alabama","University of Arizona","University of Arkansas","University of California, Los Angeles","University of Colorado Boulder","University of Florida","University of Georgia","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Miami","University of Michigan","University of Mississippi","University of Missouri","University of Nebraska","University of North Carolina at Chapel Hill","University of Oklahoma","University of Oregon","University of South Carolina","University of Southern California","University of Tennessee","University of Texas at Austin","University of Virginia","University of Washington","University of Wisconsin-Madison","Vanderbilt University","Villanova University","Virginia Tech","Wake Forest University","Washington University in St. Louis"];
-  var FRATERNITIES = ["Alpha Epsilon Pi","Alpha Sigma Phi","Alpha Tau Omega","Beta Theta Pi","Chi Phi","Chi Psi","Delta Chi","Delta Kappa Epsilon","Delta Sigma Phi","Delta Tau Delta","Delta Upsilon","Kappa Alpha Order","Kappa Sigma","Lambda Chi Alpha","Phi Delta Theta","Phi Gamma Delta (FIJI)","Phi Kappa Psi","Phi Kappa Sigma","Phi Kappa Tau","Pi Kappa Alpha (Pike)","Pi Kappa Phi","Sigma Alpha Epsilon (SAE)","Sigma Chi","Sigma Nu","Sigma Phi Epsilon (SigEp)","Sigma Pi","Tau Kappa Epsilon (TKE)","Theta Chi","Theta Xi","Zeta Beta Tau","Zeta Psi"];
 
-  // ---------- suggestion lists, ranked as on the onboarding page: whole-string
+  // ---------- school suggestions, ranked as on the onboarding page: whole-string
   // prefix first, then a word starting with what you typed, then anything containing it
   function rank(items, q) {
     q = q.trim().toLowerCase();
@@ -314,7 +319,6 @@
     }
     return starts.concat(word, has);
   }
-
   function highlight(li, value, q) {
     var at = q ? value.toLowerCase().indexOf(q.trim().toLowerCase()) : -1;
     if (at < 0) { li.textContent = value; return; }
@@ -325,10 +329,8 @@
     li.appendChild(mark);
     li.appendChild(document.createTextNode(value.slice(at + n)));
   }
-
   function combobox(input, list, items, onPick) {
     var open = false, active = -1, shown = [];
-
     function close() {
       open = false; active = -1;
       list.hidden = true;
@@ -366,13 +368,7 @@
       if (top < list.scrollTop) list.scrollTop = top - 4;
       else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight + 4;
     }
-    function pick(k) {
-      input.value = shown[k];
-      close();
-      input.focus();
-      onPick();
-    }
-
+    function pick(k) { input.value = shown[k]; close(); input.focus(); onPick(); }
     input.addEventListener('input', function () { paint(); onPick(); });
     input.addEventListener('focus', function () { if (!open) paint(); });
     input.addEventListener('blur', function () { setTimeout(close, 0); });
@@ -392,23 +388,13 @@
     });
   }
 
-  var school = document.getElementById('school');
-  var chapter = document.getElementById('chapter');
-  var steps = document.getElementById('steps');
-  var step1 = document.getElementById('step-1');
-  var step2 = document.getElementById('step-2');
-  var summary = document.getElementById('summary');
-  var link = document.getElementById('ref-link');
-  var owner = document.getElementById('ref-owner');
-  var msgWrap = document.getElementById('msg-wrap');
-  var msgEl = document.getElementById('ref-msg');
-  var copyLink = document.getElementById('copy-link');
-  var copyLinkLabel = copyLink.querySelector('span');
-  var options = document.getElementById('options');
-  var copyMsg = document.getElementById('copy-msg');
-  var textIt = document.getElementById('text-it');
-  var shareIt = document.getElementById('share-it');
-  var status = document.getElementById('status');
+  var $ = function (id) { return document.getElementById(id); };
+  var first = $('first'), school = $('school'), instagram = $('instagram'), igError = $('instagram-error');
+  var steps = $('steps'), step1 = $('step-1'), step2 = $('step-2');
+  var summary = $('summary'), link = $('ref-link'), owner = $('ref-owner');
+  var msgWrap = $('msg-wrap'), msgEl = $('ref-msg'), options = $('options');
+  var copyLink = $('copy-link'), copyLinkLabel = copyLink.querySelector('span');
+  var copyMsg = $('copy-msg'), textIt = $('text-it'), shareIt = $('share-it'), status = $('status');
   var DEFAULT_STATUS = status.textContent;
   var CHECK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
   var current = null;
@@ -420,38 +406,47 @@
     steps.setAttribute('aria-label', ready ? 'Step 2 of 2' : 'Step 1 of 2');
   }
 
+  // only complain about the handle once they've stopped typing in it
+  function showHandleError(force) {
+    var raw = instagram.value.trim(), bad = !!raw && !normalizeInstagram(raw);
+    if (force || !bad) { igError.hidden = !bad; instagram.setAttribute('aria-invalid', bad ? 'true' : 'false'); }
+  }
+
   function update() {
-    var s = school.value.trim(), c = chapter.value.trim();
-    var ready = !!(s.length >= 2 && c.length >= 2 && chapterCode(c) && schoolCode(s));
+    var name = first.value.trim(), s = school.value.trim(), handle = normalizeInstagram(instagram.value);
+    var ready = name.length >= 2 && !!handle;
     setStep(ready);
+    showHandleError(false);
     status.textContent = DEFAULT_STATUS;
     if (!ready) {
       current = null;
       summary.classList.add('is-empty');
       link.textContent = 'Your link appears here';
-      owner.textContent = 'Pick your school and fraternity first.';
+      owner.textContent = 'Add your first name and Instagram first.';
       msgWrap.hidden = true;
       options.hidden = true;
       copyLink.disabled = true;
       textIt.removeAttribute('href');
       return;
     }
-    var url = BASE + chapterCode(c) + '.' + schoolCode(s);
-    var msg = shortName(c) + ' is in Greek Wars on fomo. Every qualifying chapter’s best trader wins $500, and the top chapter in the country takes $10,000. Register your house in two minutes: ' + url;
+    var url = BASE + encodeURIComponent(handle);
+    var msg = 'Hey — it’s ' + name + (s.length >= 2 ? ' from ' + s : '') + '. Your house should be in Greek Wars on fomo: every qualifying chapter’s best trader wins $500, and the top chapter in the country takes $10,000. Register your chapter in two minutes: ' + url;
     current = { url: url, msg: msg };
     summary.classList.remove('is-empty');
     link.textContent = url.replace(/^https:\/\//, '');
-    owner.textContent = 'Credits ' + c + ' at ' + s;
+    owner.textContent = 'Credits @' + handle;
     msgEl.textContent = msg;
     msgWrap.hidden = false;
     options.hidden = false;
     copyLink.disabled = false;
     textIt.href = 'sms:?&body=' + encodeURIComponent(msg);
-    try { localStorage.setItem('fomo-refer', JSON.stringify({ school: s, chapter: c })); } catch (e) {}
+    try { localStorage.setItem('fomo-refer-person', JSON.stringify({ first: name, school: s, instagram: '@' + handle })); } catch (e) {}
   }
 
-  combobox(school, document.getElementById('school-list'), SCHOOLS, update);
-  combobox(chapter, document.getElementById('chapter-list'), FRATERNITIES, update);
+  combobox(school, $('school-list'), SCHOOLS, update);
+  first.addEventListener('input', update);
+  instagram.addEventListener('input', update);
+  instagram.addEventListener('blur', function () { showHandleError(true); });
 
   var resetTimer;
   function copy(text, labelEl, what) {
@@ -493,12 +488,14 @@
     });
   }
 
-  // Arriving from a finished registration carries the chapter in the URL;
-  // otherwise pick up whatever this browser built last time.
-  var params = new URLSearchParams(location.search), saved = null;
-  try { saved = JSON.parse(localStorage.getItem('fomo-refer') || 'null'); } catch (e) {}
-  school.value = String(params.get('school') || (saved && saved.school) || '').slice(0, 120);
-  chapter.value = String(params.get('chapter') || (saved && saved.chapter) || '').slice(0, 120);
+  // pick up whatever this browser built last time
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem('fomo-refer-person') || 'null'); } catch (e) {}
+  if (saved) {
+    first.value = String(saved.first || '').slice(0, 40);
+    school.value = String(saved.school || '').slice(0, 120);
+    instagram.value = String(saved.instagram || '').slice(0, 80);
+  }
   update();
 })();
 </script>
