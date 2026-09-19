@@ -161,14 +161,20 @@
   .range-line b { color: var(--ink); font-weight: 500; }
 
   /* ---------- the route: which way this person earns the trip ---------- */
-  .route-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px; margin: 4px 0 18px; border-radius: 8px; background: var(--tint); border: 1px solid var(--tint-line); }
-  .route-card svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
-  .route-card > div { flex: 1; min-width: 0; }
-  .route-card strong { display: block; font-size: 14px; font-weight: 500; }
-  .route-card small { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: #6a728c; }
-  .route-card.is-empty { background: #fff; border-style: dashed; border-color: var(--option-line); }
-  .route-card.is-empty svg { color: #9399af; }
-  .route-card.is-empty strong { color: var(--muted-2); font-weight: 400; }
+  .routes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0 10px; }
+  .route-option { position: relative; display: block; padding: 14px; border: 1px solid var(--option-line); border-radius: 8px; cursor: pointer; transition: background .15s, border-color .15s, box-shadow .15s; }
+  .route-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .route-option b { display: block; font-size: 14px; font-weight: 500; }
+  .route-option small { display: block; margin-top: 4px; font-size: 12.5px; line-height: 1.5; color: var(--muted-2); }
+  .route-option em { display: block; margin-top: 10px; font-style: normal; font-size: 12px; line-height: 1.45; color: var(--blue-text); }
+  .route-option:hover:not(.is-locked) { background: var(--tint); }
+  .route-option.is-on { border-color: var(--blue); background: var(--tint); box-shadow: inset 0 0 0 1px var(--blue); }
+  .route-option.is-locked { cursor: default; background: #fbfbfd; border-style: dashed; }
+  .route-option.is-locked b { color: var(--muted-2); }
+  .route-option.is-locked em { color: var(--muted-2); }
+  .route-option:has(:focus-visible) { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .route-status { margin-bottom: 20px; font-size: 12.5px; line-height: 1.55; color: var(--muted-2); }
+  .route-status b { color: var(--ink); font-weight: 500; }
 
   /* ---------- what you'll do: a read-only look at the route ---------- */
   .ideas-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
@@ -286,6 +292,7 @@
     .mode-option { min-height: 42px; font-size: 13px; }
     .yesno { max-width: none; }
     .ideas { grid-template-columns: 1fr; }
+    .routes { grid-template-columns: 1fr; }
     .success { padding: 15px 0; }
     .success h2 { font-size: 30px; }
   }
@@ -407,13 +414,22 @@
         </div>
         <div class="field" id="role-field" hidden><label for="role">What's your role?</label><input id="role" type="text" autocomplete="off" maxlength="100" placeholder="Growth on the fomo campus team, IFC VP, investing club president…"></div>
 
-        <div class="route-card is-empty" id="route-card" aria-live="polite">
-          <svg data-route-icon="none" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
-          <svg data-route-icon="content" hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-          <svg data-route-icon="campus" hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-          <div><strong id="route-name">Your route shows up here</strong><small id="route-why">Add a handle and answer the role question.</small></div>
-          <button type="button" class="edit-button" id="route-switch" hidden></button>
+        <span class="group-label" id="routes-label">How you'd earn the trip <span>The team confirms this when they verify you</span></span>
+        <div class="routes" role="radiogroup" aria-labelledby="routes-label">
+          <label class="route-option" data-route="content">
+            <input type="radio" name="earn-route" value="content">
+            <b>Content route</b>
+            <small>Make content at their school — videos, posts, stories.</small>
+            <em data-note></em>
+          </label>
+          <label class="route-option" data-route="campus">
+            <input type="radio" name="earn-route" value="campus">
+            <b>On-campus route</b>
+            <small>Do it on the ground — tabling, events, sign-ups.</small>
+            <em data-note></em>
+          </label>
         </div>
+        <p class="route-status" id="route-status" aria-live="polite">Add your socials above to see which route you're on.</p>
 
         <p class="form-error" id="socials-error" role="alert" hidden></p>
         <button type="button" class="primary-action" id="to-deliver">Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
@@ -783,23 +799,20 @@
   var roleInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="has-role"]'));
   var roleField = $('role-field'), role = $('role');
   var hasRole = '';
-  var preferCampus = false;   // someone over the bar can still choose the on-campus route
+  var chosen = '';          // the route they're on
+  var pickedByUser = false; // true once they pick one themselves, so their numbers stop overriding it
 
   function followersOf(handleInput, countSel, normalize) {
     if (!normalize(handleInput.value) || countSel.value === '') return -1;
     return FOLLOWERS[+countSel.value][1];
   }
-  function meetsBar() {
-    return Math.max(followersOf(ig, igCount, normalizeInstagram), followersOf(tt, ttCount, normalizeTikTok)) >= CONTENT_ROUTE_MIN;
+  function bestFollowers() {
+    return Math.max(followersOf(ig, igCount, normalizeInstagram), followersOf(tt, ttCount, normalizeTikTok));
   }
-  function route() { return meetsBar() && !preferCampus ? 'content' : 'campus'; }
+  function meetsBar() { return bestFollowers() >= CONTENT_ROUTE_MIN; }
+  function barText() { return CONTENT_ROUTE_MIN.toLocaleString('en-US'); }
+  function route() { return chosen || 'campus'; }
   function routeName(r) { return r === 'content' ? 'Content route' : 'On-campus route'; }
-  function routeWhy() {
-    if (route() === 'content') return 'Your following meets the bar, so you’d earn the trip with content.';
-    if (meetsBar()) return 'Your following meets the bar for content, but you’ve chosen to earn the trip on the ground at their school.';
-    if (hasRole === 'yes') return 'You’ll earn the trip on the ground at their school, backed by your role at yours.';
-    return 'You’ll earn the trip on the ground at their school. Without a current role, the team looks at your request case by case while they verify you.';
-  }
   function socialsText(sep) {
     var out = [], i = normalizeInstagram(ig.value), t = normalizeTikTok(tt.value);
     if (i) out.push('Instagram @' + i + (igCount.value !== '' ? ' (' + FOLLOWERS[+igCount.value][0] + ' followers)' : ''));
@@ -807,24 +820,51 @@
     return out.join(sep);
   }
 
-  var routeCard = $('route-card'), routeSwitch = $('route-switch');
+  var routeInputs = Array.prototype.slice.call(document.querySelectorAll('input[name="earn-route"]'));
+  var routeStatus = $('route-status');
+  function routeOption(r) { return document.querySelector('.route-option[data-route="' + r + '"]'); }
+
   function refreshRoute() {
-    var anyHandle = !!(normalizeInstagram(ig.value) || normalizeTikTok(tt.value));
-    var ready = anyHandle && hasRole !== '';
+    var counted = bestFollowers() >= 0;   // a valid handle with a follower count against it
+    var open = meetsBar();
     $('socials-error').hidden = true;
-    routeCard.classList.toggle('is-empty', !ready);
-    each('[data-route-icon]', function (svg) { svg.hidden = svg.getAttribute('data-route-icon') !== (ready ? route() : 'none'); });
-    if (!ready) {
-      $('route-name').textContent = 'Your route shows up here';
-      $('route-why').textContent = 'Add a handle and answer the role question.';
-      routeSwitch.hidden = true;
-      return;
-    }
-    $('route-name').textContent = routeName(route());
-    $('route-why').textContent = routeWhy();
-    routeSwitch.hidden = !meetsBar();
-    routeSwitch.textContent = preferCampus ? 'Do content instead' : 'Do on-campus instead';
+
+    // the content route unlocks at the bar; the on-campus route is open to anyone
+    routeOption('content').classList.toggle('is-locked', !open);
+    routeInputs[0].disabled = !open;
+    routeOption('content').querySelector('[data-note]').textContent = open
+      ? 'Open to you — you’re over ' + barText() + ' followers.'
+      : counted ? 'Needs ' + barText() + '+ followers on Instagram or TikTok.'
+      : 'Needs ' + barText() + '+ followers on Instagram or TikTok. Add a handle and a follower count.';
+    routeOption('campus').querySelector('[data-note]').textContent = hasRole === 'yes'
+      ? 'Open to anyone — and your role at your school helps here.'
+      : 'Open to anyone, with or without a role at your school.';
+
+    // their numbers pick the route until they pick one themselves; a pick that
+    // stops qualifying hands the choice back to their numbers
+    if (pickedByUser && chosen === 'content' && !open) pickedByUser = false;
+    if (!pickedByUser) chosen = counted ? (open ? 'content' : 'campus') : '';
+    routeInputs.forEach(function (i) {
+      i.checked = i.value === chosen;
+      i.parentNode.classList.toggle('is-on', i.value === chosen);
+    });
+
+    routeStatus.textContent = '';
+    if (!chosen) { routeStatus.textContent = 'Add your socials above to see which route you’re on.'; return; }
+    var b = document.createElement('b');
+    b.textContent = 'the ' + routeName(chosen).toLowerCase();
+    routeStatus.appendChild(document.createTextNode('You’re on '));
+    routeStatus.appendChild(b);
+    routeStatus.appendChild(document.createTextNode(
+      chosen === 'content' ? '. The team confirms it when they check your follower counts.'
+      : open ? ', by choice — your following qualifies for content if you change your mind.'
+      : hasRole === 'yes' ? ', backed by your role at your school. The team confirms it when they verify you.'
+      : '. Without a role at your school, the team looks at your request case by case while they verify you.'
+    ));
   }
+  routeInputs.forEach(function (i) {
+    i.addEventListener('change', function () { if (!i.disabled) { chosen = i.value; pickedByUser = true; refreshRoute(); } });
+  });
   [ig, tt].forEach(function (el) { el.addEventListener('input', function () { el.setAttribute('aria-invalid', 'false'); refreshRoute(); }); });
   [igCount, ttCount].forEach(function (el) { el.addEventListener('change', function () { el.setAttribute('aria-invalid', 'false'); refreshRoute(); }); });
   radioChips(roleInputs, function (v) {
@@ -832,7 +872,6 @@
     roleField.hidden = v !== 'yes';
     refreshRoute();
   });
-  routeSwitch.addEventListener('click', function () { preferCampus = !preferCampus; refreshRoute(); });
 
   function checkSocials() {
     var igRaw = ig.value.trim(), ttRaw = tt.value.trim();
@@ -843,6 +882,7 @@
     if (ttRaw && ttCount.value === '') return ['tt-count', 'Pick roughly how many TikTok followers you have.'];
     if (!hasRole) return [roleInputs[0], 'Let us know whether you have a current role at your school.'];
     if (hasRole === 'yes' && role.value.trim().length < 2) return ['role', 'What’s your role at your school?'];
+    if (!chosen) return [routeInputs[1], 'Pick how you’d earn the trip.'];
     return null;
   }
 
