@@ -530,10 +530,11 @@
   // Where requests go. Submitting opens the visitor's email app addressed here.
   var TEAM_EMAIL = 'hello@fomo.family';
 
-  // The bar for the content route: followers on Instagram or TikTok. A
-  // placeholder until the team sets the real number; everything else keys off it.
-  var CONTENT_ROUTE_MIN = 5000;
-  var FOLLOWERS = [['Under 1k', 0], ['1k–5k', 1000], ['5k–10k', 5000], ['10k–50k', 10000], ['50k+', 50000]];
+  // The bar for the content route: followers on Instagram or TikTok. The copy on
+  // the page reads this number, and the ranges below break on it: the bar has to
+  // be a range boundary, or it rounds up to the next one and means nothing.
+  var CONTENT_ROUTE_MIN = 4000;
+  var FOLLOWERS = [['Under 1k', 0], ['1k–4k', 1000], ['4k–10k', 4000], ['10k–50k', 10000], ['50k+', 50000]];
 
   // What each route involves, shown on the "What you'll do" step. These are
   // examples, not a menu: the team sets each person's actual deliverables
