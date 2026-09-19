@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>Visit a friend | fomo campus</title>
-<meta name="description" content="Got a friend at another fomo school? Go see them. Tell us where and when, and fomo pays for the trip.">
+<meta name="description" content="Got a friend at another fomo school? Go see them. Earn the trip with deliverables at their school, and fomo pays for it.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Visit a friend at another fomo school">
-<meta property="og:description" content="Tell us where and when, and fomo pays for the trip.">
+<meta property="og:description" content="Earn the trip with deliverables at their school, and fomo pays for it.">
 <meta property="og:url" content="https://bijanizadian.com/campus/visit">
 <meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
 <link rel="canonical" href="https://bijanizadian.com/campus/visit">
@@ -19,7 +19,9 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <!--
   Campus trips: someone on a fomo campus asks fomo to pay for a trip to see a
-  friend at another fomo school. Built in the /hqvisitform design language.
+  friend at another fomo school. The trip is earned: the request has to lay
+  out the deliverables (content, an event, sign-ups) they will do at the other
+  school. Built in the /hqvisitform design language.
   Nothing is stored here — submitting opens the visitor's email app with the
   request addressed to TEAM_EMAIL (see the script), and the team confirms the
   trip and how it is paid for by replying.
@@ -82,6 +84,33 @@
   .steps .active { color: var(--blue-text); font-weight: 500; }
   .steps .active i, .steps .complete i { background: var(--blue); border-color: var(--blue); color: #fff; }
   .steps .step-line { height: 1px; width: 24px; background: #e0e4f0; }
+  .steps em { font-style: normal; }
+
+  /* ---------- deliverables: tap what you can do, then plan each one ---------- */
+  .group-label { display: block; font-size: 14px; font-weight: 500; }
+  .group-label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
+  .deliver-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 8px 0 18px; }
+  .deliver-option { min-height: 38px; padding: 0 10px; border: 1px solid var(--option-line); border-radius: 6px; background: #fff; color: var(--blue-text); font: inherit; font-size: 14px; font-weight: 500; transition: background .15s, border-color .15s; }
+  .deliver-option:hover { background: var(--lavender); }
+  .deliver-option[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .deliverables { display: grid; gap: 10px; margin-bottom: 18px; }
+  .deliver-empty { font-size: 13px; line-height: 1.5; color: var(--muted-2); border: 1px dashed var(--option-line); border-radius: 8px; padding: 16px; text-align: center; }
+  .deliverable { border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+  .deliverable-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .deliverable-head strong { font-size: 14px; font-weight: 500; }
+  .qty { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-2); }
+  .qty button { width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--option-line); border-radius: 6px; background: #fff; color: var(--blue-text); font: inherit; font-size: 16px; line-height: 1; }
+  .qty button:hover:not(:disabled) { background: var(--lavender); }
+  .qty button:disabled { opacity: .4; cursor: default; }
+  .qty output { min-width: 18px; text-align: center; font-size: 14px; font-weight: 500; color: var(--ink); }
+  .deliverable input {
+    display: block; width: 100%; min-height: 44px; margin-top: 10px; padding: 10px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .deliverable input::placeholder { color: #8990a4; font-size: 14px; }
+  .deliverable input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .deliverable input[aria-invalid="true"] { border-color: #d0574b; }
 
   /* ---------- fields ---------- */
   .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
@@ -190,6 +219,8 @@
   .receipt > span:first-child { display: block; font-size: 12px; letter-spacing: 1px; color: var(--muted-2); margin-bottom: 12px; }
   .receipt > strong { display: block; font-size: 20px; font-weight: 500; }
   .receipt > p { color: var(--muted); font-size: 14px; margin: 7px 0 15px; }
+  .receipt > #rc-dates { margin-bottom: 0; }
+  .receipt > #rc-deliver { margin-top: 4px; }
   .pending { font-size: 12px; background: #e2e8ff; border-radius: 4px; padding: 5px 10px; color: #3b4c9b; }
   .success > .under-button { font-size: 12px; color: var(--muted-2); line-height: 1.5; margin-top: 10px; min-height: 18px; }
 
@@ -233,6 +264,12 @@
     .subtitle { font-size: 14px; }
     .steps { margin: 20px 0 24px; }
     .form-pair { grid-template-columns: 1fr; gap: 0; }
+    /* three steps don't fit on a phone: keep every circle, name only the current step */
+    .steps { gap: 9px; }
+    .steps .step-line { width: 16px; }
+    .steps > span:not(.active) em { display: none; }
+    .deliver-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .deliver-option { min-height: 42px; }
     .calendar-layout { display: block; }
     .day { height: clamp(34px, 9vw, 40px); }
     .modes { border: 0; padding: 0; margin-top: 23px; }
@@ -268,18 +305,18 @@
     <section class="invitation" aria-labelledby="invite-title">
       <span class="eyebrow">CAMPUS TRIPS</span>
       <h1 id="invite-title">See a friend.<br><span>On fomo.</span></h1>
-      <p class="benefits">Got a friend at another fomo school? Go see them. Tell us where and when, and fomo pays for the trip.</p>
+      <p class="benefits">Got a friend at another fomo school? Go see them. You earn the trip with deliverables at their school, and fomo pays for it.</p>
       <div class="info">
         <div>
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
-          <span>Your trip, paid for<small>fomo covers it once the team confirms your trip.</small></span>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+          <span>Earned with deliverables<small>Content, an event or sign-ups — whatever you'll do while you're there.</small></span>
         </div>
         <div>
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Any fomo campus<small>Visit a friend at another school in the program.</small></span>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+          <span>Your trip, paid for<small>fomo covers it once the team signs off on your plan.</small></span>
         </div>
       </div>
-      <p class="invitation-note">Pick your dates.<br>We'll confirm the trip together.</p>
+      <p class="invitation-note">Pick your dates and what you'll deliver.<br>We'll confirm the trip together.</p>
     </section>
 
     <section class="booking" aria-label="Request a paid trip to another fomo school">
@@ -287,7 +324,7 @@
       <div id="step-trip">
         <h2 tabindex="-1" id="trip-title">Plan your trip</h2>
         <p class="subtitle">Where you're going and when. We'll confirm before you book.</p>
-        <div class="steps" aria-label="Step 1 of 2"><span class="active"><i>1</i>Your trip</span><span class="step-line"></span><span><i>2</i>Your details</span></div>
+        <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your trip</em></span><span class="step-line"></span><span><i>2</i><em>Deliverables</em></span><span class="step-line"></span><span><i>3</i><em>Your details</em></span></div>
 
         <div class="form-pair">
           <div class="field">
@@ -328,18 +365,42 @@
         <p class="under-button">Don't book anything yet — the team confirms your trip first.</p>
       </div>
 
-      <!-- step 2 · who you are -->
-      <div id="step-details" hidden>
-        <h2 tabindex="-1" id="details-title">Your details</h2>
-        <p class="subtitle">So the team knows who's going and how to reach you.</p>
-        <div class="steps" aria-label="Step 2 of 2"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i>Your trip</span><span class="step-line"></span><span class="active"><i>2</i>Your details</span></div>
+      <!-- step 2 · what earns the trip -->
+      <div id="step-deliver" hidden>
+        <h2 tabindex="-1" id="deliver-title">Your deliverables</h2>
+        <p class="subtitle">This is what earns the trip. Lay out what you'll do at their school.</p>
+        <div class="steps" aria-label="Step 2 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Deliverables</em></span><span class="step-line"></span><span><i>3</i><em>Your details</em></span></div>
 
         <div class="selection-summary">
           <div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
-            <span><strong id="sum-route"></strong><small id="sum-dates"></small></span>
+            <span><strong class="sum-route"></strong><small id="sum-trip"></small></span>
           </div>
-          <button type="button" class="edit-button" id="edit-trip" aria-label="Change your trip">Edit</button>
+          <button type="button" class="edit-button" data-edit-trip aria-label="Change your trip">Edit</button>
+        </div>
+
+        <span class="group-label" id="deliver-label">What you can deliver <span>Pick everything you'll do</span></span>
+        <div class="deliver-options" id="deliver-options" role="group" aria-labelledby="deliver-label"></div>
+        <div class="deliverables" id="deliverables" aria-live="polite"></div>
+
+        <p class="form-error" id="deliver-error" role="alert" hidden></p>
+        <button type="button" class="primary-action" id="to-details">Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <p class="under-button">The team signs off on your plan before you book anything.</p>
+        <button type="button" class="back-button" data-edit-trip><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your trip</button>
+      </div>
+
+      <!-- step 3 · who you are -->
+      <div id="step-details" hidden>
+        <h2 tabindex="-1" id="details-title">Your details</h2>
+        <p class="subtitle">So the team knows who's going and how to reach you.</p>
+        <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your trip</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Deliverables</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Your details</em></span></div>
+
+        <div class="selection-summary">
+          <div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.99-5.54 10.19-7.4 11.8a1 1 0 0 1-1.2 0C9.54 20.19 4 14.99 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><strong class="sum-route"></strong><small id="sum-dates"></small></span>
+          </div>
+          <button type="button" class="edit-button" id="edit-deliver" aria-label="Change your deliverables">Edit</button>
         </div>
 
         <form id="details-form" novalidate>
@@ -360,13 +421,12 @@
             <div class="field"><label for="friend">Who you're visiting</label><input id="friend" autocomplete="off" placeholder="Your friend's name" maxlength="100"></div>
             <div class="field"><label for="cost">Rough cost <span>Best guess</span></label><div class="money"><input id="cost" inputmode="decimal" autocomplete="off" placeholder="Travel and a bed, e.g. 180" maxlength="8"></div></div>
           </div>
-          <div class="field"><label for="notes">What are you two getting up to? <span>Optional</span></label><textarea id="notes" rows="3" maxlength="800" placeholder="A game, a dinner, meeting their campus team, or just hanging out…"></textarea></div>
           <p class="privacy-note">This opens your email app with the request filled in, addressed to the fomo team. Nothing is saved on this page.</p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <button type="submit" class="primary-action">Email my request<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          <p class="under-button">The team confirms the trip and how it's paid for before you book.</p>
+          <p class="under-button">The team confirms the trip, your deliverables and how it's paid for before you book.</p>
         </form>
-        <button type="button" class="back-button" id="back-trip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your trip</button>
+        <button type="button" class="back-button" id="back-deliver"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your deliverables</button>
       </div>
 
       <!-- step 3 · hand-off to email -->
@@ -379,6 +439,7 @@
           <span>YOUR TRIP</span>
           <strong id="rc-route"></strong>
           <p id="rc-dates"></p>
+          <p id="rc-deliver"></p>
           <span class="pending">Pending approval</span>
         </div>
         <a class="primary-action" id="mail-again">Open the email again</a>
@@ -592,20 +653,115 @@
   combobox(from, $('from-list'), SCHOOLS, refresh);
   combobox(to, $('to-list'), SCHOOLS, refresh);
 
+  // ---------- deliverables: the trip is earned, so the request lays out what
+  // the visitor will do at the other school. Each pick gets a count and a line.
+  var KINDS = [
+    ['TikTok or Reel', 'A day-in-the-life at their school, posted from your account'],
+    ['Instagram post', 'A photo dump from the weekend, tagging fomo'],
+    ['Instagram story', 'Stories from the trip with your fomo link'],
+    ['Event or dinner', 'A watch party or dinner with their campus team'],
+    ['App sign-ups', 'Get 25 people at their school onto fomo'],
+    ['Something else', 'Tell us what you have in mind']
+  ];
+  var picked = [];   // [{ kind, count, plan }] in the order they were tapped
+  var deliverOptions = $('deliver-options'), deliverList = $('deliverables'), deliverError = $('deliver-error');
+
+  KINDS.forEach(function (k, n) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'deliver-option'; b.textContent = k[0];
+    b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', function () {
+      var at = picked.map(function (p) { return p.kind; }).indexOf(n);
+      if (at > -1) picked.splice(at, 1); else picked.push({ kind: n, count: 1, plan: '' });
+      b.setAttribute('aria-pressed', at > -1 ? 'false' : 'true');
+      deliverError.hidden = true;
+      renderDeliverables();
+      if (at < 0) $('plan-' + n).focus();
+    });
+    deliverOptions.appendChild(b);
+  });
+
+  function renderDeliverables() {
+    deliverList.textContent = '';
+    if (!picked.length) {
+      var empty = document.createElement('p');
+      empty.className = 'deliver-empty';
+      empty.textContent = 'Tap what you can deliver above, then add a line on each.';
+      deliverList.appendChild(empty);
+      return;
+    }
+    picked.forEach(function (p) {
+      var kind = KINDS[p.kind], box = document.createElement('div');
+      box.className = 'deliverable';
+      box.innerHTML =
+        '<div class="deliverable-head"><strong></strong>' +
+        '<span class="qty"><span>How many</span><button type="button" data-step="-1">−</button><output></output><button type="button" data-step="1">+</button></span></div>' +
+        '<input maxlength="140" autocomplete="off">';
+      box.querySelector('strong').textContent = kind[0];
+      var out = box.querySelector('output'), minus = box.querySelector('[data-step="-1"]'), plus = box.querySelector('[data-step="1"]');
+      function paintCount() { out.textContent = p.count; minus.disabled = p.count <= 1; plus.disabled = p.count >= 20; }
+      minus.setAttribute('aria-label', 'Fewer ' + kind[0]);
+      plus.setAttribute('aria-label', 'More ' + kind[0]);
+      [minus, plus].forEach(function (btn) {
+        btn.addEventListener('click', function () { p.count = Math.max(1, Math.min(20, p.count + +btn.getAttribute('data-step'))); paintCount(); });
+      });
+      paintCount();
+      var input = box.querySelector('input');
+      input.id = 'plan-' + p.kind;
+      input.value = p.plan;
+      input.placeholder = kind[1];
+      input.setAttribute('aria-label', kind[0] + ': the plan');
+      input.addEventListener('input', function () { p.plan = input.value; input.setAttribute('aria-invalid', 'false'); deliverError.hidden = true; });
+      deliverList.appendChild(box);
+    });
+  }
+  function deliverText(sep) {
+    return picked.map(function (p) { return p.count + '× ' + KINDS[p.kind][0]; }).join(sep);
+  }
+  function deliverCount() {
+    var n = picked.reduce(function (s, p) { return s + p.count; }, 0);
+    return n + (n === 1 ? ' deliverable' : ' deliverables');
+  }
+
   // ---------- steps
-  var stepTrip = $('step-trip'), stepDetails = $('step-details'), stepSent = $('step-sent');
+  var stepTrip = $('step-trip'), stepDeliver = $('step-deliver'), stepDetails = $('step-details'), stepSent = $('step-sent');
   function show(el, heading) {
-    [stepTrip, stepDetails, stepSent].forEach(function (s) { s.hidden = s !== el; });
+    [stepTrip, stepDeliver, stepDetails, stepSent].forEach(function (s) { s.hidden = s !== el; });
     if (heading) $(heading).focus();
+  }
+  function paintRoute() {
+    Array.prototype.forEach.call(document.querySelectorAll('.sum-route'), function (el) { el.textContent = route(); });
   }
   cont.addEventListener('click', function () {
     if (cont.disabled) return;
-    $('sum-route').textContent = route();
-    $('sum-dates').textContent = datesText() + ' · ' + trip.mode + ' · Pending approval';
+    paintRoute();
+    $('sum-trip').textContent = datesText() + ' · ' + trip.mode;
+    renderDeliverables();
+    show(stepDeliver, 'deliver-title');
+  });
+  $('to-details').addEventListener('click', function () {
+    var bad = null;
+    if (!picked.length) bad = [null, 'Pick at least one thing you’ll deliver at their school.'];
+    else picked.some(function (p) {
+      if (p.plan.trim().length < 8) { bad = ['plan-' + p.kind, 'Add a line on the plan for ' + KINDS[p.kind][0] + ' — what, where, and roughly when.']; return true; }
+      return false;
+    });
+    if (bad) {
+      deliverError.textContent = bad[1];
+      deliverError.hidden = false;
+      if (bad[0]) { $(bad[0]).setAttribute('aria-invalid', 'true'); $(bad[0]).focus(); }
+      else deliverOptions.querySelector('button').focus();
+      return;
+    }
+    deliverError.hidden = true;
+    $('sum-dates').textContent = datesText() + ' · ' + trip.mode + ' · ' + deliverCount();
     show(stepDetails, 'details-title');
   });
-  $('edit-trip').addEventListener('click', function () { show(stepTrip, 'trip-title'); });
-  $('back-trip').addEventListener('click', function () { show(stepTrip, 'trip-title'); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-edit-trip]'), function (b) {
+    b.addEventListener('click', function () { show(stepTrip, 'trip-title'); });
+  });
+  $('edit-deliver').addEventListener('click', function () { show(stepDeliver, 'deliver-title'); });
+  $('back-deliver').addEventListener('click', function () { show(stepDeliver, 'deliver-title'); });
 
   // ---------- details, checked the way the onboarding page checks them
   var EMAIL = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
@@ -672,8 +828,8 @@
       'Getting there: ' + trip.mode,
       'Rough cost: $' + cost
     ];
-    var notes = $('notes').value.trim();
-    if (notes) lines.push('', 'What we’re doing: ' + notes);
+    lines.push('', 'Deliverables (what earns the trip):');
+    picked.forEach(function (p) { lines.push('- ' + p.count + 'x ' + KINDS[p.kind][0] + ': ' + p.plan.trim()); });
     lines.push('', 'Sent from bijanizadian.com/campus/visit');
     var subject = 'Campus trip: ' + route() + ', ' + fmt(trip.start) + ' – ' + fmt(trip.end) + ' (' + name + ')';
     request = {
@@ -683,6 +839,7 @@
     $('team-email').textContent = TEAM_EMAIL;
     $('rc-route').textContent = route();
     $('rc-dates').textContent = datesText() + ' · ' + trip.mode + ' · ~$' + cost;
+    $('rc-deliver').textContent = deliverText(' · ');
     $('mail-again').href = request.href;
     show(stepSent, 'sent-title');
     window.location.href = request.href;
@@ -707,6 +864,8 @@
   });
   $('start-over').addEventListener('click', function () {
     trip.start = trip.end = null;
+    picked = [];
+    Array.prototype.forEach.call(deliverOptions.children, function (b) { b.setAttribute('aria-pressed', 'false'); });
     renderCal(); refresh();
     show(stepTrip, 'trip-title');
   });
