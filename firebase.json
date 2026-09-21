@@ -32,6 +32,17 @@
     "trailingSlash": false,
     "rewrites": [
       {
+        "source": "/irrigation/api/**",
+        "function": {
+          "functionId": "irrigationApi",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/irrigation",
+        "destination": "/irrigation/index.html"
+      },
+      {
         "source": "/LAhousepitch",
         "destination": "/housepitch/index.html"
       },
