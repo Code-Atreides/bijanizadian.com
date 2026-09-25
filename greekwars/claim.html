@@ -27,12 +27,11 @@
   size, plus an email. Submitting saves the clan to the shared Firebase project
   (greekwars_clans/<id>: chapter, school and lead username, readable one clan at
   a time; greekwars_clan_leads/<id>: the lead's details, write-only) and hands
-  them two links to send the chapter. Anyone new to fomo signs up through the
-  lead's referral link and fomo adds them to the clan automatically; that link
-  does nothing for people who already have the app, so they add themselves on
-  the clan's own page, /greekwars/clan/<id>. The page can only check the
-  referral link's shape (fomo.family answers every /r/ path the same way), so
-  the team checks the account itself.
+  them one link to send the chapter: the clan's own page, /greekwars/clan/<id>,
+  a small sign-up where members give their name, fomo username and email, and
+  anyone without the app downloads it from the store buttons there first. The
+  page can only check the referral link's shape (fomo.family answers every /r/
+  path the same way), so the team checks the account itself.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -191,8 +190,7 @@
   }
   .option:hover { background: var(--lavender); }
 
-  /* the two links a chapter needs: the referral link for anyone new to fomo,
-     the clan page for anyone who already has it */
+  /* the one link the chapter needs */
   .link-rows { display: grid; gap: 8px; margin-bottom: 14px; }
   .link-row { display: flex; align-items: center; gap: 11px; min-width: 0; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 9px 6px 9px 12px; }
   .link-row > svg { color: var(--blue); flex-shrink: 0; }
@@ -321,15 +319,15 @@
     <section class="invitation" aria-labelledby="invite-title">
       <span class="eyebrow">FOR CHAPTER HEADS</span>
       <h1 id="invite-title">Claim your<br><span>clan.</span></h1>
-      <p class="benefits">Onboarding your chapter? Prove your fomo account with your referral link and tell us your chapter. fomo sets up your clan, and you get two links to send your members.</p>
+      <p class="benefits">Onboarding your chapter? Prove your fomo account with your referral link and tell us your chapter. fomo sets up your clan, and you get one link to send your members.</p>
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>New to fomo: your referral link<small>Anyone who signs up through it joins your clan automatically.</small></span>
+          <span>One link for your chapter<small>Members open it and sign up with their name, fomo username and email.</small></span>
         </div>
         <div>
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-          <span>Already on fomo: your clan page<small>Your referral link doesn't reach people who have the app, so they add themselves there.</small></span>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          <span>No app yet? Covered.<small>The page has App Store and Google Play buttons to get fomo first.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -382,7 +380,7 @@
         </div>
 
         <button type="button" class="primary-action" id="to-chapter" disabled>Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-        <p class="under-button aside">Only the chapter head does this. Members use the links you get at the end.</p>
+        <p class="under-button aside">Only the chapter head does this. Members use the link you get at the end.</p>
       </div>
 
       <!-- step 2 · which clan -->
@@ -427,38 +425,33 @@
           <p class="privacy-note">Only the fomo team sees your name and email.<span class="note-more"> Your chapter, school and fomo username show on your clan page.</span></p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <button type="submit" class="primary-action" id="create"><span>Submit</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          <p class="under-button aside">Next, you get the links to send your chapter.</p>
+          <p class="under-button aside">Next, you get the link to send your chapter.</p>
         </form>
       </div>
 
-      <!-- step 3 · the two links the chapter needs, and one message carrying both -->
+      <!-- step 3 · the one link the chapter needs -->
       <div id="step-share" hidden>
-        <h2 tabindex="-1" id="share-title">Send your chapter these</h2>
+        <h2 tabindex="-1" id="share-title">Send your chapter this link</h2>
         <p class="subtitle" id="share-subtitle"></p>
         <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Share</em></span></div>
 
         <div class="link-rows">
           <div class="link-row">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
-            <span><small><b>New to fomo</b> · signing up with it puts them in your clan</small><strong id="ref-url"></strong></span>
-            <button type="button" class="text-button" id="copy-ref">Copy</button>
-          </div>
-          <div class="link-row">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span><small><b>Already on fomo</b> · they add themselves here</small><strong id="clan-url"></strong></span>
-            <button type="button" class="text-button" id="copy-clan">Copy</button>
+            <span><small><b>Your clan's sign-up</b> · anyone without fomo can download it there first</small><strong id="clan-url"></strong></span>
+            <a class="text-button" id="clan-open" target="_blank" rel="noopener">Open</a>
           </div>
         </div>
 
-        <button type="button" class="primary-action" id="copy-msg">
-          <span>Copy group-chat message</span>
+        <button type="button" class="primary-action" id="copy-link">
+          <span>Copy link</span>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         </button>
         <div class="options">
           <a class="option" id="text-it">Text it</a>
           <button type="button" class="option" id="share-it" hidden>Share…</button>
         </div>
-        <p class="under-button" id="status" role="status" aria-live="polite">One message with both links, and which one to use.</p>
+        <p class="under-button" id="status" role="status" aria-live="polite">Drop it in your chapter group chat.</p>
       </div>
     </section>
   </main>
@@ -720,18 +713,13 @@
     }
     function done(id) {
       busy(false);
-      var url = CLAN_BASE + id, ref = linked.url, target = Math.ceil(actives * 0.8);
-      // new to fomo: the lead's referral link, which fomo uses to put sign-ups
-      // in the clan; already on fomo: the clan page, since the link can't
-      var msg = c + ' is in Greek Wars on fomo. Get in our clan:\n\n'
-        + 'New to fomo? Sign up with my link and you\u2019re in automatically: ' + ref + '\n\n'
-        + 'Already have fomo? Add yourself here: ' + url;
-      claim = { url: url, ref: ref, msg: msg, chapter: c };
+      var url = CLAN_BASE + id, target = Math.ceil(actives * 0.8);
+      claim = { url: url, chapter: c };
       try { localStorage.setItem(SAVED_KEY, JSON.stringify({ url: url, chapter: c, school: s })); } catch (err) {}
       $('share-subtitle').textContent = 'Saved. You need ' + target + ' of ' + actives + ' actives in the clan.';
-      $('ref-url').textContent = ref.replace(/^https:\/\//, '');
       $('clan-url').textContent = url.replace(/^https:\/\//, '');
-      $('text-it').href = 'sms:?&body=' + encodeURIComponent(msg);
+      $('clan-open').href = url;
+      $('text-it').href = 'sms:?&body=' + encodeURIComponent(url);
       status.textContent = DEFAULT_STATUS;
       show('share');
     }
@@ -771,13 +759,11 @@
       status.textContent = 'Press Ctrl+C (⌘C on a Mac) to copy.';
     });
   }
-  $('copy-ref').addEventListener('click', function () { if (claim) copyWithLabel(claim.ref, $('copy-ref'), 'Referral link'); });
-  $('copy-clan').addEventListener('click', function () { if (claim) copyWithLabel(claim.url, $('copy-clan'), 'Clan page link'); });
-  $('copy-msg').addEventListener('click', function () { if (claim) copyWithLabel(claim.msg, $('copy-msg').querySelector('span'), 'Message'); });
+  $('copy-link').addEventListener('click', function () { if (claim) copyWithLabel(claim.url, $('copy-link').querySelector('span'), 'Link'); });
   if (navigator.share) {
     $('share-it').hidden = false;
     $('share-it').addEventListener('click', function () {
-      if (claim) navigator.share({ title: claim.chapter + ' · Greek Wars clan', text: claim.msg }).catch(function () {});
+      if (claim) navigator.share({ title: claim.chapter + ' · Greek Wars clan', url: claim.url }).catch(function () {});
     });
   }
 
@@ -786,7 +772,7 @@
   try { saved = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null'); } catch (e) {}
   if (saved && typeof saved.url === 'string' && saved.url.indexOf(CLAN_BASE) === 0) {
     var savedCopy = $('saved-copy');
-    $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan page';
+    $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan link';
     $('saved-url').textContent = saved.url.replace(/^https:\/\//, '');
     $('saved-clan').hidden = false;
     $('step-link').classList.add('has-saved');
