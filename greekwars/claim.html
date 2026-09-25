@@ -27,9 +27,12 @@
   size, plus an email. Submitting saves the clan to the shared Firebase project
   (greekwars_clans/<id>: chapter, school and lead username, readable one clan at
   a time; greekwars_clan_leads/<id>: the lead's details, write-only) and hands
-  them the clan's own link, /greekwars/clan/<id>, where members add themselves.
-  The page can only check the referral link's shape (fomo.family answers every
-  /r/ path the same way), so the team checks the account itself.
+  them two links to send the chapter. Anyone new to fomo signs up through the
+  lead's referral link and fomo adds them to the clan automatically; that link
+  does nothing for people who already have the app, so they add themselves on
+  the clan's own page, /greekwars/clan/<id>. The page can only check the
+  referral link's shape (fomo.family answers every /r/ path the same way), so
+  the team checks the account itself.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -55,80 +58,81 @@
   ::selection { background: var(--blue); color: #fff; }
   svg { display: block; }
 
-  .site-shell { max-width: 1160px; margin: auto; padding: 0 40px; }
+  /* Every step fits one screen: the shell is the viewport's height, the header
+     and footer take what they need, and the card sits centred between them. */
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
   /* ---------- header ---------- */
-  .site-header { height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--blue); }
-  .brand svg { width: 90px; height: auto; }
-  .brand > span { font-size: 27px; letter-spacing: -.8px; color: var(--muted); }
-  .season { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--muted); }
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: auto; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .season { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
 
   /* ---------- the card ---------- */
-  main { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); margin-top: 24px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
+  main { flex: none; margin: auto 0; display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
 
-  .invitation { padding: 40px 32px; background: var(--lavender); }
-  .eyebrow { display: block; font-size: 12px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
-  h1 { font-size: 48px; line-height: 1.1; font-weight: 500; letter-spacing: -1.8px; margin: 24px 0; }
+  .invitation { padding: 30px 28px; background: var(--lavender); }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  h1 { font-size: 42px; line-height: 1.1; font-weight: 500; letter-spacing: -1.5px; margin: 16px 0 14px; }
   h1 > span { color: var(--blue); }
-  .benefits { font-size: 16px; line-height: 1.65; color: #50566e; }
-  .info { display: grid; gap: 23px; margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--panel-rule); }
-  .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.5; }
-  .info svg { color: var(--blue); flex-shrink: 0; margin-top: 2px; }
-  .info small { display: block; font-size: 13px; font-weight: 400; color: #68708d; line-height: 1.55; margin-top: 3px; }
-  .invitation-note { font-size: 14px; color: #636b87; line-height: 1.6; margin-top: 37px; }
+  .benefits { font-size: 15px; line-height: 1.6; color: #50566e; }
+  .info { display: grid; gap: 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--panel-rule); }
+  .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.45; }
+  .info svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
+  .info small { display: block; font-size: 12.5px; font-weight: 400; color: #68708d; line-height: 1.5; margin-top: 2px; }
 
-  .claim { padding: 35px 34px 27px; background: #fff; min-width: 0; }
-  h2 { font-size: 27px; font-weight: 500; letter-spacing: -.7px; line-height: 1.2; margin-bottom: 9px; }
-  .subtitle { font-size: 15px; line-height: 1.5; color: var(--muted); }
-  .steps { display: flex; align-items: center; gap: 13px; margin: 24px 0 27px; color: var(--muted-2); font-size: 14px; }
+  .claim { padding: 28px 32px 24px; background: #fff; min-width: 0; }
+  h2 { font-size: 25px; font-weight: 500; letter-spacing: -.6px; line-height: 1.2; margin-bottom: 6px; }
+  .subtitle { font-size: 14.5px; line-height: 1.5; color: var(--muted); }
+  .steps { display: flex; align-items: center; gap: 12px; margin: 16px 0 20px; color: var(--muted-2); font-size: 13.5px; }
   .steps > span { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
   .steps em { font-style: normal; }
   .steps i { font-style: normal; background: var(--chip); border: 1px solid var(--line); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
   .steps .active { color: var(--blue-text); font-weight: 500; }
   .steps .active i, .steps .complete i { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .steps .step-line { height: 1px; width: 24px; background: #e0e4f0; }
+  .steps .step-line { height: 1px; width: 22px; background: #e0e4f0; }
 
   /* ---------- where the link lives ---------- */
-  .find { display: grid; grid-template-columns: minmax(0, 1fr) 256px; gap: 22px; align-items: center; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 20px; margin-bottom: 24px; }
-  .find-steps { list-style: none; display: grid; gap: 15px; counter-reset: find; }
-  .find-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 14px; line-height: 1.5; color: #50566e; counter-increment: find; }
+  .find { display: grid; grid-template-columns: minmax(0, 1fr) 232px; gap: 18px; align-items: center; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+  .find-steps { list-style: none; display: grid; gap: 10px; counter-reset: find; }
+  .find-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 13.5px; line-height: 1.45; color: #50566e; counter-increment: find; }
   .find-steps li::before { content: counter(find); display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid var(--option-line); color: var(--blue-text); font-size: 12px; font-weight: 500; }
   .find-steps b { color: var(--ink); font-weight: 500; }
   .find-steps code { font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--tint-line); border-radius: 4px; padding: 0 4px; white-space: nowrap; }
 
   /* A drawn stand-in for the Rewards panel in the fomo app, so the page never
-     shows anyone's real balance. Amounts are blurred bars, the username is a
+     shows anyone's real balance. The amount is a blurred bar, the username is a
      placeholder, and the referral link is ringed. */
-  .rewards { background: var(--ink); color: #fff; border-radius: 14px; padding: 14px 13px 16px; font-size: 12px; box-shadow: 0 18px 38px -22px rgba(11,9,31,.55); }
+  .rewards { background: var(--ink); color: #fff; border-radius: 14px; padding: 12px 12px 36px; font-size: 12px; box-shadow: 0 18px 38px -22px rgba(11,9,31,.55); }
   .rw-top { display: flex; align-items: center; justify-content: space-between; }
-  .rw-top b { font-size: 15px; font-weight: 500; }
-  .rw-share { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.08); border-radius: 7px; padding: 5px 8px; font-size: 11px; font-weight: 500; }
-  .rw-total { text-align: center; margin: 10px 0 12px; color: #8d8ea3; font-size: 10px; }
-  .rw-bar { display: block; height: 18px; width: 64px; margin: 5px auto 0; border-radius: 5px; background: linear-gradient(90deg, rgba(255,255,255,.34), rgba(255,255,255,.14)); filter: blur(2.5px); }
+  .rw-top b { font-size: 14px; font-weight: 500; }
+  .rw-share { display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,.08); border-radius: 7px; padding: 4px 8px; font-size: 11px; font-weight: 500; }
+  .rw-total { text-align: center; margin: 6px 0 10px; color: #8d8ea3; font-size: 10px; }
+  .rw-bar { display: block; height: 14px; width: 56px; margin: 4px auto 0; border-radius: 5px; background: linear-gradient(90deg, rgba(255,255,255,.34), rgba(255,255,255,.14)); filter: blur(2.5px); }
   .rw-ref { position: relative; border-radius: 10px; box-shadow: 0 0 0 1px rgba(203,208,235,.14), 0 0 0 4px var(--glow); }
-  .rw-banner { display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--blue); border-radius: 10px 10px 0 0; padding: 7px 6px; font-size: 10px; font-weight: 500; white-space: nowrap; }
-  .rw-link { display: flex; align-items: center; justify-content: center; gap: 5px; background: #16152a; border-radius: 0 0 10px 10px; padding: 11px 6px; font-size: 12px; color: #8d8ea3; white-space: nowrap; }
+  .rw-banner { display: flex; align-items: center; justify-content: center; gap: 5px; background: var(--blue); border-radius: 10px 10px 0 0; padding: 6px; font-size: 9.5px; font-weight: 500; white-space: nowrap; }
+  .rw-link { display: flex; align-items: center; justify-content: center; gap: 5px; background: #16152a; border-radius: 0 0 10px 10px; padding: 10px 6px; font-size: 12px; color: #8d8ea3; white-space: nowrap; }
   .rw-link b { color: #fff; font-weight: 700; }
   .rw-link svg { color: #8d8ea3; margin-left: 2px; }
-  .rw-callout { position: absolute; right: 4px; bottom: -31px; background: var(--glow); color: var(--ink); font-size: 11px; font-weight: 500; border-radius: 6px; padding: 4px 8px; }
+  .rw-callout { position: absolute; right: 4px; bottom: -30px; background: var(--glow); color: var(--ink); font-size: 11px; font-weight: 500; border-radius: 6px; padding: 3px 8px; }
   .rw-callout::before { content: ""; position: absolute; right: 16px; top: -5px; border: 5px solid transparent; border-top: 0; border-bottom-color: var(--glow); }
-  .rw-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 40px; }
-  .rw-cards > span { background: #16152a; border: 1px solid rgba(203,208,235,.12); border-radius: 9px; padding: 8px 9px; font-size: 10px; color: #b7b9cc; }
-  .rw-cards .rw-bar { width: 38px; height: 12px; margin: 6px 0 0; }
 
   /* ---------- fields ---------- */
-  .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .field { min-width: 0; margin-bottom: 19px; }
-  .field > label { display: block; font-size: 14px; font-weight: 500; }
+  .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-pair.narrow-end { grid-template-columns: minmax(0, 1fr) 150px; }
+  .field { min-width: 0; margin-bottom: 14px; }
+  .field > label { display: block; font-size: 13.5px; font-weight: 500; }
   .field > label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
-  .help { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted-2); }
-  .field-error { margin-top: 7px; font-size: 13px; line-height: 1.5; color: #9b362e; }
+  .help { margin-top: 6px; font-size: 12px; line-height: 1.5; color: var(--muted-2); }
+  .help.is-found { color: var(--blue-text); font-weight: 500; }
+  .help a { color: inherit; text-underline-offset: 3px; margin-left: 4px; }
+  .field-error { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: #9b362e; }
   .field input[aria-invalid="true"] { border-color: #d0574b; }
   .field input[type="number"] { -moz-appearance: textfield; }
   .field input::-webkit-inner-spin-button, .field input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   .field input {
-    display: block; width: 100%; min-height: 44px; margin-top: 8px; padding: 10px 12px;
+    display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
     font: inherit; font-size: 16px; color: var(--ink); background: #fff;
     border: 1px solid var(--input); border-radius: 7px; outline: none;
     transition: border-color .15s, box-shadow .15s;
@@ -151,46 +155,33 @@
   .combo-list li[aria-selected="true"] { background: var(--lavender); color: var(--ink); }
   .combo-list mark { background: none; color: var(--blue-text); font-weight: 500; }
 
-  /* ---------- the account the link points at ---------- */
-  .summary { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 11px; margin: 0 0 18px; }
+  /* ---------- tinted rows: the account, a saved clan link, the new clan link ---------- */
+  .summary { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 11px; margin: 0 0 16px; }
   .summary > div { display: flex; align-items: center; gap: 11px; min-width: 0; }
   .summary svg { color: var(--blue); flex-shrink: 0; }
   .summary span { min-width: 0; }
-  .summary strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.45; overflow-wrap: anywhere; }
-  .summary small { display: block; font-size: 12px; color: #6a728c; margin-top: 3px; line-height: 1.5; overflow-wrap: anywhere; }
-  .summary.is-empty strong { color: var(--muted-2); font-weight: 400; }
-  .summary.is-empty svg { color: #9399af; }
+  .summary strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+  .summary small { display: block; font-size: 12px; color: #6a728c; margin-top: 2px; line-height: 1.45; overflow-wrap: anywhere; }
+  .saved-clan { margin: -4px 0 16px; }
   .text-button { border: 0; background: none; font: inherit; font-size: 13px; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; flex-shrink: 0; text-decoration: none; white-space: nowrap; }
   .text-button:hover { background: var(--lavender); }
 
   .primary-action {
-    display: flex; width: 100%; height: 45px; align-items: center; justify-content: center; gap: 10px;
+    display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 10px;
     border: 0; border-radius: 7px; background: var(--blue); color: #fff; text-decoration: none;
     font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
   }
   .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
   .primary-action:disabled { color: #7b829b; background: #edf0f9; cursor: default; }
-  .option-btn {
-    display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; min-height: 42px; margin-top: 8px;
-    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
-    font: inherit; font-size: 14px; font-weight: 500; transition: background .15s;
-  }
-  .option-btn:hover { background: var(--lavender); }
-  .under-button { font-size: 12px; color: var(--muted-2); text-align: center; margin-top: 10px; line-height: 1.5; min-height: 18px; }
-  .back-button { margin: 16px auto 0; display: flex; align-items: center; gap: 7px; border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 10px; border-radius: 6px; }
-  .back-button:hover { background: var(--chip); }
-  .form-error { font-size: 14px; line-height: 1.5; background: #fff1ef; padding: 12px; border-radius: 6px; color: #9b362e; margin-bottom: 15px; }
-  .privacy-note { font-size: 12px; color: var(--muted-2); line-height: 1.6; margin: 0 0 20px; }
-  .fine-print { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted-2); line-height: 1.6; }
-  .fine-print a { color: var(--blue-text); font-weight: 500; text-underline-offset: 3px; }
-
-  .saved-clan { margin: -6px 0 24px; }
   .primary-action.is-busy { opacity: .7; cursor: progress; }
+  .under-button { font-size: 12px; color: var(--muted-2); text-align: center; margin-top: 9px; line-height: 1.5; min-height: 18px; }
+  .form-error { font-size: 13.5px; line-height: 1.5; background: #fff1ef; padding: 10px 12px; border-radius: 6px; color: #9b362e; margin-bottom: 12px; }
+  .privacy-note { font-size: 12px; color: var(--muted-2); line-height: 1.55; margin: 0 0 14px; }
 
   /* ---------- step 3: share the clan link ---------- */
-  .msg-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+  .msg-label { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 7px; }
   .clan-link strong { user-select: all; -webkit-user-select: all; }
-  .msg { font-size: 14px; line-height: 1.6; color: #50566e; border: 1px solid var(--line); border-radius: 7px; padding: 12px 14px; margin-bottom: 16px; overflow-wrap: anywhere; }
+  .msg { font-size: 13.5px; line-height: 1.55; color: #50566e; border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; margin-bottom: 14px; overflow-wrap: anywhere; }
   .options { display: flex; gap: 6px; margin-top: 8px; }
   .option {
     flex: 1 1 0; min-width: 0;
@@ -200,50 +191,110 @@
   }
   .option:hover { background: var(--lavender); }
 
-  .site-footer { text-align: center; font-size: 12px; color: var(--faint); padding: 23px 0 30px; line-height: 1.7; }
+  /* the two links a chapter needs: the referral link for anyone new to fomo,
+     the clan page for anyone who already has it */
+  .link-rows { display: grid; gap: 8px; margin-bottom: 14px; }
+  .link-row { display: flex; align-items: center; gap: 11px; min-width: 0; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 9px 6px 9px 12px; }
+  .link-row > svg { color: var(--blue); flex-shrink: 0; }
+  .link-row > span { flex: 1; min-width: 0; }
+  .link-row small { display: block; font-size: 12px; color: #6a728c; line-height: 1.45; }
+  .link-row small b { color: var(--ink); font-weight: 500; }
+  .link-row strong { display: block; font-size: 13.5px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+  /* a returning lead's saved link takes the subtitle's place */
+  .has-saved .subtitle { display: none; }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 14px 0 16px; line-height: 1.6; }
   .site-footer a { color: inherit; text-underline-offset: 3px; }
 
   @media (max-width: 1050px) {
-    .site-shell { padding: 0 28px; }
-    main { grid-template-columns: minmax(0, 290px) minmax(0, 1fr); }
-    .invitation { padding: 34px 27px; }
-    h1 { font-size: 43px; }
-    .claim { padding: 32px 25px 25px; }
-    /* the drawing needs its full width, so it sits above the steps */
-    .find { grid-template-columns: 1fr; }
-    .rewards { width: 100%; max-width: 280px; margin: 0 auto; order: -1; }
+    .site-shell { padding: 0 24px; }
+    main { grid-template-columns: minmax(0, 270px) minmax(0, 1fr); }
+    .invitation { padding: 26px 22px; }
+    h1 { font-size: 36px; }
+    .claim { padding: 26px 24px 22px; }
+    .find { grid-template-columns: minmax(0, 1fr) 220px; gap: 14px; padding: 14px; }
   }
+  /* short screens — laptops at 125% scaling, small windows: tighten the rhythm
+     rather than make anyone scroll */
+  @media (min-width: 601px) and (max-height: 760px) {
+    .site-header { height: 56px; }
+    .site-footer { padding: 8px 0 10px; }
+    .invitation { padding: 22px 24px; }
+    h1 { font-size: 36px; margin: 12px 0 10px; }
+    .benefits { font-size: 14px; line-height: 1.55; }
+    .info { margin-top: 16px; padding-top: 14px; gap: 12px; }
+    .claim { padding: 20px 26px 18px; }
+    h2 { font-size: 22px; }
+    .subtitle.more, .aside { display: none; }
+    .steps { margin: 12px 0 14px; }
+    .find { padding: 12px 14px; margin-bottom: 14px; }
+    .rw-total { display: none; }
+    .rewards { padding-top: 10px; }
+    .rw-top { margin-bottom: 10px; }
+    .field { margin-bottom: 10px; }
+    .field input { min-height: 40px; padding: 8px 12px; }
+    .summary { padding: 8px 12px; margin-bottom: 12px; }
+    .privacy-note { margin-bottom: 10px; }
+    .under-button { margin-top: 6px; }
+  }
+  /* stacked: the panel above the form shrinks to its headline */
   @media (max-width: 850px) {
-    .site-shell { max-width: 680px; padding: 0 24px; }
-    .site-header { height: 80px; }
-    main { grid-template-columns: 1fr; margin-top: 10px; }
-    .invitation { padding: 27px 28px; border-bottom: 1px solid #dfe4fa; }
-    h1 { font-size: 36px; letter-spacing: -1.1px; margin: 13px 0; }
-    .info { margin-top: 22px; padding-top: 20px; gap: 16px; }
-    .invitation-note { display: none; }
-    .claim { padding: 27px 28px; }
+    .site-shell { max-width: 640px; }
+    main { grid-template-columns: 1fr; }
+    .invitation { padding: 18px 24px; border-bottom: 1px solid #dfe4fa; }
+    h1 { font-size: 28px; letter-spacing: -.8px; margin: 6px 0 0; }
+    h1 br { display: none; }
+    .benefits, .info { display: none; }
   }
-  @media (max-width: 480px) {
-    .site-shell { padding: 0 16px; }
-    .site-header { height: 72px; }
-    .brand svg { width: 80px; }
-    .brand > span { font-size: 24px; }
-    .season { font-size: 12px; }
-    main { margin-top: 6px; border-radius: 12px; }
-    .invitation { padding: 23px 20px; }
-    h1 { font-size: 33px; }
-    .eyebrow { font-size: 11px; }
-    .benefits { font-size: 15px; }
-    .claim { padding: 24px 20px; }
-    h2 { font-size: 25px; }
-    .subtitle { font-size: 14px; }
+  /* phones: the step's own heading carries the page, so the panel goes */
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 54px; }
+    .brand svg { width: 70px; }
+    .brand > span { font-size: 21px; }
+    .season { font-size: 11.5px; gap: 5px; }
+    .season svg { width: 13px; height: 13px; }
+    main { border-radius: 12px; }
+    .invitation { display: none; }
+    .claim { padding: 18px 16px 16px; }
+    h2 { font-size: 22px; }
+    .subtitle.more { display: none; }
     /* three named steps don't fit on a phone: keep every circle, name only the current step */
-    .steps { margin: 20px 0 24px; }
+    .steps { margin: 12px 0 14px; gap: 9px; }
+    .steps .step-line { width: 16px; }
     .steps > span:not(.active) em { display: none; }
-    .find { padding: 16px 14px; gap: 18px; }
-    .form-pair { grid-template-columns: 1fr; gap: 0; }
+    .find { grid-template-columns: 1fr; gap: 12px; padding: 12px; margin-bottom: 14px; }
+    .rewards { width: 100%; max-width: 280px; margin: 0 auto; order: -1; }
+    .find-steps { gap: 7px; }
+    .find-steps li { font-size: 13px; }
+    .form-pair { gap: 10px; }
+    .form-pair.stack { grid-template-columns: 1fr; gap: 0; }
+    .form-pair.narrow-end { grid-template-columns: minmax(0, 1fr) 104px; }
+    .field { margin-bottom: 11px; }
+    .field input { min-height: 40px; padding: 8px 11px; }
+    .privacy-note { margin-bottom: 11px; }
+    .summary { margin-bottom: 12px; }
+    .msg { margin-bottom: 10px; }
     /* size to the label so "Copy message" never crowds its border */
-    .option { flex: 1 1 auto; min-height: 42px; }
+    .option { flex: 1 1 auto; min-height: 40px; }
+    .site-footer { font-size: 11px; padding: 10px 0 12px; line-height: 1.5; }
+    .site-header { height: 50px; }
+    .rw-total, .aside { display: none; }
+    .rw-top { margin-bottom: 10px; }
+    .link-row { padding: 8px 4px 8px 10px; gap: 9px; }
+    /* a returning lead came back for their link, so it takes the drawing's place */
+    .has-saved .rewards { display: none; }
+    #step-chapter .summary small, .note-more { display: none; }
+    .field { margin-bottom: 9px; }
+  }
+  /* the smallest phones keep the written steps and drop the drawing */
+  @media (max-width: 600px) and (max-height: 620px) {
+    .rewards { display: none; }
+    .steps { margin: 8px 0 10px; }
+    .under-button:not(#status), .steps { display: none; }
+    h2 { font-size: 20px; margin-bottom: 12px; }
+    .field input { min-height: 38px; }
+    .field > label { font-size: 13px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -268,28 +319,31 @@
 
   <main>
     <section class="invitation" aria-labelledby="invite-title">
-      <span class="eyebrow">FOR CHAPTER LEADS</span>
+      <span class="eyebrow">FOR CHAPTER HEADS</span>
       <h1 id="invite-title">Claim your<br><span>clan.</span></h1>
-      <p class="benefits">Onboarding your chapter? Prove your fomo account with your rewards referral link and tell us your chapter. You get your clan's own link to send your members, and fomo sets up the clan on the app.</p>
+      <p class="benefits">Onboarding your chapter? Prove your fomo account with your referral link and tell us your chapter. fomo sets up your clan, and you get two links to send your members.</p>
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Your clan's own link<small>Members open it and add their name, fomo username and email. Every one counts toward your 80%.</small></span>
+          <span>New to fomo: your referral link<small>Anyone who signs up through it joins your clan automatically.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Already on fomo: your clan page<small>Your referral link doesn't reach people who have the app, so they add themselves there.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-          <span>$500 for your chapter<small>Guaranteed to your chapter's #1 trader once 80% of actives are in. Ranked on raw PnL through Dec&nbsp;11.</small></span>
+          <span>$500 for your chapter<small>To your #1 trader once 80% of actives are in the clan.</small></span>
         </div>
       </div>
-      <p class="invitation-note">Takes about a minute.<br>Then send the link to your chapter.</p>
     </section>
 
     <section class="claim" aria-label="Claim your spot in your chapter's clan">
       <!-- step 1 · prove the account -->
       <div id="step-link">
         <h2 tabindex="-1" id="link-title">Prove your account</h2>
-        <p class="subtitle">Your referral link from the fomo app has your username in it. It's how the team matches you to a real account.</p>
-        <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your link</em></span><span class="step-line"></span><span><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Clan link</em></span></div>
+        <p class="subtitle more">Your referral link from the fomo app has your username in it. It's how the team matches you to a real account.</p>
+        <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your link</em></span><span class="step-line"></span><span><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
 
         <!-- shown when this browser already made a clan link -->
         <div class="summary saved-clan" id="saved-clan" hidden>
@@ -302,13 +356,13 @@
 
         <div class="find">
           <ol class="find-steps">
-            <li><span><b>Open Rewards in the fomo app.</b> It's where you see what you've earned.</span></li>
-            <li><span><b>Find “Refer and earn 25% of your friends' fees.”</b> Your link is right under it: <code>fomo.family/r/</code> and your username.</span></li>
-            <li><span><b>Tap the copy icon next to it</b> and paste it below.</span></li>
+            <li><span>In fomo, open your <b>profile</b>.</span></li>
+            <li><span>Tap <b>Rewards</b> in the top right.</span></li>
+            <li><span>Under <b>“Refer and earn 25% of your friends' fees”</b>, tap <b>copy</b> next to your <code>fomo.family/r/</code> link and paste it below.</span></li>
           </ol>
           <div class="rewards" aria-hidden="true">
             <div class="rw-top">
-              <b>Rewards</b>
+              <b>‹&nbsp; Rewards</b>
               <span class="rw-share"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Share</span>
             </div>
             <div class="rw-total">Total earned<i class="rw-bar"></i></div>
@@ -316,10 +370,6 @@
               <div class="rw-banner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>Refer and earn 25% of your friends' fees</div>
               <div class="rw-link"><span>fomo.family/r/<b>yourname</b></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></div>
               <span class="rw-callout">Copy this</span>
-            </div>
-            <div class="rw-cards">
-              <span>Referrals<i class="rw-bar"></i></span>
-              <span>Creator rewards<i class="rw-bar"></i></span>
             </div>
           </div>
         </div>
@@ -331,23 +381,15 @@
           <p class="field-error" id="ref-error" hidden></p>
         </div>
 
-        <div class="summary is-empty" id="account">
-          <div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span><strong id="account-name">Your fomo account appears here</strong><small id="account-link">Once you paste your link.</small></span>
-          </div>
-          <a class="text-button" id="account-open" target="_blank" rel="noopener" hidden>Open link</a>
-        </div>
-
         <button type="button" class="primary-action" id="to-chapter" disabled>Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-        <p class="under-button">Only the chapter lead does this. Members join through your clan link.</p>
+        <p class="under-button aside">Only the chapter head does this. Members use the links you get at the end.</p>
       </div>
 
       <!-- step 2 · which clan -->
       <div id="step-chapter" hidden>
         <h2 tabindex="-1" id="chapter-title">Your chapter</h2>
-        <p class="subtitle">So the team sets up the right clan, and your link says who it's for.</p>
-        <div class="steps" aria-label="Step 2 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Clan link</em></span></div>
+        <p class="subtitle more">So the team sets up the right clan, and your link says who it's for.</p>
+        <div class="steps" aria-label="Step 2 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
 
         <div class="summary">
           <div>
@@ -362,69 +404,67 @@
             <div class="field"><label for="first">First name</label><input id="first" autocomplete="given-name" maxlength="50"></div>
             <div class="field"><label for="last">Last name</label><input id="last" autocomplete="family-name" maxlength="50"></div>
           </div>
-          <div class="field">
-            <label for="school">Your school</label>
-            <div class="combo"><input id="school" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="school-list" maxlength="120" placeholder="Start typing and pick yours"><ul class="combo-list" id="school-list" role="listbox" aria-label="Schools" hidden></ul></div>
+          <div class="form-pair stack">
+            <div class="field">
+              <label for="school">Your school</label>
+              <div class="combo"><input id="school" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="school-list" maxlength="120" placeholder="Start typing and pick yours"><ul class="combo-list" id="school-list" role="listbox" aria-label="Schools" hidden></ul></div>
+            </div>
+            <div class="field">
+              <label for="chapter">Your chapter</label>
+              <div class="combo"><input id="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" maxlength="120" placeholder="SAE, FIJI, Tri Delt…"><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Chapters" hidden></ul></div>
+            </div>
           </div>
-          <div class="field">
-            <label for="chapter">Your chapter</label>
-            <div class="combo"><input id="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" maxlength="120" placeholder="Start typing your letters" aria-describedby="chapter-help"><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Chapters" hidden></ul></div>
-            <p class="help" id="chapter-help">SAE, FIJI, Tri Delt — nicknames are fine.</p>
-          </div>
-          <div class="form-pair">
+          <div class="form-pair narrow-end">
             <div class="field">
               <label for="email">Email</label>
               <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu">
             </div>
             <div class="field">
               <label for="actives">Active members</label>
-              <input id="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" autocomplete="off" placeholder="e.g. 84" aria-describedby="actives-help">
-              <p class="help" id="actives-help">Rough is fine. 80% is your target.</p>
+              <input id="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" autocomplete="off" placeholder="e.g. 84">
             </div>
           </div>
-          <p class="privacy-note">Only the fomo team sees your name and email. Your chapter, school and fomo username show on your clan page.</p>
+          <p class="privacy-note">Only the fomo team sees your name and email.<span class="note-more"> Your chapter, school and fomo username show on your clan page.</span></p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <button type="submit" class="primary-action" id="create"><span>Submit</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          <p class="under-button">Next, you get your clan link to send your chapter.</p>
+          <p class="under-button aside">Next, you get the links to send your chapter.</p>
         </form>
-        <button type="button" class="back-button" data-go="link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your link</button>
-
-        <p class="fine-print">One clan per chapter, claimed from the lead's own fomo account. Members competing must be 18 or older. <a href="/greekwars">What's Greek Wars?</a></p>
       </div>
 
-      <!-- step 3 · send the claim, then share the clan's own link -->
+      <!-- step 3 · the two links the chapter needs, and one message carrying both -->
       <div id="step-share" hidden>
-        <h2 tabindex="-1" id="share-title">Your clan link</h2>
+        <h2 tabindex="-1" id="share-title">Send your chapter these</h2>
         <p class="subtitle" id="share-subtitle"></p>
-        <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Clan link</em></span></div>
+        <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Share</em></span></div>
 
-        <span class="msg-label">Send this to your chapter</span>
-        <div class="summary clan-link">
-          <div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span><strong id="clan-url"></strong><small id="clan-for"></small></span>
+        <div class="link-rows">
+          <div class="link-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+            <span><small><b>New to fomo</b> · signing up with it puts them in your clan</small><strong id="ref-url"></strong></span>
+            <button type="button" class="text-button" id="copy-ref">Copy</button>
           </div>
-          <a class="text-button" id="clan-open" target="_blank" rel="noopener">Open</a>
+          <div class="link-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span><small><b>Already on fomo</b> · they add themselves here</small><strong id="clan-url"></strong></span>
+            <button type="button" class="text-button" id="copy-clan">Copy</button>
+          </div>
         </div>
-        <p class="msg" id="clan-msg"></p>
 
-        <button type="button" class="primary-action" id="copy-link">
-          <span>Copy link</span>
+        <button type="button" class="primary-action" id="copy-msg">
+          <span>Copy group-chat message</span>
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
         </button>
         <div class="options">
-          <button type="button" class="option" id="copy-msg">Copy message</button>
           <a class="option" id="text-it">Text it</a>
           <button type="button" class="option" id="share-it" hidden>Share…</button>
         </div>
-        <p class="under-button" id="status" role="status" aria-live="polite">Your clan link is saved on this device, and you can come back to this page to copy it again.</p>
+        <p class="under-button" id="status" role="status" aria-live="polite">One message with both links, and which one to use.</p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    fomo · Greek Wars · <a href="/greekwars">Back to Greek Wars</a><br>
-    Trading involves risk, including loss of principal. A prize is not a trading return.
+    fomo · <a href="/greekwars">Greek Wars</a> · One clan per chapter · 18+ to compete · Trading involves risk, including loss of principal. A prize is not a trading return.
   </footer>
 </div>
 
@@ -574,7 +614,6 @@
   var $ = function (id) { return document.getElementById(id); };
   function each(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
   var refInput = $('ref-link'), refError = $('ref-error'), refHelp = $('ref-help');
-  var account = $('account'), accountName = $('account-name'), accountLink = $('account-link'), accountOpen = $('account-open');
   var cont = $('to-chapter');
   var school = $('school'), chapter = $('chapter');
   var linked = null, claim = null;
@@ -590,22 +629,20 @@
       refInput.setAttribute('aria-invalid', bad ? 'true' : 'false');
     }
   }
+  // the hint under the input doubles as the result: which account the link is
+  var HELP = refHelp.textContent;
   function refreshLink() {
     var r = readLink(refInput.value);
     linked = r.name ? r : null;
     showRefError(false);
     cont.disabled = !linked;
-    account.classList.toggle('is-empty', !linked);
-    accountOpen.hidden = !linked;
-    if (!linked) {
-      accountName.textContent = 'Your fomo account appears here';
-      accountLink.textContent = 'Once you paste your link.';
-      accountOpen.removeAttribute('href');
-      return;
-    }
-    accountName.textContent = '@' + linked.name;
-    accountLink.textContent = linked.url.replace(/^https:\/\//, '');
-    accountOpen.href = linked.url;
+    refHelp.classList.toggle('is-found', !!linked);
+    if (!linked) { refHelp.textContent = HELP; return; }
+    refHelp.textContent = '\u2713 Found @' + linked.name + '.';
+    var open = document.createElement('a');
+    open.href = linked.url; open.target = '_blank'; open.rel = 'noopener';
+    open.textContent = 'Open link';
+    refHelp.appendChild(open);
   }
   refInput.addEventListener('input', refreshLink);
   refInput.addEventListener('blur', function () { showRefError(true); });
@@ -683,15 +720,17 @@
     }
     function done(id) {
       busy(false);
-      var url = CLAN_BASE + id, target = Math.ceil(actives * 0.8);
-      var msg = 'We’re claiming ' + c + '’s clan for Greek Wars on fomo. Add your name, fomo username and email here to join it: ' + url;
-      claim = { url: url, msg: msg, chapter: c };
+      var url = CLAN_BASE + id, ref = linked.url, target = Math.ceil(actives * 0.8);
+      // new to fomo: the lead's referral link, which fomo uses to put sign-ups
+      // in the clan; already on fomo: the clan page, since the link can't
+      var msg = c + ' is in Greek Wars on fomo. Get in our clan:\n\n'
+        + 'New to fomo? Sign up with my link and you\u2019re in automatically: ' + ref + '\n\n'
+        + 'Already have fomo? Add yourself here: ' + url;
+      claim = { url: url, ref: ref, msg: msg, chapter: c };
       try { localStorage.setItem(SAVED_KEY, JSON.stringify({ url: url, chapter: c, school: s })); } catch (err) {}
-      $('share-subtitle').textContent = 'Saved. Everyone in ' + c + ' opens it and adds their name, fomo username and email. You need ' + target + ' of ' + actives + ' in the clan.';
+      $('share-subtitle').textContent = 'Saved. You need ' + target + ' of ' + actives + ' actives in the clan.';
+      $('ref-url').textContent = ref.replace(/^https:\/\//, '');
       $('clan-url').textContent = url.replace(/^https:\/\//, '');
-      $('clan-for').textContent = c + ' · ' + s + ' · led by @' + linked.name;
-      $('clan-open').href = url;
-      $('clan-msg').textContent = msg;
       $('text-it').href = 'sms:?&body=' + encodeURIComponent(msg);
       status.textContent = DEFAULT_STATUS;
       show('share');
@@ -732,8 +771,9 @@
       status.textContent = 'Press Ctrl+C (⌘C on a Mac) to copy.';
     });
   }
-  $('copy-link').addEventListener('click', function () { if (claim) copyWithLabel(claim.url, $('copy-link').querySelector('span'), 'Link'); });
-  $('copy-msg').addEventListener('click', function () { if (claim) copyWithLabel(claim.msg, $('copy-msg'), 'Message'); });
+  $('copy-ref').addEventListener('click', function () { if (claim) copyWithLabel(claim.ref, $('copy-ref'), 'Referral link'); });
+  $('copy-clan').addEventListener('click', function () { if (claim) copyWithLabel(claim.url, $('copy-clan'), 'Clan page link'); });
+  $('copy-msg').addEventListener('click', function () { if (claim) copyWithLabel(claim.msg, $('copy-msg').querySelector('span'), 'Message'); });
   if (navigator.share) {
     $('share-it').hidden = false;
     $('share-it').addEventListener('click', function () {
@@ -746,9 +786,10 @@
   try { saved = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null'); } catch (e) {}
   if (saved && typeof saved.url === 'string' && saved.url.indexOf(CLAN_BASE) === 0) {
     var savedCopy = $('saved-copy');
-    $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan link';
+    $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan page';
     $('saved-url').textContent = saved.url.replace(/^https:\/\//, '');
     $('saved-clan').hidden = false;
+    $('step-link').classList.add('has-saved');
     savedCopy.addEventListener('click', function () {
       copy(saved.url, function () {
         savedCopy.textContent = 'Copied';
