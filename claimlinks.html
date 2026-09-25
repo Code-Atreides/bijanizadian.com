@@ -24,6 +24,11 @@
   that head attach their fomo referral link, and the members' link the head then
   sends out. Status is live: whether a referral is attached (the clan's public
   lead) and how many members have claimed (the clan's public roster).
+
+  A wrong referral can be removed from here. The list holds each head's key, and
+  the rules let whoever has it clear the head's entry and the clan's lead in one
+  update (the lead may only change to match the entry under the key, so both go
+  to nothing together). Claims already made stay; the head can attach again.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -112,6 +117,9 @@
   .chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .chip { display: inline-block; font-size: 12px; line-height: 1.3; padding: 4px 9px; border-radius: 999px; background: var(--chip); color: var(--muted); white-space: nowrap; }
   .chip.ok { background: var(--ok-bg); color: var(--ok); }
+  .chip-remove { border: 0; background: none; font: inherit; font-size: 12px; color: #9b362e; padding: 4px 6px; border-radius: 6px; text-decoration: underline; text-underline-offset: 2px; }
+  .chip-remove:hover { background: #fff1ef; }
+  .chip-remove:disabled { color: var(--muted-2); text-decoration: none; cursor: progress; }
   .chip.goal { background: #fff4e0; color: #8a5a00; }
   .count { font-size: 12.5px; color: var(--muted); margin-top: 7px; }
   .count b { color: var(--ink); font-weight: 500; font-size: 14px; }
@@ -331,6 +339,8 @@
       var chips = el('div', 'chips');
       var headChip = el('span', 'chip', 'Waiting for head');
       chips.appendChild(headChip);
+      var remove = el('button', 'chip-remove', 'Remove'); remove.type = 'button'; remove.hidden = true;
+      chips.appendChild(remove);
       if (c.arya_portal_open) chips.appendChild(el('span', 'chip goal', "Hit goal on Arya's portal"));
       status.appendChild(chips);
       var count = el('p', 'count');
@@ -352,10 +362,13 @@
 
       var r = { id: id, c: c, row: row, lead: null, claims: 0, text: (c.chapter + ' ' + c.school + ' ' + regs.map(function (x) { return x.name + ' ' + x.instagram; }).join(' ')).toLowerCase() };
       rows.push(r);
+      remove.addEventListener('click', function () { detach(r, remove); });
       // live: whether the head has attached, and how many members have claimed
       db.ref('greekwars_clans/' + id + '/lead').on('value', function (snap) {
         r.lead = snap.val();
         headChip.className = r.lead ? 'chip ok' : 'chip';
+        remove.hidden = !r.lead;
+        remove.setAttribute('aria-label', r.lead ? 'Remove @' + r.lead + '\u2019s referral from ' + c.chapter + ', ' + c.school : 'Remove');
         headChip.textContent = r.lead ? '✓ @' + r.lead + ' attached' : 'Waiting for head';
         totals(); apply();
       });
@@ -393,6 +406,25 @@
   });
 
   // ---------- copying
+  // ---------- take a wrong referral off a chapter: the head's entry under its
+  // key and the clan's lead go together, which is the only way the rules allow
+  function detach(r, btn) {
+    var key = null;
+    try { key = new URL(r.c.head_link).searchParams.get('head'); } catch (e) {}
+    if (!key || !r.lead) return;
+    if (!window.confirm('Remove @' + r.lead + '\u2019s referral from ' + r.c.chapter + ' \u00b7 ' + r.c.school + '?\n\nClaims already made stay. The head can attach the right link again with their head link.')) return;
+    var updates = {};
+    updates['greekwars_clan_heads/' + r.id + '/' + key] = null;
+    updates['greekwars_clans/' + r.id + '/lead'] = null;
+    btn.disabled = true; btn.textContent = 'Removing\u2026';
+    withTimeout(db.ref().update(updates), 15000).then(function () {
+      btn.disabled = false; btn.textContent = 'Remove';
+    }, function (err) {
+      btn.disabled = false; btn.textContent = 'Remove';
+      window.alert(err && err.code === 'TIMEOUT' ? 'That took too long. Check your connection and try again.' : 'That referral couldn\u2019t be removed. Refresh and try again.');
+    });
+  }
+
   function copyTo(text, btn) {
     var label = btn.textContent;
     function done() { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = label; }, 1600); }
