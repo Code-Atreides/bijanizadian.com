@@ -351,7 +351,10 @@
     var words = name.replace(/\([^)]*\)/g, ' ').toLowerCase().match(/[a-z]+/g) || [];
     var letters = words.map(function (w) { return GREEK[w]; }).filter(Boolean);
     if (letters.length >= 2 && letters.length <= 4 && letters.length >= words.length - 1) return letters.join('');
-    return (name.match(/[A-Za-z0-9]+/g) || ['?']).map(function (w) { return w.charAt(0); }).join('').toUpperCase().slice(0, 3);
+    // a short nickname in brackets says it best; otherwise the name's initials
+    var nick = name.match(/\(([^)]+)\)\s*$/);
+    if (nick && nick[1].replace(/\s/g, '').length <= 4) return nick[1].replace(/\s/g, '').toUpperCase();
+    return (name.replace(/\([^)]*\)/g, ' ').match(/[A-Za-z0-9]+/g) || ['?']).map(function (w) { return w.charAt(0); }).join('').toUpperCase().slice(0, 3);
   }
   // "Sigma Alpha Epsilon (SAE)" is SAE in the headline
   function shortName(name) {
