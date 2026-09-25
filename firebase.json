@@ -55,6 +55,10 @@
         "destination": "/hqvisitform/index.html"
       },
       {
+        "source": "/greekwars/clan/**",
+        "destination": "/greekwars/clan.html"
+      },
+      {
         "source": "/",
         "destination": "/desktop.html"
       }
