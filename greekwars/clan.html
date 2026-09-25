@@ -35,7 +35,8 @@
 
   Claim clans (kind: 'claim') are made straight from chapters that onboarded
   before these portals, listed for the team on /claimlinks. Their members
-  already have fomo, so the page asks them to claim rather than join. Those
+  already have fomo, so the page asks them to claim rather than join, and asks
+  for nothing but their fomo username. Those
   clans start with no head: the head opens /greekwars/clan/<id>?head=<key>, and
   pasting their referral link writes greekwars_clan_heads/<id>/<key> and the
   clan's lead together. The rules only accept that when <key> matches the
@@ -375,7 +376,7 @@
           <i>1</i>
           <div>
             <b>Already on fomo? Claim your account.</b>
-            <small>Your name, fomo username and email. One claim per member.</small>
+            <small>Just your fomo username. One claim per member.</small>
           </div>
         </li>
         <li class="get-app">
@@ -574,7 +575,7 @@
       actives: typeof v.actives === 'number' && v.actives >= 5 ? Math.floor(v.actives) : null
     };
     wear(clan);
-    if (clan.claim && headKey) headView(); else { show('join'); ask(1); }
+    if (clan.claim && headKey) headView(); else { show('join'); ask(firstQ()); }
     count();
   }, function (err) {
     if (err && /permission/i.test(err.code || err.message || '')) show('missing');
@@ -602,6 +603,8 @@
     // claim clans say claim all the way through
     if (c.claim) {
       $('q2-help').textContent = 'The one on your fomo account, with or without the @.';
+      document.querySelector('[data-q="2"] .q-num').hidden = true;
+      $('privacy-note').textContent = 'Only your username is saved, and it counts toward the clan.';
       $('sent-title').textContent = 'Claimed.';
       $('pass-more').textContent = ' Every claim counts toward the 80%.';
       $('join-card').setAttribute('aria-label', 'Claim your fomo account for your chapter');
@@ -684,8 +687,12 @@
     return { name: name };
   }
 
-  // ---------- one question at a time
+  // ---------- one question at a time: name, username, email for a new
+  // chapter; just the username for a claim clan, whose members already have fomo
   var Q = [null, ['first', 'last'], ['username'], ['email']], TITLES = [null, 'join-title', 'q2-title', 'q3-title'];
+  function order() { return clan && clan.claim ? [2] : [1, 2, 3]; }
+  function firstQ() { return order()[0]; }
+  function lastQ() { var o = order(); return o[o.length - 1]; }
   var cur = 1, formError = $('form-error'), joinButton = $('join-button'), joinLabel = joinButton.querySelector('span');
   function fail(message, fieldId) {
     formError.textContent = message;
@@ -696,8 +703,8 @@
     cur = n;
     Array.prototype.forEach.call(document.querySelectorAll('.q'), function (q) { q.hidden = Number(q.getAttribute('data-q')) !== n; });
     formError.hidden = true;
-    $('q-back').hidden = n === 1;
-    joinLabel.textContent = n === 3 ? finalLabel() : 'Next';
+    $('q-back').hidden = n === firstQ();
+    joinLabel.textContent = n === lastQ() ? finalLabel() : 'Next';
     if (focus) $(Q[n][0]).focus();
   }
   function finalLabel() { return clan && clan.claim ? 'Claim my spot' : 'Join the clan'; }
@@ -721,12 +728,15 @@
   ['first', 'last', 'username', 'email'].forEach(function (k) {
     $(k).addEventListener('input', function () { $(k).removeAttribute('aria-invalid'); formError.hidden = true; });
   });
-  $('q-back').addEventListener('click', function () { if (cur > 1) ask(cur - 1, true); });
+  $('q-back').addEventListener('click', function () {
+    var o = order(), at = o.indexOf(cur);
+    if (at > 0) ask(o[at - 1], true);
+  });
 
   function busy(on) {
     joinButton.disabled = on;
     joinButton.classList.toggle('is-busy', on);
-    joinLabel.textContent = on ? (clan && clan.claim ? 'Claiming…' : 'Joining…') : (cur === 3 ? finalLabel() : 'Next');
+    joinLabel.textContent = on ? (clan && clan.claim ? 'Claiming…' : 'Joining…') : (cur === lastQ() ? finalLabel() : 'Next');
   }
   // Enter in any box submits the form, so Enter and the button both move on
   $('join-form').addEventListener('submit', function (e) {
@@ -734,7 +744,8 @@
     if (joinButton.disabled || !clan) return;
     var bad = check(cur);
     if (bad) { fail(bad[0], bad[1]); return; }
-    if (cur < 3) { ask(cur + 1, true); return; }
+    var o = order(), at = o.indexOf(cur);
+    if (at < o.length - 1) { ask(o[at + 1], true); return; }
     save();
   });
 
@@ -742,12 +753,14 @@
   // roster, together, so the count can never run ahead of real sign-ups. The
   // key is the lowercased username with dots as commas (keys can't hold dots).
   function save() {
-    var first = $('first').value.trim(), last = $('last').value.trim(), email = $('email').value.trim();
     var u = readUsername($('username').value), key = u.name.toLowerCase().replace(/\./g, ','), updates = {};
-    updates['greekwars_clan_members/' + id + '/' + key] = {
-      first_name: first, last_name: last, email: email,
-      fomo_username: u.name, submitted_at: firebase.database.ServerValue.TIMESTAMP
-    };
+    var member = { fomo_username: u.name, submitted_at: firebase.database.ServerValue.TIMESTAMP };
+    if (!clan.claim) {
+      member.first_name = $('first').value.trim();
+      member.last_name = $('last').value.trim();
+      member.email = $('email').value.trim();
+    }
+    updates['greekwars_clan_members/' + id + '/' + key] = member;
     updates['greekwars_clan_roster/' + id + '/' + key] = true;
     busy(true);
     withTimeout(db.ref().update(updates), 15000).then(function () {
@@ -873,13 +886,13 @@
   }
   $('copy-member').addEventListener('click', function () { copyMember($('copy-member')); });
   $('copy-member-main').addEventListener('click', function () { copyMember($('copy-member-main').querySelector('span')); });
-  $('head-claim').addEventListener('click', function () { show('join'); ask(1, true); });
+  $('head-claim').addEventListener('click', function () { show('join'); ask(firstQ(), true); });
 
   $('start-over').addEventListener('click', function () {
     $('join-form').reset();
     ['first', 'last', 'username', 'email'].forEach(function (k) { $(k).removeAttribute('aria-invalid'); });
     show('join');
-    ask(1, true);
+    ask(firstQ(), true);
   });
 })();
 </script>

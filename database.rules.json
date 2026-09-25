@@ -74,7 +74,7 @@
       "$clan": {
         "$member": {
           ".write": "!data.exists() && root.child('greekwars_clans').child($clan).exists()",
-          ".validate": "newData.hasChildren(['first_name','last_name','email','fomo_username','submitted_at']) && $member == newData.child('fomo_username').val().toLowerCase().replace('.', ',')",
+          ".validate": "newData.hasChildren(['fomo_username','submitted_at']) && (newData.hasChildren(['first_name','last_name','email']) || root.child('greekwars_clans').child($clan).child('kind').val() == 'claim') && $member == newData.child('fomo_username').val().toLowerCase().replace('.', ',')",
           "first_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
           "last_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
           "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
