@@ -43,6 +43,7 @@
         "chapter": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
         "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
         "lead": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+        "actives": { ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 1000" },
         "created_at": { ".validate": "newData.val() == now" },
         "$other": { ".validate": false }
       }
@@ -76,6 +77,15 @@
           "fomo_username": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
           "submitted_at": { ".validate": "newData.val() == now" },
           "$other": { ".validate": false }
+        }
+      }
+    },
+    "greekwars_clan_roster": {
+      "$clan": {
+        ".read": true,
+        "$member": {
+          ".write": "!data.exists() && newData.parent().parent().parent().child('greekwars_clan_members').child($clan).child($member).exists()",
+          ".validate": "newData.val() == true"
         }
       }
     }

@@ -25,7 +25,7 @@
   prove their fomo account is real with the rewards referral link from the app
   (fomo.family/r/<username>), then give their name, school, chapter and roster
   size, plus an email. Submitting saves the clan to the shared Firebase project
-  (greekwars_clans/<id>: chapter, school and lead username, readable one clan at
+  (greekwars_clans/<id>: chapter, school, lead username and roster size, readable one clan at
   a time; greekwars_clan_leads/<id>: the lead's details, write-only) and hands
   them one link to send the chapter: the clan's own page, /greekwars/clan/<id>,
   a small sign-up where members give their name, fomo username and email, and
@@ -323,11 +323,11 @@
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>One link for your chapter<small>Members open it and sign up with their name, fomo username and email.</small></span>
+          <span>One link for your chapter<small>Members sign up there with their name, fomo username and email, and it counts them live.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          <span>No app yet? Covered.<small>The page has App Store and Google Play buttons to get fomo first.</small></span>
+          <span>Your referral code rides along<small>Anyone new downloads fomo from the page and enters your code at sign-up.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -438,7 +438,7 @@
         <div class="link-rows">
           <div class="link-row">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            <span><small><b>Your clan's sign-up</b> · anyone without fomo can download it there first</small><strong id="clan-url"></strong></span>
+            <span><small><b>Your clan's sign-up</b> · with the live count, the app and your referral code</small><strong id="clan-url"></strong></span>
             <a class="text-button" id="clan-open" target="_blank" rel="noopener">Open</a>
           </div>
         </div>
@@ -695,7 +695,7 @@
 
     function save(attempt) {
       var id = clanId(c), now = firebase.database.ServerValue.TIMESTAMP, updates = {};
-      updates['greekwars_clans/' + id] = { chapter: c, school: s, lead: linked.name, created_at: now };
+      updates['greekwars_clans/' + id] = { chapter: c, school: s, lead: linked.name, actives: actives, created_at: now };
       updates['greekwars_clan_leads/' + id] = {
         first_name: first, last_name: last, email: email,
         fomo_username: linked.name, referral_link: linked.url,
