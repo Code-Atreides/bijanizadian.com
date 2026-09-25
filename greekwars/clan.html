@@ -32,6 +32,16 @@
   from the store badges and enter the head's referral code at sign-up, which is
   how fomo files new accounts under the head; then they add themselves here,
   one question at a time.
+
+  Claim clans (kind: 'claim') are made straight from chapters that onboarded
+  before these portals, listed for the team on /claimlinks. Their members
+  already have fomo, so the page asks them to claim rather than join. Those
+  clans start with no head: the head opens /greekwars/clan/<id>?head=<key>, and
+  pasting their referral link writes greekwars_clan_heads/<id>/<key> and the
+  clan's lead together. The rules only accept that when <key> matches the
+  clan's entry in greekwars_clan_keys, which nothing can read, so the key in the
+  head's link is the only way in. The page drops the key from the address bar
+  once it has it, so the link a head copies from there is the members' link.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -112,6 +122,24 @@
   .code-row code { font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid #dde2fb; border-radius: 6px; padding: 3px 8px; }
   .code-row button { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 3px 6px; border-radius: 5px; }
   .code-row button:hover { background: #fff; }
+
+  /* the head's panel: attach a referral link, then send the members' link */
+  .head-steps { list-style: none; counter-reset: hs; display: grid; gap: 7px; margin: 12px 0 16px; }
+  .head-steps li { counter-increment: hs; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 9px; font-size: 13.5px; line-height: 1.45; color: #50566e; }
+  .head-steps li::before { content: counter(hs); display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--tint); border: 1px solid var(--option-line); color: var(--blue-text); font-size: 11px; font-weight: 500; }
+  .head-steps b { color: var(--ink); font-weight: 500; }
+  .head-steps code, .q-help code { font: inherit; color: var(--ink); background: var(--tint); border: 1px solid var(--tint-line); border-radius: 4px; padding: 0 4px; white-space: nowrap; }
+  .help { font-size: 12px; line-height: 1.5; color: var(--muted-2); margin-top: 7px; }
+  .help.is-found { color: var(--blue-text); font-weight: 500; }
+  .help a { color: inherit; text-underline-offset: 3px; margin-left: 4px; }
+  .attached { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; letter-spacing: 1.2px; font-weight: 500; color: var(--blue-text); }
+  .attached button { border: 0; background: none; font: inherit; font-size: 12.5px; letter-spacing: 0; color: var(--muted); padding: 2px 6px; border-radius: 5px; text-decoration: underline; text-underline-offset: 3px; }
+  .attached button:hover { color: var(--ink); background: var(--chip); }
+  .link-row { display: flex; align-items: center; gap: 10px; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 10px 6px 10px 12px; margin-top: 14px; min-width: 0; }
+  .link-row strong { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+  .link-row .text-button { color: var(--blue-text); font-size: 13.5px; font-weight: 500; padding: 6px 10px; }
+  .link-row .text-button:hover { background: var(--lavender); }
+  .q-actions .option-btn { width: auto; padding: 0 18px; min-height: 44px; }
 
   /* right: one question at a time */
   .join { padding: 28px 34px; background: #fff; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
@@ -232,7 +260,13 @@
     .p-top b { font-size: 26px; }
     .p-top span { font-size: 13px; }
     .bar { margin: 8px 0 6px; height: 5px; }
-    .p-note, .how > li:last-child, .q-hint, .privacy-note, .pending, .pass-on .more { display: none; }
+    .p-note, .how > li.form-step, .q-hint, .privacy-note, .pending, .pass-on .more { display: none; }
+    /* a head attaching their link doesn't need the members' steps */
+    main.head-mode .how { display: none; }
+    .head-steps { margin: 10px 0 12px; }
+    .head-steps li { font-size: 13px; }
+    .q-actions { flex-wrap: wrap; }
+    .q-actions .option-btn { flex: 1; }
     .p-left { display: block; }
     .how { gap: 10px; }
     .how > li { grid-template-columns: 22px minmax(0, 1fr); gap: 9px; }
@@ -300,7 +334,8 @@
         <p class="p-note" id="p-note"></p>
       </div>
 
-      <ol class="how" id="how" hidden>
+      <!-- a new chapter: get the app, then join -->
+      <ol class="how" id="how-join" hidden>
         <li>
           <i>1</i>
           <div>
@@ -309,10 +344,10 @@
               <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
               <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
             </div>
-            <p class="code-row"><span>Sign-up referral code</span><code id="ref-code"></code><button type="button" id="copy-code">Copy</button></p>
+            <p class="code-row" hidden><span>Sign-up code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
           </div>
         </li>
-        <li>
+        <li class="form-step">
           <i>2</i>
           <div>
             <b>Add yourself to the clan.</b>
@@ -320,10 +355,62 @@
           </div>
         </li>
       </ol>
+
+      <!-- a chapter that onboarded before the portals: claim first, the app for anyone left -->
+      <ol class="how" id="how-claim" hidden>
+        <li class="form-step">
+          <i>1</i>
+          <div>
+            <b>Already on fomo? Claim your account.</b>
+            <small>Your name, fomo username and email. One claim per member.</small>
+          </div>
+        </li>
+        <li>
+          <i>2</i>
+          <div>
+            <b>No fomo yet? Get it, then claim.</b>
+            <div class="stores">
+              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
+              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
+            </div>
+            <p class="code-row" hidden><span>Sign-up code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+          </div>
+        </li>
+      </ol>
     </section>
 
-    <section class="join" aria-label="Join your chapter's clan" aria-live="polite">
+    <section class="join" id="join-card" aria-label="Join your chapter's clan" aria-live="polite">
       <div id="step-loading" class="loading"><span class="spinner" aria-hidden="true"></span>Loading your clan…</div>
+
+      <!-- the head of a claim clan: attach a referral link -->
+      <div id="step-head" hidden>
+        <span class="q-num">HEADS: DO THIS FIRST</span>
+        <h2 tabindex="-1" id="head-title">Attach your referral link</h2>
+        <ol class="head-steps">
+          <li><span>In fomo, open your <b>profile</b>.</span></li>
+          <li><span>Tap <b>Rewards</b> in the top right.</span></li>
+          <li><span>Under <b>“Refer and earn 25% of your friends' fees”</b>, copy your <code>fomo.family/r/</code> link and paste it here.</span></li>
+        </ol>
+        <form id="head-form" novalidate>
+          <div class="field"><label class="sr-only" for="ref-link">Your referral link</label><input id="ref-link" type="text" inputmode="url" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="300" placeholder="fomo.family/r/yourname"></div>
+          <p class="help" id="ref-help">Paste the whole link, not just your username.</p>
+          <p class="form-error" id="head-error" role="alert" hidden></p>
+          <div class="q-actions"><button type="submit" class="primary-action" id="attach-button"><span>Attach</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+        </form>
+      </div>
+
+      <!-- the head, attached: the members' link to send -->
+      <div id="step-headlink" hidden>
+        <p class="attached"><span id="attached-as"></span><button type="button" id="head-change">Change</button></p>
+        <h2 tabindex="-1" id="headlink-title">Send your chapter this link</h2>
+        <p class="q-help">Members open it and claim their fomo accounts. Every claim counts toward the 80%.</p>
+        <div class="link-row"><strong id="member-url"></strong><button type="button" class="text-button" id="copy-member">Copy</button></div>
+        <div class="q-actions">
+          <button type="button" class="primary-action" id="copy-member-main"><span>Copy link</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></button>
+          <button type="button" class="option-btn" id="head-claim">Claim my account</button>
+        </div>
+        <p class="pass-status" id="head-status" role="status" aria-live="polite"></p>
+      </div>
 
       <!-- one question at a time -->
       <div id="step-join" hidden>
@@ -340,7 +427,7 @@
           <div class="q" data-q="2" hidden>
             <span class="q-num">02 / 03</span>
             <h2 tabindex="-1" id="q2-title">Your fomo username</h2>
-            <p class="q-help">The one you picked when you made your account, with or without the @.</p>
+            <p class="q-help" id="q2-help">The one you picked when you made your account, with or without the @.</p>
             <div class="field"><label class="sr-only" for="username">Your fomo username</label><input id="username" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="40" placeholder="@yourname"></div>
           </div>
           <div class="q" data-q="3" hidden>
@@ -356,7 +443,7 @@
             <button type="submit" class="primary-action" id="join-button"><span>Next</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           </div>
           <p class="q-hint">Press <kbd>Enter ↵</kbd> to continue.</p>
-          <p class="privacy-note">Your name and email go to the fomo team only. Your username counts toward the clan.</p>
+          <p class="privacy-note" id="privacy-note">Your name and email go to the fomo team only. Your username counts toward the clan.</p>
         </form>
       </div>
 
@@ -367,7 +454,7 @@
         <p id="sent-copy"></p>
         <span class="pending">Pending verification</span>
         <div class="pass-on">
-          <p><b id="pass-title">Get the rest of your chapter in.</b><span class="more"> Every member counts toward the 80%.</span></p>
+          <p><b id="pass-title">Get the rest of your chapter in.</b><span class="more" id="pass-more"> Every member counts toward the 80%.</span></p>
           <div class="pass-row">
             <button type="button" class="option-btn" id="copy-clan">Copy the clan link</button>
             <button type="button" class="option-btn" id="start-over">Add someone else</button>
@@ -404,10 +491,11 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var USERNAME = /^[A-Za-z0-9_.-]{2,32}$/;
-  var STEPS = { loading: ['step-loading'], join: ['step-join', 'join-title'], sent: ['step-sent', 'sent-title'], missing: ['step-missing', 'missing-title'] };
+  var STEPS = { loading: ['step-loading'], head: ['step-head', 'head-title'], headlink: ['step-headlink', 'headlink-title'], join: ['step-join', 'join-title'], sent: ['step-sent', 'sent-title'], missing: ['step-missing', 'missing-title'] };
   function show(name, focus) {
     Object.keys(STEPS).forEach(function (k) { $(STEPS[k][0]).hidden = k !== name; });
     $('card').classList.toggle('no-clan', name === 'missing');
+    $('card').classList.toggle('head-mode', name === 'head' || name === 'headlink');
     if (focus && STEPS[name][1]) $(STEPS[name][1]).focus();
   }
   // an unanswered read or write never settles on its own, so give up after a while
@@ -447,17 +535,31 @@
   if (path) { try { id = decodeURIComponent(path[1]).toLowerCase(); } catch (e) {} }
   if (!id || !/^[a-z0-9-]{3,48}$/.test(id)) { show('missing'); return; }
   if (!db) { unreachable(); return; }
+  var MEMBER_URL = 'https://bijanizadian.com/greekwars/clan/' + id;
+
+  // ---------- the head's key: read it from ?head=, keep it for this tab, and
+  // take it out of the address bar so the link a head copies is the members'
+  var headKey = null, HEAD_STORE = 'fomo-clan-head-' + id;
+  try {
+    var q = new URLSearchParams(window.location.search).get('head');
+    if (q && /^[A-Za-z0-9]{12,64}$/.test(q)) { headKey = q; sessionStorage.setItem(HEAD_STORE, q); }
+    else headKey = sessionStorage.getItem(HEAD_STORE);
+    if (q) history.replaceState(null, '', window.location.pathname);
+  } catch (e) {}
 
   withTimeout(db.ref('greekwars_clans/' + id).once('value'), 12000).then(function (snap) {
     var v = snap.val();
-    if (!v || typeof v.chapter !== 'string' || typeof v.school !== 'string' || typeof v.lead !== 'string') { show('missing'); return; }
+    if (!v || typeof v.chapter !== 'string' || typeof v.school !== 'string') { show('missing'); return; }
     clan = {
-      chapter: v.chapter.slice(0, 120), school: v.school.slice(0, 120), lead: v.lead.slice(0, 32),
+      chapter: v.chapter.slice(0, 120), school: v.school.slice(0, 120),
+      // a claim clan has no lead until its head attaches a referral link
+      lead: typeof v.lead === 'string' ? v.lead.slice(0, 32) : null,
+      claim: v.kind === 'claim',
       // clans made before the roster size was public have no target to count against
       actives: typeof v.actives === 'number' && v.actives >= 5 ? Math.floor(v.actives) : null
     };
     wear(clan);
-    show('join');
+    if (clan.claim && headKey) headView(); else { show('join'); ask(1); }
     count();
   }, function (err) {
     if (err && /permission/i.test(err.code || err.message || '')) show('missing');
@@ -467,22 +569,36 @@
   // the page takes on the clan: header, headline, steps and tab title
   function wear(c) {
     var short = shortName(c.chapter);
-    document.title = c.chapter + ' · ' + c.school + ' | Greek Wars clan';
+    document.title = c.chapter + ' · ' + c.school + (c.claim ? ' | Greek Wars claim' : ' | Greek Wars clan');
     $('crest').textContent = crest(c.chapter);
     $('tag-chapter').textContent = c.chapter;
     $('tag-school').textContent = c.school;
     $('clan-tag').hidden = false;
     $('season').hidden = true;
     var h1 = $('invite-title');
-    h1.textContent = 'Join ';
+    h1.textContent = c.claim ? 'Claim ' : 'Join ';
     var span = document.createElement('span');
     span.textContent = short + '.';
     h1.appendChild(document.createElement('br'));
     h1.appendChild(span);
     h1.classList.toggle('is-long', short.length > 13);
-    $('ref-code').textContent = c.lead;
-    $('how').hidden = false;
-    $('pass-title').textContent = 'Get the rest of ' + short + ' in.';
+    $(c.claim ? 'how-claim' : 'how-join').hidden = false;
+    showCode();
+    // claim clans say claim all the way through
+    if (c.claim) {
+      $('q2-help').textContent = 'The one on your fomo account, with or without the @.';
+      $('sent-title').textContent = 'Claimed.';
+      $('pass-more').textContent = ' Every claim counts toward the 80%.';
+      $('join-card').setAttribute('aria-label', 'Claim your fomo account for your chapter');
+    }
+    $('pass-title').textContent = (c.claim ? 'Get the rest of ' + short + ' claimed.' : 'Get the rest of ' + short + ' in.');
+  }
+  // the head's referral code, for anyone who still needs the app
+  function showCode() {
+    Array.prototype.forEach.call(document.querySelectorAll('.code-row'), function (row) {
+      row.hidden = !clan.lead;
+      row.querySelector('.ref-code').textContent = clan.lead || '';
+    });
   }
 
   // ---------- the live count: the roster's size against 80% of the chapter
@@ -501,23 +617,24 @@
       return;
     }
     var target = Math.ceil(clan.actives * 0.8), left = Math.max(target - n, 0);
-    $('p-of').textContent = 'of ' + target + ' in';
+    $('p-of').textContent = 'of ' + target + (clan.claim ? ' claimed' : ' in');
     $('p-bar-wrap').hidden = false;
     $('p-bar').style.width = Math.min(100, Math.round(n / target * 100)) + '%';
     $('p-left').textContent = left ? left + ' to go' : 'Hit 80%';
     $('p-note').textContent = left
-      ? left + ' more and ' + short + ' hits 80% for the $500.'
+      ? left + ' more and ' + short + (clan.claim ? ' gets its $500 and its clan.' : ' hits 80% for the $500.')
       : short + ' hit 80%. Every extra member still counts.';
   }
 
-  $('copy-code').addEventListener('click', function () {
-    var btn = $('copy-code');
-    copy(clan ? clan.lead : '', function () {
-      btn.textContent = 'Copied';
-      setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
-    }, function () {
-      var range = document.createRange(), sel = window.getSelection();
-      range.selectNodeContents($('ref-code')); sel.removeAllRanges(); sel.addRange(range);
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-code'), function (btn) {
+    btn.addEventListener('click', function () {
+      copy(clan && clan.lead ? clan.lead : '', function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+      }, function () {
+        var range = document.createRange(), sel = window.getSelection();
+        range.selectNodeContents(btn.parentNode.querySelector('.ref-code')); sel.removeAllRanges(); sel.addRange(range);
+      });
     });
   });
 
@@ -529,7 +646,6 @@
     var name = raw.replace(/^@+/, '');
     if (!USERNAME.test(name)) return { error: "That doesn't look like a fomo username. It's the @name on your profile." };
     if (name.toLowerCase() === 'yourname') return { error: "That's the example. Put in your own username." };
-    if (clan && name.toLowerCase() === clan.lead.toLowerCase()) return { error: '@' + clan.lead + ' leads this clan and is already in it. Put in your own username.' };
     return { name: name };
   }
 
@@ -546,9 +662,10 @@
     Array.prototype.forEach.call(document.querySelectorAll('.q'), function (q) { q.hidden = Number(q.getAttribute('data-q')) !== n; });
     formError.hidden = true;
     $('q-back').hidden = n === 1;
-    joinLabel.textContent = n === 3 ? 'Join the clan' : 'Next';
+    joinLabel.textContent = n === 3 ? finalLabel() : 'Next';
     if (focus) $(Q[n][0]).focus();
   }
+  function finalLabel() { return clan && clan.claim ? 'Claim my spot' : 'Join the clan'; }
   function check(n) {
     if (n === 1) {
       if (!$('first').value.trim()) return ['Add your first name.', 'first'];
@@ -574,7 +691,7 @@
   function busy(on) {
     joinButton.disabled = on;
     joinButton.classList.toggle('is-busy', on);
-    joinLabel.textContent = on ? 'Joining…' : (cur === 3 ? 'Join the clan' : 'Next');
+    joinLabel.textContent = on ? (clan && clan.claim ? 'Claiming…' : 'Joining…') : (cur === 3 ? finalLabel() : 'Next');
   }
   // Enter in any box submits the form, so Enter and the button both move on
   $('join-form').addEventListener('submit', function (e) {
@@ -604,14 +721,14 @@
       var b = document.createElement('b');
       b.textContent = '@' + u.name;
       $('sent-copy').appendChild(b);
-      $('sent-copy').appendChild(document.createTextNode(' is on the ' + clan.chapter + ' list. The team checks your account and adds you to the clan on the app.'));
+      $('sent-copy').appendChild(document.createTextNode((clan.claim ? ' is claimed for ' : ' is on the ') + clan.chapter + (clan.claim ? '.' : ' list.') + ' The team checks your account and adds you to the clan on the app.'));
       $('pass-status').textContent = '';
       show('sent', true);
     }, function (err) {
       busy(false);
       // every answer is checked on the way through, so a refusal means this
       // username is already in the clan
-      if (err && /permission/i.test(err.code || err.message || '')) { ask(2); fail('@' + u.name + ' has already joined this clan. If that’s you, you’re all set.', 'username'); }
+      if (err && /permission/i.test(err.code || err.message || '')) { ask(2); fail('@' + u.name + (clan.claim ? ' is already claimed for this clan.' : ' has already joined this clan.') + ' If that\u2019s you, you\u2019re all set.', 'username'); }
       else if (err && err.code === 'TIMEOUT') fail('This is taking too long. Check your connection and try again.');
       else fail("We couldn't save that. Try again in a moment.");
     });
@@ -633,11 +750,96 @@
     else fallback();
   }
   $('copy-clan').addEventListener('click', function () {
-    var status = $('pass-status'), link = 'https://bijanizadian.com/greekwars/clan/' + id;
+    var status = $('pass-status'), link = MEMBER_URL;
     copy(link,
       function () { status.textContent = 'Copied. Drop it in your chapter group chat.'; },
       function () { status.textContent = link; });
   });
+  // ---------- the head of a claim clan
+  function headView() {
+    if (clan.lead) {
+      $('attached-as').textContent = '\u2713 ATTACHED \u00b7 @' + clan.lead;
+      $('member-url').textContent = MEMBER_URL.replace(/^https:\/\//, '');
+      $('head-status').textContent = '';
+      show('headlink');
+    } else show('head');
+  }
+  // "fomo.family/r/<username>", with or without https:// and www, or inside a
+  // longer pasted message; the same reading as /greekwars/claim
+  function readLink(v) {
+    var raw = String(v).trim();
+    if (!raw) return { empty: true };
+    var m = raw.match(/(?:https?:\/\/)?(?:www\.)?fomo\.family\/r\/([A-Za-z0-9_.-]+)/i);
+    if (!m) {
+      if (/fomo\.family/i.test(raw)) return { error: "That's a fomo link, but not your referral link. It should look like fomo.family/r/yourname." };
+      if (/^@?[A-Za-z0-9_.-]{2,32}$/.test(raw)) return { error: 'Paste the whole link from Rewards, not just your username. It starts with fomo.family/r/.' };
+      return { error: 'Paste the link from Rewards in the fomo app. It starts with fomo.family/r/.' };
+    }
+    var name = m[1].replace(/\.+$/, '');
+    if (!/^[A-Za-z0-9_.-]{2,32}$/.test(name)) return { error: "That link doesn't look complete. Copy it again from Rewards." };
+    if (name.toLowerCase() === 'yourname') return { error: "That's the example. Paste your own link." };
+    return { name: name, url: 'https://fomo.family/r/' + name };
+  }
+  var refInput = $('ref-link'), refHelp = $('ref-help'), HELP = refHelp.textContent, headError = $('head-error');
+  var attachButton = $('attach-button'), attachLabel = attachButton.querySelector('span');
+  refInput.addEventListener('input', function () {
+    var r = readLink(refInput.value);
+    headError.hidden = true;
+    refInput.removeAttribute('aria-invalid');
+    refHelp.classList.toggle('is-found', !!r.name);
+    refHelp.textContent = r.name ? '\u2713 Found @' + r.name + '.' : HELP;
+  });
+  $('head-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (attachButton.disabled) return;
+    var r = readLink(refInput.value);
+    if (!r.name) {
+      headError.textContent = r.empty ? 'Paste your referral link from Rewards.' : r.error;
+      headError.hidden = false;
+      refInput.setAttribute('aria-invalid', 'true');
+      refInput.focus();
+      return;
+    }
+    // the head's entry and the clan's lead go together: the rules only take
+    // the lead when the entry sits under this clan's key
+    var updates = {};
+    updates['greekwars_clan_heads/' + id + '/' + headKey] = { lead: r.name, referral_link: r.url, updated_at: firebase.database.ServerValue.TIMESTAMP };
+    updates['greekwars_clans/' + id + '/lead'] = r.name;
+    attachButton.disabled = true;
+    attachLabel.textContent = 'Attaching…';
+    withTimeout(db.ref().update(updates), 15000).then(function () {
+      attachButton.disabled = false;
+      attachLabel.textContent = 'Attach';
+      clan.lead = r.name;
+      showCode();
+      headView();
+      $('headlink-title').focus();
+    }, function (err) {
+      attachButton.disabled = false;
+      attachLabel.textContent = 'Attach';
+      headError.textContent = err && /permission/i.test(err.code || err.message || '')
+        ? "This head link isn't working. Ask the fomo team for a fresh one."
+        : err && err.code === 'TIMEOUT' ? 'This is taking too long. Check your connection and try again.' : "We couldn't attach that. Try again in a moment.";
+      headError.hidden = false;
+    });
+  });
+  $('head-change').addEventListener('click', function () {
+    refInput.value = clan.lead ? 'fomo.family/r/' + clan.lead : '';
+    refInput.dispatchEvent(new Event('input'));
+    show('head', true);
+  });
+  function copyMember(labelEl) {
+    var status = $('head-status'), label = labelEl.textContent;
+    copy(MEMBER_URL, function () {
+      labelEl.textContent = 'Copied';
+      status.textContent = 'Copied. Drop it in your chapter group chat.';
+      setTimeout(function () { labelEl.textContent = label; }, 1600);
+    }, function () { status.textContent = MEMBER_URL; });
+  }
+  $('copy-member').addEventListener('click', function () { copyMember($('copy-member')); });
+  $('copy-member-main').addEventListener('click', function () { copyMember($('copy-member-main').querySelector('span')); });
+  $('head-claim').addEventListener('click', function () { show('join'); ask(1, true); });
+
   $('start-over').addEventListener('click', function () {
     $('join-form').reset();
     ['first', 'last', 'username', 'email'].forEach(function (k) { $(k).removeAttribute('aria-invalid'); });

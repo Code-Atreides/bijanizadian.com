@@ -39,10 +39,14 @@
       "$clan": {
         ".read": true,
         ".write": "!data.exists()",
-        ".validate": "$clan.matches(/^[a-z0-9-]{3,48}$/) && newData.hasChildren(['chapter','school','lead','created_at'])",
+        ".validate": "$clan.matches(/^[a-z0-9-]{3,48}$/) && newData.hasChildren(['chapter','school','created_at']) && (newData.hasChild('lead') || newData.child('kind').val() == 'claim')",
         "chapter": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
         "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
-        "lead": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+        "lead": {
+          ".write": "root.child('greekwars_clan_keys').child($clan).exists() && newData.parent().parent().parent().child('greekwars_clan_heads').child($clan).child(root.child('greekwars_clan_keys').child($clan).val()).child('lead').val() == newData.val()",
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)"
+        },
+        "kind": { ".validate": "newData.val() == 'claim'" },
         "actives": { ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 1000" },
         "created_at": { ".validate": "newData.val() == now" },
         "$other": { ".validate": false }
@@ -87,6 +91,23 @@
           ".write": "!data.exists() && newData.parent().parent().parent().child('greekwars_clan_members').child($clan).child($member).exists()",
           ".validate": "newData.val() == true"
         }
+      }
+    },
+    "greekwars_clan_heads": {
+      "$clan": {
+        "$token": {
+          ".write": "root.child('greekwars_clan_keys').child($clan).val() == $token",
+          ".validate": "newData.hasChildren(['lead','referral_link','updated_at'])",
+          "lead": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+          "referral_link": { ".validate": "newData.isString() && newData.val() == 'https://fomo.family/r/' + newData.parent().child('lead').val()" },
+          "updated_at": { ".validate": "newData.val() == now" },
+          "$other": { ".validate": false }
+        }
+      }
+    },
+    "greekwars_claimlinks": {
+      "$code": {
+        ".read": true
       }
     }
   }
