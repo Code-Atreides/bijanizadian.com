@@ -17,17 +17,19 @@
 <link rel="apple-touch-icon" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
 <!--
   Greek Wars clan claims, in the /hqvisitform design language: a light page, a
   small header, and one split card. For the person onboarding a chapter. They
   prove their fomo account is real with the rewards referral link from the app
   (fomo.family/r/<username>), then give their name, school, chapter and roster
-  size. Submitting opens their email app with the claim addressed to TEAM_EMAIL,
-  and hands them the clan's own link — /greekwars/clan/<username>?chapter=&school=
-  — which members open to add their name and fomo username. The link carries
-  everything the clan page shows, so nothing is stored on the site. The page can
-  only check the referral link's shape (fomo.family answers every /r/ path the
-  same way), so the team checks the account itself.
+  size, plus an email. Submitting saves the clan to the shared Firebase project
+  (greekwars_clans/<id>: chapter, school and lead username, readable one clan at
+  a time; greekwars_clan_leads/<id>: the lead's details, write-only) and hands
+  them the clan's own link, /greekwars/clan/<id>, where members add themselves.
+  The page can only check the referral link's shape (fomo.family answers every
+  /r/ path the same way), so the team checks the account itself.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -182,14 +184,10 @@
   .fine-print { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted-2); line-height: 1.6; }
   .fine-print a { color: var(--blue-text); font-weight: 500; text-underline-offset: 3px; }
 
-  /* ---------- step 3: send the email, then share the clan link ---------- */
-  .notice { display: flex; gap: 11px; align-items: flex-start; border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 24px; }
-  .notice > svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
-  .notice strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.45; }
-  .notice p { font-size: 13px; color: var(--muted); line-height: 1.55; margin-top: 3px; }
-  .notice p b { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
-  .notice-actions { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0 -10px; }
-  .notice .notice-status:empty { display: none; }
+  .saved-clan { margin: -6px 0 24px; }
+  .primary-action.is-busy { opacity: .7; cursor: progress; }
+
+  /* ---------- step 3: share the clan link ---------- */
   .msg-label { display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
   .clan-link strong { user-select: all; -webkit-user-select: all; }
   .msg { font-size: 14px; line-height: 1.6; color: #50566e; border: 1px solid var(--line); border-radius: 7px; padding: 12px 14px; margin-bottom: 16px; overflow-wrap: anywhere; }
@@ -276,7 +274,7 @@
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Your clan's own link<small>Members open it and put in their name and fomo username. Every one counts toward your 80%.</small></span>
+          <span>Your clan's own link<small>Members open it and add their name, fomo username and email. Every one counts toward your 80%.</small></span>
         </div>
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
@@ -292,6 +290,15 @@
         <h2 tabindex="-1" id="link-title">Prove your account</h2>
         <p class="subtitle">Your referral link from the fomo app has your username in it. It's how the team matches you to a real account.</p>
         <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your link</em></span><span class="step-line"></span><span><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Clan link</em></span></div>
+
+        <!-- shown when this browser already made a clan link -->
+        <div class="summary saved-clan" id="saved-clan" hidden>
+          <div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            <span><strong id="saved-title"></strong><small id="saved-url"></small></span>
+          </div>
+          <button type="button" class="text-button" id="saved-copy">Copy link</button>
+        </div>
 
         <div class="find">
           <ol class="find-steps">
@@ -364,15 +371,21 @@
             <div class="combo"><input id="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" maxlength="120" placeholder="Start typing your letters" aria-describedby="chapter-help"><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Chapters" hidden></ul></div>
             <p class="help" id="chapter-help">SAE, FIJI, Tri Delt — nicknames are fine.</p>
           </div>
-          <div class="field">
-            <label for="actives">Active members</label>
-            <input id="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" autocomplete="off" placeholder="e.g. 84" aria-describedby="actives-help">
-            <p class="help" id="actives-help">A rough number is fine. 80% of it is your target.</p>
+          <div class="form-pair">
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu">
+            </div>
+            <div class="field">
+              <label for="actives">Active members</label>
+              <input id="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" autocomplete="off" placeholder="e.g. 84" aria-describedby="actives-help">
+              <p class="help" id="actives-help">Rough is fine. 80% is your target.</p>
+            </div>
           </div>
-          <p class="privacy-note">This opens your email app with your claim filled in, addressed to the fomo team, and gives you your clan link. Nothing is saved on this page.</p>
+          <p class="privacy-note">Only the fomo team sees your name and email. Your chapter, school and fomo username show on your clan page.</p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
-          <button type="submit" class="primary-action">Email my claim<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          <p class="under-button">Next, you get your clan link.</p>
+          <button type="submit" class="primary-action" id="create"><span>Submit</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <p class="under-button">Next, you get your clan link to send your chapter.</p>
         </form>
         <button type="button" class="back-button" data-go="link"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your link</button>
 
@@ -385,25 +398,13 @@
         <p class="subtitle" id="share-subtitle"></p>
         <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Clan link</em></span></div>
 
-        <div class="notice">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          <div>
-            <strong>First, hit send on your email.</strong>
-            <p>It opened with your claim addressed to <b id="team-email"></b>. That's how the team verifies you and sets up your clan. Your clan link is in it too.</p>
-            <div class="notice-actions">
-              <a class="text-button" id="mail-again">Open it again</a>
-              <button type="button" class="text-button" id="copy-claim">Copy it instead</button>
-            </div>
-            <p class="notice-status" id="copy-status" role="status" aria-live="polite"></p>
-          </div>
-        </div>
-
         <span class="msg-label">Send this to your chapter</span>
         <div class="summary clan-link">
           <div>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             <span><strong id="clan-url"></strong><small id="clan-for"></small></span>
           </div>
+          <a class="text-button" id="clan-open" target="_blank" rel="noopener">Open</a>
         </div>
         <p class="msg" id="clan-msg"></p>
 
@@ -416,8 +417,7 @@
           <a class="option" id="text-it">Text it</a>
           <button type="button" class="option" id="share-it" hidden>Share…</button>
         </div>
-        <p class="under-button" id="status" role="status" aria-live="polite">Members put in their name and fomo username. The team adds each one to your clan.</p>
-        <button type="button" class="back-button" data-go="chapter"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to your chapter</button>
+        <p class="under-button" id="status" role="status" aria-live="polite">Your clan link is saved on this device, and you can come back to this page to copy it again.</p>
       </div>
     </section>
   </main>
@@ -430,17 +430,38 @@
 
 <script>
 (function () {
-  // Where claims go. Submitting opens the visitor's email app addressed here.
-  var TEAM_EMAIL = 'hello@fomo.family';
-  // The clan's own page. The lead's fomo username makes the link unique, and the
-  // chapter and school ride along in the query so the page can say whose clan
-  // it is without anything stored on the site.
+  // ---------- saved to the shared Firebase project the other Greek Wars forms
+  // use. greekwars_clans/<id> is public one clan at a time (it's what the clan
+  // page shows); greekwars_clan_leads/<id> is write-only.
+  var firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+  var db = null;
+  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+
+  // Each clan gets a short link: its nickname or name as a slug, plus four random
+  // characters so two chapters with the same letters never collide —
+  // /greekwars/clan/sigma-chi-7fq2, /greekwars/clan/sae-k3xp.
   var CLAN_BASE = 'https://bijanizadian.com/greekwars/clan/';
-  // Spaces become "+" and commas and brackets stay readable, so the link reads
-  // chapter=Sigma+Alpha+Epsilon+(SAE) rather than a run of %28s and %20s.
-  function param(v) { return encodeURIComponent(v).replace(/%20/g, '+').replace(/%2C/gi, ','); }
-  function clanLink(lead, chapterName, schoolName) {
-    return CLAN_BASE + encodeURIComponent(lead) + '?chapter=' + param(chapterName) + '&school=' + param(schoolName);
+  var SAVED_KEY = 'fomo-greekwars-clan';
+  function clanId(chapterName) {
+    var nick = chapterName.match(/\(([^)]+)\)\s*$/);
+    var slug = (nick ? nick[1] : chapterName).toLowerCase().replace(/&/g, ' and ')
+      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32).replace(/-+$/, '');
+    var chars = 'abcdefghjkmnpqrstuvwxyz23456789', rand = new Uint32Array(4), tail = '';
+    crypto.getRandomValues(rand);
+    for (var k = 0; k < 4; k++) tail += chars.charAt(rand[k] % chars.length);
+    return (slug || 'clan') + '-' + tail;
+  }
+  // an unanswered write never settles on its own, so give up after a while
+  function withTimeout(promise, ms) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () { reject({ code: 'TIMEOUT' }); }, ms);
+      promise.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
   }
 
   var SCHOOLS = ["Arizona State University","Auburn University","Clemson University","Florida State University","Georgia Institute of Technology","Indiana University Bloomington","Louisiana State University","Michigan State University","New York University","Ohio State University","Penn State University","Purdue University","Southern Methodist University","Syracuse University","Texas A&M University","Texas Christian University","The George Washington University","Tulane University","University of Alabama","University of Arizona","University of Arkansas","University of California, Los Angeles","University of Colorado Boulder","University of Florida","University of Georgia","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Miami","University of Michigan","University of Mississippi","University of Missouri","University of Nebraska","University of North Carolina at Chapel Hill","University of Oklahoma","University of Oregon","University of South Carolina","University of Southern California","University of Tennessee","University of Texas at Austin","University of Virginia","University of Washington","University of Wisconsin-Madison","Vanderbilt University","Villanova University","Virginia Tech","Wake Forest University","Washington University in St. Louis"];
@@ -606,71 +627,77 @@
     show('chapter');
   });
 
-  // ---------- step 2: who and which clan, then hand it to email
+  // ---------- step 2: who and which clan, then save it
   combobox(school, $('school-list'), SCHOOLS);
   combobox(chapter, $('chapter-list'), CHAPTERS);
-  var formError = $('form-error');
+  var formError = $('form-error'), create = $('create'), createLabel = create.querySelector('span'), CREATE_LABEL = createLabel.textContent;
+  function fail(message) { formError.textContent = message; formError.hidden = false; }
+  function busy(on) {
+    create.disabled = on;
+    create.classList.toggle('is-busy', on);
+    createLabel.textContent = on ? 'Submitting…' : CREATE_LABEL;
+  }
   $('chapter-form').addEventListener('submit', function (e) {
     e.preventDefault();
+    if (create.disabled) return;
     formError.hidden = true;
-    var first = $('first').value.trim(), last = $('last').value.trim();
+    var first = $('first').value.trim(), last = $('last').value.trim(), email = $('email').value.trim();
     var s = school.value.trim(), c = chapter.value.trim();
     var actives = Number($('actives').value);
     var bad = !first ? ['first', 'Add your first name.']
       : !last ? ['last', 'Add your last name.']
       : s.length < 2 ? ['school', 'Add your school.']
       : c.length < 2 ? ['chapter', 'Add your chapter.']
+      : !email ? ['email', 'Add your email.']
+      : !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? ['email', "That email doesn't look right."]
       : !$('actives').value.trim() ? ['actives', 'Add roughly how many active members your chapter has.']
       : !(actives >= 5 && actives <= 1000 && actives % 1 === 0) ? ['actives', 'Active members should be a whole number between 5 and 1,000.']
       : null;
     if (bad) {
-      formError.textContent = bad[1];
-      formError.hidden = false;
+      fail(bad[1]);
       $(bad[0]).setAttribute('aria-invalid', 'true');
       $(bad[0]).focus();
       return;
     }
-    var name = first + ' ' + last, target = Math.ceil(actives * 0.8);
-    var url = clanLink(linked.name, c, s);
-    var lines = [
-      'Greek Wars clan claim',
-      '',
-      'Chapter lead: ' + name,
-      'fomo username: ' + linked.name,
-      'Referral link: ' + linked.url,
-      '',
-      'School: ' + s,
-      'Chapter: ' + c,
-      'Active members: ' + actives + ' (80% is ' + target + ')',
-      '',
-      'Clan link for members: ' + url,
-      '',
-      'I\'m onboarding my chapter. Please verify my account and set up our clan.',
-      '',
-      'Sent from bijanizadian.com/greekwars/claim'
-    ];
-    var subject = 'Greek Wars clan claim: ' + c + ', ' + s + ' (@' + linked.name + ')';
-    var msg = 'We\'re claiming ' + c + '’s clan for Greek Wars on fomo. Put your name and fomo username in here so you’re added (not on fomo yet? get it from the page first): ' + url;
-    claim = {
-      text: 'To: ' + TEAM_EMAIL + '\nSubject: ' + subject + '\n\n' + lines.join('\n'),
-      href: 'mailto:' + TEAM_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n')),
-      url: url,
-      msg: msg,
-      chapter: c
-    };
-    $('team-email').textContent = TEAM_EMAIL;
-    $('mail-again').href = claim.href;
-    $('copy-status').textContent = '';
-    $('share-subtitle').textContent = 'Everyone in ' + c + ' opens it and puts in their name and fomo username. You need ' + target + ' of ' + actives + ' in the clan.';
-    $('clan-url').textContent = url.replace(/^https:\/\//, '');
-    $('clan-for').textContent = c + ' · ' + s + ' · led by @' + linked.name;
-    $('clan-msg').textContent = msg;
-    $('text-it').href = 'sms:?&body=' + encodeURIComponent(msg);
-    status.textContent = DEFAULT_STATUS;
-    show('share');
-    window.location.href = claim.href;
+    if (!db) { fail("We couldn't reach the server. Check your connection and refresh the page."); return; }
+    busy(true);
+    save(0);
+
+    function save(attempt) {
+      var id = clanId(c), now = firebase.database.ServerValue.TIMESTAMP, updates = {};
+      updates['greekwars_clans/' + id] = { chapter: c, school: s, lead: linked.name, created_at: now };
+      updates['greekwars_clan_leads/' + id] = {
+        first_name: first, last_name: last, email: email,
+        fomo_username: linked.name, referral_link: linked.url,
+        school: s, chapter: c, actives: actives, submitted_at: now
+      };
+      withTimeout(db.ref().update(updates), 15000).then(function () { done(id); }, function (err) {
+        // every field is checked above, so a refusal almost always means the
+        // random id was taken — try a fresh one before giving up
+        if (attempt < 2 && err && /permission/i.test(err.code || err.message || '')) { save(attempt + 1); return; }
+        busy(false);
+        fail(err && err.code === 'TIMEOUT'
+          ? 'This is taking too long. Check your connection and try again.'
+          : "We couldn't create your clan link. Try again in a moment.");
+      });
+    }
+    function done(id) {
+      busy(false);
+      var url = CLAN_BASE + id, target = Math.ceil(actives * 0.8);
+      var msg = 'We’re claiming ' + c + '’s clan for Greek Wars on fomo. Add your name, fomo username and email here to join it: ' + url;
+      claim = { url: url, msg: msg, chapter: c };
+      try { localStorage.setItem(SAVED_KEY, JSON.stringify({ url: url, chapter: c, school: s })); } catch (err) {}
+      $('share-subtitle').textContent = 'Saved. Everyone in ' + c + ' opens it and adds their name, fomo username and email. You need ' + target + ' of ' + actives + ' in the clan.';
+      $('clan-url').textContent = url.replace(/^https:\/\//, '');
+      $('clan-for').textContent = c + ' · ' + s + ' · led by @' + linked.name;
+      $('clan-open').href = url;
+      $('clan-msg').textContent = msg;
+      $('text-it').href = 'sms:?&body=' + encodeURIComponent(msg);
+      status.textContent = DEFAULT_STATUS;
+      show('share');
+    }
   });
-  ['first', 'last', 'actives'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
+  ['first', 'last', 'email', 'actives'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
 
   // ---------- copying, with a fallback for browsers without the clipboard API
   function copy(text, done, blocked) {
@@ -687,13 +714,6 @@
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
     else fallback();
   }
-  $('copy-claim').addEventListener('click', function () {
-    if (!claim) return;
-    var copyStatus = $('copy-status');
-    copy(claim.text,
-      function () { copyStatus.textContent = 'Copied. Paste it into an email to ' + TEAM_EMAIL + '.'; },
-      function () { copyStatus.textContent = 'Copying is blocked here. Email ' + TEAM_EMAIL + ' with your referral link, name, school, chapter and roster size.'; });
-  });
 
   // ---------- step 3: sharing the clan link
   var status = $('status'), DEFAULT_STATUS = status.textContent, resetTimer;
@@ -718,6 +738,25 @@
     $('share-it').hidden = false;
     $('share-it').addEventListener('click', function () {
       if (claim) navigator.share({ title: claim.chapter + ' · Greek Wars clan', text: claim.msg }).catch(function () {});
+    });
+  }
+
+  // ---------- a lead coming back finds the link this browser already made
+  var saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null'); } catch (e) {}
+  if (saved && typeof saved.url === 'string' && saved.url.indexOf(CLAN_BASE) === 0) {
+    var savedCopy = $('saved-copy');
+    $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan link';
+    $('saved-url').textContent = saved.url.replace(/^https:\/\//, '');
+    $('saved-clan').hidden = false;
+    savedCopy.addEventListener('click', function () {
+      copy(saved.url, function () {
+        savedCopy.textContent = 'Copied';
+        setTimeout(function () { savedCopy.textContent = 'Copy link'; }, 1600);
+      }, function () {
+        var range = document.createRange(), sel = window.getSelection();
+        range.selectNodeContents($('saved-url')); sel.removeAllRanges(); sel.addRange(range);
+      });
     });
   }
 

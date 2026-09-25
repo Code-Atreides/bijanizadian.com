@@ -34,6 +34,50 @@
         ".write": "!data.exists()",
         ".validate": "newData.hasChildren(['first_name','last_name','email','phone','instagram','school','org_type','chapter','role','actives','best_trader','submitted_at']) && newData.child('email').val().length < 200 && newData.child('school').val().length < 200 && newData.child('chapter').val().length < 200 && newData.child('best_trader').val().length < 200"
       }
+    },
+    "greekwars_clans": {
+      "$clan": {
+        ".read": true,
+        ".write": "!data.exists()",
+        ".validate": "$clan.matches(/^[a-z0-9-]{3,48}$/) && newData.hasChildren(['chapter','school','lead','created_at'])",
+        "chapter": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "lead": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+        "created_at": { ".validate": "newData.val() == now" },
+        "$other": { ".validate": false }
+      }
+    },
+    "greekwars_clan_leads": {
+      ".read": false,
+      "$clan": {
+        ".write": "!data.exists() && newData.parent().parent().child('greekwars_clans').child($clan).exists()",
+        ".validate": "newData.hasChildren(['first_name','last_name','email','fomo_username','referral_link','school','chapter','actives','submitted_at']) && newData.child('fomo_username').val() == newData.parent().parent().child('greekwars_clans').child($clan).child('lead').val()",
+        "first_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+        "last_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+        "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
+        "fomo_username": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+        "referral_link": { ".validate": "newData.isString() && newData.val() == 'https://fomo.family/r/' + newData.parent().child('fomo_username').val()" },
+        "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "chapter": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "actives": { ".validate": "newData.isNumber() && newData.val() >= 5 && newData.val() <= 1000" },
+        "submitted_at": { ".validate": "newData.val() == now" },
+        "$other": { ".validate": false }
+      }
+    },
+    "greekwars_clan_members": {
+      ".read": false,
+      "$clan": {
+        "$member": {
+          ".write": "!data.exists() && root.child('greekwars_clans').child($clan).exists()",
+          ".validate": "newData.hasChildren(['first_name','last_name','email','fomo_username','submitted_at']) && $member == newData.child('fomo_username').val().toLowerCase().replace('.', ',')",
+          "first_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+          "last_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
+          "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
+          "fomo_username": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
+          "submitted_at": { ".validate": "newData.val() == now" },
+          "$other": { ".validate": false }
+        }
+      }
     }
   }
 }

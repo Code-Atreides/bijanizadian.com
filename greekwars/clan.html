@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>Join your clan | Greek Wars</title>
-<meta name="description" content="Your chapter is in Greek Wars on fomo. Put in your name and fomo username to join your chapter's clan.">
+<meta name="description" content="Your chapter is in Greek Wars on fomo. Add your name, fomo username and email to join your chapter's clan.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Join your clan — Greek Wars">
-<meta property="og:description" content="Your chapter is in Greek Wars on fomo. Put in your name and fomo username to join your chapter's clan.">
+<meta property="og:description" content="Your chapter is in Greek Wars on fomo. Add your name, fomo username and email to join your chapter's clan.">
 <meta property="og:image" content="https://bijanizadian.com/campus/space-bg.webp">
 <!-- every clan has its own link, so none of them belong in search results -->
 <meta name="robots" content="noindex">
@@ -16,14 +16,16 @@
 <link rel="apple-touch-icon" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
 <!--
   A chapter's clan page, in the /hqvisitform design language. The chapter lead
-  makes it on /greekwars/claim, which hands them a link of the form
-  /greekwars/clan/<lead's fomo username>?chapter=<chapter>&school=<school>
-  (firebase.json rewrites every /greekwars/clan/* path to this file). Members
-  open it and give their name and fomo username. The link carries everything
-  the page shows, and submitting opens the member's email app with their details
-  addressed to TEAM_EMAIL, so nothing is stored on the site.
+  creates it on /greekwars/claim, which saves greekwars_clans/<id> (chapter,
+  school and lead username) and hands them /greekwars/clan/<id>; firebase.json
+  rewrites every /greekwars/clan/* path to this file. The page reads that one
+  clan and wears it: the header carries the chapter's letters, name and school.
+  Members add their name, fomo username and email, saved write-only to
+  greekwars_clan_members/<id>/<username>, so each username joins a clan once.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -51,22 +53,28 @@
 
   .site-shell { max-width: 1160px; margin: auto; padding: 0 40px; }
 
-  /* ---------- header ---------- */
-  .site-header { height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--blue); }
+  /* ---------- header: fomo /campus on the left, whose clan this is on the right ---------- */
+  .site-header { min-height: 100px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--blue); flex-shrink: 0; }
   .brand svg { width: 90px; height: auto; }
   .brand > span { font-size: 27px; letter-spacing: -.8px; color: var(--muted); }
   .season { display: flex; align-items: center; gap: 7px; font-size: 14px; color: var(--muted); }
+  .clan-tag { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .clan-tag > span:last-child { min-width: 0; max-width: 380px; }
+  /* the chapter's letters — Greek when the name is made of them, initials otherwise */
+  .crest { flex-shrink: 0; display: grid; place-items: center; min-width: 46px; height: 46px; padding: 0 9px; border-radius: 11px; background: var(--blue); color: #fff; font-size: 18px; font-weight: 500; letter-spacing: 1.5px; box-shadow: 0 10px 22px -12px rgba(81,106,246,.7); }
+  .clan-tag b { display: block; font-size: 17px; font-weight: 500; letter-spacing: -.2px; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .clan-tag small { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* ---------- the card ---------- */
   main { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); margin-top: 24px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
 
   .invitation { padding: 40px 32px; background: var(--lavender); }
   .eyebrow { display: block; font-size: 12px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
-  h1 { font-size: 48px; line-height: 1.1; font-weight: 500; letter-spacing: -1.8px; margin: 24px 0; }
+  h1 { font-size: 48px; line-height: 1.1; font-weight: 500; letter-spacing: -1.8px; margin: 24px 0; overflow-wrap: anywhere; }
   h1 > span { color: var(--blue); }
+  h1.is-long { font-size: 40px; letter-spacing: -1.4px; }
   .benefits { font-size: 16px; line-height: 1.65; color: #50566e; }
-  .benefits b { color: var(--ink); font-weight: 500; }
   .info { display: grid; gap: 23px; margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--panel-rule); }
   .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.5; }
   .info svg { color: var(--blue); flex-shrink: 0; margin-top: 2px; }
@@ -75,23 +83,14 @@
 
   .join { padding: 35px 34px 27px; background: #fff; min-width: 0; }
   h2 { font-size: 27px; font-weight: 500; letter-spacing: -.7px; line-height: 1.2; margin-bottom: 9px; overflow-wrap: anywhere; }
-  .subtitle { font-size: 15px; line-height: 1.5; color: var(--muted); overflow-wrap: anywhere; }
-
-  /* ---------- not on fomo yet ---------- */
-  .notice { display: flex; gap: 11px; align-items: flex-start; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 14px; margin: 24px 0 26px; }
-  .notice > svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
-  .notice > div { min-width: 0; flex: 1; }
-  .notice strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.45; }
-  .notice p { font-size: 13px; color: var(--muted); line-height: 1.55; margin-top: 3px; overflow-wrap: anywhere; }
-  .text-button { border: 0; background: none; font: inherit; font-size: 13px; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; flex-shrink: 0; text-decoration: none; white-space: nowrap; }
-  .text-button:hover { background: var(--lavender); }
-  .notice .text-button { display: inline-block; margin: 5px 0 0 -10px; }
+  .subtitle { font-size: 15px; line-height: 1.5; color: var(--muted); margin-bottom: 26px; overflow-wrap: anywhere; }
 
   /* ---------- fields ---------- */
   .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .field { min-width: 0; margin-bottom: 19px; }
   .field > label { display: block; font-size: 14px; font-weight: 500; }
   .help { margin-top: 7px; font-size: 12px; line-height: 1.5; color: var(--muted-2); }
+  .help a { color: var(--blue-text); font-weight: 500; text-underline-offset: 3px; }
   .field-error { margin-top: 7px; font-size: 13px; line-height: 1.5; color: #9b362e; }
   .field input[aria-invalid="true"] { border-color: #d0574b; }
   .field input {
@@ -109,6 +108,7 @@
     font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
   }
   .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action.is-busy { opacity: .7; cursor: progress; }
   .option-btn {
     display: flex; width: 100%; align-items: center; justify-content: center; gap: 8px; min-height: 42px; margin-top: 8px;
     border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text); text-decoration: none;
@@ -123,16 +123,20 @@
   .fine-print { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted-2); line-height: 1.6; }
   .fine-print a { color: var(--blue-text); font-weight: 500; text-underline-offset: 3px; }
 
-  /* ---------- sent, and a link that lost its clan ---------- */
+  /* ---------- loading ---------- */
+  .loading { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 320px; color: var(--muted); font-size: 15px; }
+  .spinner { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--lavender); border-top-color: var(--blue); animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- joined, and links that don't lead to a clan ---------- */
   .success { text-align: center; padding: 28px 6px 8px; }
   .success-icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--lavender); color: var(--blue); margin: 0 auto 22px; }
   .kicker { display: block; font-size: 12px; letter-spacing: 1.3px; color: #647094; margin-bottom: 12px; }
   .success h2 { font-size: 32px; line-height: 1.15; letter-spacing: -.9px; }
   .success > p { font-size: 16px; line-height: 1.65; color: var(--muted); margin-top: 18px; }
   .success > p b { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; }
-  .success > .under-button { font-size: 12px; color: var(--muted-2); margin-top: 10px; }
-  .success > .primary-action, .success > a.option-btn { margin-top: 25px; }
-  .receipt { margin: 25px 0; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 23px; }
+  .success > a.option-btn { margin-top: 25px; }
+  .receipt { margin: 25px 0 0; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 23px; }
   .receipt > span:first-child { display: block; font-size: 12px; letter-spacing: 1px; color: var(--muted-2); margin-bottom: 12px; }
   .receipt > strong { display: block; font-size: 20px; font-weight: 500; overflow-wrap: anywhere; }
   .receipt > p { color: var(--muted); font-size: 14px; margin-top: 4px; overflow-wrap: anywhere; }
@@ -152,38 +156,47 @@
     main { grid-template-columns: minmax(0, 290px) minmax(0, 1fr); }
     .invitation { padding: 34px 27px; }
     h1 { font-size: 43px; }
+    h1.is-long { font-size: 36px; }
     .join { padding: 32px 25px 25px; }
+    .clan-tag > span:last-child { max-width: 300px; }
   }
   @media (max-width: 850px) {
     .site-shell { max-width: 680px; padding: 0 24px; }
-    .site-header { height: 80px; }
+    .site-header { min-height: 80px; }
     main { grid-template-columns: 1fr; margin-top: 10px; }
     .invitation { padding: 27px 28px; border-bottom: 1px solid #dfe4fa; }
-    h1 { font-size: 36px; letter-spacing: -1.1px; margin: 13px 0; }
+    h1, h1.is-long { font-size: 36px; letter-spacing: -1.1px; margin: 13px 0; }
     .info { margin-top: 22px; padding-top: 20px; gap: 16px; }
     .invitation-note { display: none; }
     .join { padding: 27px 28px; }
+    .loading { min-height: 200px; }
+  }
+  /* the clan's name gets its own row under the wordmark once they can't share one */
+  @media (max-width: 600px) {
+    .site-header { flex-wrap: wrap; row-gap: 14px; padding: 18px 0 14px; }
+    .site-header .clan-tag { width: 100%; padding-top: 14px; border-top: 1px solid var(--line); }
+    .clan-tag > span:last-child { max-width: none; }
   }
   @media (max-width: 480px) {
     .site-shell { padding: 0 16px; }
-    .site-header { height: 72px; }
     .brand svg { width: 80px; }
     .brand > span { font-size: 24px; }
     .season { font-size: 12px; }
+    .crest { min-width: 42px; height: 42px; font-size: 16px; }
+    .clan-tag b { font-size: 16px; }
     main { margin-top: 6px; border-radius: 12px; }
     .invitation { padding: 23px 20px; }
-    h1 { font-size: 33px; }
+    h1, h1.is-long { font-size: 33px; }
     .eyebrow { font-size: 11px; }
     .benefits { font-size: 15px; }
     .join { padding: 24px 20px; }
     h2 { font-size: 25px; }
-    .subtitle { font-size: 14px; }
-    .notice { margin: 20px 0 22px; }
+    .subtitle { font-size: 14px; margin-bottom: 22px; }
     .form-pair { grid-template-columns: 1fr; gap: 0; }
     .success { padding: 15px 0 4px; }
     .success h2 { font-size: 30px; }
   }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } .spinner { animation-duration: 2.4s; } }
 </style>
 </head>
 <body>
@@ -198,17 +211,21 @@
       </svg>
       <span>/campus</span>
     </a>
-    <span class="season">
+    <span class="season" id="season">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       Greek Wars · Fall 2026
     </span>
+    <div class="clan-tag" id="clan-tag" hidden>
+      <span class="crest" id="crest" aria-hidden="true"></span>
+      <span><b id="tag-chapter"></b><small id="tag-school"></small></span>
+    </div>
   </header>
 
   <main>
     <section class="invitation" aria-labelledby="invite-title">
-      <span class="eyebrow">GREEK WARS CLAN</span>
+      <span class="eyebrow">GREEK WARS · FALL 2026</span>
       <h1 id="invite-title">Join your<br><span>clan.</span></h1>
-      <p class="benefits"><span id="clan-line">Your chapter lead is setting up your chapter's clan for Greek Wars on fomo.</span> Put in your name and fomo username, and fomo adds you to it on the app.</p>
+      <p class="benefits" id="benefits">Your chapter lead is setting up your chapter's clan for Greek Wars on fomo. Add your name, fomo username and email, and fomo puts you in it on the app.</p>
       <div class="info">
         <div>
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -219,23 +236,16 @@
           <span>$500 for your chapter<small>Guaranteed to its #1 trader once it qualifies. Ranked on raw PnL through Dec&nbsp;11.</small></span>
         </div>
       </div>
-      <p class="invitation-note">Your name and your username.<br>That's all it takes.</p>
+      <p class="invitation-note">Three things,<br>and you're in.</p>
     </section>
 
-    <section class="join" aria-label="Join your chapter's clan">
+    <section class="join" aria-label="Join your chapter's clan" aria-live="polite">
+      <div id="step-loading" class="loading"><span class="spinner" aria-hidden="true"></span>Loading your clan…</div>
+
       <!-- the form -->
       <div id="step-join" hidden>
-        <h2 tabindex="-1" id="join-title">Join your clan</h2>
+        <h2 tabindex="-1" id="join-title">Add yourself</h2>
         <p class="subtitle" id="join-sub"></p>
-
-        <div class="notice">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-          <div>
-            <strong>Not on fomo yet?</strong>
-            <p id="invite-copy">Download it first, then come back and finish here.</p>
-            <a class="text-button" id="get-fomo" href="https://fomo.family" target="_blank" rel="noopener">Get fomo</a>
-          </div>
-        </div>
 
         <form id="join-form" novalidate>
           <div class="form-pair">
@@ -244,35 +254,36 @@
           </div>
           <div class="field">
             <label for="username">Your fomo username</label>
-            <input id="username" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="300" placeholder="@yourname" aria-describedby="username-help">
-            <p class="help" id="username-help">It's the @name on your fomo profile. Pasting your fomo.family/r/ link from Rewards works too.</p>
+            <input id="username" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="40" placeholder="@yourname" aria-describedby="username-help">
+            <p class="help" id="username-help">The @name on your fomo profile. Not on fomo yet? <a href="https://fomo.family" target="_blank" rel="noopener">Get the app</a> first.</p>
             <p class="field-error" id="username-error" hidden></p>
           </div>
-          <p class="privacy-note">This opens your email app with your details filled in, addressed to the fomo team. Nothing is saved on this page.</p>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu">
+          </div>
+          <p class="privacy-note">Only the fomo team sees your name and email.</p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
-          <button type="submit" class="primary-action">Join the clan<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <button type="submit" class="primary-action" id="join-button"><span>Join the clan</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           <p class="under-button">The team checks each account before adding it to the clan.</p>
         </form>
 
         <p class="fine-print">One clan per person: your own chapter's. Members competing must be 18 or older. <a href="/greekwars">What's Greek Wars?</a></p>
       </div>
 
-      <!-- hand-off to email -->
+      <!-- joined -->
       <div id="step-sent" class="success" hidden>
         <span class="success-icon"><svg width="29" height="29" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
-        <span class="kicker">ALMOST IN</span>
-        <h2 tabindex="-1" id="sent-title">Now hit send.</h2>
-        <p>Your email app should have opened with your details filled in, addressed to <b id="team-email"></b>. Once it's sent, the team checks your account and adds you to the clan on the app.</p>
+        <span class="kicker">SAVED</span>
+        <h2 tabindex="-1" id="sent-title">You're on the list.</h2>
+        <p id="sent-copy"></p>
         <div class="receipt">
           <span>YOUR CLAN</span>
           <strong id="rc-name"></strong>
           <p id="rc-clan"></p>
-          <p id="rc-lead"></p>
+          <p id="rc-person"></p>
           <span class="pending">Pending verification</span>
         </div>
-        <a class="primary-action" id="mail-again">Open the email again</a>
-        <button type="button" class="option-btn" id="copy-details">Copy it instead</button>
-        <p class="under-button" id="copy-status" role="status" aria-live="polite">No email app? Copy it and send it from your inbox.</p>
 
         <div class="pass-on">
           <strong>Get the rest of your chapter in</strong>
@@ -283,12 +294,12 @@
         <button type="button" class="back-button" id="start-over">Add someone else</button>
       </div>
 
-      <!-- a link missing its lead, chapter or school -->
+      <!-- a link that doesn't lead to a clan, or a clan that couldn't load -->
       <div id="step-missing" class="success" hidden>
         <span class="success-icon"><svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 17H7A5 5 0 0 1 7 7h2M15 7h2a5 5 0 1 1 0 10h-2M8 12h8"/></svg></span>
-        <span class="kicker">LINK INCOMPLETE</span>
-        <h2 tabindex="-1" id="missing-title">This clan link is missing a piece.</h2>
-        <p>A clan link says which chapter it's for. Ask your chapter lead to send you the whole link again.</p>
+        <span class="kicker" id="missing-kicker">CLAN NOT FOUND</span>
+        <h2 tabindex="-1" id="missing-title">We can't find this clan.</h2>
+        <p id="missing-copy">Check you have the whole link, or ask your chapter lead to send it again.</p>
         <a class="option-btn" href="/greekwars/claim">Leading your chapter? Claim your clan</a>
       </div>
     </section>
@@ -302,49 +313,99 @@
 
 <script>
 (function () {
-  // Where details go. Submitting opens the member's email app addressed here.
-  var TEAM_EMAIL = 'hello@fomo.family';
+  // ---------- the shared Firebase project the other Greek Wars forms use
+  var firebaseConfig = {
+    apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
+    authDomain: 'bijanizadian-84e48.firebaseapp.com',
+    databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
+    projectId: 'bijanizadian-84e48'
+  };
+  var db = null;
+  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
 
   var $ = function (id) { return document.getElementById(id); };
   var USERNAME = /^[A-Za-z0-9_.-]{2,32}$/;
-
-  // ---------- whose clan this is: /greekwars/clan/<lead>?chapter=&school=
-  var path = window.location.pathname.match(/^\/greekwars\/clan\/([^/]+)\/?$/);
-  var lead = null;
-  if (path) { try { lead = decodeURIComponent(path[1]); } catch (e) {} }
-  if (lead && !USERNAME.test(lead)) lead = null;
-  var params = new URLSearchParams(window.location.search);
-  var chapter = (params.get('chapter') || '').trim().slice(0, 120);
-  var school = (params.get('school') || '').trim().slice(0, 120);
-
-  var STEPS = { join: ['step-join', 'join-title'], sent: ['step-sent', 'sent-title'], missing: ['step-missing', 'missing-title'] };
+  var STEPS = { loading: ['step-loading'], join: ['step-join', 'join-title'], sent: ['step-sent', 'sent-title'], missing: ['step-missing', 'missing-title'] };
   function show(name, focus) {
     Object.keys(STEPS).forEach(function (k) { $(STEPS[k][0]).hidden = k !== name; });
-    if (focus) $(STEPS[name][1]).focus();
+    if (focus && STEPS[name][1]) $(STEPS[name][1]).focus();
+  }
+  // an unanswered read or write never settles on its own, so give up after a while
+  function withTimeout(promise, ms) {
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () { reject({ code: 'TIMEOUT' }); }, ms);
+      promise.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
+  function unreachable() {
+    $('missing-kicker').textContent = 'CONNECTION PROBLEM';
+    $('missing-title').textContent = "We couldn't load this clan.";
+    $('missing-copy').textContent = 'Check your connection and refresh the page.';
+    show('missing');
   }
 
-  if (!lead || chapter.length < 2 || school.length < 2) { show('missing'); return; }
+  // ---------- the chapter's letters for the header crest: Greek when the name
+  // is spelled in Greek letters (Sigma Chi → ΣΧ), initials when it isn't
+  var GREEK = { alpha: 'Α', beta: 'Β', gamma: 'Γ', delta: 'Δ', epsilon: 'Ε', zeta: 'Ζ', eta: 'Η', theta: 'Θ', iota: 'Ι', kappa: 'Κ', lambda: 'Λ', mu: 'Μ', nu: 'Ν', xi: 'Ξ', omicron: 'Ο', pi: 'Π', rho: 'Ρ', sigma: 'Σ', tau: 'Τ', upsilon: 'Υ', phi: 'Φ', chi: 'Χ', psi: 'Ψ', omega: 'Ω' };
+  function crest(name) {
+    var words = name.replace(/\([^)]*\)/g, ' ').toLowerCase().match(/[a-z]+/g) || [];
+    var letters = words.map(function (w) { return GREEK[w]; }).filter(Boolean);
+    if (letters.length >= 2 && letters.length <= 4 && letters.length >= words.length - 1) return letters.join('');
+    return (name.match(/[A-Za-z0-9]+/g) || ['?']).map(function (w) { return w.charAt(0); }).join('').toUpperCase().slice(0, 3);
+  }
+  // "Sigma Alpha Epsilon (SAE)" is SAE in the headline
+  function shortName(name) {
+    var nick = name.match(/\(([^)]+)\)\s*$/);
+    return nick ? nick[1] : name;
+  }
 
-  var invite = 'https://fomo.family/r/' + lead;
-  document.title = 'Join ' + chapter + ' | Greek Wars';
-  $('join-title').textContent = 'Join ' + chapter;
-  $('join-sub').textContent = school + ' · clan led by @' + lead;
-  $('clan-line').textContent = '@' + lead + ' is setting up ' + chapter + '’s clan at ' + school + ' for Greek Wars on fomo.';
-  $('invite-copy').textContent = 'Download it with @' + lead + '’s invite, then come back and finish here.';
-  $('get-fomo').href = invite;
-  show('join');
+  // ---------- which clan: /greekwars/clan/<id>
+  var id = null, clan = null;
+  var path = window.location.pathname.match(/^\/greekwars\/clan\/([^/]+)\/?$/);
+  if (path) { try { id = decodeURIComponent(path[1]).toLowerCase(); } catch (e) {} }
+  if (!id || !/^[a-z0-9-]{3,48}$/.test(id)) { show('missing'); return; }
+  if (!db) { unreachable(); return; }
 
-  // ---------- the member's username: "@name", "name" or their own
-  // fomo.family/r/ link all land on one value
+  withTimeout(db.ref('greekwars_clans/' + id).once('value'), 12000).then(function (snap) {
+    var v = snap.val();
+    if (!v || typeof v.chapter !== 'string' || typeof v.school !== 'string' || typeof v.lead !== 'string') { show('missing'); return; }
+    clan = { chapter: v.chapter.slice(0, 120), school: v.school.slice(0, 120), lead: v.lead.slice(0, 32) };
+    wear(clan);
+    show('join');
+  }, function (err) {
+    if (err && /permission/i.test(err.code || err.message || '')) show('missing');
+    else unreachable();
+  });
+
+  // the page takes on the clan: header, headline, copy and tab title
+  function wear(c) {
+    var short = shortName(c.chapter);
+    document.title = c.chapter + ' · ' + c.school + ' | Greek Wars clan';
+    $('crest').textContent = crest(c.chapter);
+    $('tag-chapter').textContent = c.chapter;
+    $('tag-school').textContent = c.school;
+    $('clan-tag').hidden = false;
+    $('season').hidden = true;
+    var h1 = $('invite-title');
+    h1.textContent = 'Join ';
+    var span = document.createElement('span');
+    span.textContent = short + '.';
+    h1.appendChild(document.createElement('br'));
+    h1.appendChild(span);
+    h1.classList.toggle('is-long', short.length > 13);
+    $('benefits').textContent = c.chapter + ' at ' + c.school + ' is in Greek Wars. Add your name, fomo username and email, and fomo puts you in the clan on the app.';
+    $('join-sub').textContent = 'Clan led by @' + c.lead + '.';
+  }
+
+  // ---------- the member's username: "@name" or "name"
   function readUsername(v) {
     var raw = String(v).trim();
     if (!raw) return { empty: true };
-    var m = raw.match(/fomo\.family\/r\/([A-Za-z0-9_.-]+)/i);
-    if (!m && /fomo\.family/i.test(raw)) return { error: "That link doesn't have a username in it. Type your username instead, like @yourname." };
-    var name = (m ? m[1] : raw.replace(/^@+/, '')).replace(/\.+$/, '');
+    if (/[\/:]|fomo\.family/i.test(raw)) return { error: 'Just your username, like @yourname. No link needed.' };
+    var name = raw.replace(/^@+/, '');
     if (!USERNAME.test(name)) return { error: "That doesn't look like a fomo username. It's the @name on your profile." };
     if (name.toLowerCase() === 'yourname') return { error: "That's the example. Put in your own username." };
-    if (name.toLowerCase() === lead.toLowerCase()) return { error: "That's @" + lead + "'s account, who leads the clan. Put in your own." };
+    if (clan && name.toLowerCase() === clan.lead.toLowerCase()) return { error: '@' + clan.lead + ' leads this clan and is already in it. Put in your own username.' };
     return { name: name };
   }
   var username = $('username'), usernameError = $('username-error'), usernameHelp = $('username-help');
@@ -359,58 +420,60 @@
   }
   username.addEventListener('input', function () { showUsernameError(false); });
   username.addEventListener('blur', function () { showUsernameError(true); });
-  ['first', 'last'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
+  ['first', 'last', 'email'].forEach(function (k) { $(k).addEventListener('input', function () { $(k).removeAttribute('aria-invalid'); }); });
 
-  // ---------- hand it to email
-  var formError = $('form-error'), details = null;
+  // ---------- save the member: greekwars_clan_members/<id>/<username>, where
+  // the key is the lowercased username with dots as commas (keys can't hold dots)
+  var formError = $('form-error'), joinButton = $('join-button'), joinLabel = joinButton.querySelector('span'), JOIN_LABEL = joinLabel.textContent;
+  function fail(message) { formError.textContent = message; formError.hidden = false; }
+  function busy(on) {
+    joinButton.disabled = on;
+    joinButton.classList.toggle('is-busy', on);
+    joinLabel.textContent = on ? 'Joining…' : JOIN_LABEL;
+  }
   $('join-form').addEventListener('submit', function (e) {
     e.preventDefault();
+    if (joinButton.disabled || !clan) return;
     formError.hidden = true;
-    var first = $('first').value.trim(), last = $('last').value.trim(), u = readUsername(username.value);
+    var first = $('first').value.trim(), last = $('last').value.trim(), email = $('email').value.trim(), u = readUsername(username.value);
     var bad = !first ? ['first', 'Add your first name.']
       : !last ? ['last', 'Add your last name.']
       : u.empty ? ['username', 'Add your fomo username.']
       : u.error ? ['username', u.error]
+      : !email ? ['email', 'Add your email.']
+      : !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? ['email', "That email doesn't look right."]
       : null;
     if (bad) {
       if (bad[0] === 'username') showUsernameError(true);
-      formError.textContent = bad[1];
-      formError.hidden = false;
+      fail(bad[1]);
       $(bad[0]).setAttribute('aria-invalid', 'true');
       $(bad[0]).focus();
       return;
     }
-    var name = first + ' ' + last;
-    var lines = [
-      'Greek Wars clan member',
-      '',
-      'Name: ' + name,
-      'fomo username: ' + u.name,
-      '',
-      'Clan: ' + chapter + ', ' + school,
-      'Clan lead: @' + lead,
-      '',
-      'Please add this account to the clan.',
-      '',
-      'Sent from ' + window.location.href.replace(/^https?:\/\//, '')
-    ];
-    var subject = 'Greek Wars clan member: ' + chapter + ', ' + school + ' (@' + u.name + ')';
-    details = {
-      text: 'To: ' + TEAM_EMAIL + '\nSubject: ' + subject + '\n\n' + lines.join('\n'),
-      href: 'mailto:' + TEAM_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'))
-    };
-    $('team-email').textContent = TEAM_EMAIL;
-    $('rc-name').textContent = '@' + u.name;
-    $('rc-clan').textContent = chapter + ' · ' + school;
-    $('rc-lead').textContent = name + ' · clan led by @' + lead;
-    $('mail-again').href = details.href;
-    $('copy-status').textContent = 'No email app? Copy it and send it from your inbox.';
-    $('pass-status').textContent = '';
-    show('sent', true);
-    window.location.href = details.href;
+    busy(true);
+    var key = u.name.toLowerCase().replace(/\./g, ',');
+    withTimeout(db.ref('greekwars_clan_members/' + id + '/' + key).set({
+      first_name: first, last_name: last, email: email,
+      fomo_username: u.name, submitted_at: firebase.database.ServerValue.TIMESTAMP
+    }), 15000).then(function () {
+      busy(false);
+      $('sent-copy').textContent = 'The team checks your account and adds you to the ' + clan.chapter + ' clan on the app.';
+      $('rc-name').textContent = '@' + u.name;
+      $('rc-clan').textContent = clan.chapter + ' · ' + clan.school;
+      $('rc-person').textContent = first + ' ' + last;
+      $('pass-status').textContent = '';
+      show('sent', true);
+    }, function (err) {
+      busy(false);
+      // every field is checked above, so a refusal means this username is
+      // already in the clan
+      if (err && /permission/i.test(err.code || err.message || '')) fail('@' + u.name + ' has already joined this clan. If that\'s you, you\'re all set.');
+      else if (err && err.code === 'TIMEOUT') fail('This is taking too long. Check your connection and try again.');
+      else fail("We couldn't save that. Try again in a moment.");
+    });
   });
 
-  // ---------- copying, with a fallback for browsers without the clipboard API
+  // ---------- passing the link on
   function copy(text, done, blocked) {
     function fallback() {
       var ta = document.createElement('textarea');
@@ -425,15 +488,8 @@
     if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback);
     else fallback();
   }
-  $('copy-details').addEventListener('click', function () {
-    if (!details) return;
-    var status = $('copy-status');
-    copy(details.text,
-      function () { status.textContent = 'Copied. Paste it into an email to ' + TEAM_EMAIL + '.'; },
-      function () { status.textContent = 'Copying is blocked here. Email ' + TEAM_EMAIL + ' with your name, fomo username and this clan link.'; });
-  });
   $('copy-clan').addEventListener('click', function () {
-    var status = $('pass-status'), link = window.location.href;
+    var status = $('pass-status'), link = 'https://bijanizadian.com/greekwars/clan/' + id;
     copy(link,
       function () { status.textContent = 'Copied. Drop it in your chapter group chat.'; },
       function () { status.textContent = link; });
