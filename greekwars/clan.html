@@ -111,6 +111,10 @@
   .how > li > i { font-style: normal; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 1px solid var(--option-line); color: var(--blue-text); font-size: 12px; font-weight: 500; }
   .how b { display: block; font-size: 14.5px; font-weight: 500; line-height: 1.4; padding-top: 2px; }
   .how small { display: block; font-size: 12.5px; color: #68708d; line-height: 1.5; margin-top: 2px; }
+  /* the download step stands on its own card: these buttons carry the head's
+     referral, which is how a new account lands in the clan */
+  .how > li.get-app { background: #fff; border: 1px solid #cdd5fb; border-radius: 12px; padding: 12px 12px 12px 10px; margin: 0 -4px; box-shadow: 0 10px 22px -16px rgba(81,106,246,.55); }
+  .get-note strong { color: var(--ink); font-weight: 500; }
   /* fomo.family's own store badges, on ink so they read on the lavender */
   .stores { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
   .store { display: block; border-radius: 7px; background: var(--ink); transition: opacity .15s; }
@@ -231,6 +235,9 @@
     .stores, .code-row { margin-top: 7px; }
     .store img { height: 32px; }
     .join { padding: 20px 28px; }
+    /* the buttons already carry the referral, so the typed-in code can go */
+    .code-row, .get-note .then { display: none; }
+    .how > li.get-app { padding: 10px 10px 10px 8px; }
   }
   /* stacked: the headline goes, the count and the steps stay above the form */
   @media (max-width: 850px) {
@@ -262,7 +269,7 @@
     .bar { margin: 8px 0 6px; height: 5px; }
     .p-note, .how > li.form-step, .q-hint, .privacy-note, .pending, .pass-on .more { display: none; }
     /* a head attaching their link doesn't need the members' steps */
-    main.head-mode .how { display: none; }
+    main.head-mode .how, main.done-mode .how { display: none; }
     .head-steps { margin: 10px 0 12px; }
     .head-steps li { font-size: 13px; }
     .q-actions { flex-wrap: wrap; }
@@ -272,6 +279,10 @@
     .how > li { grid-template-columns: 22px minmax(0, 1fr); gap: 9px; }
     .how > li > i { width: 22px; height: 22px; font-size: 11px; }
     .how b { font-size: 13.5px; padding-top: 1px; }
+    .how > li.get-app { padding: 10px 12px; margin: 0; grid-template-columns: minmax(0, 1fr); }
+    /* the form step above it is hidden on phones, so a lone "2" would read oddly */
+    .how > li.get-app > i { display: none; }
+    .get-note .then { display: none; }
     .how small { font-size: 12px; }
     .stores, .code-row { margin-top: 7px; }
     .store img { height: 30px; }
@@ -292,6 +303,7 @@
   }
   /* the smallest phones drop the lines the labels already say */
   @media (max-width: 600px) and (max-height: 620px) {
+    .code-row { display: none; }
     .q-help { display: none; }
     .q-num { margin-bottom: 8px; }
     .field input { min-height: 42px; }
@@ -336,15 +348,16 @@
 
       <!-- a new chapter: get the app, then join -->
       <ol class="how" id="how-join" hidden>
-        <li>
+        <li class="get-app">
           <i>1</i>
           <div>
-            <b>Get fomo and make your account.</b>
+            <b>No fomo yet? Download it here first.</b>
+            <small class="get-note"></small>
             <div class="stores">
-              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
-              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
+              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
+              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
             </div>
-            <p class="code-row" hidden><span>Sign-up code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+            <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
           </div>
         </li>
         <li class="form-step">
@@ -365,15 +378,16 @@
             <small>Your name, fomo username and email. One claim per member.</small>
           </div>
         </li>
-        <li>
+        <li class="get-app">
           <i>2</i>
           <div>
-            <b>No fomo yet? Get it, then claim.</b>
+            <b>No fomo yet? Download it here first.</b>
+            <small class="get-note"></small>
             <div class="stores">
-              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
-              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
+              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
+              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
             </div>
-            <p class="code-row" hidden><span>Sign-up code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+            <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
           </div>
         </li>
       </ol>
@@ -496,6 +510,7 @@
     Object.keys(STEPS).forEach(function (k) { $(STEPS[k][0]).hidden = k !== name; });
     $('card').classList.toggle('no-clan', name === 'missing');
     $('card').classList.toggle('head-mode', name === 'head' || name === 'headlink');
+    $('card').classList.toggle('done-mode', name === 'sent');
     if (focus && STEPS[name][1]) $(STEPS[name][1]).focus();
   }
   // an unanswered read or write never settles on its own, so give up after a while
@@ -593,13 +608,33 @@
     }
     $('pass-title').textContent = (c.claim ? 'Get the rest of ' + short + ' claimed.' : 'Get the rest of ' + short + ' in.');
   }
-  // the head's referral code, for anyone who still needs the app
+  // the head's referral, for anyone who still needs the app: the store badges
+  // go through fomo.family/r/<head>, which is what files a new account under
+  // the head and so into this clan; until a head attaches, they go straight to
+  // the stores. The code itself stays below them for an app that asks for it.
   function showCode() {
+    var short = shortName(clan.chapter), ref = clan.lead ? 'https://fomo.family/r/' + encodeURIComponent(clan.lead) : null;
+    Array.prototype.forEach.call(document.querySelectorAll('.store'), function (a) {
+      a.href = ref || a.getAttribute('data-store');
+    });
     Array.prototype.forEach.call(document.querySelectorAll('.code-row'), function (row) {
       row.hidden = !clan.lead;
       row.querySelector('.ref-code').textContent = clan.lead || '';
     });
+    Array.prototype.forEach.call(document.querySelectorAll('.get-note'), function (note) {
+      note.textContent = '';
+      if (ref) {
+        note.appendChild(document.createTextNode('These buttons carry '));
+        note.appendChild(el('strong', '@' + clan.lead + '\u2019s referral'));
+        note.appendChild(document.createTextNode(', so your new account joins the ' + short + ' clan.'));
+        note.appendChild(el('span', clan.claim ? ' Then claim here too.' : ' Then add yourself here too.', 'then'));
+      } else {
+        note.appendChild(document.createTextNode(clan.claim ? 'Download it, then claim here.' : 'Download it, then add yourself here.'));
+        note.appendChild(el('span', ' Once your head attaches their referral, these buttons put new accounts straight in the clan.', 'then'));
+      }
+    });
   }
+  function el(tag, text, cls) { var n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
 
   // ---------- the live count: the roster's size against 80% of the chapter
   function count() {
