@@ -60,6 +60,7 @@
         "first_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
         "last_name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 50" },
         "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
+        "phone": { ".validate": "newData.isString() && newData.val().length >= 7 && newData.val().length <= 30 && newData.val().matches(/^[+()0-9 .-]+$/)" },
         "fomo_username": { ".validate": "newData.isString() && newData.val().matches(/^[A-Za-z0-9_.-]{2,32}$/)" },
         "referral_link": { ".validate": "newData.isString() && newData.val() == 'https://fomo.family/r/' + newData.parent().child('fomo_username').val()" },
         "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },

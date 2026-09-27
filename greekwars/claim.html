@@ -22,7 +22,7 @@
 <!--
   Greek Wars clan claims, in the /hqvisitform design language: a light page, a
   small header, and one split card. For the person onboarding a chapter. They
-  give their name, school, chapter, roster size and email first, then prove
+  give their name, school, chapter, roster size, email and phone first, then prove
   their fomo account is real with the rewards referral link from the app
   (fomo.family/r/<username>). Creating the clan saves it to the shared Firebase project
   (greekwars_clans/<id>: chapter, school, lead username and roster size, readable one clan at
@@ -119,7 +119,7 @@
 
   /* ---------- fields ---------- */
   .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-pair.narrow-end { grid-template-columns: minmax(0, 1fr) 150px; }
+  .form-pair.contact-row { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) 130px; }
   .field { min-width: 0; margin-bottom: 14px; }
   .field > label { display: block; font-size: 13.5px; font-weight: 500; }
   .field > label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
@@ -267,7 +267,10 @@
     .find-steps li { font-size: 13px; }
     .form-pair { gap: 10px; }
     .form-pair.stack { grid-template-columns: 1fr; gap: 0; }
-    .form-pair.narrow-end { grid-template-columns: minmax(0, 1fr) 104px; }
+    /* phones: email gets its own row, then phone beside the roster size */
+    .form-pair.contact-row { grid-template-columns: minmax(0, 1fr) 104px; }
+    .form-pair.contact-row { row-gap: 0; }
+    .contact-row > .field:first-child { grid-column: 1 / -1; }
     .field { margin-bottom: 11px; }
     .field input { min-height: 40px; padding: 8px 11px; }
     .privacy-note { margin-bottom: 11px; }
@@ -371,17 +374,21 @@
               <div class="combo"><input id="chapter" type="text" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="chapter-list" maxlength="120" placeholder="SAE, FIJI, Tri Delt…"><ul class="combo-list" id="chapter-list" role="listbox" aria-label="Chapters" hidden></ul></div>
             </div>
           </div>
-          <div class="form-pair narrow-end">
+          <div class="form-pair contact-row">
             <div class="field">
               <label for="email">Email</label>
               <input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu">
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="30" placeholder="(555) 123-4567">
             </div>
             <div class="field">
               <label for="actives">Active members</label>
               <input id="actives" type="number" inputmode="numeric" min="5" max="1000" step="1" autocomplete="off" placeholder="e.g. 84">
             </div>
           </div>
-          <p class="privacy-note">Only the fomo team sees your name and email.<span class="note-more"> Your chapter, school and fomo username show on your clan page.</span></p>
+          <p class="privacy-note">Only the fomo team sees your name, email and phone.<span class="note-more"> Your chapter, school and fomo username show on your clan page.</span></p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <button type="submit" class="primary-action" id="to-link"><span>Continue</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
           <p class="under-button aside">Only the chapter head does this. Members use the link you get at the end.</p>
@@ -663,6 +670,7 @@
     e.preventDefault();
     formError.hidden = true;
     var first = $('first').value.trim(), last = $('last').value.trim(), email = $('email').value.trim();
+    var phone = $('phone').value.trim(), digits = phone.replace(/\D/g, '').length;
     var s = school.value.trim(), c = chapter.value.trim();
     var actives = Number($('actives').value);
     var bad = !first ? ['first', 'Add your first name.']
@@ -671,6 +679,8 @@
       : c.length < 2 ? ['chapter', 'Add your chapter.']
       : !email ? ['email', 'Add your email.']
       : !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? ['email', "That email doesn't look right."]
+      : !phone ? ['phone', 'Add your phone number.']
+      : !/^[+()0-9 .-]{7,30}$/.test(phone) || digits < 7 || digits > 15 ? ['phone', "That phone number doesn't look right."]
       : !$('actives').value.trim() ? ['actives', 'Add roughly how many active members your chapter has.']
       : !(actives >= 5 && actives <= 1000 && actives % 1 === 0) ? ['actives', 'Active members should be a whole number between 5 and 1,000.']
       : null;
@@ -680,7 +690,7 @@
       $(bad[0]).focus();
       return;
     }
-    details = { first: first, last: last, email: email, school: s, chapter: c, actives: actives };
+    details = { first: first, last: last, email: email, phone: phone, school: s, chapter: c, actives: actives };
     each('.sum-chapter', function (el) { el.textContent = c; });
     each('.sum-detail', function (el) { el.textContent = s + ' · ' + actives + ' actives'; });
     show('link');
@@ -700,7 +710,7 @@
     if (!details) { show('chapter'); return; }
     saveError.hidden = true;
     if (!db) { saveFail("We couldn't reach the server. Check your connection and refresh the page."); return; }
-    var first = details.first, last = details.last, email = details.email;
+    var first = details.first, last = details.last, email = details.email, phone = details.phone;
     var s = details.school, c = details.chapter, actives = details.actives;
     busy(true);
     save(0);
@@ -709,7 +719,7 @@
       var id = clanId(c), now = firebase.database.ServerValue.TIMESTAMP, updates = {};
       updates['greekwars_clans/' + id] = { chapter: c, school: s, lead: linked.name, actives: actives, created_at: now };
       updates['greekwars_clan_leads/' + id] = {
-        first_name: first, last_name: last, email: email,
+        first_name: first, last_name: last, email: email, phone: phone,
         fomo_username: linked.name, referral_link: linked.url,
         school: s, chapter: c, actives: actives, submitted_at: now
       };
@@ -736,7 +746,7 @@
       show('share');
     }
   });
-  ['first', 'last', 'email', 'actives'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
+  ['first', 'last', 'email', 'phone', 'actives'].forEach(function (id) { $(id).addEventListener('input', function () { $(id).removeAttribute('aria-invalid'); }); });
 
   // ---------- copying, with a fallback for browsers without the clipboard API
   function copy(text, done, blocked) {
