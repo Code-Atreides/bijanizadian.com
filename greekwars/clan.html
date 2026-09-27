@@ -29,9 +29,10 @@
   greekwars_clan_members/<id>/<username> and a public true to
   greekwars_clan_roster/<id>/<username> in one update, and the roster's size
   against 80% of the roster is the progress bar. Members without the app get it
-  from the store badges and enter the head's referral code at sign-up, which is
-  how fomo files new accounts under the head; then they add themselves here,
-  one question at a time.
+  from the page and keep the head's referral code at sign-up, which links the
+  new account to the chapter; then they add themselves here, one question at a
+  time. Nothing here puts anyone in the clan: the fomo team adds members to
+  clans in the app from these sign-ups.
 
   Claim clans (kind: 'claim') are made straight from chapters that onboarded
   before these portals, listed for the team on /claimlinks. Their members
@@ -132,11 +133,19 @@
   .store:hover { transform: translateY(-1px); box-shadow: 0 14px 24px -12px rgba(11,9,31,.85); }
   .store:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
   .store img { display: block; height: 40px; width: auto; max-width: 88%; object-fit: contain; }
-  /* the head's referral code, for an app that asks for it at sign-up */
-  .code-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 8px; margin-top: 12px; font-size: 12.5px; color: var(--muted-2); }
-  .code-row code { font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); background: var(--tint); border: 1px solid var(--tint-line); border-radius: 6px; padding: 3px 8px; }
-  .code-row button { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 3px 6px; border-radius: 5px; }
-  .code-row button:hover { background: var(--lavender); }
+  /* with the head's referral: one button to fomo's code page, then the app's
+     own sign-up screens in order */
+  .get-one { display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 440px; height: 56px; margin-top: 14px; border-radius: 10px; background: var(--ink); color: #fff; text-decoration: none; font-size: 17px; font-weight: 500; box-shadow: 0 10px 20px -12px rgba(11,9,31,.75); transition: transform .15s, box-shadow .15s; }
+  .get-one:hover { transform: translateY(-1px); box-shadow: 0 14px 24px -12px rgba(11,9,31,.85); }
+  .get-one:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  .get-steps { list-style: none; counter-reset: gs; display: grid; gap: 7px; margin-top: 14px; max-width: 520px; }
+  .get-steps li { counter-increment: gs; display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 9px; font-size: 13.5px; line-height: 1.5; color: var(--muted); }
+  .get-steps li::before { content: counter(gs); display: grid; place-items: center; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; background: var(--tint); border: 1px solid var(--option-line); color: var(--blue-text); font-size: 11px; font-weight: 500; }
+  .get-steps b { color: var(--ink); font-weight: 500; }
+  .get-steps code { font: inherit; font-weight: 500; color: var(--ink); background: var(--tint); border: 1px solid var(--tint-line); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
+  #code-why { display: block; }
+  .copy-code { border: 0; background: none; font: inherit; font-weight: 500; color: var(--blue-text); padding: 1px 5px; border-radius: 5px; }
+  .copy-code:hover { background: var(--lavender); }
 
   /* the head's panel: attach a referral link, then send the members' link */
   .head-steps { list-style: none; counter-reset: hs; display: grid; gap: 7px; margin: 12px 0 16px; }
@@ -249,8 +258,9 @@
     .store { height: 48px; }
     .store img { height: 34px; }
     .join { padding: 20px 28px; }
-    /* the buttons already carry the referral, so the typed-in code can go */
-    .code-row { display: none; }
+    .get-one { height: 48px; font-size: 16px; margin-top: 10px; }
+    .get-steps { gap: 4px; margin-top: 10px; }
+    .get-steps li { font-size: 13px; }
   }
   /* stacked: the headline goes, the count and the steps stay above the form */
   @media (max-width: 850px) {
@@ -286,8 +296,11 @@
     .q-actions { flex-wrap: wrap; }
     .q-actions .option-btn { flex: 1; }
     .p-left { display: block; }
-    .or { margin: 20px 0 14px; }
+    .or { margin: 16px 0 12px; }
     .get-app h3 { font-size: 19px; }
+    .get-one { height: 52px; margin-top: 12px; }
+    .get-steps { gap: 5px; margin-top: 10px; }
+    .get-steps li { font-size: 13px; }
     .get-note { font-size: 13.5px; margin: 4px 0 12px; }
     .stores { gap: 8px; }
     .store { height: 52px; }
@@ -309,7 +322,6 @@
   }
   /* the smallest phones drop the lines the labels already say */
   @media (max-width: 600px) and (max-height: 620px) {
-    .code-row { display: none; }
     .q-help { display: none; }
     .q-num { margin-bottom: 8px; }
     .field input { min-height: 42px; }
@@ -423,8 +435,10 @@
           <p class="privacy-note" id="privacy-note">Your name and email go to the fomo team only. Your username counts toward the clan.</p>
         </form>
 
-        <!-- no fomo yet: get the app first. With the head's referral attached,
-             these buttons are what put a new account in the clan. -->
+        <!-- no fomo yet: get the app first. Once the head attaches their
+             referral, one button goes to fomo.family/r/<head>, which fills
+             their code in at sign-up and so links the new account to the
+             chapter. Before that, the store badges go straight to the stores. -->
         <div class="get-app">
           <p class="or">or</p>
           <h3 class="get-title">New to fomo? Get it here first.</h3>
@@ -433,7 +447,13 @@
             <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
             <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
           </div>
-          <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+          <a class="get-one" id="get-one" target="_blank" rel="noopener" hidden><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download fomo</a>
+          <ol class="get-steps" id="get-steps" hidden>
+            <li><span>fomo's page opens. Tap <b>Download app</b>.</span></li>
+            <li><span>Sign in and pick a username.</span></li>
+            <li><span>When it asks for a referral code, keep <code class="ref-code"></code><button type="button" class="copy-code">Copy</button> <span id="code-why"></span></span></li>
+            <li><span id="last-step"></span></li>
+          </ol>
         </div>
       </div>
 
@@ -592,35 +612,36 @@
     $('pass-title').textContent = (c.claim ? 'Get the rest of ' + short + ' claimed.' : 'Get the rest of ' + short + ' in.');
     $('share-text').textContent = 'Send this page to your chapter.';
   }
-  // the head's referral, for anyone who still needs the app: the store badges
-  // go through fomo.family/r/<head>, which is what files a new account under
-  // the head and so into this clan; until a head attaches, they go straight to
-  // the stores. The code itself stays below them for an app that asks for it.
+  // for anyone who still needs the app. With the head's referral, one button
+  // goes to fomo.family/r/<head>, whose page fills the head's code in at
+  // sign-up; the code links the account to this chapter. Before a head
+  // attaches, the store badges go straight to the stores. Either way the fomo
+  // team adds people to the clan in the app, from the sign-ups on this page.
   function showCode() {
     var short = shortName(clan.chapter), ref = clan.lead ? 'https://fomo.family/r/' + encodeURIComponent(clan.lead) : null;
-    Array.prototype.forEach.call(document.querySelectorAll('.store'), function (a) {
-      a.href = ref || a.getAttribute('data-store');
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('.code-row'), function (row) {
-      row.hidden = !clan.lead;
-      row.querySelector('.ref-code').textContent = clan.lead || '';
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('.get-title'), function (title) {
-      title.textContent = ref ? 'New to fomo? Get it with these buttons.' : 'New to fomo? Get it here first.';
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('.get-note'), function (note) {
-      note.textContent = '';
-      if (ref) {
-        // the referral only rides along through these buttons, so say so plainly
-        note.appendChild(el('strong', 'Use these buttons, not a store search.'));
-        note.appendChild(document.createTextNode(' They carry @' + clan.lead + '\u2019s referral, which is what puts your new account in the ' + short + ' clan. ' + (clan.claim ? 'Then claim your username above.' : 'Then add yourself above.')));
-      } else {
-        // no referral yet: the store buttons can't connect anyone, the form here does
-        note.appendChild(document.createTextNode('Make your account in the app, then '));
-        note.appendChild(el('strong', clan.claim ? 'claim your username above.' : 'add yourself above.'));
-        note.appendChild(document.createTextNode(' That\u2019s what puts you in the ' + short + ' clan.'));
-      }
-    });
+    var code = clan.lead ? clan.lead.toLowerCase() : '';
+    var back = clan.claim ? 'claim your username above' : 'add yourself above';
+    $('get-one').hidden = !ref;
+    $('get-steps').hidden = !ref;
+    document.querySelector('.get-app .stores').hidden = !!ref;
+    document.querySelector('.get-app .get-note').hidden = !!ref;
+    if (ref) {
+      $('get-one').href = ref;
+      document.querySelector('.get-app .get-title').textContent = 'New to fomo? Get it with @' + clan.lead + '\u2019s code.';
+      document.querySelector('.get-steps .ref-code').textContent = code;
+      $('code-why').textContent = 'It links you to ' + short + ' and gets you 10% off fees.';
+      $('last-step').textContent = '';
+      $('last-step').appendChild(document.createTextNode('Come back and '));
+      $('last-step').appendChild(el('b', back + '.'));
+      $('last-step').appendChild(document.createTextNode(' We\u2019ll add you to the clan from there.'));
+      return;
+    }
+    document.querySelector('.get-app .get-title').textContent = 'New to fomo? Get it here first.';
+    var note = document.querySelector('.get-app .get-note');
+    note.textContent = '';
+    note.appendChild(document.createTextNode('Make your account in the app, then '));
+    note.appendChild(el('strong', back + '.'));
+    note.appendChild(document.createTextNode(' We\u2019ll add you to the ' + short + ' clan from there.'));
   }
   function el(tag, text, cls) { var n = document.createElement(tag); n.textContent = text; if (cls) n.className = cls; return n; }
 
@@ -633,14 +654,14 @@
     box.hidden = false;
     $('p-count').textContent = n;
     if (!clan.actives) {
-      $('p-of').textContent = n === 1 ? 'member in the clan' : 'members in the clan';
+      $('p-of').textContent = n === 1 ? 'member signed up' : 'members signed up';
       $('p-left').textContent = '';
       $('p-bar-wrap').hidden = true;
       $('p-note').textContent = 'Every member counts toward ' + short + '’s 80%.';
       return;
     }
     var target = Math.ceil(clan.actives * 0.8), left = Math.max(target - n, 0);
-    $('p-of').textContent = 'of ' + target + (clan.claim ? ' claimed' : ' in');
+    $('p-of').textContent = 'of ' + target + (clan.claim ? ' claimed' : ' signed up');
     $('p-bar-wrap').hidden = false;
     $('p-bar').style.width = Math.min(100, Math.round(n / target * 100)) + '%';
     $('p-left').textContent = left ? left + ' to go' : 'Hit 80%';
@@ -651,7 +672,7 @@
 
   Array.prototype.forEach.call(document.querySelectorAll('.copy-code'), function (btn) {
     btn.addEventListener('click', function () {
-      copy(clan && clan.lead ? clan.lead : '', function () {
+      copy(clan && clan.lead ? clan.lead.toLowerCase() : '', function () {
         btn.textContent = 'Copied';
         setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
       }, function () {
@@ -692,7 +713,7 @@
     joinLabel.textContent = n === lastQ() ? finalLabel() : 'Next';
     if (focus) $(Q[n][0]).focus();
   }
-  function finalLabel() { return clan && clan.claim ? 'Claim my spot' : 'Join the clan'; }
+  function finalLabel() { return clan && clan.claim ? 'Claim my spot' : 'Add me to the clan'; }
   function check(n) {
     if (n === 1) {
       if (!$('first').value.trim()) return ['Add your first name.', 'first'];
