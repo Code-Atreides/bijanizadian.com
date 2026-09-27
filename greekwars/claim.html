@@ -204,6 +204,11 @@
   .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 14px 0 16px; line-height: 1.6; }
   .site-footer a { color: inherit; text-underline-offset: 3px; }
 
+  /* only on narrow screens: the pitch's Get started, and the way back to it */
+  .get-started, .how-link { display: none; }
+  .how-link { align-items: center; gap: 5px; min-height: 36px; border: 0; background: none; padding: 0 12px 0 0; margin: -8px 0 2px; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); }
+  .how-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
   @media (max-width: 1050px) {
     .site-shell { padding: 0 24px; }
     main { grid-template-columns: minmax(0, 270px) minmax(0, 1fr); }
@@ -243,6 +248,15 @@
     h1 { font-size: 28px; letter-spacing: -.8px; margin: 6px 0 0; }
     h1 br { display: none; }
     .benefits, .info { display: none; }
+    /* the pitch first, whole, with Get started; then the steps take the card */
+    main.intro-mode .claim { display: none; }
+    main.intro-mode .invitation { display: block; padding: 26px 24px 24px; border-bottom: 0; }
+    main.intro-mode h1 { font-size: 38px; letter-spacing: -1.2px; margin: 14px 0 12px; }
+    main.intro-mode h1 br { display: inline; }
+    main.intro-mode .benefits { display: block; }
+    main.intro-mode .info { display: grid; }
+    main.intro-mode .get-started { display: flex; margin-top: 24px; }
+    main:not(.intro-mode) .how-link { display: inline-flex; }
   }
   /* phones: the step's own heading carries the page, so the panel goes */
   @media (max-width: 600px) {
@@ -254,6 +268,9 @@
     .season svg { width: 13px; height: 13px; }
     main { border-radius: 12px; }
     .invitation { display: none; }
+    main.intro-mode .invitation { padding: 22px 18px 20px; }
+    main.intro-mode h1 { font-size: 34px; }
+    main.intro-mode .info { gap: 14px; margin-top: 18px; padding-top: 16px; }
     .claim { padding: 18px 16px 16px; }
     h2 { font-size: 22px; }
     .subtitle.more { display: none; }
@@ -318,7 +335,7 @@
     </span>
   </header>
 
-  <main>
+  <main class="intro-mode">
     <section class="invitation" aria-labelledby="invite-title">
       <span class="eyebrow">REGISTRATION · FALL 2026</span>
       <h1 id="invite-title">Onboard your <br><span>chapter.</span></h1>
@@ -341,11 +358,13 @@
           <span>Any recognised Greek chapter<small>Fraternity or sorority, 18+ to compete. No crypto knowledge needed.</small></span>
         </div>
       </div>
+      <button type="button" class="primary-action get-started" id="get-started">Get started<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
     </section>
 
     <section class="claim" aria-label="Claim your spot in your chapter's clan">
       <!-- step 1 · which clan -->
       <div id="step-chapter">
+        <button type="button" class="how-link" id="how-it-works"><span aria-hidden="true">←</span> How it works</button>
         <h2 tabindex="-1" id="chapter-title">Your chapter</h2>
         <p class="subtitle more">So the team sets up the right clan, and your link says who it's for.</p>
         <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your chapter</em></span><span class="step-line"></span><span><i>2</i><em>Your link</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
@@ -793,6 +812,20 @@
     });
   }
 
+  // ---------- narrow screens open on the pitch: Get started goes to step 1 and
+  // "How it works" comes back. Wide screens show both, so the class does nothing.
+  var card = document.querySelector('main');
+  $('get-started').addEventListener('click', function () {
+    card.classList.remove('intro-mode');
+    window.scrollTo(0, 0);
+    $('chapter-title').focus();
+  });
+  $('how-it-works').addEventListener('click', function () {
+    card.classList.add('intro-mode');
+    window.scrollTo(0, 0);
+    $('get-started').focus();
+  });
+
   // ---------- a lead coming back finds the link this browser already made
   var saved = null;
   try { saved = JSON.parse(localStorage.getItem(SAVED_KEY) || 'null'); } catch (e) {}
@@ -802,6 +835,8 @@
     $('saved-url').textContent = saved.url.replace(/^https:\/\//, '');
     $('saved-clan').hidden = false;
     $('step-chapter').classList.add('has-saved');
+    // they came back for their link, so skip the pitch
+    card.classList.remove('intro-mode');
     savedCopy.addEventListener('click', function () {
       copy(saved.url, function () {
         savedCopy.textContent = 'Copied';
