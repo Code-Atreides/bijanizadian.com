@@ -460,7 +460,7 @@
       <!-- in -->
       <div id="step-sent" class="done" hidden>
         <span class="done-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>
-        <h2 tabindex="-1" id="sent-title">You're in.</h2>
+        <h2 tabindex="-1" id="sent-title">You're on the list.</h2>
         <p id="sent-copy"></p>
         <span class="pending">Pending verification</span>
         <div class="pass-on">
@@ -541,22 +541,29 @@
     return nick ? nick[1] : name;
   }
 
-  // ---------- which clan: /greekwars/clan/<id>
-  var id = null, clan = null;
-  var path = window.location.pathname.match(/^\/greekwars\/clan\/([^/]+)\/?$/);
+  // ---------- which clan: …/clan/<id>, or ?c=<id> on a host that can't rewrite
+  // paths to this page. Whichever address opened it is the members' link, so
+  // the page works on any domain and under any folder.
+  var id = null, clan = null, byQuery = false, query = null;
+  try { query = new URLSearchParams(window.location.search); } catch (e) {}
+  var path = window.location.pathname.match(/\/clan\/([^/]+)\/?$/);
   if (path) { try { id = decodeURIComponent(path[1]).toLowerCase(); } catch (e) {} }
+  else if (query && query.get('c')) { id = query.get('c').toLowerCase(); byQuery = true; }
   if (!id || !/^[a-z0-9-]{3,48}$/.test(id)) { show('missing'); return; }
   if (!db) { unreachable(); return; }
-  var MEMBER_URL = 'https://bijanizadian.com/greekwars/clan/' + id;
+  var PAGE_PATH = byQuery
+    ? window.location.pathname + '?c=' + id
+    : window.location.pathname.replace(/\/clan\/[^/]+\/?$/, '/clan/' + id);
+  var MEMBER_URL = window.location.origin + PAGE_PATH;
 
   // ---------- the head's key: read it from ?head=, keep it for this tab, and
   // take it out of the address bar so the link a head copies is the members'
   var headKey = null, HEAD_STORE = 'fomo-clan-head-' + id;
   try {
-    var q = new URLSearchParams(window.location.search).get('head');
+    var q = query && query.get('head');
     if (q && /^[A-Za-z0-9]{12,64}$/.test(q)) { headKey = q; sessionStorage.setItem(HEAD_STORE, q); }
     else headKey = sessionStorage.getItem(HEAD_STORE);
-    if (q) history.replaceState(null, '', window.location.pathname);
+    if (q) history.replaceState(null, '', PAGE_PATH);
   } catch (e) {}
 
   withTimeout(db.ref('greekwars_clans/' + id).once('value'), 12000).then(function (snap) {

@@ -490,7 +490,11 @@
   // Each clan gets a short link: its nickname or name as a slug, plus four random
   // characters so two chapters with the same letters never collide —
   // /greekwars/clan/sigma-chi-7fq2, /greekwars/clan/sae-k3xp.
-  var CLAN_BASE = 'https://bijanizadian.com/greekwars/clan/';
+  // Links are built on whichever site serves this page. If the clan page lives
+  // somewhere else, change CLAN_PATH — to '/greekwars/clan.html?c=' on a host
+  // that can't rewrite /greekwars/clan/<id> to it.
+  var CLAN_PATH = '/greekwars/clan/';
+  var CLAN_BASE = window.location.origin + CLAN_PATH;
   var SAVED_KEY = 'fomo-greekwars-clan';
   function clanId(chapterName) {
     var nick = chapterName.match(/\(([^)]+)\)\s*$/);
