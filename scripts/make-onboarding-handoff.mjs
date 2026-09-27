@@ -4,9 +4,10 @@
 //   node scripts/make-onboarding-handoff.mjs
 //
 // Unlike make-fomo-handoff.mjs, the pages keep writing to this project's
-// Realtime Database, so every clan, head and member stays in one place and the
-// team's tools (Irrigation, /claimlinks, the live counts) keep seeing them. The
-// README says how to point the pages at another Firebase project instead.
+// Realtime Database, so every clan, head and member stays in one place: the clan
+// pages' live counts, the team's Irrigation workspace and the recipient's admin
+// all read the same data. The bundle deliberately has no route to another
+// Firebase project, since that would disconnect it from Irrigation.
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
@@ -14,9 +15,6 @@ const OUT = 'greekwars-onboarding';
 const PAGES = ['greekwars/claim.html', 'greekwars/clan.html'];
 const FILES = ['fomo-favicon.svg', 'badge-app-store.svg', 'badge-google-play.svg', 'campus/space-bg.webp'];
 const DIRS = ['campus/fonts'];
-// the nodes the two pages read and write, lifted from the live rules
-const RULE_NODES = ['greekwars_clans', 'greekwars_clan_leads', 'greekwars_clan_members',
-                    'greekwars_clan_roster', 'greekwars_clan_heads'];
 const DATABASE_URL = 'https://bijanizadian-84e48-default-rtdb.firebaseio.com';
 
 await rm(OUT, { recursive: true, force: true });
@@ -47,15 +45,6 @@ for (const page of PAGES) {
   if (!src.includes(DATABASE_URL)) throw new Error(`${page}: database config not found`);
   await writeFile(path, src);
 }
-
-const live = JSON.parse(await readFile('database.rules.json', 'utf8'));
-const rules = {};
-for (const node of RULE_NODES) {
-  if (!live.rules[node]) throw new Error(`no rule for ${node} in database.rules.json`);
-  rules[node] = live.rules[node];
-}
-await mkdir(join(OUT, 'own-firebase'), { recursive: true });
-await writeFile(join(OUT, 'own-firebase', 'database.rules.json'), JSON.stringify({ rules }, null, 2) + '\n');
 
 await writeFile(join(OUT, 'admin-read-example.mjs'), `// Reads every Greek Wars clan, its head and its members, shaped for an admin
 // page. Run it on a server, never in a browser: heads' and members' details are
@@ -185,6 +174,10 @@ The pages write to the fomo team's Firebase Realtime Database
 made on your site show up in the team's tools straight away. The database rules
 decide what a browser may do; the pages don't need a login.
 
+**Keep the \`firebaseConfig\` in both pages exactly as it is.** The fomo team's
+Irrigation workspace and your admin both read this database, so pointing the
+pages anywhere else would disconnect them.
+
 | Node | Holds | Browser can read |
 |---|---|---|
 | \`greekwars_clans/<id>\` | chapter, school, head's fomo username (\`lead\`), active members (\`actives\`), \`created_at\`; \`kind: "claim"\` on clans the team made | one clan at a time, by id |
@@ -209,19 +202,9 @@ read them on the server:
 3. Use \`admin-read-example.mjs\`. \`readClans()\` returns one row per clan with its
    head and members, ready to render or return as JSON. Show your admin behind
    its own login, since the rows include emails and phone numbers.
-
-## Using your own Firebase project instead
-
-Only do this if the sign-ups should live apart from the fomo team's data. Their
-tools won't see clans made on your site.
-
-1. Create a Realtime Database in your project and deploy
-   \`own-firebase/database.rules.json\` to it.
-2. In both pages, replace the \`firebaseConfig\` values with your project's.
-3. Change \`DATABASE_URL\` in \`admin-read-example.mjs\`.
 `);
 
-console.log(`built ${OUT}/ — ${PAGES.length} pages, rules for ${RULE_NODES.length} nodes, admin example and README`);
+console.log(`built ${OUT}/ — ${PAGES.length} pages, admin example and README`);
 // Windows' own tar writes forward-slash paths; Compress-Archive writes
 // backslashes, which some Mac and Linux unzip tools turn into flat file names.
 console.log(`zip it with:  tar -a -c -f ${OUT}.zip ${OUT}   (in PowerShell: Windows' tar.exe, not Compress-Archive)`);
