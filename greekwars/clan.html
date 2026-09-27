@@ -94,6 +94,13 @@
   h1 { font-size: 42px; line-height: 1.1; font-weight: 500; letter-spacing: -1.5px; margin-top: 12px; overflow-wrap: anywhere; }
   h1 > span { color: var(--blue); }
   h1.is-long { font-size: 34px; letter-spacing: -1.1px; }
+  /* whose link this is: the chapter's crest, name and school. It lives here
+     beside the headline; the header only carries it once the headline is gone. */
+  .clan-id { display: flex; align-items: center; gap: 12px; margin-top: 18px; padding: 10px 14px 10px 10px; background: #fff; border: 1px solid #dde2fb; border-radius: 12px; min-width: 0; }
+  .clan-id > span:last-child { min-width: 0; }
+  .clan-id b { display: block; font-size: 15.5px; font-weight: 500; letter-spacing: -.2px; line-height: 1.3; overflow-wrap: anywhere; }
+  .clan-id small { display: block; font-size: 13.5px; color: var(--muted); margin-top: 1px; overflow-wrap: anywhere; }
+  @media (min-width: 851px) { .site-header .clan-tag { display: none !important; } }
 
   /* the live count: members in, out of the 80% the chapter needs */
   .progress { background: #fff; border: 1px solid #dde2fb; border-radius: 12px; padding: 14px 16px 13px; margin-top: auto; }
@@ -232,6 +239,8 @@
     .invitation { padding: 20px 24px; gap: 14px; }
     h1 { font-size: 34px; margin-top: 8px; }
     h1.is-long { font-size: 28px; }
+    .clan-id { margin-top: 12px; padding: 8px 12px 8px 8px; }
+    .clan-id .crest { min-width: 38px; height: 38px; font-size: 15px; }
     .progress { padding: 11px 14px; }
     .p-top b { font-size: 30px; }
     .bar { margin: 9px 0 7px; }
@@ -335,6 +344,7 @@
       <div class="intro">
         <span class="eyebrow">GREEK WARS · FALL 2026</span>
         <h1 id="invite-title">Join your<br><span>clan.</span></h1>
+        <p class="clan-id" id="clan-id" hidden><span class="crest" id="id-crest" aria-hidden="true"></span><span><b id="id-chapter"></b><small id="id-school"></small></span></p>
       </div>
 
       <div class="progress" id="progress" aria-live="polite" hidden>
@@ -556,6 +566,10 @@
     $('tag-chapter').textContent = c.chapter;
     $('tag-school').textContent = c.school;
     $('clan-tag').hidden = false;
+    $('id-crest').textContent = crest(c.chapter);
+    $('id-chapter').textContent = c.chapter;
+    $('id-school').textContent = c.school;
+    $('clan-id').hidden = false;
     $('season').hidden = true;
     var h1 = $('invite-title');
     h1.textContent = c.claim ? 'Claim ' : 'Join ';
