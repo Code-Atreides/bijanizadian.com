@@ -22,9 +22,9 @@
 <!--
   Greek Wars clan claims, in the /hqvisitform design language: a light page, a
   small header, and one split card. For the person onboarding a chapter. They
-  prove their fomo account is real with the rewards referral link from the app
-  (fomo.family/r/<username>), then give their name, school, chapter and roster
-  size, plus an email. Submitting saves the clan to the shared Firebase project
+  give their name, school, chapter, roster size and email first, then prove
+  their fomo account is real with the rewards referral link from the app
+  (fomo.family/r/<username>). Creating the clan saves it to the shared Firebase project
   (greekwars_clans/<id>: chapter, school, lead username and roster size, readable one clan at
   a time; greekwars_clan_leads/<id>: the lead's details, write-only) and hands
   them one link to send the chapter: the clan's own page, /greekwars/clan/<id>,
@@ -282,7 +282,7 @@
     .link-row { padding: 8px 4px 8px 10px; gap: 9px; }
     /* a returning lead came back for their link, so it takes the drawing's place */
     .has-saved .rewards { display: none; }
-    #step-chapter .summary small, .note-more { display: none; }
+    #step-link .summary small, .note-more { display: none; }
     .field { margin-bottom: 9px; }
   }
   /* the smallest phones keep the written steps and drop the drawing */
@@ -341,11 +341,11 @@
     </section>
 
     <section class="claim" aria-label="Claim your spot in your chapter's clan">
-      <!-- step 1 · prove the account -->
-      <div id="step-link">
-        <h2 tabindex="-1" id="link-title">Prove your account</h2>
-        <p class="subtitle more">Your referral link from the fomo app has your username in it. It's how the team matches you to a real account.</p>
-        <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your link</em></span><span class="step-line"></span><span><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
+      <!-- step 1 · which clan -->
+      <div id="step-chapter">
+        <h2 tabindex="-1" id="chapter-title">Your chapter</h2>
+        <p class="subtitle more">So the team sets up the right clan, and your link says who it's for.</p>
+        <div class="steps" aria-label="Step 1 of 3"><span class="active"><i>1</i><em>Your chapter</em></span><span class="step-line"></span><span><i>2</i><em>Your link</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
 
         <!-- shown when this browser already made a clan link -->
         <div class="summary saved-clan" id="saved-clan" hidden>
@@ -354,51 +354,6 @@
             <span><strong id="saved-title"></strong><small id="saved-url"></small></span>
           </div>
           <button type="button" class="text-button" id="saved-copy">Copy link</button>
-        </div>
-
-        <div class="find">
-          <ol class="find-steps">
-            <li><span>In fomo, open your <b>profile</b>.</span></li>
-            <li><span>Tap <b>Rewards</b> in the top right.</span></li>
-            <li><span>Under <b>“Refer and earn 25% of your friends' fees”</b>, tap <b>copy</b> next to your <code>fomo.family/r/</code> link and paste it below.</span></li>
-          </ol>
-          <div class="rewards" aria-hidden="true">
-            <div class="rw-top">
-              <b>‹&nbsp; Rewards</b>
-              <span class="rw-share"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Share</span>
-            </div>
-            <div class="rw-total">Total earned<i class="rw-bar"></i></div>
-            <div class="rw-ref">
-              <div class="rw-banner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>Refer and earn 25% of your friends' fees</div>
-              <div class="rw-link"><span>fomo.family/r/<b>yourname</b></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></div>
-              <span class="rw-callout">Copy this</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="ref-link">Your referral link</label>
-          <input id="ref-link" name="ref-link" type="text" inputmode="url" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="300" placeholder="fomo.family/r/yourname" aria-describedby="ref-help">
-          <p class="help" id="ref-help">Paste the whole link, not just your username.</p>
-          <p class="field-error" id="ref-error" hidden></p>
-        </div>
-
-        <button type="button" class="primary-action" id="to-chapter" disabled>Continue<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-        <p class="under-button aside">Only the chapter head does this. Members use the link you get at the end.</p>
-      </div>
-
-      <!-- step 2 · which clan -->
-      <div id="step-chapter" hidden>
-        <h2 tabindex="-1" id="chapter-title">Your chapter</h2>
-        <p class="subtitle more">So the team sets up the right clan, and your link says who it's for.</p>
-        <div class="steps" aria-label="Step 2 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Your chapter</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
-
-        <div class="summary">
-          <div>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span><strong class="sum-name"></strong><small class="sum-link"></small></span>
-          </div>
-          <button type="button" class="text-button" data-go="link" aria-label="Change your referral link">Edit</button>
         </div>
 
         <form id="chapter-form" novalidate>
@@ -428,16 +383,62 @@
           </div>
           <p class="privacy-note">Only the fomo team sees your name and email.<span class="note-more"> Your chapter, school and fomo username show on your clan page.</span></p>
           <p class="form-error" id="form-error" role="alert" hidden></p>
-          <button type="submit" class="primary-action" id="create"><span>Submit</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
-          <p class="under-button aside">Next, you get the link to send your chapter.</p>
+          <button type="submit" class="primary-action" id="to-link"><span>Continue</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <p class="under-button aside">Only the chapter head does this. Members use the link you get at the end.</p>
         </form>
+      </div>
+
+      <!-- step 2 · prove the account, which creates the clan -->
+      <div id="step-link" hidden>
+        <h2 tabindex="-1" id="link-title">Prove your account</h2>
+        <p class="subtitle more">Your referral link from the fomo app has your username in it. It's how the team matches you to a real account.</p>
+        <div class="steps" aria-label="Step 2 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>2</i><em>Your link</em></span><span class="step-line"></span><span><i>3</i><em>Share</em></span></div>
+
+        <div class="summary">
+          <div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span><strong class="sum-chapter"></strong><small class="sum-detail"></small></span>
+          </div>
+          <button type="button" class="text-button" data-go="chapter" aria-label="Change your chapter details">Edit</button>
+        </div>
+
+        <div class="find">
+          <ol class="find-steps">
+            <li><span>In fomo, open your <b>profile</b>.</span></li>
+            <li><span>Tap <b>Rewards</b> in the top right.</span></li>
+            <li><span>Under <b>“Refer and earn 25% of your friends' fees”</b>, tap <b>copy</b> next to your <code>fomo.family/r/</code> link and paste it below.</span></li>
+          </ol>
+          <div class="rewards" aria-hidden="true">
+            <div class="rw-top">
+              <b>‹&nbsp; Rewards</b>
+              <span class="rw-share"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>Share</span>
+            </div>
+            <div class="rw-total">Total earned<i class="rw-bar"></i></div>
+            <div class="rw-ref">
+              <div class="rw-banner"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg>Refer and earn 25% of your friends' fees</div>
+              <div class="rw-link"><span>fomo.family/r/<b>yourname</b></span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg></div>
+              <span class="rw-callout">Copy this</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="ref-link">Your referral link</label>
+          <input id="ref-link" name="ref-link" type="text" inputmode="url" autocomplete="off" spellcheck="false" autocapitalize="none" maxlength="300" placeholder="fomo.family/r/yourname" aria-describedby="ref-help">
+          <p class="help" id="ref-help">Paste the whole link, not just your username.</p>
+          <p class="field-error" id="ref-error" hidden></p>
+        </div>
+
+        <p class="form-error" id="save-error" role="alert" hidden></p>
+        <button type="button" class="primary-action" id="create" disabled><span>Create my clan</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <p class="under-button aside">Next, you get the link to send your chapter.</p>
       </div>
 
       <!-- step 3 · the one link the chapter needs -->
       <div id="step-share" hidden>
         <h2 tabindex="-1" id="share-title">Send your chapter this link</h2>
         <p class="subtitle" id="share-subtitle"></p>
-        <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Share</em></span></div>
+        <div class="steps" aria-label="Step 3 of 3"><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your chapter</em></span><span class="step-line"></span><span class="complete"><i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Your link</em></span><span class="step-line"></span><span class="active"><i>3</i><em>Share</em></span></div>
 
         <div class="link-rows">
           <div class="link-row">
@@ -611,9 +612,9 @@
   var $ = function (id) { return document.getElementById(id); };
   function each(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
   var refInput = $('ref-link'), refError = $('ref-error'), refHelp = $('ref-help');
-  var cont = $('to-chapter');
+  var cont = $('create');
   var school = $('school'), chapter = $('chapter');
-  var linked = null, claim = null;
+  var linked = null, claim = null, details = null;
 
   // ---------- step 1: read the link as it's typed or pasted, but only
   // complain about it once they've left the field or pressed Continue
@@ -653,27 +654,13 @@
   }
   each('[data-go]', function (b) { b.addEventListener('click', function () { show(b.getAttribute('data-go')); }); });
 
-  cont.addEventListener('click', function () {
-    showRefError(true);
-    if (!linked) { refInput.focus(); return; }
-    each('.sum-name', function (el) { el.textContent = '@' + linked.name; });
-    each('.sum-link', function (el) { el.textContent = linked.url.replace(/^https:\/\//, ''); });
-    show('chapter');
-  });
-
-  // ---------- step 2: who and which clan, then save it
+  // ---------- step 1: who and which clan
   combobox(school, $('school-list'), SCHOOLS);
   combobox(chapter, $('chapter-list'), CHAPTERS);
-  var formError = $('form-error'), create = $('create'), createLabel = create.querySelector('span'), CREATE_LABEL = createLabel.textContent;
+  var formError = $('form-error');
   function fail(message) { formError.textContent = message; formError.hidden = false; }
-  function busy(on) {
-    create.disabled = on;
-    create.classList.toggle('is-busy', on);
-    createLabel.textContent = on ? 'Submitting…' : CREATE_LABEL;
-  }
   $('chapter-form').addEventListener('submit', function (e) {
     e.preventDefault();
-    if (create.disabled) return;
     formError.hidden = true;
     var first = $('first').value.trim(), last = $('last').value.trim(), email = $('email').value.trim();
     var s = school.value.trim(), c = chapter.value.trim();
@@ -693,7 +680,28 @@
       $(bad[0]).focus();
       return;
     }
-    if (!db) { fail("We couldn't reach the server. Check your connection and refresh the page."); return; }
+    details = { first: first, last: last, email: email, school: s, chapter: c, actives: actives };
+    each('.sum-chapter', function (el) { el.textContent = c; });
+    each('.sum-detail', function (el) { el.textContent = s + ' · ' + actives + ' actives'; });
+    show('link');
+  });
+
+  // ---------- step 2: the referral link proves the account and creates the clan
+  var saveError = $('save-error'), createLabel = cont.querySelector('span'), CREATE_LABEL = createLabel.textContent;
+  function saveFail(message) { saveError.textContent = message; saveError.hidden = false; }
+  function busy(on) {
+    cont.disabled = on || !linked;
+    cont.classList.toggle('is-busy', on);
+    createLabel.textContent = on ? 'Creating your clan…' : CREATE_LABEL;
+  }
+  cont.addEventListener('click', function () {
+    showRefError(true);
+    if (!linked) { refInput.focus(); return; }
+    if (!details) { show('chapter'); return; }
+    saveError.hidden = true;
+    if (!db) { saveFail("We couldn't reach the server. Check your connection and refresh the page."); return; }
+    var first = details.first, last = details.last, email = details.email;
+    var s = details.school, c = details.chapter, actives = details.actives;
     busy(true);
     save(0);
 
@@ -710,7 +718,7 @@
         // random id was taken — try a fresh one before giving up
         if (attempt < 2 && err && /permission/i.test(err.code || err.message || '')) { save(attempt + 1); return; }
         busy(false);
-        fail(err && err.code === 'TIMEOUT'
+        saveFail(err && err.code === 'TIMEOUT'
           ? 'This is taking too long. Check your connection and try again.'
           : "We couldn't create your clan link. Try again in a moment.");
       });
@@ -779,7 +787,7 @@
     $('saved-title').textContent = 'Your ' + String(saved.chapter || '').slice(0, 120) + ' clan link';
     $('saved-url').textContent = saved.url.replace(/^https:\/\//, '');
     $('saved-clan').hidden = false;
-    $('step-link').classList.add('has-saved');
+    $('step-chapter').classList.add('has-saved');
     savedCopy.addEventListener('click', function () {
       copy(saved.url, function () {
         savedCopy.textContent = 'Copied';
