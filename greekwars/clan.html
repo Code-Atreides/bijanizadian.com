@@ -489,15 +489,77 @@
 
 <script>
 (function () {
-  // ---------- the shared Firebase project the other Greek Wars forms use
+  // ======================================================================
+  // THE DATA LAYER: the only code on this page that knows which database is
+  // behind it. To use another backend, rewrite DATA and keep what each function
+  // promises; nothing else on the page needs to change.
+  //
+  // Today it reads and writes a Firebase Realtime Database: greekwars_clans/<id>
+  // (public one clan at a time), greekwars_clan_members/<id>/<username>
+  // (write-only) and greekwars_clan_roster/<id>/<username> (public, the count).
+  // ======================================================================
   var firebaseConfig = {
     apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
     authDomain: 'bijanizadian-84e48.firebaseapp.com',
     databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
     projectId: 'bijanizadian-84e48'
   };
-  var db = null;
-  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+  var DATA = (function () {
+    var db = null;
+    try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+    var refused = function (err) { return err && /permission/i.test(err.code || err.message || ''); };
+    return {
+      // false when the database couldn't be reached at all
+      ready: !!db,
+      // Resolves with the clan, or null when there's no clan with this id:
+      // { chapter, school, lead, kind, actives }. lead is the head's fomo
+      // username (null until a team-made clan's head attaches one), kind is
+      // 'claim' only on clans the fomo team made, and actives is the roster
+      // size. Rejects { code: 'TIMEOUT' } or anything else if it can't read.
+      getClan: function (id) {
+        return withTimeout(db.ref('greekwars_clans/' + id).once('value'), 12000).then(
+          function (snap) { return snap.val(); },
+          function (err) { if (refused(err)) return null; throw err; });
+      },
+      // Calls onCount(n) with how many people have signed up for this clan,
+      // straight away and again whenever it changes. Calls onError() if the
+      // count can't be read. Only the number is needed, never who.
+      watchCount: function (id, onCount, onError) {
+        db.ref('greekwars_clan_roster/' + id).on('value', function (snap) { onCount(snap.numChildren()); }, onError);
+      },
+      // Saves one member. member: { fomoUsername, firstName, lastName, email };
+      // team-made clans send only fomoUsername. Resolves once saved, and only
+      // then does the count go up. Rejects { code: 'DUPLICATE' } if that
+      // username (ignoring case) has already signed up for this clan,
+      // { code: 'TIMEOUT' }, or anything else for other failures.
+      addMember: function (id, member) {
+        var key = member.fomoUsername.toLowerCase().replace(/\./g, ',');
+        var record = { fomo_username: member.fomoUsername, submitted_at: firebase.database.ServerValue.TIMESTAMP };
+        if (member.firstName) record.first_name = member.firstName;
+        if (member.lastName) record.last_name = member.lastName;
+        if (member.email) record.email = member.email;
+        var updates = {};
+        updates['greekwars_clan_members/' + id + '/' + key] = record;
+        updates['greekwars_clan_roster/' + id + '/' + key] = true;
+        return withTimeout(db.ref().update(updates), 15000).catch(function (err) {
+          throw refused(err) ? { code: 'DUPLICATE' } : err;
+        });
+      },
+      // Team-made clans only: a head opens their private link (?head=<key>)
+      // and attaches their referral link, which makes lead their username.
+      // Resolves once saved; rejects { code: 'REFUSED' } when the key isn't
+      // this clan's. Clans made on the claim page already have a lead, so a
+      // site that only onboards new chapters never calls this.
+      attachHead: function (id, key, lead, referralLink) {
+        var updates = {};
+        updates['greekwars_clan_heads/' + id + '/' + key] = { lead: lead, referral_link: referralLink, updated_at: firebase.database.ServerValue.TIMESTAMP };
+        updates['greekwars_clans/' + id + '/lead'] = lead;
+        return withTimeout(db.ref().update(updates), 15000).catch(function (err) {
+          throw refused(err) ? { code: 'REFUSED' } : err;
+        });
+      }
+    };
+  })();
 
   var $ = function (id) { return document.getElementById(id); };
   var USERNAME = /^[A-Za-z0-9_.-]{2,32}$/;
@@ -550,7 +612,7 @@
   if (path) { try { id = decodeURIComponent(path[1]).toLowerCase(); } catch (e) {} }
   else if (query && query.get('c')) { id = query.get('c').toLowerCase(); byQuery = true; }
   if (!id || !/^[a-z0-9-]{3,48}$/.test(id)) { show('missing'); return; }
-  if (!db) { unreachable(); return; }
+  if (!DATA.ready) { unreachable(); return; }
   var PAGE_PATH = byQuery
     ? window.location.pathname + '?c=' + id
     : window.location.pathname.replace(/\/clan\/[^/]+\/?$/, '/clan/' + id);
@@ -566,8 +628,7 @@
     if (q) history.replaceState(null, '', PAGE_PATH);
   } catch (e) {}
 
-  withTimeout(db.ref('greekwars_clans/' + id).once('value'), 12000).then(function (snap) {
-    var v = snap.val();
+  DATA.getClan(id).then(function (v) {
     if (!v || typeof v.chapter !== 'string' || typeof v.school !== 'string') { show('missing'); return; }
     clan = {
       chapter: v.chapter.slice(0, 120), school: v.school.slice(0, 120),
@@ -580,10 +641,7 @@
     wear(clan);
     if (clan.claim && headKey) headView(); else { show('join'); ask(firstQ()); }
     count();
-  }, function (err) {
-    if (err && /permission/i.test(err.code || err.message || '')) show('missing');
-    else unreachable();
-  });
+  }, function () { unreachable(); });
 
   // the page takes on the clan: header, headline, steps and tab title
   function wear(c) {
@@ -654,7 +712,7 @@
 
   // ---------- the live count: the roster's size against 80% of the chapter
   function count() {
-    db.ref('greekwars_clan_roster/' + id).on('value', function (snap) { paint(snap.numChildren()); }, function () { $('progress').hidden = true; });
+    DATA.watchCount(id, paint, function () { $('progress').hidden = true; });
   }
   function paint(n) {
     var short = shortName(clan.chapter), box = $('progress');
@@ -762,21 +820,17 @@
     save();
   });
 
-  // ---------- save: the member (write-only) and their place on the public
-  // roster, together, so the count can never run ahead of real sign-ups. The
-  // key is the lowercased username with dots as commas (keys can't hold dots).
+  // ---------- save: the member, counted only once they're saved. Team-made
+  // clans ask for nothing but the username.
   function save() {
-    var u = readUsername($('username').value), key = u.name.toLowerCase().replace(/\./g, ','), updates = {};
-    var member = { fomo_username: u.name, submitted_at: firebase.database.ServerValue.TIMESTAMP };
+    var u = readUsername($('username').value), member = { fomoUsername: u.name };
     if (!clan.claim) {
-      member.first_name = $('first').value.trim();
-      member.last_name = $('last').value.trim();
+      member.firstName = $('first').value.trim();
+      member.lastName = $('last').value.trim();
       member.email = $('email').value.trim();
     }
-    updates['greekwars_clan_members/' + id + '/' + key] = member;
-    updates['greekwars_clan_roster/' + id + '/' + key] = true;
     busy(true);
-    withTimeout(db.ref().update(updates), 15000).then(function () {
+    DATA.addMember(id, member).then(function () {
       busy(false);
       $('sent-copy').textContent = '';
       var b = document.createElement('b');
@@ -787,9 +841,7 @@
       show('sent', true);
     }, function (err) {
       busy(false);
-      // every answer is checked on the way through, so a refusal means this
-      // username is already in the clan
-      if (err && /permission/i.test(err.code || err.message || '')) { ask(2); fail('@' + u.name + (clan.claim ? ' is already claimed for this clan.' : ' has already joined this clan.') + ' If that\u2019s you, you\u2019re all set.', 'username'); }
+      if (err && err.code === 'DUPLICATE') { ask(2); fail('@' + u.name + (clan.claim ? ' is already claimed for this clan.' : ' has already joined this clan.') + ' If that\u2019s you, you\u2019re all set.', 'username'); }
       else if (err && err.code === 'TIMEOUT') fail('This is taking too long. Check your connection and try again.');
       else fail("We couldn't save that. Try again in a moment.");
     });
@@ -867,14 +919,9 @@
       refInput.focus();
       return;
     }
-    // the head's entry and the clan's lead go together: the rules only take
-    // the lead when the entry sits under this clan's key
-    var updates = {};
-    updates['greekwars_clan_heads/' + id + '/' + headKey] = { lead: r.name, referral_link: r.url, updated_at: firebase.database.ServerValue.TIMESTAMP };
-    updates['greekwars_clans/' + id + '/lead'] = r.name;
     attachButton.disabled = true;
     attachLabel.textContent = 'Attaching…';
-    withTimeout(db.ref().update(updates), 15000).then(function () {
+    DATA.attachHead(id, headKey, r.name, r.url).then(function () {
       attachButton.disabled = false;
       attachLabel.textContent = 'Attach';
       clan.lead = r.name;
@@ -884,7 +931,7 @@
     }, function (err) {
       attachButton.disabled = false;
       attachLabel.textContent = 'Attach';
-      headError.textContent = err && /permission/i.test(err.code || err.message || '')
+      headError.textContent = err && err.code === 'REFUSED'
         ? "This head link isn't working. Ask the fomo team for a fresh one."
         : err && err.code === 'TIMEOUT' ? 'This is taking too long. Check your connection and try again.' : "We couldn't attach that. Try again in a moment.";
       headError.hidden = false;

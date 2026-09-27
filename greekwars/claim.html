@@ -494,17 +494,49 @@
 
 <script>
 (function () {
-  // ---------- saved to the shared Firebase project the other Greek Wars forms
-  // use. greekwars_clans/<id> is public one clan at a time (it's what the clan
-  // page shows); greekwars_clan_leads/<id> is write-only.
+  // ======================================================================
+  // THE DATA LAYER: the only code on this page that knows which database is
+  // behind it. To use another backend, rewrite DATA and keep what each function
+  // promises; nothing else on the page needs to change.
+  //
+  // Today it saves to a Firebase Realtime Database: greekwars_clans/<id> is
+  // public one clan at a time (the clan page shows it), and
+  // greekwars_clan_leads/<id> is write-only.
+  // ======================================================================
   var firebaseConfig = {
     apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
     authDomain: 'bijanizadian-84e48.firebaseapp.com',
     databaseURL: 'https://bijanizadian-84e48-default-rtdb.firebaseio.com',
     projectId: 'bijanizadian-84e48'
   };
-  var db = null;
-  try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+  var DATA = (function () {
+    var db = null;
+    try { db = firebase.initializeApp(firebaseConfig).database(); } catch (e) { /* offline / blocked */ }
+    return {
+      // false when the database couldn't be reached at all
+      ready: !!db,
+      // Saves a new clan and its head's private details together: both or
+      // neither. clan: { chapter, school, lead, actives }, where lead is the
+      // head's fomo username. head: { firstName, lastName, email, phone,
+      // fomoUsername, referralLink, school, chapter, actives }. Resolves once
+      // saved. Rejects { code: 'TAKEN' } if a clan with this id already exists
+      // (the page retries with a new id), { code: 'TIMEOUT' } if it gets no
+      // answer, or anything else for other failures.
+      createClan: function (id, clan, head) {
+        var now = firebase.database.ServerValue.TIMESTAMP, updates = {};
+        updates['greekwars_clans/' + id] = { chapter: clan.chapter, school: clan.school, lead: clan.lead, actives: clan.actives, created_at: now };
+        updates['greekwars_clan_leads/' + id] = {
+          first_name: head.firstName, last_name: head.lastName, email: head.email, phone: head.phone,
+          fomo_username: head.fomoUsername, referral_link: head.referralLink,
+          school: head.school, chapter: head.chapter, actives: head.actives, submitted_at: now
+        };
+        return withTimeout(db.ref().update(updates), 15000).catch(function (err) {
+          // the page checks every field first, so the rules only refuse an id that's taken
+          throw err && /permission/i.test(err.code || err.message || '') ? { code: 'TAKEN' } : err;
+        });
+      }
+    };
+  })();
 
   // Each clan gets a short link: its nickname or name as a slug, plus four random
   // characters so two chapters with the same letters never collide —
@@ -732,24 +764,21 @@
     if (!linked) { refInput.focus(); return; }
     if (!details) { show('chapter'); return; }
     saveError.hidden = true;
-    if (!db) { saveFail("We couldn't reach the server. Check your connection and refresh the page."); return; }
+    if (!DATA.ready) { saveFail("We couldn't reach the server. Check your connection and refresh the page."); return; }
     var first = details.first, last = details.last, email = details.email, phone = details.phone;
     var s = details.school, c = details.chapter, actives = details.actives;
     busy(true);
     save(0);
 
     function save(attempt) {
-      var id = clanId(c), now = firebase.database.ServerValue.TIMESTAMP, updates = {};
-      updates['greekwars_clans/' + id] = { chapter: c, school: s, lead: linked.name, actives: actives, created_at: now };
-      updates['greekwars_clan_leads/' + id] = {
-        first_name: first, last_name: last, email: email, phone: phone,
-        fomo_username: linked.name, referral_link: linked.url,
-        school: s, chapter: c, actives: actives, submitted_at: now
-      };
-      withTimeout(db.ref().update(updates), 15000).then(function () { done(id); }, function (err) {
-        // every field is checked above, so a refusal almost always means the
-        // random id was taken — try a fresh one before giving up
-        if (attempt < 2 && err && /permission/i.test(err.code || err.message || '')) { save(attempt + 1); return; }
+      var id = clanId(c);
+      DATA.createClan(id, { chapter: c, school: s, lead: linked.name, actives: actives }, {
+        firstName: first, lastName: last, email: email, phone: phone,
+        fomoUsername: linked.name, referralLink: linked.url,
+        school: s, chapter: c, actives: actives
+      }).then(function () { done(id); }, function (err) {
+        // a random id that's already taken: try a fresh one before giving up
+        if (attempt < 2 && err && err.code === 'TAKEN') { save(attempt + 1); return; }
         busy(false);
         saveFail(err && err.code === 'TIMEOUT'
           ? 'This is taking too long. Check your connection and try again.'
