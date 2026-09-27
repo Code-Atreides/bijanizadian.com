@@ -12,7 +12,7 @@ function fail(message) { failures++; console.error(message); }
 // Firebase's **/.* pattern excludes dotfiles, not all files inside dot-directories.
 // Keep explicit recursive exclusions: a previous deployment included .git contents.
 const hosting = JSON.parse(fs.readFileSync(path.join(root, 'firebase.json'), 'utf8')).hosting;
-for (const required of ['**/.*', '**/.*/**', '.git/**', '.firebase/**', '**/*.log', 'scripts/**', 'AGENTS.md', 'portfolio/**', 'database.rules.json']) {
+for (const required of ['**/.*', '**/.*/**', '.git/**', '.firebase/**', '**/*.log', 'scripts/**', 'AGENTS.md', 'portfolio/**', 'database.rules.json', 'greekwars-onboarding/**', 'greekwars-onboarding.zip']) {
   if (!hosting.ignore?.includes(required)) fail(`firebase.json: missing protected-path exclusion ${required}`);
 }
 function assertJourney(condition, message) {
