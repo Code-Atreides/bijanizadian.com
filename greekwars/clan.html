@@ -112,21 +112,27 @@
   .how > li > i { font-style: normal; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 1px solid var(--option-line); color: var(--blue-text); font-size: 12px; font-weight: 500; }
   .how b { display: block; font-size: 14.5px; font-weight: 500; line-height: 1.4; padding-top: 2px; }
   .how small { display: block; font-size: 12.5px; color: #68708d; line-height: 1.5; margin-top: 2px; }
-  /* the download step stands on its own card: these buttons carry the head's
-     referral, which is how a new account lands in the clan */
-  .how > li.get-app { background: #fff; border: 1px solid #cdd5fb; border-radius: 12px; padding: 12px 12px 12px 10px; margin: 0 -4px; box-shadow: 0 10px 22px -16px rgba(81,106,246,.55); }
-  .get-note strong { color: var(--ink); font-weight: 500; }
-  /* fomo.family's own store badges, on ink so they read on the lavender */
-  .stores { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-  .store { display: block; border-radius: 7px; background: var(--ink); transition: opacity .15s; }
-  .store:hover { opacity: .88; }
-  .store:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
-  .store img { display: block; height: 34px; width: auto; }
-  /* the head's referral code, entered at sign-up so fomo files the account under them */
-  .code-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 8px; margin-top: 9px; font-size: 12.5px; color: #68708d; }
-  .code-row code { font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border: 1px solid #dde2fb; border-radius: 6px; padding: 3px 8px; }
-  .code-row button { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 3px 6px; border-radius: 5px; }
-  .code-row button:hover { background: #fff; }
+  /* the download step is the one a new member can't get wrong, so it's the
+     page's loudest card: fomo blue, with the store buttons across its full
+     width. Once the head attaches a referral, these buttons are what put a
+     new account in the clan. */
+  .how > li.get-app { background: var(--blue); color: #fff; border-radius: 14px; padding: 16px; margin: 0 -4px; row-gap: 10px; box-shadow: 0 18px 32px -20px rgba(53,74,193,.95); }
+  .how > li.get-app > i { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.45); color: #fff; }
+  .how > li.get-app b { font-size: 16px; }
+  .get-app > .get-note, .get-app > .stores, .get-app > .code-row { grid-column: 1 / -1; }
+  .get-note { font-size: 13.5px; line-height: 1.5; color: var(--lavender); }
+  .get-note strong { color: #fff; font-weight: 500; }
+  /* fomo.family's own store badges, each on a full-size ink button */
+  .stores { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .store { display: grid; place-items: center; height: 54px; border-radius: 10px; background: var(--ink); box-shadow: 0 8px 18px -10px rgba(11,9,31,.8); transition: transform .15s, box-shadow .15s; }
+  .store:hover { transform: translateY(-1px); box-shadow: 0 12px 22px -10px rgba(11,9,31,.9); }
+  .store:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .store img { display: block; height: 38px; width: auto; max-width: 88%; object-fit: contain; }
+  /* the head's referral code, for an app that asks for it at sign-up */
+  .code-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px 8px; font-size: 12.5px; color: var(--lavender); }
+  .code-row code { font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); background: #fff; border-radius: 6px; padding: 3px 8px; }
+  .code-row button { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: #fff; padding: 3px 6px; border-radius: 5px; text-decoration: underline; text-underline-offset: 3px; }
+  .code-row button:hover { background: rgba(255,255,255,.16); }
 
   /* the head's panel: attach a referral link, then send the members' link */
   .head-steps { list-style: none; counter-reset: hs; display: grid; gap: 7px; margin: 12px 0 16px; }
@@ -233,12 +239,12 @@
     .p-top b { font-size: 30px; }
     .bar { margin: 9px 0 7px; }
     .how { gap: 11px; }
-    .stores, .code-row { margin-top: 7px; }
-    .store img { height: 32px; }
+    .store { height: 48px; }
+    .store img { height: 34px; }
     .join { padding: 20px 28px; }
     /* the buttons already carry the referral, so the typed-in code can go */
     .code-row, .get-note .then { display: none; }
-    .how > li.get-app { padding: 10px 10px 10px 8px; }
+    .how > li.get-app { padding: 13px 14px; row-gap: 8px; }
   }
   /* stacked: the headline goes, the count and the steps stay above the form */
   @media (max-width: 850px) {
@@ -280,13 +286,15 @@
     .how > li { grid-template-columns: 22px minmax(0, 1fr); gap: 9px; }
     .how > li > i { width: 22px; height: 22px; font-size: 11px; }
     .how b { font-size: 13.5px; padding-top: 1px; }
-    .how > li.get-app { padding: 10px 12px; margin: 0; grid-template-columns: minmax(0, 1fr); }
+    .how > li.get-app { padding: 14px; margin: 0; row-gap: 9px; grid-template-columns: minmax(0, 1fr); }
     /* the form step above it is hidden on phones, so a lone "2" would read oddly */
     .how > li.get-app > i { display: none; }
     .get-note .then { display: none; }
     .how small { font-size: 12px; }
-    .stores, .code-row { margin-top: 7px; }
-    .store img { height: 30px; }
+    .how > li.get-app b { font-size: 15px; }
+    .get-note { font-size: 13px; }
+    .store { height: 52px; }
+    .store img { height: 36px; }
     .join { padding: 16px 16px 18px; }
     h2 { font-size: 22px; }
     .q-num { margin-bottom: 5px; }
@@ -351,15 +359,13 @@
       <ol class="how" id="how-join" hidden>
         <li class="get-app">
           <i>1</i>
-          <div>
-            <b>No fomo yet? Download it here first.</b>
-            <small class="get-note"></small>
-            <div class="stores">
-              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
-              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
-            </div>
-            <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+          <b class="get-title">No fomo yet? Get it here first.</b>
+          <p class="get-note"></p>
+          <div class="stores">
+            <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
+            <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
           </div>
+          <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
         </li>
         <li class="form-step">
           <i>2</i>
@@ -381,15 +387,13 @@
         </li>
         <li class="get-app">
           <i>2</i>
-          <div>
-            <b>No fomo yet? Download it here first.</b>
-            <small class="get-note"></small>
-            <div class="stores">
-              <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
-              <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
-            </div>
-            <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
+          <b class="get-title">No fomo yet? Get it here first.</b>
+          <p class="get-note"></p>
+          <div class="stores">
+            <a class="store" href="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" data-store="https://apps.apple.com/us/app/fomo-never-miss-out/id6741115427" target="_blank" rel="noopener"><img src="/badge-app-store.svg" alt="Download fomo on the App Store" width="120" height="40"></a>
+            <a class="store" href="https://play.google.com/store/apps/details?id=family.fomo.app" data-store="https://play.google.com/store/apps/details?id=family.fomo.app" target="_blank" rel="noopener"><img src="/badge-google-play.svg" alt="Get fomo on Google Play" width="135" height="40"></a>
           </div>
+          <p class="code-row" hidden><span>Referral code</span><code class="ref-code"></code><button type="button" class="copy-code">Copy</button></p>
         </li>
       </ol>
     </section>
@@ -624,16 +628,21 @@
       row.hidden = !clan.lead;
       row.querySelector('.ref-code').textContent = clan.lead || '';
     });
+    Array.prototype.forEach.call(document.querySelectorAll('.get-title'), function (title) {
+      title.textContent = ref ? 'No fomo yet? Download it with these buttons.' : 'No fomo yet? Get it here first.';
+    });
     Array.prototype.forEach.call(document.querySelectorAll('.get-note'), function (note) {
       note.textContent = '';
       if (ref) {
-        note.appendChild(document.createTextNode('These buttons carry '));
-        note.appendChild(el('strong', '@' + clan.lead + '\u2019s referral'));
-        note.appendChild(document.createTextNode(', so your new account joins the ' + short + ' clan.'));
-        note.appendChild(el('span', clan.claim ? ' Then claim here too.' : ' Then add yourself here too.', 'then'));
+        // the referral only rides along through these buttons, so say so plainly
+        note.appendChild(el('strong', 'Use these buttons, not a store search.'));
+        note.appendChild(document.createTextNode(' They carry @' + clan.lead + '\u2019s referral, which is what puts your new account in the ' + short + ' clan.'));
+        note.appendChild(el('span', clan.claim ? ' Then claim your username here too.' : ' Then add yourself here too.', 'then'));
       } else {
-        note.appendChild(document.createTextNode(clan.claim ? 'Download it, then claim here.' : 'Download it, then add yourself here.'));
-        note.appendChild(el('span', ' Once your head attaches their referral, these buttons put new accounts straight in the clan.', 'then'));
+        // no referral yet: the store buttons can't connect anyone, the form here does
+        note.appendChild(document.createTextNode('Make your account, then '));
+        note.appendChild(el('strong', clan.claim ? 'come back and claim your username here.' : 'come back and add yourself here.'));
+        note.appendChild(document.createTextNode(' That\u2019s what puts you in the ' + short + ' clan.'));
       }
     });
   }
