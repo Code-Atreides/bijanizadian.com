@@ -1,7 +1,16 @@
 import { blocks, categories, filterItems, lookupItems, searchArchive } from './catalog.js';
 import { archiveProjects } from './archive-data.js';
+import { createArchiveMotion } from './archive-motion.js';
 
 const $ = selector => document.querySelector(selector);
+const archiveMotion = createArchiveMotion({
+  canvas: $('#archive-canvas'),
+  isActive: () => document.body.classList.contains('archive-home')
+    && !document.body.classList.contains('modal-open')
+    && !document.querySelector('dialog[open]')
+    && $('#assistant-panel').hidden && $('#search-suggestions').hidden
+    && !document.activeElement?.matches('input,textarea,select'),
+});
 const escape = value => String(value ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const shapes = {
   grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
@@ -76,8 +85,9 @@ function render() {
   $('#archive-workspace').hidden=state.route!=='archive';
   $('.app-shell').hidden=state.route==='archive';
   document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
-  if(state.route==='archive'){renderArchive();return;}
+  if(state.route==='archive'){renderArchive();archiveMotion.sync();return;}
   document.body.classList.remove('archive-home','archive-results');
+  archiveMotion.sync();
   const inArchive=state.route==='archive';
   const collection=state.collections.find(c=>c.id===state.collection);
   const heading=state.route==='saved'?'Saved for later.':inArchive?'The archive.':state.route==='foundations'?'A familiar feeling.':collection?`${collection.name}.`:state.category==='All'?'The skeletons.':`${state.category}.`;
@@ -134,7 +144,7 @@ function archiveStateChanged(){
   url.hash='archive';history.pushState(null,'',url);toggleSuggestions(false);render();window.scrollTo({top:0,behavior:'instant'});
 }
 function resetArchive(){state.query='';state.project=null;state.category='All';state.scope='finished';$('#archive-search').value='';archiveStateChanged();}
-function toggleSuggestions(open){$('#search-suggestions').hidden=!open;$('#suggestion-toggle').setAttribute('aria-expanded',String(open));$('#suggestion-toggle').setAttribute('aria-label',open?'Hide search ideas':'Show search ideas');$('#archive-search-stage').classList.toggle('suggestions-open',open);}
+function toggleSuggestions(open){$('#search-suggestions').hidden=!open;$('#suggestion-toggle').setAttribute('aria-expanded',String(open));$('#suggestion-toggle').setAttribute('aria-label',open?'Hide search ideas':'Show search ideas');$('#archive-search-stage').classList.toggle('suggestions-open',open);archiveMotion.sync();}
 $('#archive-search-form').addEventListener('submit',event=>{event.preventDefault();searchFromInput();});
 $('#archive-search').addEventListener('input',()=>{$('#archive-clear').hidden=!$('#archive-search').value;});
 $('#archive-clear').addEventListener('click',()=>{$('#archive-search').value='';state.query='';archiveStateChanged();$('#archive-search').focus();});
@@ -198,7 +208,7 @@ function askGuide(message) {
   const reply=document.createElement('div');reply.className='assistant-message';
   let answer, matches=[];
   if(/archiv|original|past work/i.test(text)){answer='The archive keeps original work together by project. These pages haven’t been turned into reusable blocks yet.';matches=archiveProjects.map(p=>({name:p.name,href:`#archive/${p.id}`}));}
-  else if(/curve|corner|round|design|aesthetic/i.test(text)){answer='The kit uses a grayscale palette and continuous corners in three sizes. The assistant carries the same shape. You can explore them in Foundations.';matches=[{name:'Explore the foundations',href:'#foundations'}];}
+  else if(/curve|corner|round|design|aesthetic/i.test(text)){answer='The kit has a neutral frame with continuous corners in three sizes. Original project previews keep their own colors. The assistant carries the same curved shape; explore it in Foundations.';matches=[{name:'Explore the foundations',href:'#foundations'}];}
   else if(/collect|bundle|shortlist/i.test(text)){answer='A collection is a shortlist for a client or project. Choose “New collection”, give it a name, and select a few starting points. It stays in this browser; it doesn’t generate a site yet.';}
   else {const found=lookupItems(blocks,text);answer=found.length?'These starting points look relevant. Open one to see what it will include and the original work behind it.':'I couldn’t find a matching starting point. Try a portal, campaign page, application form, or referral flow. This preview searches the catalog; an AI connection comes later.';matches=found.map(x=>({name:x.name,id:x.id}));}
   const label=document.createElement('span');label.className='guide-label';label.textContent='FROM THE LIBRARY';reply.append(label);
