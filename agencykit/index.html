@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7f7f5">
+  <title>agencykit — a place for the work</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="/agencykit/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/agencykit/styles.css">
+  <link rel="stylesheet" href="/agencykit/details.css">
+  <link rel="stylesheet" href="/agencykit/archive.css">
+  <script type="module" src="/agencykit/app.js"></script>
+</head>
+<body class="archive-mode archive-home">
+  <a class="skip-link" href="#main-content">Skip to the work</a>
+  <header class="archive-header">
+    <a class="archive-brand" href="#archive" aria-label="agencykit home"><span class="archive-brand-mark" aria-hidden="true"></span>agencykit<span class="brand-period">.</span></a>
+    <nav aria-label="Main navigation"><a href="#archive" data-nav-route="archive">Archive</a><a href="#library" data-nav-route="library">Skeletons</a><a href="#saved" data-nav-route="saved">Saved</a><button id="archive-about">About</button></nav>
+  </header>
+  <main id="archive-workspace" tabindex="-1">
+    <h1 class="sr-only">The project archive</h1>
+    <div id="archive-search-stage">
+      <form id="archive-search-form" role="search">
+        <div class="archive-search-box"><label class="search-prefix" for="archive-search">Show me</label><input id="archive-search" type="search" placeholder="something we’ve made" aria-label="Search the project archive" autocomplete="off" maxlength="160"><button id="archive-clear" type="button" aria-label="Clear search" hidden>×</button><button id="archive-submit" type="submit" aria-label="Search archive">↵</button></div>
+        <div id="search-suggestions" hidden><p>Some places to start</p><button type="button" data-archive-query="fomo portals">fomo portals <span>↗</span></button><button type="button" data-archive-query="pages for events">pages for events <span>↗</span></button><button type="button" data-archive-query="onboarding forms">onboarding forms <span>↗</span></button><button type="button" data-archive-query="artwork galleries">artwork galleries <span>↗</span></button><button type="button" data-archive-query="referral tools">referral tools <span>↗</span></button></div>
+      </form>
+      <button class="suggestion-toggle" id="suggestion-toggle" aria-label="Show search ideas" aria-expanded="false" aria-controls="search-suggestions">A few ideas <span>⌄</span></button>
+    </div>
+    <section id="archive-gallery" aria-label="Archived project previews"><div id="archive-canvas"></div></section>
+    <div class="archive-controls">
+      <div class="archive-filters"><label><span class="sr-only">Project</span><select id="archive-project" aria-label="Project"><option value="">All projects</option></select></label><label><span class="sr-only">Page type</span><select id="archive-type" aria-label="Page type"><option value="All">All types</option><option>Portals</option><option>Pages</option><option>Forms</option><option>Tools</option></select></label><label><span class="sr-only">Work status</span><select id="archive-scope" aria-label="Work status"><option value="finished">Finished work</option><option value="all">All originals</option><option value="prototype">Prototypes</option></select></label></div>
+      <span id="archive-count" role="status" aria-live="polite"></span>
+      <button id="archive-reset" type="button" hidden>Reset view ↗</button>
+    </div>
+    <p class="archive-footnote">A place for the work. And a starting point for what’s next.</p>
+  </main>
+  <div class="app-shell" hidden>
+    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="#library" aria-label="The kit home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">the kit<span class="workspace-label">A shared starting point</span></span></a>
+      <div class="nav-section"><div class="nav-label">LIBRARY</div><nav id="library-nav" aria-label="Library"></nav></div>
+      <div class="nav-section"><div class="nav-label">WORKSPACE</div><nav id="workspace-nav" aria-label="Workspace"></nav></div>
+      <div class="nav-section collections-nav" id="collections-nav" hidden><div class="nav-label">COLLECTIONS</div><nav id="collection-links" aria-label="Collections"></nav></div>
+      <div class="sidebar-bottom"><button class="sidebar-help" id="about-button"><span class="help-dot">?</span>A note on this space</button><div class="profile"><span class="avatar">us</span><div><strong>Our workspace</strong><span>Made for the next project</span></div></div></div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+    <main class="main" id="main-content" tabindex="-1">
+      <header class="topbar"><div class="topbar-left"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="Open navigation" aria-expanded="false"></button><div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="breadcrumb-current">Library</strong></div></div><div class="topbar-actions"><span class="draft-label"><i></i>Kit frame</span><button class="quiet-button" id="open-assistant-top">Ask the kit<span class="shortcut-key">⌘ K</span></button></div></header>
+      <div class="content">
+        <section class="page-header"><div><p class="eyebrow" id="page-eyebrow">A LITTLE LESS FROM SCRATCH</p><h1 class="page-title" id="page-title">The library.</h1><p class="page-description" id="page-description">Good starting points, ready to become something else.</p></div><div class="page-header-actions"><button class="primary-button" id="new-collection"><span aria-hidden="true">+</span>New collection</button></div></section>
+        <div class="toolbar" id="toolbar"><label class="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" placeholder="Find a starting point…" aria-label="Search the library"><kbd>/</kbd></label><div class="filter-tabs" id="filter-tabs" aria-label="Filter blocks"></div><button class="icon-button view-toggle" id="view-toggle" aria-label="Switch to compact previews" aria-pressed="false"></button></div>
+        <div id="view-content"></div>
+        <footer class="workspace-footer"><span>Built thoughtfully. Kept for later.</span><span id="footer-meta">Kit frame · v0.2</span></footer>
+      </div>
+    </main>
+  </div>
+  <button class="assistant-launcher" id="assistant-launcher" aria-label="Open the kit assistant" aria-expanded="false" aria-controls="assistant-panel"><span class="assistant-mark" aria-hidden="true"><i></i><i></i></span></button>
+  <section class="assistant-popover" id="assistant-panel" role="dialog" aria-label="The kit assistant" hidden>
+    <div class="assistant-header"><span class="assistant-mark small" aria-hidden="true"><i></i><i></i></span><div><strong>A second pair of eyes</strong><span class="assistant-status">Library guide · AI not connected</span></div><button class="icon-button" id="assistant-close" aria-label="Close assistant"></button></div>
+    <div class="assistant-body" id="assistant-body"><div id="assistant-intro"><div class="assistant-orb" aria-hidden="true"><span></span></div><h2>What are we making?</h2><p>Find a starting point, explore past work, or put a few pieces together.</p><div class="assistant-suggestions" id="assistant-suggestions"></div></div><div id="assistant-messages" role="log" aria-live="polite" aria-relevant="additions"></div></div>
+    <form class="assistant-input" id="assistant-form"><label class="sr-only" for="assistant-question">Ask about the kit</label><input id="assistant-question" maxlength="600" placeholder="Ask about the kit…" autocomplete="off"><button class="icon-button" type="submit" id="assistant-send" aria-label="Send question"></button></form><p class="assistant-note">Searches this library. AI connection comes next.</p>
+  </section>
+  <div class="overlay" id="detail-overlay" hidden><section class="drawer" id="detail-drawer" role="dialog" aria-modal="true" aria-labelledby="detail-title"><div class="drawer-header"><span class="eyebrow" id="detail-kicker">BLOCK DETAILS</span><button class="icon-button close-drawer" id="detail-close" aria-label="Close details"></button></div><div id="detail-content"></div></section></div>
+  <dialog class="modal" id="collection-modal" aria-labelledby="collection-title"><form id="collection-form"><div class="modal-header"><div><p class="eyebrow">PUT A FEW PIECES TOGETHER</p><h2 id="collection-title">A new collection.</h2></div><button class="icon-button" id="collection-close" type="button" aria-label="Close collection dialog"></button></div><p class="modal-description">A shortlist for a project, a client, or an idea worth keeping.</p><label class="field">Name<input id="collection-name" name="name" maxlength="60" placeholder="e.g. Next campus launch" required></label><label class="field">A little context <span>(optional)</span><textarea id="collection-note" name="note" maxlength="240" rows="2" placeholder="What are you putting together?"></textarea></label><fieldset class="collection-picker"><legend>Starting points</legend><div id="collection-options"></div></fieldset><div class="modal-actions"><span>Saved in this browser</span><button type="submit" class="primary-button">Create collection</button></div></form></dialog>
+  <dialog class="modal about-modal" id="about-modal" aria-labelledby="about-title"><div class="modal-header"><div><p class="eyebrow">A NOTE ON THIS SPACE</p><h2 id="about-title">Keep the useful things.</h2></div><button class="icon-button" id="about-close" aria-label="Close note"></button></div><p>This is the frame for agencykit, our shared GTM library. A place to organize the pages, portals, forms, and tools we can build on again.</p><p>The archive opens with finished pages and portals. Choose “All originals” to include protected tools and local prototypes. Skeletons is where reusable starting points will live; those are blueprints for now. Nothing has been converted yet.</p><p>Search recognizes the projects and types of work in this catalog. Saved pieces and collections stay in this browser. The assistant is a local catalog guide for now; its AI connection is still to come.</p><div class="about-signoff">For us, and whatever comes next.</div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
