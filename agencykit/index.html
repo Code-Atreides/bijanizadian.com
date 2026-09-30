@@ -30,11 +30,13 @@
     </div>
     <section id="archive-gallery" aria-label="Archived project previews"><div id="archive-canvas"></div></section>
     <div class="archive-controls">
-      <div class="archive-filters"><label><span class="sr-only">Project</span><select id="archive-project" aria-label="Project"><option value="">All projects</option></select></label><label><span class="sr-only">Page type</span><select id="archive-type" aria-label="Page type"><option value="All">All types</option><option>Portals</option><option>Pages</option><option>Forms</option><option>Tools</option></select></label><label><span class="sr-only">Work status</span><select id="archive-scope" aria-label="Work status"><option value="all">Whole archive</option><option value="finished">Finished work</option><option value="prototype">Prototypes</option></select></label></div>
-      <span id="archive-count" role="status" aria-live="polite"></span>
-      <button id="archive-shuffle" type="button" aria-label="Shuffle archive previews">Shuffle ↻</button>
-      <span id="archive-pagination" class="archive-pagination"><button id="archive-previous" type="button" aria-label="Previous archive view">←</button><span class="sr-only" id="archive-page-label" aria-live="polite"></span><button id="archive-next" type="button" aria-label="Next archive view">→</button></span>
-      <button id="archive-reset" type="button" hidden>Reset view ↗</button>
+      <button id="archive-filter-toggle" type="button" aria-expanded="false" aria-controls="archive-filter-panel"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true"><path d="M3 6h4m4 0h6M3 14h8m4 0h2"/><circle cx="9" cy="6" r="2"/><circle cx="13" cy="14" r="2"/></svg><span id="archive-filter-label">Filter</span><i id="archive-filter-dot" hidden aria-hidden="true"></i></button>
+      <div id="archive-filter-panel" role="region" aria-label="Archive filters" hidden>
+        <div class="archive-filters"><label><span>Project</span><select id="archive-project" aria-label="Project"><option value="">All projects</option></select></label><label><span>Page type</span><select id="archive-type" aria-label="Page type"><option value="All">All types</option><option>Portals</option><option>Pages</option><option>Forms</option><option>Tools</option></select></label><label><span>Work status</span><select id="archive-scope" aria-label="Work status"><option value="all">Whole archive</option><option value="finished">Finished work</option><option value="prototype">Prototypes</option></select></label></div>
+        <div class="archive-filter-footer"><span id="archive-count" role="status" aria-live="polite"></span><span id="archive-pagination" class="archive-pagination"><button id="archive-previous" type="button" aria-label="Previous archive view">←</button><span class="sr-only" id="archive-page-label" aria-live="polite"></span><button id="archive-next" type="button" aria-label="Next archive view">→</button></span></div>
+        <button id="archive-shuffle" type="button" aria-label="Shuffle archive previews">Shuffle previews ↻</button>
+        <button id="archive-reset" type="button" hidden>Reset view ↗</button>
+      </div>
     </div>
     <p class="archive-footnote">Find a page you like. Make it your next starting point.</p>
   </main>
