@@ -1,0 +1,53 @@
+/* One screen of work. Search and paging always address the complete archive. */
+html:has(body.archive-mode){height:100%;overflow:hidden}
+body.archive-mode{height:100dvh;min-height:0;max-height:100dvh;overflow:hidden;overscroll-behavior:none}
+body.archive-mode #archive-workspace{position:fixed;inset:0;overflow:clip;min-height:0}
+body.archive-mode #archive-gallery{position:absolute;inset:104px 76px 126px;width:auto;height:auto;min-height:0;max-width:none;padding:0;margin:0;overflow:visible}
+body.archive-results #archive-gallery{inset:150px 48px 112px}
+body.archive-mode #archive-canvas{position:relative;display:block;width:100%;height:100%;min-height:0;padding:0;margin:0;gap:0}
+body.archive-mode #archive-canvas>.archive-tile{position:absolute;display:flex;align-items:center;justify-content:flex-start;transform:none;margin:0;padding:0;transition:none}
+body.archive-mode #archive-canvas .tile-visual{height:var(--tile-visual-height);min-height:0;max-height:none;flex:none;align-items:center}
+body.archive-mode #archive-canvas .tile-visual img{width:100%;height:100%;max-height:none;object-fit:contain;object-position:center}
+body.archive-mode #archive-canvas .tile-caption{position:absolute;top:var(--tile-visual-height);left:0;width:100%;height:36px;min-height:0;max-height:36px;padding-top:7px;gap:2px;overflow:hidden}
+body.archive-mode #archive-canvas .tile-caption strong,body.archive-mode #archive-canvas .tile-caption>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+body.archive-mode #archive-canvas .tile-caption strong{font-size:10px;line-height:14px}
+body.archive-mode #archive-canvas .tile-caption>span{font-size:8px;line-height:11px}
+body.archive-mode #archive-search-stage{transition:none}
+body.archive-mode .archive-controls{display:flex;flex-wrap:nowrap;gap:7px;width:max-content;max-width:calc(100vw - 180px);bottom:23px;left:50%;transform:translateX(-50%)}
+body.archive-mode .archive-pagination{display:flex;align-items:center;gap:3px;padding:0}
+body.archive-mode .archive-pagination button{width:30px;padding:4px;font-size:15px}
+body.archive-mode .archive-pagination button:disabled{opacity:.28;cursor:default}
+body.archive-mode .archive-controls #archive-count{display:inline;min-width:68px;padding-inline:3px;font-size:9px;text-align:center}
+body.archive-mode #archive-shuffle{white-space:nowrap}
+body.archive-mode .archive-footnote{max-width:160px;font-size:8px}
+body.archive-mode .archive-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px}
+body.archive-mode #search-suggestions{max-height:42dvh;overflow:auto;overscroll-behavior:contain}
+@media(max-width:1100px){body.archive-mode #archive-gallery{inset:96px 65px 126px}body.archive-results #archive-gallery{inset:190px 35px 112px}body.archive-mode .archive-footnote{display:none}}
+@media(max-width:720px){body.archive-mode #archive-gallery{inset:80px 18px 142px}body.archive-results #archive-gallery{inset:188px 18px 142px}body.archive-mode .archive-controls{bottom:max(17px,env(safe-area-inset-bottom));left:16px;right:76px;transform:none;width:auto;max-width:none;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px;border-radius:18px}body.archive-mode .archive-filters{width:100%;justify-content:space-between;gap:5px}body.archive-mode .archive-filters label{flex:1;min-width:0}body.archive-mode .archive-filters select{width:100%;max-width:none;height:28px;padding-inline:5px;font-size:9px}body.archive-mode .archive-controls #archive-count{min-width:68px;font-size:9px}body.archive-mode .archive-pagination button{height:28px;width:28px}body.archive-mode #archive-reset{font-size:8px;height:28px}body.archive-mode #archive-shuffle{height:28px;font-size:9px}body.archive-mode #archive-canvas .tile-caption strong{font-size:9px}body.archive-mode .assistant-launcher{right:18px;bottom:max(19px,env(safe-area-inset-bottom))}}
+@media(max-height:600px) and (min-width:721px){body.archive-mode #archive-gallery{inset:78px 72px 90px}body.archive-results #archive-gallery{inset:126px 38px 88px}body.archive-mode .archive-controls{bottom:14px}body.archive-mode .archive-header{height:64px}body.archive-results #archive-search-stage{top:65px}body.archive-mode #search-suggestions{max-height:34dvh}}
+
+/* In a short window, the search belongs above the collage. Keep real preview
+   and caption space instead of letting its protected center consume the grid. */
+@media(max-height:567px){
+  body.archive-mode .archive-header{height:48px;padding-inline:24px}
+  body.archive-mode .archive-header .archive-brand{font-size:17px}
+  body.archive-mode #archive-search-stage{top:53px;width:min(470px,calc(100vw - 36px))}
+  body.archive-mode .archive-search-box{height:48px;padding:6px 7px 6px 18px;border-radius:21px}
+  body.archive-mode .search-prefix,body.archive-mode #archive-search{font-size:17px}
+  body.archive-mode #archive-submit{width:34px;height:34px}
+  body.archive-mode #archive-submit svg{width:17px;height:17px}
+  body.archive-mode .suggestion-toggle{min-height:23px;margin-top:4px;padding-block:4px;font-size:8px}
+  body.archive-mode #archive-gallery{inset:140px 38px 82px}
+  body.archive-mode #search-suggestions{max-height:calc(100dvh - 180px)}
+  body.archive-mode .archive-controls{bottom:max(12px,env(safe-area-inset-bottom))}
+  body.archive-mode .archive-footnote{display:none}
+  body.archive-mode .archive-space-needed{padding:6px;text-align:center}
+  body.archive-mode .archive-space-needed h2{font-size:15px;margin-bottom:6px}
+  body.archive-mode .archive-space-needed p{font-size:10px;line-height:1.5;margin-bottom:8px;max-width:320px}
+  body.archive-mode .archive-space-needed a{color:#b9b9b3;font-size:10px;text-decoration:underline;text-underline-offset:3px}
+}
+@media(max-height:567px) and (max-width:720px){
+  body.archive-mode .archive-header{padding-inline:18px}
+  body.archive-mode #archive-gallery{inset:140px 18px 110px}
+  body.archive-mode .archive-controls{bottom:max(12px,env(safe-area-inset-bottom))}
+}

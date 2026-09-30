@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/agencykit/styles.css">
   <link rel="stylesheet" href="/agencykit/details.css">
   <link rel="stylesheet" href="/agencykit/archive.css">
+  <link rel="stylesheet" href="/agencykit/archive-viewport.css">
   <script type="module" src="/agencykit/app.js"></script>
 </head>
 <body class="archive-mode archive-home">
@@ -31,6 +32,8 @@
     <div class="archive-controls">
       <div class="archive-filters"><label><span class="sr-only">Project</span><select id="archive-project" aria-label="Project"><option value="">All projects</option></select></label><label><span class="sr-only">Page type</span><select id="archive-type" aria-label="Page type"><option value="All">All types</option><option>Portals</option><option>Pages</option><option>Forms</option><option>Tools</option></select></label><label><span class="sr-only">Work status</span><select id="archive-scope" aria-label="Work status"><option value="all">Whole archive</option><option value="finished">Finished work</option><option value="prototype">Prototypes</option></select></label></div>
       <span id="archive-count" role="status" aria-live="polite"></span>
+      <button id="archive-shuffle" type="button" aria-label="Shuffle archive previews">Shuffle ↻</button>
+      <span id="archive-pagination" class="archive-pagination"><button id="archive-previous" type="button" aria-label="Previous archive view">←</button><span class="sr-only" id="archive-page-label" aria-live="polite"></span><button id="archive-next" type="button" aria-label="Next archive view">→</button></span>
       <button id="archive-reset" type="button" hidden>Reset view ↗</button>
     </div>
     <p class="archive-footnote">Find a page you like. Make it your next starting point.</p>

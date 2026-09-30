@@ -2,11 +2,13 @@ import { blocks, categories, filterItems, searchArchive } from './catalog.js';
 import { archiveProjects } from './archive-data.js';
 import { createArchiveMotion } from './archive-motion.js';
 import { downloadSkeleton } from './skeletons.js';
+import { generateArchiveLayout, shuffleItems, paginateItems } from './archive-layout.js';
 
 const $ = selector => document.querySelector(selector);
 const archiveMotion = createArchiveMotion({
   canvas: $('#archive-canvas'),
   isActive: () => document.body.classList.contains('archive-home')
+    && !document.body.classList.contains('archive-compact')
     && !document.body.classList.contains('modal-open')
     && !document.querySelector('dialog[open]')
     && $('#assistant-panel').hidden && $('#search-suggestions').hidden
@@ -35,6 +37,7 @@ const icon = (name, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="no
 const categoryIcon = category => ({Portals:'portal',Pages:'page',Forms:'form',Tools:'tool'}[category] || 'grid');
 const allArchive = archiveProjects.flatMap(project => project.items.map(item => ({...item, project: project.name, projectId:project.id, origin:project.name, archived:true})));
 const catalog = allArchive;
+let archiveDeck = shuffleItems(allArchive), archivePage = 0, archivePageCount = 1;
 const currentIds = ids => [...new Set(ids.map(id=>catalog.some(item=>item.id===id)?id:blocks.find(item=>item.id===id)?.sourceId).filter(id=>catalog.some(item=>item.id===id)))];
 const state = { route:'archive', scope:'all', category:'All', project:null, collection:null, query:'', compact:false, saved:[], collections:[] };
 try {
@@ -118,31 +121,45 @@ function render() {
 }
 
 
-function archiveTile(item) {
-  return `<button class="archive-tile" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)} — ${escape(item.project)}"><span class="tile-visual">${preview(item)}</span><span class="tile-caption"><strong>${escape(item.name)}</strong><span>${escape(item.project)} <i>·</i> ${escape(item.category)}${item.status==='prototype'?' · Prototype':''}</span></span></button>`;
+function archiveTile(item,slot) {
+  const position=`left:${slot.x}px;top:${slot.y}px;width:${slot.width}px;height:${slot.height}px;--tile-visual-height:${slot.visualHeight}px`;
+  return `<button class="archive-tile" style="${position}" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)} — ${escape(item.project)}"><span class="tile-visual">${preview(item)}</span><span class="tile-caption"><strong>${escape(item.name)}</strong><span>${escape(item.project)} <i>·</i> ${escape(item.category)}${item.status==='prototype'?' · Prototype':''}</span></span></button>`;
 }
 function renderArchive(){
   const home=!state.query&&state.category==='All'&&!state.project&&state.scope==='all';
+  const compact=innerHeight<568;
   document.body.classList.toggle('archive-home',home);
   document.body.classList.toggle('archive-results',!home);
-  let items=allArchive.filter(item=>state.scope==='all'||(state.scope==='prototype'?item.status==='prototype':['finished','contextual'].includes(item.status)));
+  document.body.classList.toggle('archive-compact',compact);
+  let items=(home?archiveDeck:allArchive).filter(item=>state.scope==='all'||(state.scope==='prototype'?item.status==='prototype':['finished','contextual'].includes(item.status)));
   items=items.filter(item=>(!state.project||item.projectId===state.project)&&(state.category==='All'||item.category===state.category));
   items=searchArchive(items,state.query);
-  // Alternate forms, campaigns, and tools; filtered results retain their relevance order.
-  if(home){const preferred=['fomo-campus','fomo-onboard','fomo-campus-connected','fomo-clan-claim','fomo-hq-visit','fomo-dinners','fomo-refer','fomo-greek-wars','fomo-campus-visit','fomo-campus-directory','bijan-build-request','fomo-gameday','fomo-dinner-application','fomo-campus-original','fomo-campus-manual','fomo-invite','fomo-campus-wars'];const rank=id=>{const index=preferred.indexOf(id);return index<0?preferred.length:index;};items.sort((a,b)=>rank(a.id)-rank(b.id));}
-  $('#archive-canvas').innerHTML=items.length?items.map(archiveTile).join(''):`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea. “Whole archive” also includes local prototypes and protected tools.</p><button type="button" data-reset-archive>Browse the whole archive ↗</button></div>`;
+  const canvas=$('#archive-canvas'),rect=$('#archive-gallery').getBoundingClientRect(),search=$('.archive-search-box').getBoundingClientRect();
+  const motion=innerWidth>720?{x:64,y:36}:{x:0,y:0};
+  const exclusion=home&&!compact?{x:search.left-rect.left-motion.x-16,y:search.top-rect.top-motion.y-10,width:search.width+motion.x*2+32,height:search.height+motion.y*2+52}:null;
+  const layout=generateArchiveLayout({width:canvas.clientWidth,height:canvas.clientHeight,home:home&&!compact,exclusion});
+  const page=paginateItems(items,archivePage,layout.capacity);
+  archivePage=page.page;archivePageCount=page.pageCount;
+  const focused=document.activeElement?.closest('.archive-tile')?.dataset.detail;
+  canvas.innerHTML=!items.length?`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea.</p><button type="button" data-reset-archive>Browse the whole archive ↗</button></div>`:layout.capacity?page.items.map((item,index)=>archiveTile(item,layout.slots[index])).join(''):`<div class="archive-empty archive-space-needed"><h2>A little more room.</h2><p>Make this window taller to see the previews, or explore the full list.</p><a href="#library">Open all skeletons ↗</a></div>`;
+  if(focused)canvas.querySelector(`[data-detail="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
   $('#archive-project').innerHTML='<option value="">All projects</option>'+archiveProjects.map(p=>`<option value="${p.id}">${escape(p.name)}</option>`).join('');
   $('#archive-project').value=state.project||'';$('#archive-type').value=state.category;$('#archive-scope').value=state.scope;
-  $('#archive-count').textContent=`${items.length} ${items.length===1?'piece':'pieces'}${state.query?' found':''}`;
+  $('#archive-count').textContent=!items.length?'0 matches':page.items.length?`${archivePage*page.capacity+1}–${archivePage*page.capacity+page.items.length} of ${items.length}`:`${items.length} pieces`;
+  $('#archive-previous').disabled=!page.hasPrevious;$('#archive-next').disabled=!page.hasNext;
+  $('#archive-pagination').hidden=page.pageCount<=1;$('#archive-shuffle').hidden=!home;
+  $('#archive-page-label').textContent=`View ${archivePage+1} of ${page.pageCount||1}`;
   $('#archive-reset').hidden=home;$('#archive-clear').hidden=!$('#archive-search').value;
 }
 function searchFromInput(){state.query=$('#archive-search').value.trim().slice(0,160);archiveStateChanged();$('#archive-search').focus();}
-function archiveStateChanged(){
+function archiveStateChanged({resetPage=true}={}){
+  if(resetPage)archivePage=0;
   const url=new URL(location.href);url.search='';
   if(state.query)url.searchParams.set('q',state.query);
   if(state.category!=='All')url.searchParams.set('type',state.category);
   if(state.project)url.searchParams.set('project',state.project);
   if(state.scope!=='all')url.searchParams.set('scope',state.scope);
+  if(archivePage>0)url.searchParams.set('page',String(archivePage+1));
   url.hash='archive';history.pushState(null,'',url);toggleSuggestions(false);render();window.scrollTo({top:0,behavior:'instant'});
 }
 function resetArchive(){state.query='';state.project=null;state.category='All';state.scope='all';$('#archive-search').value='';archiveStateChanged();}
@@ -155,6 +172,11 @@ $('#archive-project').addEventListener('change',event=>{state.project=event.targ
 $('#archive-type').addEventListener('change',event=>{state.category=event.target.value;archiveStateChanged();});
 $('#archive-scope').addEventListener('change',event=>{state.scope=event.target.value;archiveStateChanged();});
 $('#archive-reset').addEventListener('click',resetArchive);
+$('#archive-shuffle').addEventListener('click',()=>{archiveDeck=shuffleItems(allArchive);archivePage=0;archiveStateChanged({resetPage:false});});
+$('#archive-previous').addEventListener('click',()=>{archivePage=Math.max(0,archivePage-1);archiveStateChanged({resetPage:false});});
+$('#archive-next').addEventListener('click',()=>{archivePage=Math.min(archivePageCount-1,archivePage+1);archiveStateChanged({resetPage:false});});
+let layoutFrame=0;
+new ResizeObserver(()=>{cancelAnimationFrame(layoutFrame);layoutFrame=requestAnimationFrame(()=>{if(state.route==='archive'){renderArchive();archiveMotion.sync();}});}).observe($('#archive-canvas'));
 document.addEventListener('click',event=>{const suggestion=event.target.closest('[data-archive-query]');if(suggestion){$('#archive-search').value=suggestion.dataset.archiveQuery;searchFromInput();}if(event.target.closest('[data-reset-archive]'))resetArchive();});
 
 function foundations() {return `<div class="foundation-intro"><span class="eyebrow">01 / THE CURVE</span><h2>Soft edges.<br>A consistent character.</h2><p>The same continuous curve, scaled to suit the thing you’re holding. Small on a control. Generous on a surface. A little more character in the assistant.</p></div><div class="curve-study"><div class="curve-swatch"><span class="curve-sample tiny"></span><strong>Small</strong><p>Controls & icons</p><code>12 px</code></div><div class="curve-swatch"><span class="curve-sample medium"></span><strong>Medium</strong><p>Cards & objects</p><code>22 px</code></div><div class="curve-swatch"><span class="curve-sample large"></span><strong>Large</strong><p>Panels & dialogs</p><code>32 px</code></div><div class="curve-swatch"><span class="assistant-orb"><span></span></span><strong>Companion</strong><p>A shape with a presence</p><code>Continuous</code></div></div><div class="foundation-bottom"><div><span class="eyebrow">02 / THE PALETTE</span><h2>Room for the work.</h2><p>Paper, stone, graphite, and ink. Color can arrive with a client. The library stays quiet.</p><div class="palette"><span style="background:#f7f7f5"></span><span style="background:#e9e9e6"></span><span style="background:#b8b8b3"></span><span style="background:#747470"></span><span style="background:#242423"></span></div></div><div><span class="eyebrow">03 / THE VOICE</span><h2>A helpful person.</h2><p>Say what a thing does. Make the next step clear. Leave a little room to breathe.</p><div class="voice-example">“What are we making?”<small>A question, not a command.</small></div></div></div>`; }
@@ -167,6 +189,7 @@ function route() {
   state.collection=state.route==='collection'?parts[1]:null;
   if(state.route==='collection'&&!state.collections.some(c=>c.id===state.collection)){state.route='library';state.collection=null;}
   const params=new URLSearchParams(location.search);
+  archivePage=Math.max(0,Math.min(10000,Math.floor(Number(params.get('page'))||1)-1));
   state.query=state.route==='archive'?(params.get('q')||'').slice(0,160):'';
   if(state.route==='archive'){
     state.category=categories.includes(params.get('type'))?params.get('type'):'All';

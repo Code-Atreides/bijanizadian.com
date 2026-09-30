@@ -56,19 +56,19 @@ test('assistant lookup returns no invented match for unknown or empty requests',
   }
 });
 
-test('archive search intersects project and category concepts in natural requests', () => {
+test('global archive search finds fomo work across projects while retaining portal constraints', () => {
   const result = searchArchive(archive, 'Please show me the fomo portals');
-  assert.ok(result.length >= 2);
-  assert.ok(result.every(item => item.projectId === 'fomo' && item.category === 'Portals'));
-  assert.ok(result.some(item => item.id === 'fomo-clan'));
+  assert.ok(result.every(item => item.category === 'Portals'));
+  for (const id of ['fomo-clan', 'fomo-irrigation', 'milo-fomoportal']) assert.ok(ids(result).includes(id), `finds ${id}`);
+  assert.ok(!ids(result).includes('milo-home'), 'unrelated portfolio is not a fomo portal');
   assert.deepEqual(searchArchive(archive, 'UnknownCompany portals'), []);
 });
 
 test('archive website and application aliases select their actual categories', () => {
   const pages = searchArchive(archive, 'I would like to see fomo websites');
-  assert.equal(pages.length, archive.filter(item => item.projectId === 'fomo' && item.category === 'Pages').length);
-  assert.ok(pages.length > 0);
-  assert.ok(pages.every(item => item.projectId === 'fomo' && item.category === 'Pages'));
+  for (const id of ['fomo-campus', 'milo-fomo', 'milo-campuswars']) assert.ok(ids(pages).includes(id), `finds ${id}`);
+  assert.ok(pages.every(item => item.category === 'Pages'));
+  assert.ok(!ids(pages).includes('milo-photos'), 'unrelated photography does not match the fomo concept');
   assert.deepEqual(new Set(ids(searchArchive(archive, 'Find applications'))), new Set(ids(archive.filter(item => item.category === 'Forms'))));
 });
 
@@ -78,16 +78,19 @@ test('archive onboarding and program synonyms retain useful constrained matches'
   assert.ok(onboarding.every(item => item.category === 'Forms'));
   const greekPortals = searchArchive(archive, 'Greek Wars portals');
   assert.ok(greekPortals.some(item => item.id === 'fomo-clan'));
-  assert.ok(greekPortals.every(item => item.category === 'Portals' && item.projectId === 'fomo'));
+  assert.ok(greekPortals.every(item => item.category === 'Portals'));
+  assert.ok(!ids(greekPortals).includes('milo-visit-console'), 'a general operations portal does not become a Greek Wars match');
   const referrals = searchArchive(archive, 'fomo referral');
-  assert.ok(referrals.some(item => item.id === 'fomo-refer'));
-  assert.ok(referrals.every(item => item.projectId === 'fomo'));
+  for (const id of ['fomo-refer', 'milo-fomo-refer']) assert.ok(ids(referrals).includes(id), `finds ${id}`);
+  assert.ok(!ids(referrals).includes('fomo-dinners'), 'fomo branding alone does not satisfy the referral concept');
+  assert.deepEqual(new Set(ids(searchArchive(archive, 'fomo invitations'))), new Set(ids(referrals)), 'invitation and referral aliases select the same matching work');
 });
 
 test('archive topic searches find fomo work without weakening category constraints', () => {
   const result = searchArchive(archive, 'Find me fomo dinner pages');
   assert.ok(result.some(item => item.id === 'fomo-dinners'));
-  assert.ok(result.every(item => item.projectId === 'fomo' && item.category === 'Pages'));
+  assert.ok(result.every(item => item.category === 'Pages'));
+  assert.ok(!ids(result).includes('milo-fomo'), 'a general fomo page does not satisfy the dinner concept');
 });
 
 test('generic requests return the archive without mutation or a hidden result limit', () => {
@@ -145,11 +148,24 @@ test('archive entries have unique identities, recognized types, and safe source 
   }
 });
 
-test('every project and page-type query intersects correctly across the full archive', () => {
+test('explicit project filtering stays strict even when global keywords cross project boundaries', () => {
+  const items = [
+    { id: 'brand', project: 'fomo', projectId: 'fomo', category: 'Portals', name: 'Member hub', tags: [] },
+    { id: 'partner', project: 'Partner studio', projectId: 'partner', category: 'Portals', name: 'Campus hub', tags: ['fomo'] },
+    { id: 'unrelated', project: 'Partner studio', projectId: 'partner', category: 'Portals', name: 'Travel hub', tags: [] },
+    { id: 'wrong-type', project: 'Partner studio', projectId: 'partner', category: 'Forms', name: 'Signup', tags: ['fomo'] },
+  ];
+  assert.deepEqual(new Set(ids(searchArchive(items, 'fomo portals'))), new Set(['brand', 'partner']));
+  assert.deepEqual(ids(searchArchive(items.filter(item => item.projectId === 'fomo'), 'fomo portals')), ['brand']);
+  assert.deepEqual(ids(searchArchive(items.filter(item => item.projectId === 'partner'), 'fomo portals')), ['partner']);
+});
+
+test('every explicit project filter intersects correctly with page types across the full archive', () => {
   for (const project of archiveProjects) {
+    const scoped = archive.filter(item => item.projectId === project.id);
     for (const category of categories) {
-      const expected = archive.filter(item => item.projectId === project.id && item.category === category);
-      const found = searchArchive(archive, `${project.name} ${category}`);
+      const expected = scoped.filter(item => item.category === category);
+      const found = searchArchive(scoped, category);
       assert.deepEqual(new Set(ids(found)), new Set(ids(expected)), `${project.name} ${category}`);
     }
   }

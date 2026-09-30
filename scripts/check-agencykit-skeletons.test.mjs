@@ -2,10 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Script } from 'node:vm';
 import { archiveProjects } from '../agencykit/archive-data.js';
-import { buildSkeletonDocument, skeletonFamily } from '../agencykit/skeletons.js';
+import { buildSkeletonDocument, skeletonFamily, calculateInvoice } from '../agencykit/skeletons.js';
 
 const archive = archiveProjects.flatMap(project => project.items);
-const families = ['campaign-page', 'event-page', 'application-form', 'referral-flow', 'member-portal', 'relationship-workspace', 'assistant', 'directory', 'handbook', 'crew-planner'];
+const families = ['campaign-page', 'event-page', 'application-form', 'referral-flow', 'member-portal', 'relationship-workspace', 'assistant', 'directory', 'handbook', 'crew-planner', 'gallery', 'invoice'];
 const escaped = value => value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 const scripts = html => [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)].map(match => match[1]);
 
@@ -86,11 +86,67 @@ test('family layouts expose their intended semantic controls rather than one gen
     directory: [/data-directory-search/, /data-directory-item/, /data-directory-open/],
     handbook: [/aria-label="Handbook chapters"/, /<article\b/, /<details>/, /<summary>/],
     'crew-planner': [/type="checkbox"/, /data-task-count/, /data-task-form/],
+    gallery: [/data-gallery-filter/, /<figure\b/, /<figcaption>/, /data-gallery-count/],
+    invoice: [/data-invoice-quantity/, /data-invoice-rate/, /data-invoice-total/, /Nothing is stored, sent, or paid/],
   };
   for (const family of families) {
     const html = buildSkeletonDocument({ skeletonKey: family });
     for (const structure of structures[family]) assert.match(html, structure, family);
   }
+});
+
+test('invoice arithmetic handles zero and fractional line items without floating-point cent errors', () => {
+  assert.deepEqual(calculateInvoice([]), { lineTotalsCents: [], totalCents: 0 });
+  const lines = [{ quantity: 0, unitPrice: 500 }, { quantity: '0.5', unitPrice: '0.01' }, { quantity: '3', unitPrice: '0.10' }, { quantity: '.25', unitPrice: '19.99' }];
+  const original = structuredClone(lines);
+  assert.deepEqual(calculateInvoice(lines), { lineTotalsCents: [0, 1, 30, 500], totalCents: 531 });
+  assert.deepEqual(lines, original);
+  assert.deepEqual(calculateInvoice([{ quantity: 1, unitPrice: 125 }, { quantity: 2, unitPrice: 75 }, { quantity: 0.5, unitPrice: 60 }]), { lineTotalsCents: [12500, 15000, 3000], totalCents: 30500 });
+});
+
+test('invoice arithmetic rejects invalid, negative, over-precise and excessive inputs', () => {
+  for (const quantity of [-1, NaN, Infinity, '', '1.001', '10001', null, true]) {
+    assert.throws(() => calculateInvoice([{ quantity, unitPrice: 10 }]), RangeError);
+  }
+  for (const unitPrice of [-1, '1.005', 1000001]) assert.throws(() => calculateInvoice([{ quantity: 1, unitPrice }]), RangeError);
+});
+
+test('standalone invoice includes its calculator and updates only local outputs', () => {
+  const output = { textContent: '' }, status = { textContent: '' }, line = { textContent: '' };
+  const quantity = { value: '0.5' }, rate = { value: '19.99' };
+  const row = { querySelector: selector => ({ '[data-invoice-quantity]': quantity, '[data-invoice-rate]': rate, '[data-invoice-line]': line })[selector] };
+  const events = new Map();
+  const root = {
+    querySelector: selector => ({ '[data-invoice-total]': output, '[data-invoice-status]': status })[selector] || null,
+    querySelectorAll: selector => selector === '[data-invoice-row]' ? [row] : [],
+    addEventListener: (type, handler) => events.set(type, handler),
+  };
+  new Script(scripts(buildSkeletonDocument({ skeletonKey: 'invoice' }))[0]).runInNewContext({ document: { querySelector: () => root }, AbortController, setTimeout, clearTimeout });
+  assert.equal(output.textContent, '$10.00');
+  assert.equal(line.textContent, '$10.00');
+  rate.value = '';
+  events.get('input')({ target: { matches: () => true } });
+  assert.equal(output.textContent, '—');
+  assert.match(status.textContent, /Enter non-negative/);
+});
+
+test('gallery filters change visible placeholder pieces locally', async () => {
+  const groups = ['All', 'Spaces', 'Objects', 'Studies'];
+  const buttons = groups.map(group => ({ dataset: { galleryFilter: group }, attributes: {}, hasAttribute: name => name === 'data-gallery-filter', setAttribute(name, value) { this.attributes[name] = value; } }));
+  const pieces = ['Spaces', 'Objects', 'Studies', 'Spaces'].map(group => ({ dataset: { galleryCategory: group }, hidden: false }));
+  const count = { textContent: '' }, events = new Map();
+  const root = {
+    querySelector: selector => selector === '[data-gallery-count]' ? count : null,
+    querySelectorAll: selector => selector === '[data-gallery-item]' ? pieces : selector === '[data-gallery-filter]' ? buttons : [],
+    addEventListener: (type, handler) => events.set(type, handler), contains: () => true,
+  };
+  new Script(scripts(buildSkeletonDocument({ skeletonKey: 'gallery' }))[0]).runInNewContext({ document: { querySelector: () => root }, AbortController, setTimeout, clearTimeout });
+  await events.get('click')({ target: { closest: () => buttons[1] } });
+  assert.equal(pieces.filter(piece => !piece.hidden).length, 2);
+  assert.equal(count.textContent, '2 sample pieces');
+  assert.equal(buttons[1].attributes['aria-pressed'], 'true');
+  await events.get('click')({ target: { closest: () => buttons[0] } });
+  assert.ok(pieces.every(piece => !piece.hidden));
 });
 
 test('every starter has unique IDs and working internal link destinations', () => {
