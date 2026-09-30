@@ -10,7 +10,7 @@ const archiveMotion = createArchiveMotion({
   isActive: () => document.body.classList.contains('archive-home')
     && !document.body.classList.contains('modal-open')
     && !document.querySelector('dialog[open]')
-    && $('#assistant-panel').hidden && $('#search-suggestions').hidden && $('#archive-filter-panel').hidden
+    && $('#assistant-panel').hidden && $('#search-suggestions').hidden
     && !document.activeElement?.matches('input,textarea,select'),
 });
 const escape = value => String(value ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
@@ -36,8 +36,8 @@ const icon = (name, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="no
 const categoryIcon = category => ({Portals:'portal',Pages:'page',Forms:'form',Tools:'tool'}[category] || 'grid');
 const allArchive = archiveProjects.flatMap(project => project.items.map(item => ({...item, project: project.name, projectId:project.id, origin:project.name, archived:true})));
 const catalog = allArchive;
-let archiveDeck = shuffleItems(allArchive), archivePage = 0, archivePageCount = 1;
-let archiveLayoutSeed = Math.floor(Math.random()*0xFFFFFFFF);
+const archiveDeck = shuffleItems(allArchive), archiveLayoutSeed = Math.floor(Math.random()*0xFFFFFFFF);
+let archivePage = 0, archivePageCount = 1;
 const currentIds = ids => [...new Set(ids.map(id=>catalog.some(item=>item.id===id)?id:blocks.find(item=>item.id===id)?.sourceId).filter(id=>catalog.some(item=>item.id===id)))];
 const state = { route:'archive', scope:'all', category:'All', project:null, collection:null, query:'', compact:false, saved:[], collections:[] };
 try {
@@ -91,7 +91,6 @@ function render() {
   $('.app-shell').hidden=state.route==='archive';
   document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(state.route==='archive'){renderArchive();archiveMotion.sync();return;}
-  toggleArchiveFilters(false);
   document.body.classList.remove('archive-home','archive-results');
   archiveMotion.sync();
   const inArchive=state.route==='archive';
@@ -122,56 +121,42 @@ function render() {
 }
 
 
-function archiveTile(item,slot) {
-  const field=$('#archive-gallery').getBoundingClientRect(),x=field.left+slot.x,y=field.top+slot.y;
-  const focusX=Math.max(12,Math.min(innerWidth-slot.width-12,x))-x;
-  const focusY=Math.max(76,Math.min(innerHeight-slot.height-110,y))-y;
-  const position=`left:${slot.x}px;top:${slot.y}px;width:${slot.width}px;height:${slot.height}px;--tile-visual-height:${slot.visualHeight}px;--focus-x:${focusX}px;--focus-y:${focusY}px`;
+function archiveTile(item,slot,decorative=false) {
+  const position=`left:${slot.x}px;top:${slot.y}px;width:${slot.width}px;height:${slot.height}px;--tile-visual-height:${slot.visualHeight}px`;
+  if(decorative)return `<div class="archive-tile" style="${position}" aria-hidden="true"><span class="tile-visual">${preview(item)}</span></div>`;
   return `<button class="archive-tile" style="${position}" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)} — ${escape(item.project)}"><span class="tile-visual">${preview(item)}</span><span class="tile-caption"><strong>${escape(item.name)}</strong><span>${escape(item.project)} <i>·</i> ${escape(item.category)}${item.status==='prototype'?' · Prototype':''}</span></span></button>`;
 }
 function renderArchive(){
-  const home=!state.query&&state.category==='All'&&!state.project&&state.scope==='all';
+  const home=!state.query.trim();
+  if(home){archivePage=0;closeAssistant(false);}
   const compact=innerHeight<568;
   document.body.classList.toggle('archive-home',home);
   document.body.classList.toggle('archive-results',!home);
   document.body.classList.toggle('archive-compact',compact);
-  let items=(home?archiveDeck:allArchive).filter(item=>state.scope==='all'||(state.scope==='prototype'?item.status==='prototype':['finished','contextual'].includes(item.status)));
-  items=items.filter(item=>(!state.project||item.projectId===state.project)&&(state.category==='All'||item.category===state.category));
-  items=searchArchive(items,state.query);
+  const items=home?archiveDeck:searchArchive(allArchive,state.query);
   const canvas=$('#archive-canvas');
+  $('#archive-gallery').setAttribute('aria-label',home?'A glimpse of our work':'Search results');
+  $('#archive-gallery').setAttribute('aria-hidden',String(home));
+  $('#archive-gallery').inert=home;
   const layout=generateArchiveLayout({width:canvas.clientWidth,height:canvas.clientHeight,home,seed:archiveLayoutSeed+archivePage});
   const page=paginateItems(items,archivePage,layout.capacity);
   archivePage=page.page;archivePageCount=page.pageCount;
   const focused=document.activeElement?.closest('.archive-tile')?.dataset.detail;
-  canvas.innerHTML=!items.length?`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea.</p><button type="button" data-reset-archive>Browse the whole archive ↗</button></div>`:layout.capacity?page.items.map((item,index)=>archiveTile(item,layout.slots[index])).join(''):`<div class="archive-empty archive-space-needed"><h2>A little more room.</h2><p>Make this window taller to see the previews, or explore the full list.</p><a href="#library">Open all skeletons ↗</a></div>`;
+  canvas.innerHTML=!items.length?`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea.</p><button type="button" data-refine-search>Try another search ↗</button></div>`:layout.capacity?page.items.map((item,index)=>archiveTile(item,layout.slots[index],home)).join(''):home?'':`<div class="archive-empty archive-space-needed"><h2>A little more room.</h2><p>Make this window taller to see the search results.</p></div>`;
   if(focused)canvas.querySelector(`[data-detail="${CSS.escape(focused)}"]`)?.focus({preventScroll:true});
-  $('#archive-project').innerHTML='<option value="">All projects</option>'+archiveProjects.map(p=>`<option value="${p.id}">${escape(p.name)}</option>`).join('');
-  $('#archive-project').value=state.project||'';$('#archive-type').value=state.category;$('#archive-scope').value=state.scope;
+  $('#archive-result-controls').hidden=home;
   $('#archive-count').textContent=!items.length?'0 matches':page.items.length?`${archivePage*page.capacity+1}–${archivePage*page.capacity+page.items.length} of ${items.length}`:`${items.length} pieces`;
   $('#archive-previous').disabled=!page.hasPrevious;$('#archive-next').disabled=!page.hasNext;
-  $('#archive-pagination').hidden=page.pageCount<=1;$('#archive-shuffle').hidden=!home;
+  $('#archive-pagination').hidden=page.pageCount<=1;
   $('#archive-page-label').textContent=`View ${archivePage+1} of ${page.pageCount||1}`;
-  $('#archive-reset').hidden=home;$('#archive-clear').hidden=!$('#archive-search').value;
-  const activeFilters=Number(Boolean(state.project))+Number(state.category!=='All')+Number(state.scope!=='all');
-  $('#archive-filter-dot').hidden=!activeFilters;
-  $('#archive-filter-toggle').setAttribute('aria-label',activeFilters?`Filter, ${activeFilters} active`:'Filter');
-}
-function toggleArchiveFilters(open,{restoreFocus=false}={}){
-  $('#archive-filter-panel').hidden=!open;
-  $('#archive-filter-toggle').setAttribute('aria-expanded',String(open));
-  if(open){toggleSuggestions(false);$('#archive-project').focus({preventScroll:true});}
-  else if(restoreFocus)$('#archive-filter-toggle').focus({preventScroll:true});
-  archiveMotion.sync();
+  $('#archive-clear').hidden=!$('#archive-search').value;
 }
 function searchFromInput(){state.query=$('#archive-search').value.trim().slice(0,160);archiveStateChanged();$('#archive-search').focus();}
 function archiveStateChanged({resetPage=true}={}){
   if(resetPage)archivePage=0;
   const url=new URL(location.href);url.search='';
   if(state.query)url.searchParams.set('q',state.query);
-  if(state.category!=='All')url.searchParams.set('type',state.category);
-  if(state.project)url.searchParams.set('project',state.project);
-  if(state.scope!=='all')url.searchParams.set('scope',state.scope);
-  if(archivePage>0)url.searchParams.set('page',String(archivePage+1));
+  if(state.query&&archivePage>0)url.searchParams.set('page',String(archivePage+1));
   url.hash='archive';history.pushState(null,'',url);toggleSuggestions(false);render();window.scrollTo({top:0,behavior:'instant'});
 }
 function resetArchive(){state.query='';state.project=null;state.category='All';state.scope='all';$('#archive-search').value='';archiveStateChanged();}
@@ -180,20 +165,12 @@ $('#archive-search-form').addEventListener('submit',event=>{event.preventDefault
 $('#archive-search').addEventListener('input',()=>{$('#archive-clear').hidden=!$('#archive-search').value;});
 $('#archive-clear').addEventListener('click',()=>{$('#archive-search').value='';state.query='';archiveStateChanged();$('#archive-search').focus();});
 $('#suggestion-toggle').addEventListener('click',()=>toggleSuggestions($('#search-suggestions').hidden));
-$('#archive-search-stage').addEventListener('focusout',()=>queueMicrotask(()=>{if(!$('#archive-search-stage').contains(document.activeElement)&&!$('#search-suggestions').hidden)toggleSuggestions(false);}));
-$('#archive-filter-toggle').addEventListener('click',()=>toggleArchiveFilters($('#archive-filter-panel').hidden));
-$('.archive-controls').addEventListener('focusout',event=>{if(event.relatedTarget&&!$('.archive-controls').contains(event.relatedTarget)&&!$('#archive-filter-panel').hidden)toggleArchiveFilters(false);});
-document.addEventListener('pointerdown',event=>{if(!$('#archive-filter-panel').hidden&&!event.target.closest('.archive-controls'))toggleArchiveFilters(false);});
-$('#archive-project').addEventListener('change',event=>{state.project=event.target.value||null;archiveStateChanged();});
-$('#archive-type').addEventListener('change',event=>{state.category=event.target.value;archiveStateChanged();});
-$('#archive-scope').addEventListener('change',event=>{state.scope=event.target.value;archiveStateChanged();});
-$('#archive-reset').addEventListener('click',()=>{resetArchive();toggleArchiveFilters(false,{restoreFocus:true});});
-$('#archive-shuffle').addEventListener('click',()=>{archiveDeck=shuffleItems(allArchive);archiveLayoutSeed=Math.floor(Math.random()*0xFFFFFFFF);archivePage=0;archiveStateChanged({resetPage:false});toggleArchiveFilters(false,{restoreFocus:true});});
-$('#archive-previous').addEventListener('click',()=>{archivePage=Math.max(0,archivePage-1);archiveStateChanged({resetPage:false});toggleArchiveFilters(false,{restoreFocus:true});});
-$('#archive-next').addEventListener('click',()=>{archivePage=Math.min(archivePageCount-1,archivePage+1);archiveStateChanged({resetPage:false});toggleArchiveFilters(false,{restoreFocus:true});});
+$('#archive-search-stage').addEventListener('focusout',event=>{if(event.relatedTarget&&!$('#archive-search-stage').contains(event.relatedTarget)&&!$('#search-suggestions').hidden)toggleSuggestions(false);});
+$('#archive-previous').addEventListener('click',()=>{archivePage=Math.max(0,archivePage-1);archiveStateChanged({resetPage:false});if($('#archive-previous').disabled)$('#archive-search').focus({preventScroll:true});});
+$('#archive-next').addEventListener('click',()=>{archivePage=Math.min(archivePageCount-1,archivePage+1);archiveStateChanged({resetPage:false});if($('#archive-next').disabled)$('#archive-search').focus({preventScroll:true});});
 let layoutFrame=0;
 new ResizeObserver(()=>{cancelAnimationFrame(layoutFrame);layoutFrame=requestAnimationFrame(()=>{if(state.route==='archive'){renderArchive();archiveMotion.sync();}});}).observe($('#archive-canvas'));
-document.addEventListener('click',event=>{const suggestion=event.target.closest('[data-archive-query]');if(suggestion){$('#archive-search').value=suggestion.dataset.archiveQuery;searchFromInput();}if(event.target.closest('[data-reset-archive]'))resetArchive();});
+document.addEventListener('click',event=>{const suggestion=event.target.closest('[data-archive-query]');if(suggestion){$('#archive-search').value=suggestion.dataset.archiveQuery;searchFromInput();}if(event.target.closest('[data-refine-search]')){$('#archive-search').focus();$('#archive-search').select();}});
 
 function foundations() {return `<div class="foundation-intro"><span class="eyebrow">01 / THE CURVE</span><h2>Soft edges.<br>A consistent character.</h2><p>The same continuous curve, scaled to suit the thing you’re holding. Small on a control. Generous on a surface. A little more character in the assistant.</p></div><div class="curve-study"><div class="curve-swatch"><span class="curve-sample tiny"></span><strong>Small</strong><p>Controls & icons</p><code>12 px</code></div><div class="curve-swatch"><span class="curve-sample medium"></span><strong>Medium</strong><p>Cards & objects</p><code>22 px</code></div><div class="curve-swatch"><span class="curve-sample large"></span><strong>Large</strong><p>Panels & dialogs</p><code>32 px</code></div><div class="curve-swatch"><span class="assistant-orb"><span></span></span><strong>Companion</strong><p>A shape with a presence</p><code>Continuous</code></div></div><div class="foundation-bottom"><div><span class="eyebrow">02 / THE PALETTE</span><h2>Room for the work.</h2><p>Paper, stone, graphite, and ink. Color can arrive with a client. The library stays quiet.</p><div class="palette"><span style="background:#f7f7f5"></span><span style="background:#e9e9e6"></span><span style="background:#b8b8b3"></span><span style="background:#747470"></span><span style="background:#242423"></span></div></div><div><span class="eyebrow">03 / THE VOICE</span><h2>A helpful person.</h2><p>Say what a thing does. Make the next step clear. Leave a little room to breathe.</p><div class="voice-example">“What are we making?”<small>A question, not a command.</small></div></div></div>`; }
 
@@ -206,12 +183,14 @@ function route() {
   if(state.route==='collection'&&!state.collections.some(c=>c.id===state.collection)){state.route='library';state.collection=null;}
   const params=new URLSearchParams(location.search);
   archivePage=Math.max(0,Math.min(10000,Math.floor(Number(params.get('page'))||1)-1));
-  state.query=state.route==='archive'?(params.get('q')||'').slice(0,160):'';
+  state.query=state.route==='archive'?(params.get('q')||'').trim().slice(0,160):'';
   if(state.route==='archive'){
-    state.category=categories.includes(params.get('type'))?params.get('type'):'All';
-    state.scope=['finished','prototype'].includes(params.get('scope'))?params.get('scope'):'all';
-    state.project=state.project||(archiveProjects.some(p=>p.id===params.get('project'))?params.get('project'):null);
-    if(parts[1]){state.query='';state.category='All';state.scope='all';const clean=new URL(location.href);clean.search='';clean.searchParams.set('scope','all');history.replaceState(null,'',clean);}
+    state.category='All';state.scope='all';state.project=null;
+    if(!state.query)archivePage=0;
+    const clean=new URL(location.href);clean.search='';clean.hash='archive';
+    if(state.query)clean.searchParams.set('q',state.query);
+    if(archivePage>0)clean.searchParams.set('page',String(archivePage+1));
+    history.replaceState(null,'',clean);
   }
   $('#search').value=''; $('#archive-search').value=state.query;
   closeSidebar(); closeDetails(); render(); window.scrollTo({top:0,behavior:'instant'});
@@ -244,7 +223,7 @@ function openCollection(selectedId=null) {
   $('#collection-options').innerHTML=allArchive.map(item=>`<label class="pick-block"><input type="checkbox" name="blocks" value="${item.id}" ${selectedId===item.id?'checked':''}><span>${escape(item.name)}</span><small>${item.category}</small></label>`).join('');
   $('#collection-modal').showModal();$('#collection-name').focus();
 }
-function openAssistant(){ $('#assistant-panel').hidden=false;$('#assistant-launcher').setAttribute('aria-expanded','true');$('#assistant-question').focus(); }
+function openAssistant(){ if(state.route==='archive'&&!state.query.trim()){$('#archive-search').focus({preventScroll:true});return;}$('#assistant-panel').hidden=false;$('#assistant-launcher').setAttribute('aria-expanded','true');$('#assistant-question').focus(); }
 function closeAssistant(restore=true){ $('#assistant-panel').hidden=true;$('#assistant-launcher').setAttribute('aria-expanded','false');if(restore)$('#assistant-launcher').focus(); }
 function askGuide(message) {
   const text=message.trim().slice(0,600);if(!text)return;
@@ -303,12 +282,12 @@ document.addEventListener('keydown',event=>{
   const drawerOpen=!$('#detail-overlay').hidden;
   if(!drawerOpen&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openAssistant();}
   if(event.key==='/'&&!typing&&!drawerOpen){event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#search')).focus();}
-  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#archive-filter-panel').hidden)toggleArchiveFilters(false,{restoreFocus:true});else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}else closeSidebar();}
+  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}else closeSidebar();}
   if(event.key==='Tab'&&!$('#detail-overlay').hidden&&!$('#collection-modal').open){const focusable=[...$('#detail-drawer').querySelectorAll('button,a[href]')].filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
 });
 document.querySelectorAll('.archive-header a[href="#archive"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();state.route='archive';closeDetails();resetArchive();}));
 window.addEventListener('hashchange',route);
 window.addEventListener('popstate',route);
 $('#archive-about').addEventListener('click',()=>$('#about-modal').showModal());
-$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-workspace'):$('#main-content')).focus();});
+$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#main-content')).focus();});
 route();
