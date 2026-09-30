@@ -13,6 +13,9 @@ body.archive-mode #archive-canvas .tile-caption strong,body.archive-mode #archiv
 body.archive-mode #archive-canvas .tile-caption strong{font-size:10px;line-height:14px}
 body.archive-mode #archive-canvas .tile-caption>span{font-size:8px;line-height:11px}
 body.archive-mode #archive-search-stage{transition:none}
+/* The fixed workspace is its own stacking context. Keep the header clear so
+   the search field remains visible when it moves into the top row. */
+body.archive-results .archive-header{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
 body.archive-mode .archive-controls{display:flex;flex-wrap:nowrap;gap:7px;width:max-content;max-width:calc(100vw - 180px);bottom:23px;left:50%;transform:translateX(-50%)}
 body.archive-mode .archive-pagination{display:flex;align-items:center;gap:3px;padding:0}
 body.archive-mode .archive-pagination button{width:30px;padding:4px;font-size:15px}
@@ -59,7 +62,7 @@ body.archive-home .archive-tile .tile-visual,body.archive-home .archive-tile:hov
 body.archive-home .archive-tile .tile-caption{display:none}
 body.archive-home .archive-header{background:linear-gradient(#0c0c0cd9,#0c0c0c75 66%,transparent)}
 body.archive-home .archive-header nav{padding:3px 8px;border-radius:12px;background:#0c0c0c70;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-body.archive-home .archive-header a[data-nav-route="library"],body.archive-home .archive-header a[data-nav-route="saved"],body.archive-home .assistant-launcher{display:none}
+body.archive-home .assistant-launcher{display:none}
 body.archive-home #archive-search-stage{top:calc(47dvh - 32px)}
 body.archive-home .archive-footnote{padding:5px 7px;border-radius:8px;background:#0c0c0c9c;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 @media(max-width:720px){body.archive-home #archive-gallery{inset:-36px -26px}body.archive-home #archive-search-stage{top:calc(45dvh - 29px)}}

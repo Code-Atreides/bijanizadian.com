@@ -171,13 +171,14 @@ test('every explicit project filter intersects correctly with page types across 
   }
 });
 
-test('published screenshots have matching image bytes and a public source reference', () => {
-  for (const item of archive.filter(item => item.thumbnail)) {
+test('every original has real screenshot bytes and traceable source provenance', () => {
+  for (const item of archive) {
     assert.match(item.thumbnail, /^\/agencykit\/thumbnails\/[a-z0-9-]+\.(?:png|jpg)$/);
     const bytes = readFileSync(new URL(`../agencykit/${item.thumbnail.slice('/agencykit/'.length)}`, import.meta.url));
     if (item.thumbnail.endsWith('.png')) assert.equal(bytes.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `${item.id} is a PNG`);
     else assert.equal(bytes.subarray(0, 3).toString('hex'), 'ffd8ff', `${item.id} is a JPEG`);
-    assert.equal(new URL(item.sourceUrl).protocol, 'https:');
+    if(item.sourceUrl)assert.equal(new URL(item.sourceUrl).protocol, 'https:');
+    else assert.equal(item.previewSource, 'local-original', `${item.id} documents its local original screenshot`);
     assert.ok(item.sourcePath && item.notes, `${item.id} identifies its source and context`);
     assert.ok(!/^(?:[A-Z]:|\/)/i.test(item.sourcePath), 'does not publish a local absolute source path');
   }

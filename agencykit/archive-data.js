@@ -1,6 +1,5 @@
-// Original portfolio and GTM project metadata, reviewed 2026-09-29.
-// Safe source references only; private records, participant links, and access tokens are excluded.
-// Neutral frontend starters follow source structure without copying original assets or integrations.
+// Original work and verified original-interface previews, September 2026.
+// Internal previews use original access screens or explicitly fictional sample data.
 export const archiveProjects = [
   {
     "id": "fomo",
@@ -72,11 +71,11 @@ export const archiveProjects = [
         "category": "Portals",
         "description": "A chapter-specific member signup journey with progress and app-download instructions.",
         "sourcePath": "bijanizadian.com/greekwars/clan.html",
-        "sourceUrl": null,
+        "sourceUrl": "https://bijanizadian.com/greekwars/clan",
         "preview": "portal",
         "status": "contextual",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original chapter portal. Opening a real portal requires its chapter-specific member link; no participant-specific URL or data is included.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original chapter portal. Opening a real portal requires its chapter-specific member link; no participant-specific URL or data is included. Preview captured from the original frontend on 2026-09-30: Original chapter portal · fictional sample chapter. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/fomo-clan.jpg",
         "skeletonKey": "member-portal",
         "skeletonSections": [
           "Chapter identity",
@@ -92,7 +91,9 @@ export const archiveProjects = [
           "onboarding",
           "signup",
           "progress"
-        ]
+        ],
+        "previewSource": "local-original",
+        "previewCaption": "Original chapter portal · fictional sample chapter"
       },
       {
         "id": "fomo-clan-claim",
@@ -268,8 +269,8 @@ export const archiveProjects = [
         "sourceUrl": null,
         "preview": "portal",
         "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original assistant prototype. No public deployment is claimed; this archive does not import the widget or send chat requests.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original assistant prototype. No public deployment is claimed; this archive does not import the widget or send chat requests. Preview captured from the original frontend on 2026-09-30: Original Ask fomo prototype · local preview. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/fomo-assistant.jpg",
         "skeletonKey": "assistant",
         "skeletonSections": [
           "Centered launcher",
@@ -285,7 +286,9 @@ export const archiveProjects = [
           "chatbot",
           "widget",
           "help"
-        ]
+        ],
+        "previewSource": "local-original",
+        "previewCaption": "Original Ask fomo prototype · local preview"
       },
       {
         "id": "fomo-campus-directory",
@@ -324,8 +327,8 @@ export const archiveProjects = [
         "sourceUrl": "https://bijanizadian.com/irrigation",
         "preview": "dashboard",
         "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original internal relationship application. The route is source-defined; protected workspace access and live records were not inspected.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Original internal relationship application. The route is source-defined; protected workspace access and live records were not inspected. Preview captured from the original frontend on 2026-09-30: Original Irrigation app · built-in sample workspace. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/fomo-irrigation.jpg",
         "skeletonKey": "relationship-workspace",
         "skeletonSections": [
           "Workspace navigation",
@@ -342,7 +345,9 @@ export const archiveProjects = [
           "outreach",
           "tasks",
           "workspace"
-        ]
+        ],
+        "previewSource": "local-original",
+        "previewCaption": "Original Irrigation app · built-in sample workspace"
       },
       {
         "id": "fomo-campus-original",
@@ -474,8 +479,8 @@ export const archiveProjects = [
         "sourceUrl": "https://bijanizadian.com/crewsheet",
         "preview": "dashboard",
         "status": "contextual",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Live URL returned HTTP 200 with the expected title on 2026-09-29. form submissions and private records were not tested. A real sheet requires a dinner code. The page may reopen a previously saved code, so previews must stop at a fresh empty entry gate. No dinner data or codes are included.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Live URL returned HTTP 200 with the expected title on 2026-09-29. form submissions and private records were not tested. A real sheet requires a dinner code. The page may reopen a previously saved code, so previews must stop at a fresh empty entry gate. No dinner data or codes are included. Preview captured from the original frontend on 2026-09-30: Original crew sheet · dinner-code entry. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/fomo-crewsheet.jpg",
         "skeletonKey": "crew-planner",
         "skeletonSections": [
           "Dinner-code entry",
@@ -492,7 +497,9 @@ export const archiveProjects = [
           "tasks",
           "roles",
           "coordination"
-        ]
+        ],
+        "previewSource": "public-original",
+        "previewCaption": "Original crew sheet · dinner-code entry"
       },
       {
         "id": "fomo-claim-links",
@@ -503,8 +510,8 @@ export const archiveProjects = [
         "sourceUrl": "https://bijanizadian.com/claimlinks",
         "preview": "directory",
         "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Live URL returned HTTP 200 with the expected title on 2026-09-29. form submissions and private records were not tested. Protected team workflow. No passcode, private head link, participant record, or unlocked screenshot is included.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. Live URL returned HTTP 200 with the expected title on 2026-09-29. form submissions and private records were not tested. Protected team workflow. No passcode, private head link, participant record, or unlocked screenshot is included. Preview captured from the original frontend on 2026-09-30: Original claim-link manager · access screen. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/fomo-claim-links.jpg",
         "skeletonKey": "relationship-workspace",
         "skeletonSections": [
           "Passcode gate",
@@ -521,7 +528,9 @@ export const archiveProjects = [
           "admin",
           "team",
           "directory"
-        ]
+        ],
+        "previewSource": "public-original",
+        "previewCaption": "Original claim-link manager · access screen"
       },
       {
         "id": "fomo-invite",
@@ -974,8 +983,8 @@ export const archiveProjects = [
         "sourceAliases": [],
         "preview": "directory",
         "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. No live chapter-link table or invitation data is included. This is treated as an operational surface; the archive does not assert that the original enforces authentication.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. No live chapter-link table or invitation data is included. This is treated as an operational surface; the archive does not assert that the original enforces authentication. Preview captured from the original frontend on 2026-09-30: Original clan directory · fictional sample chapters. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/milo-fomo-onboard-links.jpg",
         "skeletonKey": "directory",
         "skeletonSections": [
           "Directory introduction",
@@ -991,7 +1000,9 @@ export const archiveProjects = [
           "links",
           "directory",
           "operations"
-        ]
+        ],
+        "previewSource": "local-original",
+        "previewCaption": "Original clan directory · fictional sample chapters"
       },
       {
         "id": "milo-fomo-refer",
@@ -1173,8 +1184,8 @@ export const archiveProjects = [
         "sourceAliases": [],
         "preview": "form",
         "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. The route serves an HTML development shell loading main.tsx; it is not equivalent to the compiled /hqvisitform page, and its browser usability is not confirmed.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. The route serves an HTML development shell loading main.tsx; it is not equivalent to the compiled /hqvisitform page, and its browser usability is not confirmed. Preview captured from the original frontend on 2026-09-30: Original visit-request prototype · local preview. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/milo-visit-form-dev.jpg",
         "skeletonKey": "application-form",
         "skeletonSections": [
           "Visit introduction",
@@ -1191,7 +1202,9 @@ export const archiveProjects = [
           "form",
           "development",
           "prototype"
-        ]
+        ],
+        "previewSource": "local-original",
+        "previewCaption": "Original visit-request prototype · local preview"
       },
       {
         "id": "milo-visit-console",
@@ -1205,8 +1218,8 @@ export const archiveProjects = [
         ],
         "preview": "dashboard",
         "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The route returned HTTP 200 to a metadata-only HEAD check; private page bodies and records were not fetched. The /invoice alias has the same ETag and local routing maps both to the same console. The earlier visit-request prototype entry is retained under this ID as a general console reference; its live visit-specific view was not inspected.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The route returned HTTP 200 to a metadata-only HEAD check; private page bodies and records were not fetched. The /invoice alias has the same ETag and local routing maps both to the same console. The earlier visit-request prototype entry is retained under this ID as a general console reference; its live visit-specific view was not inspected. Preview captured from the original frontend on 2026-09-30: Original operations console · access screen. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/milo-visit-console.jpg",
         "skeletonKey": "invoice",
         "skeletonSections": [
           "Access gate",
@@ -1224,52 +1237,54 @@ export const archiveProjects = [
           "invoice",
           "console",
           "review"
-        ]
+        ],
+        "previewSource": "public-original",
+        "previewCaption": "Original operations console · access screen"
       },
       {
         "id": "milo-invoice-beta",
-        "name": "Operations console beta",
-        "category": "Portals",
-        "description": "A separate beta operations interface with neutral invoice interactions in its starter.",
+        "name": "Beta internship",
+        "category": "Forms",
+        "description": "A guided two-week internship onboarding journey with a welcome, participant details, schedule, and review.",
         "sourcePath": "Published route: milomessina.com/internal/beta",
         "sourceUrl": "https://milomessina.com/internal/beta",
         "sourceAliases": [
           "https://milomessina.com/invoice/beta.html"
         ],
-        "preview": "dashboard",
-        "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The route returned HTTP 200 to a metadata-only HEAD check; private page bodies and records were not fetched. The /invoice/beta.html alias has the same ETag. Only route metadata was inspected; no invoice or visitor data was read.",
-        "thumbnail": null,
-        "skeletonKey": "invoice",
+        "preview": "form",
+        "status": "prototype",
+        "notes": "Original public beta internship welcome page, verified on 2026-09-30. Preview shows the initial step; no participant details were entered and no application was submitted.",
+        "thumbnail": "/agencykit/thumbnails/milo-invoice-beta.jpg",
+        "skeletonKey": "application-form",
         "skeletonSections": [
-          "Access gate",
-          "Beta workspace navigation",
-          "Invoice overview",
-          "Editable line items",
-          "Totals and status"
+          "Internship introduction",
+          "Participant details",
+          "Two-week schedule",
+          "Review and join"
         ],
         "tags": [
-          "milo",
-          "fomo",
-          "internal",
-          "invoice",
           "beta",
-          "console",
-          "operations"
-        ]
+          "internship",
+          "onboarding",
+          "application",
+          "schedule",
+          "team"
+        ],
+        "previewSource": "public-original",
+        "previewCaption": "Original beta internship · welcome step"
       },
       {
         "id": "milo-chapter-data",
         "name": "Chapter analytics",
         "category": "Tools",
-        "description": "An internal chapter analytics surface, represented by structure alone.",
+        "description": "An internal chapter analytics workspace, previewed at its original access screen.",
         "sourcePath": "milomessina/invoice/data/index.html",
         "sourceUrl": "https://milomessina.com/invoice/data",
         "sourceAliases": [],
         "preview": "dashboard",
         "status": "protected",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The route returned HTTP 200 to a metadata-only HEAD check; private page bodies and records were not fetched. Local source confirms a visual analytics page rather than an API endpoint. No chapter records, metrics, contact information, or charts of real data are included.",
-        "thumbnail": null,
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The route returned HTTP 200 to a metadata-only HEAD check; private page bodies and records were not fetched. Local source confirms a visual analytics page rather than an API endpoint. No chapter records, metrics, contact information, or charts of real data are included. Preview captured from the original frontend on 2026-09-30: Original chapter analytics · access screen. No private records or credentials are included.",
+        "thumbnail": "/agencykit/thumbnails/milo-chapter-data.jpg",
         "skeletonKey": "relationship-workspace",
         "skeletonSections": [
           "Access gate",
@@ -1287,7 +1302,9 @@ export const archiveProjects = [
           "data",
           "map",
           "internal"
-        ]
+        ],
+        "previewSource": "public-original",
+        "previewCaption": "Original chapter analytics · access screen"
       },
       {
         "id": "milo-study-arrivals",
