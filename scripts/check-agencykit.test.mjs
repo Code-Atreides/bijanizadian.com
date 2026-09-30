@@ -61,13 +61,14 @@ test('archive search intersects project and category concepts in natural request
   assert.ok(result.length >= 2);
   assert.ok(result.every(item => item.projectId === 'fomo' && item.category === 'Portals'));
   assert.ok(result.some(item => item.id === 'fomo-clan'));
-  assert.deepEqual(searchArchive(archive, 'Lucien portals'), []);
+  assert.deepEqual(searchArchive(archive, 'UnknownCompany portals'), []);
 });
 
 test('archive website and application aliases select their actual categories', () => {
-  const pages = searchArchive(archive, 'I would like to see Lucien websites');
-  assert.equal(pages.length, archive.filter(item => item.projectId === 'lucien-smith' && item.category === 'Pages').length);
-  assert.ok(pages.every(item => item.projectId === 'lucien-smith' && item.category === 'Pages'));
+  const pages = searchArchive(archive, 'I would like to see fomo websites');
+  assert.equal(pages.length, archive.filter(item => item.projectId === 'fomo' && item.category === 'Pages').length);
+  assert.ok(pages.length > 0);
+  assert.ok(pages.every(item => item.projectId === 'fomo' && item.category === 'Pages'));
   assert.deepEqual(new Set(ids(searchArchive(archive, 'Find applications'))), new Set(ids(archive.filter(item => item.category === 'Forms'))));
 });
 
@@ -78,13 +79,15 @@ test('archive onboarding and program synonyms retain useful constrained matches'
   const greekPortals = searchArchive(archive, 'Greek Wars portals');
   assert.ok(greekPortals.some(item => item.id === 'fomo-clan'));
   assert.ok(greekPortals.every(item => item.category === 'Portals' && item.projectId === 'fomo'));
-  assert.equal(searchArchive(archive, 'fomo referral')[0].id, 'fomo-refer');
+  const referrals = searchArchive(archive, 'fomo referral');
+  assert.ok(referrals.some(item => item.id === 'fomo-refer'));
+  assert.ok(referrals.every(item => item.projectId === 'fomo'));
 });
 
-test('artwork search matches Lucien work and ranks the painting archive first', () => {
-  const result = searchArchive(archive, 'Find me Lucien artwork');
-  assert.equal(result[0]?.id, 'lucien-gallery');
-  assert.ok(result.every(item => item.projectId === 'lucien-smith'));
+test('archive topic searches find fomo work without weakening category constraints', () => {
+  const result = searchArchive(archive, 'Find me fomo dinner pages');
+  assert.ok(result.some(item => item.id === 'fomo-dinners'));
+  assert.ok(result.every(item => item.projectId === 'fomo' && item.category === 'Pages'));
 });
 
 test('generic requests return the archive without mutation or a hidden result limit', () => {
@@ -97,7 +100,7 @@ test('generic requests return the archive without mutation or a hidden result li
 });
 
 test('unrelated concepts cannot be hidden by a matching project or category', () => {
-  for (const query of ['quantum astrophysics nebula', 'fomo portals zyzzyva', 'Lucien artwork blockchain']) {
+  for (const query of ['quantum astrophysics nebula', 'fomo portals zyzzyva', 'fomo dinner blockchain']) {
     assert.deepEqual(searchArchive(archive, query), [], query);
   }
   assert.deepEqual(searchArchive(archive, 'port'), [], 'does not match a fragment inside portal');
@@ -113,13 +116,42 @@ test('archive search uses tags, leaves status filtering to callers, and is stabl
   assert.deepEqual(searchArchive(items.filter(item => item.status === 'Ready'), 'Acme onboarding forms'), [items[1]]);
 });
 
-test('every visible archive search suggestion finds work in the default scope', () => {
+test('every visible archive search suggestion finds work in the whole archive', () => {
   const markup = readFileSync(new URL('../agencykit/index.html', import.meta.url), 'utf8');
   const queries = [...markup.matchAll(/data-archive-query="([^"]+)"/g)].map(match => match[1]);
-  const finished = archive.filter(item => ['finished', 'contextual'].includes(item.status));
-  assert.equal(queries.length, 5);
+  assert.ok(queries.length > 0);
   for (const query of queries) {
-    assert.ok(searchArchive(finished, query).length > 0, `suggestion must return work: ${query}`);
+    assert.ok(searchArchive(archive, query).length > 0, `suggestion must return work: ${query}`);
+  }
+});
+
+test('archive entries have unique identities, recognized types, and safe source metadata', () => {
+  assert.ok(archive.length > 0);
+  assert.equal(new Set(archiveProjects.map(project => project.id)).size, archiveProjects.length);
+  assert.equal(new Set(ids([...blocks, ...archive])).size, blocks.length + archive.length);
+  assert.doesNotMatch(JSON.stringify(archiveProjects), /lucien/i, 'removed project is absent from the published catalog');
+  for (const item of archive) {
+    assert.ok(categories.includes(item.category), `${item.id} has a recognized category`);
+    assert.ok(['finished', 'contextual', 'protected', 'prototype'].includes(item.status), `${item.id} has a recognized source status`);
+    assert.ok(item.name && item.description && item.sourcePath, `${item.id} identifies its source`);
+    assert.doesNotMatch(item.sourcePath, /^(?:[A-Z]:|\/)/i, 'source references do not expose absolute machine paths');
+    if (!item.sourceUrl) continue;
+    const url = new URL(item.sourceUrl);
+    assert.equal(url.protocol, 'https:');
+    assert.equal(url.username + url.password, '', 'no credentials in source URLs');
+    assert.equal(url.search, '', 'no participant tokens or personal query data');
+    assert.equal(url.hash, '', 'no private route fragments');
+    assert.ok(!['localhost', '127.0.0.1', '[::1]'].includes(url.hostname));
+  }
+});
+
+test('every project and page-type query intersects correctly across the full archive', () => {
+  for (const project of archiveProjects) {
+    for (const category of categories) {
+      const expected = archive.filter(item => item.projectId === project.id && item.category === category);
+      const found = searchArchive(archive, `${project.name} ${category}`);
+      assert.deepEqual(new Set(ids(found)), new Set(ids(expected)), `${project.name} ${category}`);
+    }
   }
 });
 

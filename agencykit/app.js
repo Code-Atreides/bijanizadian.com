@@ -1,6 +1,7 @@
-import { blocks, categories, filterItems, lookupItems, searchArchive } from './catalog.js';
+import { blocks, categories, filterItems, searchArchive } from './catalog.js';
 import { archiveProjects } from './archive-data.js';
 import { createArchiveMotion } from './archive-motion.js';
+import { downloadSkeleton } from './skeletons.js';
 
 const $ = selector => document.querySelector(selector);
 const archiveMotion = createArchiveMotion({
@@ -33,20 +34,21 @@ const shapes = {
 const icon = (name, cls='') => `<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${shapes[name] || shapes.grid}</svg>`;
 const categoryIcon = category => ({Portals:'portal',Pages:'page',Forms:'form',Tools:'tool'}[category] || 'grid');
 const allArchive = archiveProjects.flatMap(project => project.items.map(item => ({...item, project: project.name, projectId:project.id, origin:project.name, archived:true})));
-const catalog = [...blocks, ...allArchive];
-const state = { route:'archive', scope:'finished', category:'All', project:null, collection:null, query:'', compact:false, saved:[], collections:[] };
+const catalog = allArchive;
+const currentIds = ids => [...new Set(ids.map(id=>catalog.some(item=>item.id===id)?id:blocks.find(item=>item.id===id)?.sourceId).filter(id=>catalog.some(item=>item.id===id)))];
+const state = { route:'archive', scope:'all', category:'All', project:null, collection:null, query:'', compact:false, saved:[], collections:[] };
 try {
   const data = JSON.parse(localStorage.getItem('gtm-kit-v1') || '{}');
-  state.saved = Array.isArray(data.saved) ? data.saved.filter(id => catalog.some(x=>x.id===id)) : [];
-  state.collections = Array.isArray(data.collections) ? data.collections.filter(x => typeof x.id==='string' && typeof x.name==='string' && Array.isArray(x.items)).slice(0,30).map(x=>({id:x.id,name:x.name.slice(0,60),note:String(x.note||'').slice(0,240),items:x.items.filter(id=>catalog.some(i=>i.id===id))})) : [];
+  state.saved = Array.isArray(data.saved) ? currentIds(data.saved) : [];
+  state.collections = Array.isArray(data.collections) ? data.collections.filter(x => typeof x.id==='string' && typeof x.name==='string' && Array.isArray(x.items)).slice(0,30).map(x=>({id:x.id,name:x.name.slice(0,60),note:String(x.note||'').slice(0,240),items:currentIds(x.items)})) : [];
 } catch { /* The local frame works without browser storage. */ }
 
-let toastTimer, detailId = null, previousFocus = null;
+let toastTimer, detailId = null, detailView = 'original', previousFocus = null;
 function notify(message) { $('#toast').textContent=message; $('#toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2600); }
 function persist() { try { localStorage.setItem('gtm-kit-v1',JSON.stringify({saved:state.saved,collections:state.collections})); } catch { notify('Browser storage is unavailable. Changes last for this visit.'); } }
 function navLink(label,href,name,count,active=false) { return `<a class="nav-item ${active?'active':''}" href="${href}" ${active?'aria-current="page"':''}>${icon(name,'nav-icon')}<span>${escape(label)}</span>${count===undefined?'':`<span class="nav-count">${count}</span>`}</a>`; }
 function renderNav() {
-  $('#library-nav').innerHTML=navLink('All blocks','#library','grid',blocks.length,state.route==='library'&&state.category==='All')+categories.map(category=>navLink(category,`#library/${category.toLowerCase()}`,categoryIcon(category),blocks.filter(x=>x.category===category).length,state.route==='library'&&state.category===category)).join('');
+  $('#library-nav').innerHTML=navLink('All skeletons','#library','grid',allArchive.length,state.route==='library'&&state.category==='All')+categories.map(category=>navLink(category,`#library/${category.toLowerCase()}`,categoryIcon(category),allArchive.filter(x=>x.category===category).length,state.route==='library'&&state.category===category)).join('');
   $('#workspace-nav').innerHTML=navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
   $('#collections-nav').hidden=!state.collections.length;
   $('#collection-links').innerHTML=state.collections.map(c=>navLink(c.name,`#collection/${encodeURIComponent(c.id)}`,'collection',c.items.length,state.collection===c.id)).join('');
@@ -73,7 +75,7 @@ function preview(item) {
 }
 function card(item) {
   const saved=state.saved.includes(item.id);
-  return `<article class="block-card" data-id="${escape(item.id)}"><button class="card-preview" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)}">${preview(item)}<span class="preview-open">Explore ${icon('arrow')}</span></button><div class="card-meta"><div class="card-topline"><button class="card-title" data-detail="${escape(item.id)}">${escape(item.name)}</button><button class="card-menu ${saved?'is-saved':''}" data-save="${escape(item.id)}" aria-label="${saved?'Unsave':'Save'} ${escape(item.name)}" aria-pressed="${saved}">${icon('bookmark')}</button></div><p class="card-description">${escape(item.description)}</p><div class="card-bottom"><span class="category-label">${icon(categoryIcon(item.category))}${escape(item.category)}</span><span class="status-tag">${item.archived?(item.status==='prototype'?'Prototype':'Original'):'Blueprint'}</span></div></div></article>`;
+  return `<article class="block-card" data-id="${escape(item.id)}"><button class="card-preview" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)}">${preview(item)}<span class="preview-open">Explore ${icon('arrow')}</span></button><div class="card-meta"><div class="card-topline"><button class="card-title" data-detail="${escape(item.id)}">${escape(item.name)}</button><button class="card-menu ${saved?'is-saved':''}" data-save="${escape(item.id)}" aria-label="${saved?'Unsave':'Save'} ${escape(item.name)}" aria-pressed="${saved}">${icon('bookmark')}</button></div><p class="card-description">${escape(item.description)}</p><div class="card-bottom"><span class="category-label">${icon(categoryIcon(item.category))}${escape(item.category)}</span><span class="status-tag">${item.archived?(state.route==='library'?'Skeleton':item.status==='prototype'?'Prototype':'Original'):'Starting point'}</span></div></div></article>`;
 }
 function empty(title,body) { return `<div class="empty-state">${icon('search')}<h2>${escape(title)}</h2><p>${escape(body)}</p><button class="quiet-button" data-clear-search>Clear filters</button></div>`; }
 function grid(items) { return `<div class="grid ${state.compact?'compact':''}">${items.map(card).join('')}</div>`; }
@@ -91,7 +93,7 @@ function render() {
   const inArchive=state.route==='archive';
   const collection=state.collections.find(c=>c.id===state.collection);
   const heading=state.route==='saved'?'Saved for later.':inArchive?'The archive.':state.route==='foundations'?'A familiar feeling.':collection?`${collection.name}.`:state.category==='All'?'The skeletons.':`${state.category}.`;
-  const descriptions={library:'The shapes of things to come. Blueprints now, reusable pieces next.',saved:'The pieces you want to come back to.',archive:'Original work, kept together by project. A little history to build on.',foundations:'Quiet details that make the whole kit feel like it belongs together.',collection:collection?.note||'A few good pieces, brought together for what comes next.'};
+  const descriptions={library:'A reusable starting point for every original. Pick a page, make it yours.',saved:'The pieces you want to come back to.',archive:'Original work, kept together by project. A little history to build on.',foundations:'Quiet details that make the whole kit feel like it belongs together.',collection:collection?.note||'A few good pieces, brought together for what comes next.'};
   $('#page-title').textContent=heading;
   $('#page-description').textContent=descriptions[state.route]||descriptions.library;
   $('#page-eyebrow').textContent=inArchive?'BEFORE IT BECOMES A STARTING POINT':state.route==='foundations'?'SMALL DETAILS. SHARED EVERYWHERE.':state.route==='saved'?'WORTH KEEPING CLOSE':collection?'A COLLECTION OF POSSIBILITIES':'A LITTLE LESS FROM SCRATCH';
@@ -107,12 +109,12 @@ function render() {
     const projects=archiveProjects.filter(p=>!state.project||p.id===state.project).map(p=>({...p,filtered:filterItems(allArchive.filter(x=>x.projectId===p.id),{query:state.query})})).filter(p=>p.filtered.length);
     target.innerHTML=`<div class="notice">${icon('archive')}<span>Originals stay here until we turn them into reusable blocks.</span><span class="notice-end">Layout sketches · starter inventory</span></div>`+(projects.length?projects.map(p=>`<section class="archive-project"><div class="project-heading"><span class="project-mark">${escape(p.name.substring(0,1).toLowerCase())}</span><div><h2>${escape(p.name)}</h2><p>${escape(p.description)}</p></div><span class="project-count">${p.filtered.length} pieces</span></div>${grid(p.filtered)}</section>`).join(''):empty('Nothing here just yet.','Try another project or a simpler search.'));
   } else {
-    let items=state.route==='saved'?catalog.filter(x=>state.saved.includes(x.id)):collection?catalog.filter(x=>collection.items.includes(x.id)):blocks;
+    let items=state.route==='saved'?catalog.filter(x=>state.saved.includes(x.id)):collection?catalog.filter(x=>collection.items.includes(x.id)):allArchive;
     items=filterItems(items,{query:state.query,category:state.category});
     const label=collection?'IN THIS COLLECTION':state.route==='saved'?'YOUR SAVED PIECES':state.category==='All'?'THE STARTING POINTS':state.category.toUpperCase();
-    target.innerHTML=`<div class="section-heading"><span>${label}<span class="section-count">${items.length}</span></span><span class="section-description">${state.route==='library'?'Blueprints for now. Originals live in the archive.':collection?'A shortlist, not a generated site.':'Kept in this browser.'}</span></div>`+(items.length?grid(items):empty(state.query?'No matches this time.':collection?'Room for a few good pieces.':'Keep something for later.',state.query?'Try “portal”, “referral”, or “assistant”.':'Use the bookmark on a block to save it, or collect a few starting points.'));
+    target.innerHTML=`<div class="section-heading"><span>${label}<span class="section-count">${items.length}</span></span><span class="section-description">${state.route==='library'?'Preview a skeleton. Download an editable page.':collection?'A shortlist for your next project.':'Kept in this browser.'}</span></div>`+(items.length?grid(items):empty(state.query?'No matches this time.':collection?'Room for a few good pieces.':'Keep something for later.',state.query?'Try “portal”, “referral”, or “assistant”.':'Use the bookmark on a block to save it, or collect a few starting points.'));
   }
-  $('#footer-meta').textContent=inArchive?`${allArchive.length} originals · ${archiveProjects.length} projects`:'Kit frame · v0.2';
+  $('#footer-meta').textContent=`${allArchive.length} originals · ${allArchive.length} starting points`;
 }
 
 
@@ -120,15 +122,15 @@ function archiveTile(item) {
   return `<button class="archive-tile" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)} — ${escape(item.project)}"><span class="tile-visual">${preview(item)}</span><span class="tile-caption"><strong>${escape(item.name)}</strong><span>${escape(item.project)} <i>·</i> ${escape(item.category)}${item.status==='prototype'?' · Prototype':''}</span></span></button>`;
 }
 function renderArchive(){
-  const home=!state.query&&state.category==='All'&&!state.project&&state.scope==='finished';
+  const home=!state.query&&state.category==='All'&&!state.project&&state.scope==='all';
   document.body.classList.toggle('archive-home',home);
   document.body.classList.toggle('archive-results',!home);
   let items=allArchive.filter(item=>state.scope==='all'||(state.scope==='prototype'?item.status==='prototype':['finished','contextual'].includes(item.status)));
   items=items.filter(item=>(!state.project||item.projectId===state.project)&&(state.category==='All'||item.category===state.category));
   items=searchArchive(items,state.query);
-  // Mix projects across the home canvas; filtered results retain their relevance order.
-  if(home){const preferred=['fomo-campus','lucien-gallery','fomo-greek-wars','fomo-clan-claim','lucien-collection','fomo-dinners','fomo-refer','fomo-clan','lucien-shows','fomo-onboard','fomo-campus-visit','lucien-about','fomo-dinner-application','fomo-campus-directory'];items.sort((a,b)=>preferred.indexOf(a.id)-preferred.indexOf(b.id));}
-  $('#archive-canvas').innerHTML=items.length?items.map(archiveTile).join(''):`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea. “All originals” also includes local prototypes and protected tools.</p><button type="button" data-reset-archive>Show all finished work ↗</button></div>`;
+  // Alternate forms, campaigns, and tools; filtered results retain their relevance order.
+  if(home){const preferred=['fomo-campus','fomo-onboard','fomo-campus-connected','fomo-clan-claim','fomo-hq-visit','fomo-dinners','fomo-refer','fomo-greek-wars','fomo-campus-visit','fomo-campus-directory','bijan-build-request','fomo-gameday','fomo-dinner-application','fomo-campus-original','fomo-campus-manual','fomo-invite','fomo-campus-wars'];const rank=id=>{const index=preferred.indexOf(id);return index<0?preferred.length:index;};items.sort((a,b)=>rank(a.id)-rank(b.id));}
+  $('#archive-canvas').innerHTML=items.length?items.map(archiveTile).join(''):`<div class="archive-empty"><h2>No pieces found.</h2><p>Try a project, a page type, or a simpler idea. “Whole archive” also includes local prototypes and protected tools.</p><button type="button" data-reset-archive>Browse the whole archive ↗</button></div>`;
   $('#archive-project').innerHTML='<option value="">All projects</option>'+archiveProjects.map(p=>`<option value="${p.id}">${escape(p.name)}</option>`).join('');
   $('#archive-project').value=state.project||'';$('#archive-type').value=state.category;$('#archive-scope').value=state.scope;
   $('#archive-count').textContent=`${items.length} ${items.length===1?'piece':'pieces'}${state.query?' found':''}`;
@@ -140,10 +142,10 @@ function archiveStateChanged(){
   if(state.query)url.searchParams.set('q',state.query);
   if(state.category!=='All')url.searchParams.set('type',state.category);
   if(state.project)url.searchParams.set('project',state.project);
-  if(state.scope!=='finished')url.searchParams.set('scope',state.scope);
+  if(state.scope!=='all')url.searchParams.set('scope',state.scope);
   url.hash='archive';history.pushState(null,'',url);toggleSuggestions(false);render();window.scrollTo({top:0,behavior:'instant'});
 }
-function resetArchive(){state.query='';state.project=null;state.category='All';state.scope='finished';$('#archive-search').value='';archiveStateChanged();}
+function resetArchive(){state.query='';state.project=null;state.category='All';state.scope='all';$('#archive-search').value='';archiveStateChanged();}
 function toggleSuggestions(open){$('#search-suggestions').hidden=!open;$('#suggestion-toggle').setAttribute('aria-expanded',String(open));$('#suggestion-toggle').setAttribute('aria-label',open?'Hide search ideas':'Show search ideas');$('#archive-search-stage').classList.toggle('suggestions-open',open);archiveMotion.sync();}
 $('#archive-search-form').addEventListener('submit',event=>{event.preventDefault();searchFromInput();});
 $('#archive-search').addEventListener('input',()=>{$('#archive-clear').hidden=!$('#archive-search').value;});
@@ -168,7 +170,7 @@ function route() {
   state.query=state.route==='archive'?(params.get('q')||'').slice(0,160):'';
   if(state.route==='archive'){
     state.category=categories.includes(params.get('type'))?params.get('type'):'All';
-    state.scope=['all','prototype'].includes(params.get('scope'))?params.get('scope'):'finished';
+    state.scope=['finished','prototype'].includes(params.get('scope'))?params.get('scope'):'all';
     state.project=state.project||(archiveProjects.some(p=>p.id===params.get('project'))?params.get('project'):null);
     if(parts[1]){state.query='';state.category='All';state.scope='all';const clean=new URL(location.href);clean.search='';clean.searchParams.set('scope','all');history.replaceState(null,'',clean);}
   }
@@ -186,16 +188,21 @@ function toggleSave(id) {
 function fillDetails(id) {
   const item=catalog.find(x=>x.id===id); if(!item)return;
   const original=item.sourceId?allArchive.find(x=>x.id===item.sourceId):null;
-  $('#detail-kicker').textContent=item.archived?`${item.project} / ${item.status==='prototype'?'PROTOTYPE':'ORIGINAL'}`:`${item.category} / BLUEPRINT`;
-  $('#detail-content').innerHTML=`<div class="drawer-preview">${preview(item)}<span class="layout-caption">${item.thumbnail?'Original page · captured September 2026':(item.archived?'Layout sketch · source requires context':'Illustrative blueprint · not built yet')}</span></div><div class="drawer-body"><h2 id="detail-title">${escape(item.name)}</h2><p class="detail-description">${escape(item.description)}</p><div class="detail-status">${icon(item.archived?'archive':'curve')}<span>${item.archived?(item.status==='prototype'?'Local prototype · not deployed':item.status==='protected'?'Protected workspace · original':item.status==='contextual'?'Chapter link required · original':'Original page · not converted'):'A proposed starting point · not a working template yet'}</span></div>${item.includes?`<div class="detail-label">WHAT IT WILL HOLD</div><ul class="detail-list">${item.includes.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}<div class="detail-label">${item.archived?'PROJECT':'INSPIRED BY'}</div><p class="detail-value">${escape(item.origin||item.project)}</p>${item.archived?`<div class="detail-label">SOURCE REFERENCE</div><p class="source-path">${escape(item.sourcePath)}</p><p class="detail-small">${escape(item.notes||'Original source inspected locally. No template extraction has been performed.')}</p>`:`<p class="detail-small">Client branding, content, data, and connections will be separated when we build this block.</p>`}</div><div class="drawer-footer"><button class="primary-button" data-save="${escape(id)}">${icon('bookmark')}${state.saved.includes(id)?'Saved':'Save block'}</button><button class="quiet-button" data-collect="${escape(id)}">Create collection</button>${original?`<button class="text-button" data-detail="${original.id}">View original ${icon('arrow')}</button>`:''}${item.sourceUrl?`<a class="text-button" href="${escape(item.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open source site ${icon('external')}</a>`:''}</div>`;
+  const source=original||item;
+  const skeleton=detailView==='skeleton';
+  const previewUrl=`/agencykit/skeleton?item=${encodeURIComponent(source.id)}`;
+  $('#detail-kicker').textContent=`${source.project||source.origin} / ${source.category}`;
+  $('#detail-drawer').classList.toggle('showing-skeleton',skeleton);
+  const visual=skeleton?`<div class="skeleton-window" inert><iframe src="${previewUrl}&embed=1" title="${escape(source.name)} skeleton layout" tabindex="-1" aria-hidden="true" loading="eager"></iframe></div>`:`<div class="drawer-preview">${preview(source)}<span class="layout-caption">${source.thumbnail?'Original page · captured September 2026':'Layout sketch · source requires context'}</span></div>`;
+  const status=source.status==='prototype'?'Local prototype':source.status==='protected'?'Protected workspace':source.status==='contextual'?'Context-specific page':'Original page';
+  $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeleton ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2><span class="detail-ready">Skeleton ready</span></div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary><p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Get this skeleton'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
 }
 function setBackgroundInert(value){['.app-shell','#archive-workspace','.archive-header','#assistant-launcher'].forEach(selector=>$(selector).inert=value);}
-function openDetails(id) {if($('#detail-overlay').hidden)previousFocus=document.activeElement;closeAssistant(false);detailId=id;fillDetails(id);$('#detail-overlay').hidden=false;document.body.classList.add('modal-open');setBackgroundInert(true);$('#detail-close').focus();}
+function openDetails(id) {if($('#detail-overlay').hidden)previousFocus=document.activeElement;closeAssistant(false);detailId=id;detailView=state.route==='library'?'skeleton':'original';fillDetails(id);$('#detail-content').scrollTop=0;$('#detail-overlay').hidden=false;document.body.classList.add('modal-open');setBackgroundInert(true);archiveMotion.sync();$('#detail-close').focus();}
 function closeDetails() {if($('#detail-overlay').hidden)return;$('#detail-overlay').hidden=true;document.body.classList.remove('modal-open');setBackgroundInert(false);detailId=null;if(previousFocus?.isConnected&&previousFocus.getClientRects().length)previousFocus.focus();else (state.route==='archive'?$('#archive-search'):$('#search')).focus();}
 function openCollection(selectedId=null) {
   $('#collection-form').reset();
-  $('#collection-options').innerHTML=blocks.map(item=>`<label class="pick-block"><input type="checkbox" name="blocks" value="${item.id}" ${selectedId===item.id?'checked':''}><span>${escape(item.name)}</span><small>${item.category}</small></label>`).join('');
-  if(selectedId&&!blocks.some(x=>x.id===selectedId)){const item=catalog.find(x=>x.id===selectedId);$('#collection-options').insertAdjacentHTML('beforeend',`<label class="pick-block"><input type="checkbox" name="blocks" value="${escape(item.id)}" checked><span>${escape(item.name)}</span><small>Archive</small></label>`);}
+  $('#collection-options').innerHTML=allArchive.map(item=>`<label class="pick-block"><input type="checkbox" name="blocks" value="${item.id}" ${selectedId===item.id?'checked':''}><span>${escape(item.name)}</span><small>${item.category}</small></label>`).join('');
   $('#collection-modal').showModal();$('#collection-name').focus();
 }
 function openAssistant(){ $('#assistant-panel').hidden=false;$('#assistant-launcher').setAttribute('aria-expanded','true');$('#assistant-question').focus(); }
@@ -207,10 +214,11 @@ function askGuide(message) {
   const user=document.createElement('p');user.className='assistant-message user';user.textContent=text;log.append(user);
   const reply=document.createElement('div');reply.className='assistant-message';
   let answer, matches=[];
-  if(/archiv|original|past work/i.test(text)){answer='The archive keeps original work together by project. These pages haven’t been turned into reusable blocks yet.';matches=archiveProjects.map(p=>({name:p.name,href:`#archive/${p.id}`}));}
+  if(/archiv|original|past work/i.test(text)){answer='Search all the original pages, choose one you like, then select “Get this skeleton”. You can preview it and download an editable page for another client.';matches=archiveProjects.map(p=>({name:p.name,href:`#archive/${p.id}`}));}
+  else if(/skeleton|download|reus|template/i.test(text)){answer='Every original has a neutral frontend starting point. Open a page, choose Skeleton, then download the self-contained HTML file. The layout and local demo interactions are ready to edit; connect your own data and services for a client launch.';matches=[{name:'Browse the archive',href:'#archive'}];}
   else if(/curve|corner|round|design|aesthetic/i.test(text)){answer='The kit has a neutral frame with continuous corners in three sizes. Original project previews keep their own colors. The assistant carries the same curved shape; explore it in Foundations.';matches=[{name:'Explore the foundations',href:'#foundations'}];}
   else if(/collect|bundle|shortlist/i.test(text)){answer='A collection is a shortlist for a client or project. Choose “New collection”, give it a name, and select a few starting points. It stays in this browser; it doesn’t generate a site yet.';}
-  else {const found=lookupItems(blocks,text);answer=found.length?'These starting points look relevant. Open one to see what it will include and the original work behind it.':'I couldn’t find a matching starting point. Try a portal, campaign page, application form, or referral flow. This preview searches the catalog; an AI connection comes later.';matches=found.map(x=>({name:x.name,id:x.id}));}
+  else {const found=searchArchive(allArchive,text).slice(0,4);answer=found.length?'These pages look relevant. Open one to explore the original and get its skeleton.':'I couldn’t find a matching starting point. Try a portal, campaign page, application form, or referral flow. This guide searches the catalog; an AI connection comes later.';matches=found.map(x=>({name:x.name,id:x.id}));}
   const label=document.createElement('span');label.className='guide-label';label.textContent='FROM THE LIBRARY';reply.append(label);
   const body=document.createElement('p');body.textContent=answer;reply.append(body);
   const choices=document.createElement('div');choices.className='guide-matches';
@@ -223,6 +231,10 @@ function closeSidebar(){document.body.classList.remove('nav-open');$('#sidebar-b
 $('#mobile-menu').innerHTML=icon('menu');$('#search-icon').innerHTML=icon('search');$('#view-toggle').innerHTML=icon('grid');$('#assistant-send').innerHTML=icon('up');
 $('#assistant-suggestions').innerHTML=['Find a portal for onboarding','Explore the project archive','How do collections work?'].map(q=>`<button type="button" data-question="${escape(q)}">${escape(q)}${icon('arrow')}</button>`).join('');
 document.addEventListener('click',event=>{
+  const version=event.target.closest('[data-detail-view]');
+  if(version&&detailId){detailView=version.dataset.detailView;fillDetails(detailId);$('#detail-content').scrollTop=0;$('#detail-content [data-detail-view="'+detailView+'"]')?.focus();return;}
+  const download=event.target.closest('[data-download-skeleton]');
+  if(download){const item=allArchive.find(x=>x.id===download.dataset.downloadSkeleton);if(item){try{downloadSkeleton(item);notify('Your editable skeleton is downloading.');}catch{notify('The download could not start. Try the full-size preview.');}}return;}
   const el=event.target.closest('[data-detail],[data-save],[data-project],[data-clear-search],[data-collect],[data-question]');if(!el)return;
   if(el.dataset.detail)openDetails(el.dataset.detail);
   else if(el.dataset.save)toggleSave(el.dataset.save);

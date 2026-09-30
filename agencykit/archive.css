@@ -595,10 +595,6 @@ body.workspace-mode { background: #f7f7f5; color: #262623; color-scheme: light; 
 }
 .workspace-mode .archive-footnote { display: none; }
 .archive-header nav a,.archive-header nav button { font-size: 12px; }
-@media (min-width:1101px) {
-  .archive-home .archive-tile:nth-child(13) { grid-column: 2; }
-  .archive-home .archive-tile:nth-child(14) { grid-column: 5; }
-}
 @media (max-width:720px) {
   .workspace-mode .topbar { display:flex; height:60px; }
   .workspace-mode .sidebar { visibility:hidden; }
