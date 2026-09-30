@@ -1,11 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { blocks, categories, filterItems, lookupItems, searchArchive } from '../agencykit/catalog.js';
+import { blocks, categories, filterItems, lookupItems, searchArchive, searchArchiveDetailed } from '../agencykit/catalog.js';
 import { archiveProjects } from '../agencykit/archive-data.js';
 
 const ids = items => items.map(item => item.id);
 const archive = archiveProjects.flatMap(project => project.items.map(item => ({ ...item, project: project.name, projectId: project.id })));
+
+// Deliberate near-matches distinguish search intent from accidental word overlap.
+const searchFixtures = [
+  { id: 'night-launch', name: 'Night launch', category: 'Pages', project: 'fomo', projectId: 'fomo', tags: ['landing', 'campaign'], searchMeta: { visual: ['dark', 'large photography'], features: ['signup flow'], phrases: [] } },
+  { id: 'day-launch', name: 'Day launch', category: 'Pages', project: 'fomo', projectId: 'fomo', tags: ['landing', 'dark'], searchMeta: { visual: ['light'], features: ['newsletter'], phrases: [] } },
+  { id: 'member-hub', name: 'Member hub', category: 'Portals', project: 'fomo', projectId: 'fomo', tags: ['onboarding', 'membership'], searchMeta: { visual: ['dark'], features: [], phrases: [] } },
+  { id: 'operations', name: 'Operations console', category: 'Portals', project: 'fomo', projectId: 'fomo', tags: ['invoice'], description: 'An internal console referenced without any real records.' },
+  { id: 'ambassador-claim', name: 'Invitation claim', category: 'Forms', project: 'fomo', projectId: 'fomo', tags: ['referral'], searchMeta: { visual: [], features: ['personal share link'], phrases: ['campus ambassador signup'] } },
+  { id: 'partner-referral', name: 'Partner referral', category: 'Forms', project: 'Acme', projectId: 'acme', tags: ['referral'], searchMeta: { visual: [], features: ['personal share link'], phrases: ['campus volunteer ambassador signup'] } },
+  { id: 'partner-hub', name: 'Partner member hub', category: 'Portals', project: 'Acme', projectId: 'acme', tags: ['fomo'] },
+  { id: 'contact-page', name: 'Contact page', category: 'Pages', project: 'Acme', projectId: 'acme', tags: [] },
+  { id: 'relationship-desk', name: 'Relationship desk', category: 'Tools', project: 'fomo', projectId: 'fomo', tags: ['crm'], searchMeta: { visual: [], features: ['contact management', 'follow ups'], phrases: ['keep track of people'] } },
+  { id: 'discussion', name: 'Discussion forum', category: 'Tools', project: 'Acme', projectId: 'acme', tags: ['forum'] },
+  { id: 'foma-hub', name: 'Team hub', category: 'Portals', project: 'Foma', projectId: 'foma', tags: [] },
+];
+const expectMatches = (query, expected, items = searchFixtures) => assert.deepEqual(new Set(ids(searchArchive(items, query))), new Set(expected), query);
 
 test('catalog has unique IDs, recognized categories, and honest Blueprint status', () => {
   assert.equal(new Set(blocks.map(item => item.id)).size, blocks.length);
@@ -182,4 +198,100 @@ test('every original has real screenshot bytes and traceable source provenance',
     assert.ok(item.sourcePath && item.notes, `${item.id} identifies its source and context`);
     assert.ok(!/^(?:[A-Z]:|\/)/i.test(item.sourcePath), 'does not publish a local absolute source path');
   }
+});
+
+test('bounded typo correction handles a transposition and explains the changed term', () => {
+  const detailed = searchArchiveDetailed(searchFixtures, 'fomo portlas');
+  assert.deepEqual(new Set(ids(detailed.items)), new Set(['member-hub', 'operations', 'partner-hub']));
+  assert.ok(detailed.corrections.some(change => change.from === 'portlas' && change.to === 'portals'));
+  assert.deepEqual(searchArchive(searchFixtures, 'fomo portlas'), detailed.items, 'simple and detailed APIs agree');
+  assert.deepEqual(ids(searchArchive(searchFixtures, 'onbaording portals')), ['member-hub']);
+});
+
+test('known exact words and project identities are never silently corrected to nearby terms', () => {
+  for (const [query, expected] of [['forum', ['discussion']], ['Foma portals', ['foma-hub']]]) {
+    const result = searchArchiveDetailed(searchFixtures, query);
+    assert.deepEqual(ids(result.items), expected, query);
+    assert.deepEqual(result.corrections, [], `${query} needs no correction`);
+  }
+  for (const query of ['port', 'quantum astrophysics', 'fomo portals quantum']) {
+    expectMatches(query, []);
+  }
+});
+
+test('exclusions subtract matching topics instead of requiring the excluded words', () => {
+  expectMatches('fomo portals without invoices', ['member-hub', 'partner-hub']);
+  const outsideFomo = ['partner-referral', 'contact-page', 'discussion', 'foma-hub'];
+  expectMatches('not fomo', outsideFomo);
+  expectMatches('everything except fomo', outsideFomo);
+  expectMatches('fomo portals without quantum astrophysics', ['member-hub', 'operations', 'partner-hub']);
+});
+
+test('category alternatives preserve shared project intent and whole clauses can form a union', () => {
+  expectMatches('pages or portals', ['night-launch', 'day-launch', 'member-hub', 'operations', 'partner-hub', 'contact-page', 'foma-hub']);
+  expectMatches('fomo pages or portals', ['night-launch', 'day-launch', 'member-hub', 'operations', 'partner-hub']);
+  expectMatches('fomo portals and referral forms', ['member-hub', 'operations', 'partner-hub', 'ambassador-claim', 'partner-referral']);
+  expectMatches('fomo portals and referral forms', ['partner-hub', 'partner-referral'], searchFixtures.filter(item => item.projectId === 'acme'));
+});
+
+test('quoted phrases require contiguous text and can match curated metadata', () => {
+  expectMatches('"campus ambassador" forms', ['ambassador-claim']);
+  expectMatches('campus ambassador forms', ['ambassador-claim', 'partner-referral']);
+  expectMatches('"campus ambassador" portals', [], searchFixtures);
+});
+
+test('visual and functional concepts intersect without treating unverified tags as visual evidence', () => {
+  expectMatches('dark landing page with signup flow', ['night-launch']);
+  expectMatches('dark pages', ['night-launch']);
+  expectMatches('light pages', ['day-launch']);
+  expectMatches('dark landing page with quantum astrophysics', []);
+  assert.equal(searchArchive(searchFixtures, 'dark pages')[0], searchFixtures[0], 'results retain their original object identity');
+});
+
+test('use-case phrasing keeps related functions together rather than making every and an OR', () => {
+  expectMatches('keep track of people and follow ups', ['relationship-desk']);
+  expectMatches('keep track of people and quantum astrophysics', []);
+});
+
+test('curated metadata makes representative visual and use-case requests find real originals', () => {
+  for (const [query, expected] of [
+    ['dark space landing', ['fomo-campus', 'fomo-campus-connected']],
+    ['keep track of people and follow ups', ['fomo-irrigation']],
+    ['calendar visit request', ['fomo-hq-visit', 'milo-hq-visit-form']],
+  ]) {
+    const found = searchArchive(archive, query);
+    for (const id of expected) {
+      const original = archive.find(item => item.id === id);
+      assert.ok(original?.searchMeta, `${id} has curated search metadata`);
+      assert.ok(found.includes(original), `${query} finds ${id}`);
+    }
+    assert.ok(!ids(found).includes('milo-cars'), `${query} does not return an unrelated car gallery`);
+  }
+});
+
+test('contractions and possessive apostrophes do not accidentally start quoted phrases', () => {
+  for (const query of ["don't show fomo", 'don’t show fomo']) {
+    expectMatches(query, ['partner-referral', 'contact-page', 'discussion', 'foma-hub']);
+  }
+  expectMatches("I'm looking for fomo's portals", ['member-hub', 'operations', 'partner-hub']);
+});
+
+test('a shared trailing category constrains visual and functional alternatives', () => {
+  expectMatches('dark or light pages', ['night-launch', 'day-launch']);
+  expectMatches('signup or referral forms', ['ambassador-claim', 'partner-referral']);
+});
+
+test('typed or smart quotes stay literal in positive and excluded phrases', () => {
+  for (const query of ['“campus ambassador” forms', "'campus ambassador' forms"]) {
+    expectMatches(query, ['ambassador-claim']);
+  }
+  expectMatches('forms without "campus ambassador"', ['partner-referral']);
+  expectMatches('"campus ambassdor" forms', [], searchFixtures);
+  assert.deepEqual(searchArchiveDetailed(searchFixtures, '"campus ambassdor" forms').corrections, [], 'literal quoted spelling is not silently changed');
+});
+
+test('hyphenated descriptions do not become exclusions while a leading minus still excludes', () => {
+  expectMatches('fomo landing-page', ['night-launch', 'day-launch']);
+  expectMatches('referral-forms', ['ambassador-claim', 'partner-referral']);
+  expectMatches('fomo portals -invoice', ['member-hub', 'partner-hub']);
 });

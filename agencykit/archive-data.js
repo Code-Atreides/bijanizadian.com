@@ -33,7 +33,32 @@ export const archiveProjects = [
           "campaign",
           "program",
           "marketing"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "astronaut",
+            "blue",
+            "large typography",
+            "three cards"
+          ],
+          "features": [
+            "landing page",
+            "program navigation",
+            "chapter competition",
+            "campus recruiting",
+            "dinner hosting"
+          ],
+          "phrases": [
+            "dark space landing",
+            "find a campus program",
+            "recruit campus ambassadors",
+            "choose a campus pathway"
+          ]
+        }
       },
       {
         "id": "fomo-greek-wars",
@@ -63,7 +88,32 @@ export const archiveProjects = [
           "leaderboard",
           "campaign",
           "event"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "blue",
+            "purple",
+            "centered hero",
+            "large typography"
+          ],
+          "features": [
+            "competition",
+            "leaderboard",
+            "prizes",
+            "chapter registration",
+            "campus map",
+            "app download"
+          ],
+          "phrases": [
+            "launch a chapter competition",
+            "show campus standings",
+            "explain prizes and qualification"
+          ]
+        }
       },
       {
         "id": "fomo-clan",
@@ -93,7 +143,31 @@ export const archiveProjects = [
           "progress"
         ],
         "previewSource": "local-original",
-        "previewCaption": "Original chapter portal · fictional sample chapter"
+        "previewCaption": "Original chapter portal · fictional sample chapter",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "progress bar",
+            "stepper",
+            "blue buttons"
+          ],
+          "features": [
+            "signup",
+            "member onboarding",
+            "chapter progress",
+            "app download",
+            "copy link"
+          ],
+          "phrases": [
+            "white signup form",
+            "join a chapter",
+            "track member signup progress",
+            "guide members into the app"
+          ]
+        }
       },
       {
         "id": "fomo-clan-claim",
@@ -120,7 +194,32 @@ export const archiveProjects = [
           "onboarding",
           "registration",
           "referral"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "stepper",
+            "blue buttons",
+            "outlined inputs"
+          ],
+          "features": [
+            "signup",
+            "registration",
+            "chapter setup",
+            "referral attachment",
+            "member link",
+            "sharing"
+          ],
+          "phrases": [
+            "white signup form",
+            "register a chapter",
+            "create a chapter member link",
+            "collect chapter contact details"
+          ]
+        }
       },
       {
         "id": "fomo-onboard",
@@ -146,7 +245,31 @@ export const archiveProjects = [
           "onboarding",
           "application",
           "signup"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "purple",
+            "split layout",
+            "stepper"
+          ],
+          "features": [
+            "signup",
+            "registration",
+            "multi-step form",
+            "chapter contact",
+            "roster size",
+            "school selection"
+          ],
+          "phrases": [
+            "dark registration form",
+            "onboard a fraternity",
+            "collect chapter and school details"
+          ]
+        }
       },
       {
         "id": "fomo-refer",
@@ -173,7 +296,29 @@ export const archiveProjects = [
           "link",
           "share",
           "attribution"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "stepper",
+            "blue buttons"
+          ],
+          "features": [
+            "referral link builder",
+            "personal details",
+            "copy link",
+            "sharing",
+            "attribution"
+          ],
+          "phrases": [
+            "build a personal referral link",
+            "refer a fraternity",
+            "copy a shareable invitation"
+          ]
+        }
       },
       {
         "id": "fomo-dinners",
@@ -202,7 +347,30 @@ export const archiveProjects = [
           "host",
           "community",
           "campaign"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "purple",
+            "centered hero",
+            "large typography"
+          ],
+          "features": [
+            "event program",
+            "dinner hosting",
+            "host application",
+            "timeline",
+            "host requirements"
+          ],
+          "phrases": [
+            "recruit dinner hosts",
+            "explain a sponsored dinner program",
+            "host a campus event"
+          ]
+        }
       },
       {
         "id": "fomo-dinner-application",
@@ -229,7 +397,29 @@ export const archiveProjects = [
           "apply",
           "application",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "split layout",
+            "stepper",
+            "large typography",
+            "outlined inputs"
+          ],
+          "features": [
+            "application",
+            "multi-step form",
+            "host details",
+            "dinner proposal",
+            "review and submit"
+          ],
+          "phrases": [
+            "apply to host a dinner",
+            "collect event host applications",
+            "one question at a time"
+          ]
+        }
       },
       {
         "id": "fomo-campus-visit",
@@ -258,7 +448,31 @@ export const archiveProjects = [
           "visit",
           "request",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "calendar",
+            "stepper",
+            "blue buttons"
+          ],
+          "features": [
+            "trip request",
+            "date picker",
+            "travel choices",
+            "social profiles",
+            "contact details",
+            "multi-step form"
+          ],
+          "phrases": [
+            "plan a campus trip",
+            "collect travel preferences",
+            "request a college visit"
+          ]
+        }
       },
       {
         "id": "fomo-assistant",
@@ -288,7 +502,31 @@ export const archiveProjects = [
           "help"
         ],
         "previewSource": "local-original",
-        "previewCaption": "Original Ask fomo prototype · local preview"
+        "previewCaption": "Original Ask fomo prototype · local preview",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "minimal",
+            "lavender",
+            "floating panel",
+            "soft shadow",
+            "rounded corners"
+          ],
+          "features": [
+            "chat",
+            "assistant widget",
+            "FAQ",
+            "question answering",
+            "suggested questions",
+            "message composer"
+          ],
+          "phrases": [
+            "answer questions about fomo",
+            "add a chat assistant",
+            "help visitors find answers"
+          ]
+        }
       },
       {
         "id": "fomo-campus-directory",
@@ -316,7 +554,29 @@ export const archiveProjects = [
           "navigation",
           "journey",
           "links"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "minimal",
+            "blue",
+            "large typography",
+            "connected cards",
+            "flowchart"
+          ],
+          "features": [
+            "page directory",
+            "navigation",
+            "program routes",
+            "role shortcuts",
+            "related links"
+          ],
+          "phrases": [
+            "find every campus page",
+            "show connected page journeys",
+            "browse program entry points"
+          ]
+        }
       },
       {
         "id": "fomo-irrigation",
@@ -347,7 +607,34 @@ export const archiveProjects = [
           "workspace"
         ],
         "previewSource": "local-original",
-        "previewCaption": "Original Irrigation app · built-in sample workspace"
+        "previewCaption": "Original Irrigation app · built-in sample workspace",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "blue",
+            "sidebar",
+            "compact rows",
+            "summary cards",
+            "dashboard"
+          ],
+          "features": [
+            "CRM",
+            "contacts",
+            "relationships",
+            "follow ups",
+            "tasks",
+            "review queue",
+            "activity history",
+            "chapter views"
+          ],
+          "phrases": [
+            "keep track of people and follow ups",
+            "manage relationships",
+            "review next actions",
+            "remember conversations"
+          ]
+        }
       },
       {
         "id": "fomo-campus-original",
@@ -377,7 +664,32 @@ export const archiveProjects = [
           "landing",
           "team",
           "application"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "astronaut",
+            "purple",
+            "centered hero",
+            "large typography"
+          ],
+          "features": [
+            "landing page",
+            "program hub",
+            "competition",
+            "events",
+            "campus recruiting",
+            "application"
+          ],
+          "phrases": [
+            "bring campus programs together",
+            "recruit a college team",
+            "explore events and opportunities"
+          ]
+        }
       },
       {
         "id": "fomo-campus-connected",
@@ -406,7 +718,33 @@ export const archiveProjects = [
           "chapter",
           "map",
           "landing"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "astronaut",
+            "blue",
+            "large typography",
+            "split hero"
+          ],
+          "features": [
+            "landing page",
+            "campaign",
+            "national map",
+            "chapter onboarding",
+            "dinner hosting",
+            "campus recruiting"
+          ],
+          "phrases": [
+            "dark space landing",
+            "connect a campus campaign",
+            "show the national competition",
+            "recruit campus ambassadors"
+          ]
+        }
       },
       {
         "id": "fomo-campus-wars",
@@ -437,7 +775,31 @@ export const archiveProjects = [
           "leaderboard",
           "registration",
           "demo"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "orange",
+            "sun",
+            "large typography",
+            "blue buttons"
+          ],
+          "features": [
+            "competition",
+            "leaderboard",
+            "chapter preview",
+            "prizes",
+            "entry review",
+            "registration"
+          ],
+          "phrases": [
+            "bring a chapter into a competition",
+            "compare campus standings",
+            "review a competition entry"
+          ]
+        }
       },
       {
         "id": "fomo-gameday",
@@ -468,7 +830,30 @@ export const archiveProjects = [
           "scoreboard",
           "event",
           "demo"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "purple",
+            "centered hero"
+          ],
+          "features": [
+            "scoreboard",
+            "head-to-head competition",
+            "activity feed",
+            "participant ranking",
+            "fixture list",
+            "event rules"
+          ],
+          "phrases": [
+            "show two schools competing",
+            "follow game day activity",
+            "compare a head to head scoreboard"
+          ]
+        }
       },
       {
         "id": "fomo-crewsheet",
@@ -499,7 +884,30 @@ export const archiveProjects = [
           "coordination"
         ],
         "previewSource": "public-original",
-        "previewCaption": "Original crew sheet · dinner-code entry"
+        "previewCaption": "Original crew sheet · dinner-code entry",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "minimal",
+            "purple",
+            "blue",
+            "centered form",
+            "code entry"
+          ],
+          "features": [
+            "access screen",
+            "dinner code",
+            "crew planning",
+            "role assignments",
+            "task checklist",
+            "sync status"
+          ],
+          "phrases": [
+            "organize a dinner crew",
+            "assign event responsibilities",
+            "open a shared crew sheet"
+          ]
+        }
       },
       {
         "id": "fomo-claim-links",
@@ -530,7 +938,31 @@ export const archiveProjects = [
           "directory"
         ],
         "previewSource": "public-original",
-        "previewCaption": "Original claim-link manager · access screen"
+        "previewCaption": "Original claim-link manager · access screen",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "minimal",
+            "centered card",
+            "passcode input",
+            "blue button"
+          ],
+          "features": [
+            "access screen",
+            "passcode gate",
+            "chapter link directory",
+            "status filters",
+            "copy links",
+            "lock workspace"
+          ],
+          "phrases": [
+            "distribute chapter claim links",
+            "find the right chapter link",
+            "team access screen"
+          ]
+        }
       },
       {
         "id": "fomo-invite",
@@ -559,7 +991,30 @@ export const archiveProjects = [
           "social",
           "campus",
           "greekwars"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "tabbed layout",
+            "split layout",
+            "large graphic panel",
+            "blue buttons"
+          ],
+          "features": [
+            "invitation",
+            "program tabs",
+            "share graphics",
+            "download graphic",
+            "copy link",
+            "program navigation"
+          ],
+          "phrases": [
+            "share a campus invitation",
+            "switch between program offers",
+            "download an invitation graphic"
+          ]
+        }
       },
       {
         "id": "fomo-hq-visit",
@@ -587,7 +1042,31 @@ export const archiveProjects = [
           "appointment",
           "collaboration",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "calendar",
+            "stepper",
+            "blue accents"
+          ],
+          "features": [
+            "visit request",
+            "date picker",
+            "time selection",
+            "calendar",
+            "guest details",
+            "review request"
+          ],
+          "phrases": [
+            "calendar visit request",
+            "request a time to visit HQ",
+            "collect meeting preferences"
+          ]
+        }
       },
       {
         "id": "fomo-campus-manual",
@@ -619,7 +1098,31 @@ export const archiveProjects = [
           "roles",
           "guide",
           "playbook"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "photo hero",
+            "planet",
+            "brown",
+            "large typography",
+            "blue buttons"
+          ],
+          "features": [
+            "handbook",
+            "role guidance",
+            "weekly plan",
+            "playbook",
+            "anchored contents",
+            "team rules"
+          ],
+          "phrases": [
+            "explain the first eight weeks",
+            "train a campus team",
+            "organize a team handbook"
+          ]
+        }
       }
     ]
   },
@@ -664,7 +1167,29 @@ export const archiveProjects = [
             "httpStatus": 200,
             "notes": "Metadata-only HEAD check; JSON payload not fetched."
           }
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "retro desktop",
+            "Mac inspired",
+            "mountain wallpaper",
+            "overlapping windows",
+            "dock icons",
+            "large typography"
+          ],
+          "features": [
+            "portfolio",
+            "project index",
+            "featured work",
+            "contact links",
+            "desktop navigation"
+          ],
+          "phrases": [
+            "show a personal portfolio",
+            "browse projects in desktop windows",
+            "retro computer website"
+          ]
+        }
       },
       {
         "id": "milo-photos",
@@ -691,7 +1216,28 @@ export const archiveProjects = [
           "photos",
           "images",
           "gallery"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "retro desktop",
+            "Mac inspired",
+            "mountain wallpaper",
+            "photo grid",
+            "file icons",
+            "dock icons"
+          ],
+          "features": [
+            "photography gallery",
+            "image browsing",
+            "image viewer",
+            "previous and next navigation"
+          ],
+          "phrases": [
+            "browse a photo collection",
+            "photography as desktop files",
+            "open images in a gallery"
+          ]
+        }
       },
       {
         "id": "milo-cars",
@@ -721,7 +1267,30 @@ export const archiveProjects = [
           "3d",
           "collection",
           "gallery"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "light",
+            "gray",
+            "white",
+            "3d",
+            "car models",
+            "minimal",
+            "large canvas"
+          ],
+          "features": [
+            "vehicle collection",
+            "model viewer",
+            "car selection",
+            "model rotation",
+            "collection navigation"
+          ],
+          "phrases": [
+            "browse a virtual garage",
+            "interactive 3d car viewer",
+            "showcase vehicle models"
+          ]
+        }
       },
       {
         "id": "milo-car-model-sources",
@@ -749,7 +1318,28 @@ export const archiveProjects = [
           "sources",
           "references",
           "directory"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "green",
+            "text table",
+            "dense rows",
+            "underlined links"
+          ],
+          "features": [
+            "reference directory",
+            "model sources",
+            "attribution",
+            "status table",
+            "resource links"
+          ],
+          "phrases": [
+            "find model source credits",
+            "compare vehicle model references",
+            "organize resource links"
+          ]
+        }
       },
       {
         "id": "milo-arya",
@@ -778,7 +1368,30 @@ export const archiveProjects = [
           "office",
           "3d",
           "gallery"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "light",
+            "white",
+            "gray",
+            "3d",
+            "dollhouse view",
+            "cutaway",
+            "side controls"
+          ],
+          "features": [
+            "room scan viewer",
+            "spatial navigation",
+            "floor plan",
+            "view modes",
+            "cutaway controls"
+          ],
+          "phrases": [
+            "explore a scanned office",
+            "show a room in 3d",
+            "switch between dollhouse and floor plan"
+          ]
+        }
       },
       {
         "id": "milo-landingpage",
@@ -807,7 +1420,29 @@ export const archiveProjects = [
           "college",
           "landing",
           "campaign"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "green",
+            "campus aerial",
+            "low poly",
+            "full screen scene",
+            "game-like"
+          ],
+          "features": [
+            "landing page",
+            "campus scene",
+            "program navigation",
+            "competition pathway",
+            "internship pathway"
+          ],
+          "phrases": [
+            "explore a campus program in 3d",
+            "immersive college landing page",
+            "choose a campus opportunity"
+          ]
+        }
       },
       {
         "id": "milo-fomo",
@@ -837,7 +1472,29 @@ export const archiveProjects = [
           "roles",
           "internship",
           "recruitment"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "centered hero",
+            "large typography",
+            "metric row"
+          ],
+          "features": [
+            "campus recruiting",
+            "role cards",
+            "internship",
+            "weekly plan",
+            "application link"
+          ],
+          "phrases": [
+            "recruit campus ambassadors",
+            "choose a campus team role",
+            "explain an internship opportunity"
+          ]
+        }
       },
       {
         "id": "milo-fomo-apply",
@@ -868,7 +1525,29 @@ export const archiveProjects = [
           "apply",
           "application",
           "recruitment"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "centered heading",
+            "role cards",
+            "outlined inputs"
+          ],
+          "features": [
+            "application",
+            "role selection",
+            "personal details",
+            "campus experience",
+            "review and submit"
+          ],
+          "phrases": [
+            "apply for a campus role",
+            "dark application form",
+            "collect student team applications"
+          ]
+        }
       },
       {
         "id": "milo-campuswars",
@@ -910,7 +1589,31 @@ export const archiveProjects = [
             "httpStatus": 200,
             "notes": "Metadata-only HEAD check; JSON payload not fetched."
           }
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "green",
+            "low poly",
+            "street view",
+            "campus buildings",
+            "crowds",
+            "game-like"
+          ],
+          "features": [
+            "interactive campus",
+            "chapter selection",
+            "competition",
+            "leaderboard",
+            "scene navigation",
+            "join action"
+          ],
+          "phrases": [
+            "explore a virtual campus village",
+            "browse chapters in 3d",
+            "join a campus competition"
+          ]
+        }
       },
       {
         "id": "milo-girls",
@@ -941,7 +1644,30 @@ export const archiveProjects = [
           "culture",
           "intake",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "black",
+            "lavender",
+            "purple",
+            "large typography",
+            "serif accent",
+            "offer cards"
+          ],
+          "features": [
+            "intake",
+            "opportunity selection",
+            "referrals",
+            "personal details",
+            "participation preferences"
+          ],
+          "phrases": [
+            "choose an opportunity",
+            "collect interests and details",
+            "route visitors by what they want to do"
+          ]
+        }
       },
       {
         "id": "milo-fomo-onboard",
@@ -971,7 +1697,29 @@ export const archiveProjects = [
           "member",
           "onboarding",
           "signup"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "centered heading",
+            "numbered steps",
+            "green notice"
+          ],
+          "features": [
+            "signup",
+            "member onboarding",
+            "app download",
+            "account instructions",
+            "chapter membership"
+          ],
+          "phrases": [
+            "get new members into a clan",
+            "connect an account to a chapter",
+            "finish member onboarding"
+          ]
+        }
       },
       {
         "id": "milo-fomo-onboard-links",
@@ -1002,7 +1750,30 @@ export const archiveProjects = [
           "operations"
         ],
         "previewSource": "local-original",
-        "previewCaption": "Original clan directory · fictional sample chapters"
+        "previewCaption": "Original clan directory · fictional sample chapters",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "blue",
+            "purple",
+            "compact rows",
+            "rounded cards",
+            "monospace links"
+          ],
+          "features": [
+            "link directory",
+            "chapter lookup",
+            "copy message",
+            "copy link",
+            "onboarding links"
+          ],
+          "phrases": [
+            "find chapter onboarding links",
+            "copy a chapter invitation",
+            "distribute member links"
+          ]
+        }
       },
       {
         "id": "milo-fomo-refer",
@@ -1041,7 +1812,29 @@ export const archiveProjects = [
             "httpStatus": 200,
             "notes": "The public shell is titled opening fomo and uses a client redirect. It is related routing rather than a distinct visual page."
           }
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "centered hero",
+            "large typography",
+            "oversized numbers"
+          ],
+          "features": [
+            "referral program",
+            "reward tiers",
+            "code claim",
+            "instructions",
+            "attribution"
+          ],
+          "phrases": [
+            "bring people into a program",
+            "claim a personal referral code",
+            "explain a referral program"
+          ]
+        }
       },
       {
         "id": "milo-fomo-report",
@@ -1071,7 +1864,30 @@ export const archiveProjects = [
           "report",
           "activity",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "blue",
+            "green accent",
+            "left aligned",
+            "outlined inputs",
+            "rounded form"
+          ],
+          "features": [
+            "weekly report",
+            "reporting form",
+            "role selection",
+            "activity reporting",
+            "supporting context"
+          ],
+          "phrases": [
+            "collect weekly campus updates",
+            "report what happened this week",
+            "submit team activity"
+          ]
+        }
       },
       {
         "id": "milo-fomo-submit",
@@ -1104,7 +1920,29 @@ export const archiveProjects = [
           "submit",
           "application",
           "form"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "centered hero",
+            "large typography",
+            "oversized numbers"
+          ],
+          "features": [
+            "creator application",
+            "content submission",
+            "submission requirements",
+            "process guidance",
+            "review"
+          ],
+          "phrases": [
+            "collect creator submissions",
+            "apply to create content",
+            "submit a social post"
+          ]
+        }
       },
       {
         "id": "milo-fomoportal",
@@ -1133,7 +1971,31 @@ export const archiveProjects = [
           "portal",
           "directory",
           "program"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue",
+            "purple",
+            "green accent",
+            "four cards",
+            "card grid",
+            "gradient accents"
+          ],
+          "features": [
+            "portal",
+            "program navigation",
+            "competition link",
+            "team link",
+            "dinner link",
+            "creator link"
+          ],
+          "phrases": [
+            "put campus opportunities in one place",
+            "choose a program from cards",
+            "central campus portal"
+          ]
+        }
       },
       {
         "id": "milo-hq-visit-form",
@@ -1172,7 +2034,31 @@ export const archiveProjects = [
             "httpStatus": 405,
             "notes": "HEAD returned 405. No visitor payload or mutating request was sent; this is an API route, not a page preview."
           }
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "calendar",
+            "stepper",
+            "blue accents"
+          ],
+          "features": [
+            "visit request",
+            "date picker",
+            "time selection",
+            "calendar",
+            "guest details",
+            "review request"
+          ],
+          "phrases": [
+            "calendar visit request",
+            "request a time to visit HQ",
+            "collect meeting preferences"
+          ]
+        }
       },
       {
         "id": "milo-visit-form-dev",
@@ -1204,7 +2090,31 @@ export const archiveProjects = [
           "prototype"
         ],
         "previewSource": "local-original",
-        "previewCaption": "Original visit-request prototype · local preview"
+        "previewCaption": "Original visit-request prototype · local preview",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "split layout",
+            "calendar",
+            "stepper",
+            "blue accents"
+          ],
+          "features": [
+            "visit request",
+            "date picker",
+            "time selection",
+            "calendar",
+            "guest details",
+            "local prototype"
+          ],
+          "phrases": [
+            "preview a visit request flow",
+            "calendar visit request",
+            "choose a preferred meeting time"
+          ]
+        }
       },
       {
         "id": "milo-visit-console",
@@ -1239,7 +2149,31 @@ export const archiveProjects = [
           "review"
         ],
         "previewSource": "public-original",
-        "previewCaption": "Original operations console · access screen"
+        "previewCaption": "Original operations console · access screen",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "minimal",
+            "centered card",
+            "soft shadow",
+            "purple button",
+            "passcode input"
+          ],
+          "features": [
+            "access screen",
+            "login",
+            "name selection",
+            "passcode gate",
+            "operations console",
+            "invoice management"
+          ],
+          "phrases": [
+            "open the internal operations console",
+            "team login screen",
+            "access invoice operations"
+          ]
+        }
       },
       {
         "id": "milo-invoice-beta",
@@ -1271,7 +2205,30 @@ export const archiveProjects = [
           "team"
         ],
         "previewSource": "public-original",
-        "previewCaption": "Original beta internship · welcome step"
+        "previewCaption": "Original beta internship · welcome step",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "centered card",
+            "soft shadow",
+            "stepper",
+            "purple button"
+          ],
+          "features": [
+            "internship onboarding",
+            "participant details",
+            "schedule",
+            "two-week plan",
+            "review and join"
+          ],
+          "phrases": [
+            "onboard an intern",
+            "show a two week internship plan",
+            "guide participants through joining"
+          ]
+        }
       },
       {
         "id": "milo-chapter-data",
@@ -1304,7 +2261,29 @@ export const archiveProjects = [
           "internal"
         ],
         "previewSource": "public-original",
-        "previewCaption": "Original chapter analytics · access screen"
+        "previewCaption": "Original chapter analytics · access screen",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "black",
+            "minimal",
+            "centered form",
+            "passcode input",
+            "blue button"
+          ],
+          "features": [
+            "access screen",
+            "passcode gate",
+            "chapter analytics",
+            "campus comparisons",
+            "chapter table"
+          ],
+          "phrases": [
+            "access chapter analytics",
+            "open an internal data workspace",
+            "minimal dark access screen"
+          ]
+        }
       },
       {
         "id": "milo-study-arrivals",
@@ -1335,7 +2314,31 @@ export const archiveProjects = [
           "parachute",
           "arrivals",
           "motion"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "gray blue sky",
+            "campus building",
+            "spotlight",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "arrival animation",
+            "parachutes",
+            "replay controls",
+            "day and night",
+            "pause"
+          ],
+          "phrases": [
+            "preview parachute arrivals",
+            "compare campus arrival animations",
+            "test a game-like scene"
+          ]
+        }
       },
       {
         "id": "milo-study-banner",
@@ -1366,7 +2369,29 @@ export const archiveProjects = [
           "banner",
           "village",
           "branding"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "off white",
+            "colorful",
+            "black cards",
+            "banner grid",
+            "Greek letters",
+            "large numbers"
+          ],
+          "features": [
+            "visual study",
+            "banner comparison",
+            "chapter branding",
+            "progress display",
+            "reward display"
+          ],
+          "phrases": [
+            "compare chapter banner designs",
+            "show signup progress on a banner",
+            "explore Greek letter graphics"
+          ]
+        }
       },
       {
         "id": "milo-study-campus-hill",
@@ -1397,7 +2422,30 @@ export const archiveProjects = [
           "campus",
           "hill",
           "terrain"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "campus aerial",
+            "brick buildings",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "terrain preview",
+            "campus scene",
+            "camera views",
+            "day and night",
+            "pause"
+          ],
+          "phrases": [
+            "inspect a virtual campus landscape",
+            "compare campus camera views",
+            "preview a campus quad"
+          ]
+        }
       },
       {
         "id": "milo-study-construction",
@@ -1428,7 +2476,29 @@ export const archiveProjects = [
           "construction",
           "crew",
           "animation"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "building frame",
+            "aerial view",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "construction animation",
+            "crew variants",
+            "chapter selection",
+            "playback controls"
+          ],
+          "phrases": [
+            "preview a building under construction",
+            "review construction crew animation",
+            "compare construction variants"
+          ]
+        }
       },
       {
         "id": "milo-study-helipad",
@@ -1459,7 +2529,31 @@ export const archiveProjects = [
           "helipad",
           "scene",
           "characters"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "muted green",
+            "helicopter",
+            "helipad",
+            "aerial view",
+            "timeline bar"
+          ],
+          "features": [
+            "visual study",
+            "helicopter arrival",
+            "camera shots",
+            "character placement",
+            "playback timeline",
+            "day and night"
+          ],
+          "phrases": [
+            "preview a helicopter arrival",
+            "compare cinematic camera shots",
+            "scrub a scene timeline"
+          ]
+        }
       },
       {
         "id": "milo-study-human",
@@ -1490,7 +2584,31 @@ export const archiveProjects = [
           "people",
           "human",
           "character"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "crowds",
+            "campus buildings",
+            "green",
+            "close-up figures",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "character variants",
+            "crowd preview",
+            "scale comparison",
+            "camera views",
+            "pause"
+          ],
+          "phrases": [
+            "inspect a campus crowd",
+            "compare low poly people",
+            "preview characters at different scales"
+          ]
+        }
       },
       {
         "id": "milo-study-intro",
@@ -1521,7 +2639,30 @@ export const archiveProjects = [
           "intro",
           "opening",
           "motion"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "campus aerial",
+            "text overlay",
+            "full screen scene",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "intro composition",
+            "reveal animation",
+            "scene layers",
+            "join action"
+          ],
+          "phrases": [
+            "preview a campus intro",
+            "place a call to action over a 3d scene",
+            "review an opening reveal"
+          ]
+        }
       },
       {
         "id": "milo-study-leaderboard",
@@ -1552,7 +2693,30 @@ export const archiveProjects = [
           "leaderboard",
           "ranking",
           "interface"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "3d",
+            "scoreboard",
+            "ranking rows",
+            "white text",
+            "gold accent"
+          ],
+          "features": [
+            "visual study",
+            "leaderboard",
+            "rankings",
+            "progress display",
+            "mock data controls",
+            "state comparison"
+          ],
+          "phrases": [
+            "compare leaderboard states",
+            "show chapter rankings on a board",
+            "preview a 3d scoreboard"
+          ]
+        }
       },
       {
         "id": "milo-study-scale",
@@ -1583,7 +2747,31 @@ export const archiveProjects = [
           "scale",
           "performance",
           "village"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "street view",
+            "campus buildings",
+            "crowds",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "scene scale",
+            "density controls",
+            "camera views",
+            "day and night",
+            "activity pause"
+          ],
+          "phrases": [
+            "compare a crowded campus scene",
+            "test village scale",
+            "inspect scene density"
+          ]
+        }
       },
       {
         "id": "milo-study-school-banner",
@@ -1614,7 +2802,29 @@ export const archiveProjects = [
           "school",
           "banner",
           "identity"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "off white",
+            "colorful",
+            "banner grid",
+            "school logos",
+            "large letters",
+            "serif heading"
+          ],
+          "features": [
+            "visual study",
+            "school branding",
+            "banner comparison",
+            "logo collection",
+            "color palettes"
+          ],
+          "phrases": [
+            "compare school banner designs",
+            "browse campus branding variations",
+            "show school colors"
+          ]
+        }
       },
       {
         "id": "milo-study-skyline",
@@ -1645,7 +2855,30 @@ export const archiveProjects = [
           "skyline",
           "architecture",
           "buildings"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "gray blue",
+            "green",
+            "building grid",
+            "aerial view",
+            "miniature buildings"
+          ],
+          "features": [
+            "visual study",
+            "architecture collection",
+            "building selection",
+            "camera views",
+            "skyline comparison"
+          ],
+          "phrases": [
+            "compare campus architecture",
+            "browse miniature building models",
+            "inspect a village skyline"
+          ]
+        }
       },
       {
         "id": "milo-study-stadium",
@@ -1676,7 +2909,31 @@ export const archiveProjects = [
           "stadium",
           "sports",
           "scene"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "purple seating",
+            "football stadium",
+            "aerial view",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "stadium preview",
+            "camera views",
+            "day and night",
+            "touchdown animation",
+            "fireworks"
+          ],
+          "phrases": [
+            "explore a virtual football stadium",
+            "compare stadium camera angles",
+            "preview stadium celebrations"
+          ]
+        }
       },
       {
         "id": "milo-study-vehicle",
@@ -1707,7 +2964,30 @@ export const archiveProjects = [
           "vehicle",
           "cars",
           "village"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "gray blue",
+            "blue car",
+            "minimal",
+            "large canvas"
+          ],
+          "features": [
+            "visual study",
+            "vehicle variants",
+            "model comparison",
+            "sedan",
+            "crossover",
+            "shuttle"
+          ],
+          "phrases": [
+            "compare village vehicle models",
+            "preview a low poly car",
+            "switch between vehicle types"
+          ]
+        }
       }
     ]
   },
@@ -1744,7 +3024,32 @@ export const archiveProjects = [
           "request",
           "client",
           "budget"
-        ]
+        ],
+        "searchMeta": {
+          "visual": [
+            "light",
+            "warm gray",
+            "off white",
+            "minimal",
+            "centered card",
+            "serif heading",
+            "green button"
+          ],
+          "features": [
+            "project intake",
+            "multi-step form",
+            "project brief",
+            "requirements",
+            "timing",
+            "budget",
+            "review"
+          ],
+          "phrases": [
+            "collect a website project brief",
+            "turn an idea into a build request",
+            "ask about scope timing and budget"
+          ]
+        }
       }
     ]
   }

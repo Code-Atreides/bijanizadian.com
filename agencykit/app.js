@@ -1,4 +1,4 @@
-import { blocks, categories, filterItems, searchArchive } from './catalog.js';
+import { blocks, categories, filterItems, searchArchive, searchArchiveDetailed } from './catalog.js';
 import { archiveProjects } from './archive-data.js';
 import { createArchiveMotion } from './archive-motion.js';
 import { downloadSkeleton } from './skeletons.js';
@@ -118,7 +118,12 @@ function renderArchive(){
   document.body.classList.toggle('archive-home',home);
   document.body.classList.toggle('archive-results',!home);
   document.body.classList.toggle('archive-compact',compact);
-  const items=home?archiveDeck:searchArchive(allArchive,state.query);
+  const result=home?{items:archiveDeck,corrections:[]}:searchArchiveDetailed(allArchive,state.query);
+  const items=result.items;
+  const feedback=$('#archive-search-feedback');
+  feedback.textContent=result.corrections.length?`Including ${result.corrections.map(({from,to})=>`“${to}” for “${from}”`).join('; ')}`:'';
+  feedback.hidden=home||!result.corrections.length;
+  document.body.classList.toggle('archive-corrected',!feedback.hidden);
   const canvas=$('#archive-canvas');
   $('#archive-gallery').setAttribute('aria-label',home?'A glimpse of our work':'Search results');
   $('#archive-gallery').setAttribute('aria-hidden',String(home));

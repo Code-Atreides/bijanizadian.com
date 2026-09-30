@@ -77,3 +77,7 @@ body.archive-mode #archive-result-controls .archive-pagination button{display:gr
 body.archive-mode #archive-result-controls .archive-pagination button:hover:not(:disabled){background:#ffffff08;color:#f0f0eb}
 body.archive-mode #archive-result-controls .archive-pagination button:disabled{opacity:.28;cursor:default}
 body.archive-mode #archive-result-controls .archive-pagination button:focus-visible{outline:1px solid #d0d0c8;outline-offset:2px}
+body.archive-mode #archive-search-feedback{max-width:100%;margin:2px auto 0;padding:0 10px;overflow:hidden;color:#858580;font-size:9px;line-height:14px;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+body.archive-mode #archive-search-feedback[hidden]{display:none}
+@media(max-height:600px) and (min-width:721px){body.archive-results.archive-corrected #archive-gallery{top:190px}}
+@media(max-height:567px){body.archive-results.archive-corrected #archive-gallery{top:158px}}
