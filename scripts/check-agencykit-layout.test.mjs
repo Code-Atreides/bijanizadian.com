@@ -19,19 +19,36 @@ function assertGeometry(layout, exclusion) {
   for(let i=0;i<layout.slots.length;i++) for(let j=i+1;j<layout.slots.length;j++) assert.equal(overlaps(layout.slots[i],layout.slots[j]),false,'tiles overlap');
 }
 
-test('home geometry fits one canvas and avoids the motion-inflated search at every target viewport',()=>{
-  const viewports=[[320,568],[375,667],[390,844],[768,1024],[1024,768],[1280,720],[1440,900],[1920,1080]];
+test('home fills an overscanned canvas with dense nonoverlapping masonry, including behind the search',()=>{
+  const viewports=[[320,568],[375,667],[390,844],[768,1024],[1024,768],[1280,720],[1440,900],[1600,750],[1920,1080]];
   for(const [vw,vh] of viewports){
-    const small=vw<=600;
-    const width=vw-(small?36:120),height=vh-(small?210:182);
-    const motionX=small?0:68,motionY=small?0:40;
-    const pillWidth=Math.min(500,vw-32);
-    const exclusion={x:(width-pillWidth)/2-motionX-12,y:vh*.47-32-(small?78:82)-motionY-12,width:pillWidth+motionX*2+24,height:100+motionY*2+24};
-    const result=generateArchiveLayout({width,height,home:true,exclusion});
-    assertGeometry(result,exclusion);
-    assert.ok(result.capacity>=4,`too few home slots at ${vw}x${vh}`);
-    assert.ok(result.capacity<=18);
+    const small=vw<=720;
+    const width=vw+(small?52:180),height=vh+(small?72:128);
+    const center={x:width/2-Math.min(width/2,250),y:height/2-95,width:Math.min(width,500),height:190};
+    const result=generateArchiveLayout({width,height,home:true,seed:47,exclusion:center});
+    assertGeometry(result);
+    assert.deepEqual(result,generateArchiveLayout({width,height,home:true,seed:47}), 'home must ignore a fixed-search exclusion');
+    assert.ok(result.slots.some(slot=>overlaps({...slot,height:slot.visualHeight},center)), 'center is artificially empty');
+    assert.ok(result.rows>=4,`too few vertical layers at ${vw}x${vh}`);
+    assert.ok(result.capacity>=(small?12:24),`too few home slots at ${vw}x${vh}`);
+    if(small)assert.ok(result.capacity<=18);
+    const yPositions=result.slots.map(slot=>slot.y);
+    assert.ok(Math.max(...yPositions)-Math.min(...yPositions)>height*.6,'field does not span the canvas');
   }
+  assert.equal(generateArchiveLayout({width:1460,height:848,home:true}).capacity,35);
+  assert.equal(generateArchiveLayout({width:1780,height:878,home:true}).capacity,40);
+});
+
+test('home geometry is reproducible per seed, changes with a shuffle seed, and is not locked to three rows',()=>{
+  const args={width:1780,height:878,home:true,seed:'our-next-project'};
+  const first=generateArchiveLayout(args);
+  assert.deepEqual(first,generateArchiveLayout(args));
+  const second=generateArchiveLayout({...args,seed:'another-project'});
+  assert.equal(first.capacity,second.capacity);
+  assert.notDeepEqual(first.slots,second.slots);
+  assert.ok(first.rows>=5);
+  assert.ok(new Set(first.slots.map(slot=>Math.round(slot.y/12))).size>6,'columns are not independently staggered');
+  for(const seed of [0,1,2,77,1234,'field'])assertGeometry(generateArchiveLayout({...args,seed}));
 });
 
 test('results are bounded with real caption space across narrow and wide canvases',()=>{
@@ -59,7 +76,7 @@ test('compact landscape keeps previews reachable below the fixed search without 
 
 test('tiny or blocked canvases return safely and offscreen exclusions do not remove slots',()=>{
   for(const args of [{width:0,height:100},{width:100,height:0},{width:-1,height:500},{width:NaN,height:500},{width:70,height:70}]) assert.equal(generateArchiveLayout(args).capacity,0);
-  const base={width:1000,height:600,home:true};
+  const base={width:1000,height:600,home:false};
   assert.deepEqual(generateArchiveLayout({...base,exclusion:{x:1500,y:100,width:200,height:200}}),generateArchiveLayout(base));
   assert.equal(generateArchiveLayout({...base,exclusion:{x:0,y:0,width:1000,height:600}}).capacity,0);
   assertGeometry(generateArchiveLayout({...base,exclusion:{x:-50,y:150,width:200,height:180}}),{x:-50,y:150,width:200,height:180});
@@ -67,7 +84,7 @@ test('tiny or blocked canvases return safely and offscreen exclusions do not rem
 
 test('pagination makes every item reachable exactly once for every positive capacity',()=>{
   const items=Array.from({length:73},(_,id)=>({id}));
-  for(const capacity of [1,2,4,6,8,12,18,20,100]){
+  for(const capacity of [1,2,4,6,8,12,18,20,28,40,56,100]){
     const first=paginateItems(items,0,capacity),reached=[];
     for(let page=0;page<first.pageCount;page++){
       const slice=paginateItems(items,page,capacity);

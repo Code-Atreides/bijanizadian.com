@@ -8,7 +8,6 @@ const $ = selector => document.querySelector(selector);
 const archiveMotion = createArchiveMotion({
   canvas: $('#archive-canvas'),
   isActive: () => document.body.classList.contains('archive-home')
-    && !document.body.classList.contains('archive-compact')
     && !document.body.classList.contains('modal-open')
     && !document.querySelector('dialog[open]')
     && $('#assistant-panel').hidden && $('#search-suggestions').hidden
@@ -38,6 +37,7 @@ const categoryIcon = category => ({Portals:'portal',Pages:'page',Forms:'form',To
 const allArchive = archiveProjects.flatMap(project => project.items.map(item => ({...item, project: project.name, projectId:project.id, origin:project.name, archived:true})));
 const catalog = allArchive;
 let archiveDeck = shuffleItems(allArchive), archivePage = 0, archivePageCount = 1;
+let archiveLayoutSeed = Math.floor(Math.random()*0xFFFFFFFF);
 const currentIds = ids => [...new Set(ids.map(id=>catalog.some(item=>item.id===id)?id:blocks.find(item=>item.id===id)?.sourceId).filter(id=>catalog.some(item=>item.id===id)))];
 const state = { route:'archive', scope:'all', category:'All', project:null, collection:null, query:'', compact:false, saved:[], collections:[] };
 try {
@@ -122,7 +122,10 @@ function render() {
 
 
 function archiveTile(item,slot) {
-  const position=`left:${slot.x}px;top:${slot.y}px;width:${slot.width}px;height:${slot.height}px;--tile-visual-height:${slot.visualHeight}px`;
+  const field=$('#archive-gallery').getBoundingClientRect(),x=field.left+slot.x,y=field.top+slot.y;
+  const focusX=Math.max(12,Math.min(innerWidth-slot.width-12,x))-x;
+  const focusY=Math.max(76,Math.min(innerHeight-slot.height-110,y))-y;
+  const position=`left:${slot.x}px;top:${slot.y}px;width:${slot.width}px;height:${slot.height}px;--tile-visual-height:${slot.visualHeight}px;--focus-x:${focusX}px;--focus-y:${focusY}px`;
   return `<button class="archive-tile" style="${position}" data-detail="${escape(item.id)}" aria-label="Preview ${escape(item.name)} — ${escape(item.project)}"><span class="tile-visual">${preview(item)}</span><span class="tile-caption"><strong>${escape(item.name)}</strong><span>${escape(item.project)} <i>·</i> ${escape(item.category)}${item.status==='prototype'?' · Prototype':''}</span></span></button>`;
 }
 function renderArchive(){
@@ -134,10 +137,8 @@ function renderArchive(){
   let items=(home?archiveDeck:allArchive).filter(item=>state.scope==='all'||(state.scope==='prototype'?item.status==='prototype':['finished','contextual'].includes(item.status)));
   items=items.filter(item=>(!state.project||item.projectId===state.project)&&(state.category==='All'||item.category===state.category));
   items=searchArchive(items,state.query);
-  const canvas=$('#archive-canvas'),rect=$('#archive-gallery').getBoundingClientRect(),search=$('.archive-search-box').getBoundingClientRect();
-  const motion=innerWidth>720?{x:64,y:36}:{x:0,y:0};
-  const exclusion=home&&!compact?{x:search.left-rect.left-motion.x-16,y:search.top-rect.top-motion.y-10,width:search.width+motion.x*2+32,height:search.height+motion.y*2+52}:null;
-  const layout=generateArchiveLayout({width:canvas.clientWidth,height:canvas.clientHeight,home:home&&!compact,exclusion});
+  const canvas=$('#archive-canvas');
+  const layout=generateArchiveLayout({width:canvas.clientWidth,height:canvas.clientHeight,home,seed:archiveLayoutSeed+archivePage});
   const page=paginateItems(items,archivePage,layout.capacity);
   archivePage=page.page;archivePageCount=page.pageCount;
   const focused=document.activeElement?.closest('.archive-tile')?.dataset.detail;
@@ -168,11 +169,12 @@ $('#archive-search-form').addEventListener('submit',event=>{event.preventDefault
 $('#archive-search').addEventListener('input',()=>{$('#archive-clear').hidden=!$('#archive-search').value;});
 $('#archive-clear').addEventListener('click',()=>{$('#archive-search').value='';state.query='';archiveStateChanged();$('#archive-search').focus();});
 $('#suggestion-toggle').addEventListener('click',()=>toggleSuggestions($('#search-suggestions').hidden));
+$('#archive-search-stage').addEventListener('focusout',()=>queueMicrotask(()=>{if(!$('#archive-search-stage').contains(document.activeElement)&&!$('#search-suggestions').hidden)toggleSuggestions(false);}));
 $('#archive-project').addEventListener('change',event=>{state.project=event.target.value||null;archiveStateChanged();});
 $('#archive-type').addEventListener('change',event=>{state.category=event.target.value;archiveStateChanged();});
 $('#archive-scope').addEventListener('change',event=>{state.scope=event.target.value;archiveStateChanged();});
 $('#archive-reset').addEventListener('click',resetArchive);
-$('#archive-shuffle').addEventListener('click',()=>{archiveDeck=shuffleItems(allArchive);archivePage=0;archiveStateChanged({resetPage:false});});
+$('#archive-shuffle').addEventListener('click',()=>{archiveDeck=shuffleItems(allArchive);archiveLayoutSeed=Math.floor(Math.random()*0xFFFFFFFF);archivePage=0;archiveStateChanged({resetPage:false});});
 $('#archive-previous').addEventListener('click',()=>{archivePage=Math.max(0,archivePage-1);archiveStateChanged({resetPage:false});});
 $('#archive-next').addEventListener('click',()=>{archivePage=Math.min(archivePageCount-1,archivePage+1);archiveStateChanged({resetPage:false});});
 let layoutFrame=0;
@@ -287,7 +289,7 @@ document.addEventListener('keydown',event=>{
   const drawerOpen=!$('#detail-overlay').hidden;
   if(!drawerOpen&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openAssistant();}
   if(event.key==='/'&&!typing&&!drawerOpen){event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#search')).focus();}
-  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else closeSidebar();}
+  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}else closeSidebar();}
   if(event.key==='Tab'&&!$('#detail-overlay').hidden&&!$('#collection-modal').open){const focusable=[...$('#detail-drawer').querySelectorAll('button,a[href]')].filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
 });
 document.querySelectorAll('.archive-header a[href="#archive"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();state.route='archive';closeDetails();resetArchive();}));

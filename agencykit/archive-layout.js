@@ -4,14 +4,76 @@ const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const ASPECT = 16 / 9;
 const CAPTION_HEIGHT = 36;
 
+function seededRandom(seed) {
+  let state = 2166136261;
+  for (const character of String(seed)) state = Math.imul(state ^ character.charCodeAt(0), 16777619) >>> 0;
+  return () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+}
+
+function homeLayout(width, height, seed) {
+  const random = seededRandom(seed);
+  const mobile = width < 850;
+  const edge = 8;
+  const gap = mobile ? 14 : 24;
+  const innerWidth = Math.max(0, width - edge * 2);
+  const innerHeight = Math.max(0, height - edge * 2);
+  const preferredColumns = mobile ? 3 : width >= 1650 ? 8 : width >= 1350 ? 7 : width >= 1000 ? 6 : 4;
+  const columns = Math.min(preferredColumns, Math.floor((innerWidth + gap) / (80 + gap)));
+  const empty = () => ({ width, height, slots: [], capacity: 0, columns: Math.max(0, columns), rows: 0, captionHeight: CAPTION_HEIGHT });
+  if (columns < 1) return empty();
+  const cellWidth = (innerWidth - gap * (columns - 1)) / columns;
+  const minWidth = Math.min(cellWidth, mobile ? 95 : 140);
+  const minHeight = minWidth / ASPECT + CAPTION_HEIGHT;
+  const fittingRows = Math.floor((innerHeight + gap) / (minHeight + gap));
+  if (fittingRows < 1) return empty();
+  const targetStep = mobile ? 145 : 180;
+  const rows = Math.min(fittingRows, mobile ? 6 : Infinity, Math.max(1, Math.round(height / targetStep)));
+  const rowWidthLimit = ((innerHeight - gap * (rows - 1)) / rows - CAPTION_HEIGHT) * ASPECT;
+  const maxWidth = Math.min(cellWidth, rowWidthLimit, mobile ? 125 : 200);
+  const slots = [];
+  for (let column = 0; column < columns; column += 1) {
+    const sizes = Array.from({ length: rows }, () => {
+      const tileWidth = minWidth + random() * Math.max(0, maxWidth - minWidth);
+      return { width: tileWidth, visualHeight: tileWidth / ASPECT, height: tileWidth / ASPECT + CAPTION_HEIGHT };
+    });
+    const remaining = Math.max(0, innerHeight - sizes.reduce((sum, tile) => sum + tile.height, 0) - gap * (rows - 1));
+    // Give every column a different vertical phase, rather than keeping the
+    // first row pinned to a shared baseline. Leave some slack between tiles.
+    const edgeBudget = Math.min(120, remaining * (0.72 + random() * 0.18));
+    const phase = (column * 0.61803398875 + random() * 0.4) % 1;
+    const topSpace = rows === 1 ? remaining / 2 : edgeBudget * phase;
+    const bottomSpace = rows === 1 ? remaining / 2 : edgeBudget - topSpace;
+    const gapSpace = Math.max(0, remaining - topSpace - bottomSpace);
+    const weights = Array.from({ length: rows - 1 }, () => 0.45 + random() * 1.1);
+    const weightTotal = weights.reduce((sum, value) => sum + value, 0);
+    let y = edge + topSpace;
+    sizes.forEach((tile, row) => {
+      slots.push({
+        x: edge + column * (cellWidth + gap) + random() * Math.max(0, cellWidth - tile.width),
+        y,
+        ...tile,
+        captionHeight: CAPTION_HEIGHT,
+      });
+      y += tile.height + gap + (weights[row] ? gapSpace * weights[row] / weightTotal : 0);
+    });
+  }
+  slots.sort((a, b) => a.y - b.y || a.x - b.x);
+  return { width, height, slots, capacity: slots.length, columns, rows, captionHeight: CAPTION_HEIGHT };
+}
+
 /**
  * Coordinates are relative to the actual archive canvas, not the viewport.
- * The caller expands exclusion for the fixed search and its motion clearance.
+ * Home fills an overscanned canvas and deliberately continues behind fixed UI.
+ * Results use bounded grid placement, with an optional protected exclusion.
  * Every slot includes a 36px caption area, including the hover caption at home.
  */
-export function generateArchiveLayout({ width = 0, height = 0, home = true, exclusion = null } = {}) {
+export function generateArchiveLayout({ width = 0, height = 0, home = true, exclusion = null, seed = 0 } = {}) {
   width = Math.max(0, finite(width));
   height = Math.max(0, finite(height));
+  if (home) return homeLayout(width, height, seed);
   const mobile = width < 600;
   const tablet = width < 1000;
   const edge = 8;
