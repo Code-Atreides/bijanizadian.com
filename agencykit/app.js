@@ -102,8 +102,8 @@ projectCloud=createProjectCloud({store:projectStore,setStorageMode:mode=>{projec
 
 function renderNav() {
   $('#library-nav').innerHTML=navLink('All originals','#library','grid',allArchive.length,state.route==='library'&&state.category==='All')+categories.map(category=>navLink(category,`#library/${category.toLowerCase()}`,categoryIcon(category),allArchive.filter(x=>x.category===category).length,state.route==='library'&&state.category===category)).join('');
-  $('#workspace-nav').innerHTML=navLink('Clients','#clients','collection',projectStore.getClients().length,['clients','client','projects','project'].includes(state.route))+navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
-  $('#collections-nav').hidden=!state.collections.length;
+  $('#collections-nav').hidden=!state.collections.length||state.route==='foundations';
+  $('#library-nav').hidden=state.route!=='library';
   $('#collection-links').innerHTML=state.collections.map(c=>navLink(c.name,`#collection/${encodeURIComponent(c.id)}`,'collection',c.items.length,state.collection===c.id)).join('');
 }
 
@@ -127,7 +127,7 @@ function render() {
   document.body.classList.toggle('workspace-mode',state.route!=='archive');
   $('#archive-workspace').hidden=state.route!=='archive';
   $('.app-shell').hidden=state.route==='archive'||projectRoute;
-  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route||(projectRoute&&a.dataset.navRoute==='clients'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route||(state.route==='collection'&&a.dataset.navRoute==='saved')||(projectRoute&&a.dataset.navRoute==='clients'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(state.route==='archive'){renderArchive();archiveMotion.sync();return;}
   document.body.classList.remove('archive-home','archive-results');
   archiveMotion.sync();
@@ -139,7 +139,6 @@ function render() {
   $('#page-title').textContent=heading;
   $('#page-description').textContent=descriptions[state.route]||descriptions.library;
   $('#page-eyebrow').textContent=inArchive?'BEFORE IT BECOMES A STARTING POINT':state.route==='foundations'?'SMALL DETAILS. SHARED EVERYWHERE.':state.route==='saved'?'WORTH KEEPING CLOSE':collection?'A COLLECTION OF POSSIBILITIES':'A LITTLE LESS FROM SCRATCH';
-  $('#breadcrumb-current').textContent=inArchive?'Archive':state.route==='foundations'?'Foundations':state.route==='saved'?'Saved':collection?'Collections':state.category==='All'?'Library':state.category;
   $('#search').placeholder=inArchive?'Search the archive…':'Find original work…';
   $('#search').setAttribute('aria-label',inArchive?'Search the archive':'Search the library');
   $('#toolbar').hidden=state.route==='foundations';
@@ -153,7 +152,7 @@ function render() {
   } else {
     let items=state.route==='saved'?catalog.filter(x=>state.saved.includes(x.id)):collection?catalog.filter(x=>collection.items.includes(x.id)):allArchive;
     items=filterItems(items,{query:state.query,category:state.category});
-    const label=collection?'IN THIS COLLECTION':state.route==='saved'?'YOUR SAVED ORIGINALS':state.category==='All'?'ORIGINAL WORK':state.category.toUpperCase();
+    const label=collection?'In this collection':state.route==='saved'?'Saved originals':state.category==='All'?'Original work':state.category;
     target.innerHTML=`<div class="section-heading"><span>${label}<span class="section-count">${items.length}</span></span><span class="section-description">${state.route==='library'?'Open an original, then choose Skeletonify.':collection?'A shortlist for your next project.':'Kept in this browser.'}</span></div>`+(items.length?grid(items):empty(state.query?'No matches this time.':collection?'Room for a few good pieces.':'Keep something for later.',state.query?'Try “portal”, “referral”, or “assistant”.':'Use the bookmark on an original to save it, or collect a few pieces.'));
   }
   $('#footer-meta').textContent=`${allArchive.length} originals · ready to skeletonify`;
@@ -216,7 +215,7 @@ let layoutFrame=0;
 new ResizeObserver(()=>{cancelAnimationFrame(layoutFrame);layoutFrame=requestAnimationFrame(()=>{if(state.route==='archive'){renderArchive();archiveMotion.sync();}});}).observe($('#archive-canvas'));
 document.addEventListener('click',event=>{const suggestion=event.target.closest('[data-archive-query]');if(suggestion){$('#archive-search').value=suggestion.dataset.archiveQuery;searchFromInput();}if(event.target.closest('[data-refine-search]')){$('#archive-search').focus();$('#archive-search').select();}});
 
-function foundations() {return `<div class="foundation-intro"><span class="eyebrow">01 / THE CURVE</span><h2>Soft edges.<br>A consistent character.</h2><p>The same continuous curve, scaled to suit the thing you’re holding. Small on a control. Generous on a surface. A little more character in the assistant.</p></div><div class="curve-study"><div class="curve-swatch"><span class="curve-sample tiny"></span><strong>Small</strong><p>Controls & icons</p><code>12 px</code></div><div class="curve-swatch"><span class="curve-sample medium"></span><strong>Medium</strong><p>Cards & objects</p><code>22 px</code></div><div class="curve-swatch"><span class="curve-sample large"></span><strong>Large</strong><p>Panels & dialogs</p><code>32 px</code></div><div class="curve-swatch"><span class="assistant-orb"><span></span></span><strong>Companion</strong><p>A shape with a presence</p><code>Continuous</code></div></div><div class="foundation-bottom"><div><span class="eyebrow">02 / THE PALETTE</span><h2>Room for the work.</h2><p>Paper, stone, graphite, and ink. Color can arrive with a client. The library stays quiet.</p><div class="palette"><span style="background:#f7f7f5"></span><span style="background:#e9e9e6"></span><span style="background:#b8b8b3"></span><span style="background:#747470"></span><span style="background:#242423"></span></div></div><div><span class="eyebrow">03 / THE VOICE</span><h2>A helpful person.</h2><p>Say what a thing does. Make the next step clear. Leave a little room to breathe.</p><div class="voice-example">“What are we making?”<small>A question, not a command.</small></div></div></div>`; }
+function foundations() {return `<div class="foundation-intro"><span class="eyebrow">01 / THE CURVE</span><h2>Soft edges.<br>A consistent character.</h2><p>The same continuous curve, scaled to suit the thing you’re holding. Small on a control. Generous on a surface. A little more character in the assistant.</p></div><div class="curve-study"><div class="curve-swatch"><span class="curve-sample tiny"></span><strong>Small</strong><p>Controls & icons</p><code>12 px</code></div><div class="curve-swatch"><span class="curve-sample medium"></span><strong>Medium</strong><p>Cards & objects</p><code>22 px</code></div><div class="curve-swatch"><span class="curve-sample large"></span><strong>Large</strong><p>Panels & dialogs</p><code>32 px</code></div><div class="curve-swatch"><span class="assistant-orb"><span></span></span><strong>Companion</strong><p>A shape with a presence</p><code>Continuous</code></div></div><div class="foundation-bottom"><div><span class="eyebrow">02 / THE PALETTE</span><h2>Room for the work.</h2><p>Ink, graphite, and a little light. A quiet frame lets the color in the work come through.</p><div class="palette"><span style="background:#0c0c0c"></span><span style="background:#171717"></span><span style="background:#282828"></span><span style="background:#8a8a87"></span><span style="background:#ededeb"></span></div></div><div><span class="eyebrow">03 / THE VOICE</span><h2>A helpful person.</h2><p>Say what a thing does. Make the next step clear. Leave a little room to breathe.</p><div class="voice-example">“What are we making?”<small>A question, not a command.</small></div></div></div>`; }
 
 function route() {
   const parts=location.hash.slice(1).split('/');
@@ -237,7 +236,7 @@ function route() {
     history.replaceState(null,'',clean);
   }
   $('#search').value=''; $('#archive-search').value=state.query;
-  closeSidebar(); closeDetails(); render(); window.scrollTo({top:0,behavior:'instant'});
+  closeDetails(); render(); window.scrollTo({top:0,behavior:'instant'});
 }
 function toggleSave(id) {
   const was=state.saved.includes(id);
@@ -255,7 +254,8 @@ function fillDetails(id) {
   const previewUrl=`/agencykit/skeleton?item=${encodeURIComponent(source.id)}`;
   $('#detail-kicker').textContent=`${source.project||source.origin} / ${source.category}`;
   $('#detail-drawer').classList.toggle('showing-skeleton',skeleton);
-  const visual=skeleton?`<div class="skeleton-window" inert><iframe src="${previewUrl}&embed=1" title="${escape(source.name)} skeleton layout" tabindex="-1" aria-hidden="true" loading="eager"></iframe></div>`:`<div class="drawer-preview">${preview(source)}<span class="layout-caption">${escape(source.previewCaption||'Original page · captured September 2026')}</span></div>`;
+  const originalPreview=`${preview(source)}<span class="layout-caption">${escape(source.previewCaption||'Original page · captured September 2026')}</span>`;
+  const visual=skeleton?`<div class="skeleton-window" inert><iframe src="${previewUrl}&embed=1" title="${escape(source.name)} skeleton layout" tabindex="-1" aria-hidden="true" loading="eager"></iframe></div>`:source.sourceUrl?`<a class="drawer-preview original-site-preview" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Visit ${escape(source.name)} — opens in a new tab">${originalPreview}<span class="original-site-cue">Visit site ${icon('external')}</span></a>`:`<div class="drawer-preview">${originalPreview}</div>`;
   const status=source.status==='prototype'?'Local prototype':source.status==='protected'?'Protected workspace':source.status==='contextual'?'Context-specific page':'Original page';
   $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeletonify ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2>${skeleton?'<span class="detail-ready">Skeleton ready</span>':'<span class="detail-ready">'+(source.status==='prototype'?'Prototype':'Original')+'</span>'}</div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary>${source.sourceHost?`<p class="detail-small">Published on · ${escape(source.sourceHost)}</p>`:''}<p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" data-use-project="${escape(source.id)}">Use in project ${icon('arrow')}</button><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Skeletonify'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
 }
@@ -289,10 +289,9 @@ function askGuide(message) {
   matches.forEach(match=>{const el=document.createElement(match.href?'a':'button');el.className='guide-match';el.textContent=match.name;if(match.href){el.href=match.href;el.addEventListener('click',closeAssistant);}else{el.type='button';el.dataset.detail=match.id;}el.insertAdjacentHTML('beforeend',icon('arrow'));choices.append(el);});
   reply.append(choices);log.append(reply);$('#assistant-question').value='';$('#assistant-body').scrollTop=$('#assistant-body').scrollHeight;
 }
-function closeSidebar(){document.body.classList.remove('nav-open');$('#sidebar-backdrop').hidden=true;$('#mobile-menu').setAttribute('aria-expanded','false');}
 
 ['detail-close','collection-close','about-close','assistant-close'].forEach(id=>$('#'+id).innerHTML=icon('close'));
-$('#mobile-menu').innerHTML=icon('menu');$('#search-icon').innerHTML=icon('search');$('#view-toggle').innerHTML=icon('grid');$('#assistant-send').innerHTML=icon('up');
+$('#search-icon').innerHTML=icon('search');$('#view-toggle').innerHTML=icon('grid');$('#assistant-send').innerHTML=icon('up');
 $('#assistant-suggestions').innerHTML=['Find a portal for onboarding','Explore the project archive','How do collections work?'].map(q=>`<button type="button" data-question="${escape(q)}">${escape(q)}${icon('arrow')}</button>`).join('');
 document.addEventListener('click',event=>{
   const use=event.target.closest('[data-use-project]');
@@ -320,17 +319,16 @@ $('#collection-form').addEventListener('submit',event=>{
   state.collections.push({id,name,note:$('#collection-note').value.trim(),items:data.getAll('blocks').filter(id=>catalog.some(x=>x.id===id))});persist();$('#collection-modal').close();location.hash=`collection/${id}`;notify('A new collection, ready for ideas.');
 });
 $('#detail-close').addEventListener('click',closeDetails);$('#detail-overlay').addEventListener('click',e=>{if(e.target===$('#detail-overlay'))closeDetails();});
-$('#about-button').addEventListener('click',()=>$('#about-modal').showModal());$('#about-close').addEventListener('click',()=>$('#about-modal').close());
-$('#assistant-launcher').addEventListener('click',()=>$('#assistant-panel').hidden?openAssistant():closeAssistant());$('#open-assistant-top').addEventListener('click',openAssistant);$('#assistant-close').addEventListener('click',closeAssistant);
+$('#about-close').addEventListener('click',()=>$('#about-modal').close());
+$('#assistant-launcher').addEventListener('click',()=>$('#assistant-panel').hidden?openAssistant():closeAssistant());$('#assistant-close').addEventListener('click',closeAssistant);
 $('#assistant-form').addEventListener('submit',e=>{e.preventDefault();askGuide($('#assistant-question').value);});
-$('#mobile-menu').addEventListener('click',()=>{const open=!document.body.classList.contains('nav-open');document.body.classList.toggle('nav-open',open);$('#sidebar-backdrop').hidden=!open;$('#mobile-menu').setAttribute('aria-expanded',String(open));});$('#sidebar-backdrop').addEventListener('click',closeSidebar);
 document.addEventListener('keydown',event=>{
   if(document.querySelector('dialog[open]'))return;
   const typing=['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName);
   const drawerOpen=!$('#detail-overlay').hidden;
   if(!drawerOpen&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openAssistant();}
   if(event.key==='/'&&!typing&&!drawerOpen){event.preventDefault();if(['client','clients','project','projects'].includes(state.route)){$('.archive-header a[href="#archive"]').click();$('#archive-search').focus();}else (state.route==='archive'?$('#archive-search'):$('#search')).focus();}
-  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}else closeSidebar();}
+  if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}}
   if(event.key==='Tab'&&!$('#detail-overlay').hidden&&!$('#collection-modal').open){const focusable=[...$('#detail-drawer').querySelectorAll('button,a[href]')].filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
 });
 document.querySelectorAll('.archive-header a[href="#archive"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();state.route='archive';closeDetails();resetArchive();}));

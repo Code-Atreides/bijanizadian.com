@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#f7f7f5">
+  <meta name="theme-color" content="#0c0c0c">
   <title>agencykit — a place for the work</title>
   <meta name="robots" content="noindex, nofollow">
   <link rel="icon" href="/agencykit/mark.svg" type="image/svg+xml">
@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="/agencykit/archive.css">
   <link rel="stylesheet" href="/agencykit/archive-viewport.css">
   <link rel="stylesheet" href="/agencykit/projects.css">
+  <link rel="stylesheet" href="/agencykit/kit-ui.css">
   <script type="module" src="/agencykit/app.js"></script>
 </head>
 <body class="archive-mode archive-home">
@@ -36,21 +37,14 @@
   </main>
   <main id="projects-workspace" tabindex="-1" hidden></main>
   <div class="app-shell" hidden>
-    <aside class="sidebar" id="sidebar" aria-label="Workspace navigation">
-      <a class="brand" href="#library" aria-label="The kit home"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span class="brand-name">the kit<span class="workspace-label">A shared starting point</span></span></a>
-      <div class="nav-section"><div class="nav-label">LIBRARY</div><nav id="library-nav" aria-label="Library"></nav></div>
-      <div class="nav-section"><div class="nav-label">WORKSPACE</div><nav id="workspace-nav" aria-label="Workspace"></nav></div>
-      <div class="nav-section collections-nav" id="collections-nav" hidden><div class="nav-label">COLLECTIONS</div><nav id="collection-links" aria-label="Collections"></nav></div>
-      <div class="sidebar-bottom"><button class="sidebar-help" id="about-button"><span class="help-dot">?</span>A note on this space</button><div class="profile"><span class="avatar">us</span><div><strong>Our workspace</strong><span>Made for the next project</span></div></div></div>
-    </aside>
-    <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
     <main class="main" id="main-content" tabindex="-1">
-      <header class="topbar"><div class="topbar-left"><button class="icon-button mobile-menu" id="mobile-menu" aria-label="Open navigation" aria-expanded="false"></button><div class="breadcrumb"><span>Workspace</span><span class="crumb-divider">/</span><strong id="breadcrumb-current">Library</strong></div></div><div class="topbar-actions"><span class="draft-label"><i></i>Reusable library</span><button class="quiet-button" id="open-assistant-top">Ask the kit<span class="shortcut-key">⌘ K</span></button></div></header>
       <div class="content">
         <section class="page-header"><div><p class="eyebrow" id="page-eyebrow">A LITTLE LESS FROM SCRATCH</p><h1 class="page-title" id="page-title">The library.</h1><p class="page-description" id="page-description">Good starting points, ready to become something else.</p></div><div class="page-header-actions"><button class="primary-button" id="new-collection"><span aria-hidden="true">+</span>New collection</button></div></section>
         <div class="toolbar" id="toolbar"><label class="search-box"><span id="search-icon" aria-hidden="true"></span><input id="search" type="search" placeholder="Find a starting point…" aria-label="Search the library"><kbd>/</kbd></label><div class="filter-tabs" id="filter-tabs" aria-label="Filter blocks"></div><button class="icon-button view-toggle" id="view-toggle" aria-label="Switch to compact previews" aria-pressed="false"></button></div>
+        <nav class="library-navigation" id="library-nav" aria-label="Original page types"></nav>
+        <details class="collections-tray" id="collections-nav" hidden><summary>Collections <span>⌄</span></summary><nav id="collection-links" aria-label="Collections"></nav></details>
         <div id="view-content"></div>
-        <footer class="workspace-footer"><span>Built thoughtfully. Kept for later.</span><span id="footer-meta">Originals + reusable starting points</span></footer>
+        <footer class="workspace-footer"><a href="#foundations">The details that make the kit.</a><span id="footer-meta">Originals + reusable starting points</span></footer>
       </div>
     </main>
   </div>
