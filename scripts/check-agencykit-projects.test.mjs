@@ -217,3 +217,156 @@ test('unreadable storage cannot be overwritten with guessed empty state', () => 
   assert.throws(() => store.replaceData(payload([])), /could not be read/);
   assert.equal(writes, 0);
 });
+
+test('legacy version-one data migrates clients deterministically without rewriting or losing project work', () => {
+  const original = make();
+  const first = original.createProject({ name: 'Launch', client: 'Acme', status: 'complete', brand: { accent: '#123456' }, brief: { goal: 'Keep this brief' } });
+  const second = original.createProject({ name: 'Follow-on', client: 'Acme' });
+  const draft = original.createDraft(first.id, 'source-a');
+  original.updateDraft(first.id, draft.id, { copy: { title: 'Keep this draft' } });
+  original.saveVersion(first.id, draft.id, 'Approved');
+  const legacy = JSON.parse(original.exportData());
+  legacy.version = 1;
+  delete legacy.clients;
+  for (const project of legacy.projects) delete project.clientId;
+  const raw = JSON.stringify(legacy), storage = memory({ [PROJECT_STORAGE_KEY]: raw });
+  const migrated = make(storage), client = migrated.getClient(migrated.getProject(first.id).clientId);
+  assert.equal(client.name, 'Acme');
+  assert.equal(client.relationship, 'current', 'completion does not imply a previous client');
+  assert.equal(migrated.getProject(second.id).clientId, client.id);
+  assert.deepEqual(migrated.getDraft(first.id, draft.id), original.getDraft(first.id, draft.id));
+  assert.deepEqual(migrated.getProject(first.id).brand, original.getProject(first.id).brand);
+  assert.deepEqual(migrated.getProject(first.id).brief, original.getProject(first.id).brief);
+  assert.equal(migrated.getProject(first.id).status, 'complete');
+  assert.equal(storage.getItem(PROJECT_STORAGE_KEY), raw, 'reading a legacy backup does not replace it');
+  assert.equal(storage.writes.length, 0);
+  assert.deepEqual(make(memory({ [PROJECT_STORAGE_KEY]: raw })).getClients(), migrated.getClients());
+  const exported = JSON.parse(migrated.exportData());
+  assert.equal(exported.version, 2);
+  assert.ok(exported.clients.length >= 4);
+});
+
+test('several projects can share a client whose rename and relationship remain independent of project status', () => {
+  const store = make(), client = store.createClient({ name: 'Acme' });
+  assert.equal(client.relationship, 'current');
+  const first = store.createProject({ name: 'Launch', clientId: client.id, status: 'active' });
+  const second = store.createProject({ name: 'Finished campaign', clientId: client.id, status: 'complete' });
+  const draft = store.createDraft(first.id, 'source-a');
+  store.saveVersion(first.id, draft.id, 'Before rename');
+  const beforeDraft = store.getDraft(first.id, draft.id);
+  const updated = store.updateClient(client.id, { id: 'forged-id', name: 'Acme Studio', relationship: 'previous' });
+  assert.equal(updated.id, client.id);
+  assert.equal(updated.relationship, 'previous');
+  for (const project of [first, second]) {
+    assert.equal(store.getProject(project.id).clientId, client.id);
+    assert.equal(store.getProject(project.id).client, 'Acme Studio');
+    assert.equal(store.getProject(project.id).name, project.name);
+    assert.equal(store.getProject(project.id).status, project.status);
+  }
+  assert.deepEqual(store.getDraft(first.id, draft.id), beforeDraft);
+  updated.name = 'Outside change';
+  assert.equal(store.getClient(client.id).name, 'Acme Studio');
+  store.updateClient(client.id, { relationship: 'current' });
+  assert.equal(store.getClient(client.id).name, 'Acme Studio');
+});
+
+test('assignment supports existing client IDs and compatible name-based creation without changing the original', () => {
+  const store = make(), client = store.createClient({ name: 'Acme' });
+  const first = store.createProject({ name: 'Campaign', client: '  ACME  ' });
+  assert.equal(first.clientId, client.id);
+  const named = store.createProject({ name: 'New customer' });
+  assert.equal(store.getClient(named.clientId).name, 'New customer');
+  const draft = store.createDraft(first.id, 'source-a');
+  store.updateProject(first.id, { clientId: named.clientId, client: 'Ignored conflicting label' });
+  assert.equal(store.getProject(first.id).client, 'New customer');
+  assert.equal(store.getDraft(first.id, draft.id).sourceId, 'source-a');
+  store.updateProject(first.id, { client: 'Acme' });
+  assert.equal(store.getProject(first.id).clientId, client.id, 'old client-text updates still work');
+  const before = store.exportData();
+  assert.throws(() => store.createProject({ name: 'Invalid', clientId: 'missing-client' }), /existing client/);
+  assert.throws(() => store.updateProject(first.id, { clientId: '__proto__' }), /existing client/);
+  assert.equal(store.exportData(), before);
+});
+
+test('client backups preserve relationships, merge local edits, and reuse a client for legacy imports', () => {
+  const local = make(), client = local.createClient({ name: 'Acme', relationship: 'previous' });
+  const project = local.createProject({ name: 'Local campaign', clientId: client.id });
+  const remote = make(); remote.replaceData(local.exportData());
+  remote.updateClient(client.id, { name: 'Remote rename', relationship: 'current' });
+  const added = remote.createProject({ name: 'Imported project', clientId: client.id });
+  local.importData(remote.exportData());
+  assert.equal(local.getClient(client.id).name, 'Acme');
+  assert.equal(local.getClient(client.id).relationship, 'previous');
+  assert.equal(local.getProject(added.id).clientId, client.id);
+  assert.equal(local.getProject(added.id).client, 'Acme');
+  local.importData(payload([{ id: 'legacy-project', name: 'Old campaign', client: 'ACME', status: 'complete' }]));
+  assert.equal(local.getProject('legacy-project').clientId, client.id);
+  assert.equal(local.getClients().filter(item => item.name.toLowerCase() === 'acme').length, 1);
+  const restored = make(); restored.replaceData(local.exportData());
+  assert.deepEqual(restored.getClients(), local.getClients());
+  assert.equal(restored.getProject(project.id).clientId, client.id);
+  assert.equal(restored.getClient(client.id).relationship, 'previous');
+});
+
+test('client changes and assignments preserve atomic save behavior when storage fails', () => {
+  const storage = memory(), store = make(storage), client = store.createClient({ name: 'Saved client' });
+  const project = store.createProject({ name: 'Saved project', clientId: client.id });
+  const before = store.exportData(); let events = 0;
+  store.subscribe(() => { events += 1; }); storage.failure = () => true;
+  for (const action of [() => store.createClient({ name: 'Unsaved' }), () => store.updateClient(client.id, { name: 'Unsaved rename', relationship: 'previous' }), () => store.createProject({ name: 'New auto-client project' }), () => store.updateProject(project.id, { client: 'Unsaved client' })]) {
+    assert.throws(action, /quota/);
+    assert.equal(store.exportData(), before);
+  }
+  assert.equal(events, 0);
+  storage.failure = null;
+  assert.deepEqual(make(storage).getClients(), store.getClients());
+  for (const clients of [[{ id: 'constructor', name: 'Invalid' }], [{ id: client.id }, { id: client.id }]]) {
+    assert.throws(() => store.replaceData({ version: 1, clients, projects: [] }));
+    assert.equal(store.exportData(), before);
+  }
+  assert.throws(() => store.replaceData({ version: 1, clients: [], projects: [{ id: 'orphan', clientId: 'missing' }] }));
+  assert.equal(store.exportData(), before);
+});
+
+test('untouched seeded inventories adopt corrected sources while edited profiles and draft references survive', () => {
+  const seedTime = '1970-01-01T00:00:00.000Z';
+  const legacy = payload([
+    { id: 'fomo', name: 'fomo', updatedAt: seedTime, originalIds: ['source-c'], drafts: [{ id: 'preserved-draft', sourceId: 'source-b', copy: { title: 'Keep this work' }, versions: [{ id: 'saved-version', snapshot: { copy: { title: 'Approved work' } } }] }] },
+    { id: 'milo', name: 'Milo', updatedAt: seedTime, originalIds: ['source-a'] },
+    { id: 'bijan', name: 'Edited studio project', updatedAt: '2026-01-01T00:00:00.000Z', originalIds: ['source-a'] },
+  ]);
+  const corrected = [
+    { ...archiveProjects[0], items: [catalog[0], catalog[1]] },
+    { ...archiveProjects[1], items: [] },
+    archiveProjects[2],
+  ];
+  const store = createProjectStore({ storage: memory({ [PROJECT_STORAGE_KEY]: JSON.stringify(legacy) }), catalog, archiveProjects: corrected });
+  assert.deepEqual(new Set(store.getProject('fomo').originalIds), new Set(['source-a', 'source-b']));
+  assert.deepEqual(store.getProject('milo').originalIds, []);
+  assert.ok(store.getProject('bijan').originalIds.includes('source-a'), 'edited original references stay intact');
+  assert.equal(store.getProject('bijan').name, 'Edited studio project');
+  const draft = store.getDraft('fomo', 'preserved-draft');
+  assert.equal(draft.sourceId, 'source-b');
+  assert.equal(draft.copy.title, 'Keep this work');
+  assert.equal(draft.versions[0].snapshot.copy.title, 'Approved work');
+  assert.ok(store.getClients().every(client => client.relationship === 'current'));
+});
+
+test('version two requires client records and rejects incomplete replacements without changing state', () => {
+  const storage = memory(), store = make(storage);
+  const client = store.createClient({ name: 'Previous client', relationship: 'previous' });
+  store.createProject({ name: 'Preserved project', clientId: client.id });
+  const before = store.exportData(), persisted = storage.getItem(PROJECT_STORAGE_KEY);
+  let events = 0; store.subscribe(() => { events += 1; });
+  for (const method of ['replaceData', 'importData']) {
+    assert.throws(() => store[method]({ version: 2, projects: [] }), /client list/);
+    assert.equal(store.exportData(), before);
+    assert.equal(storage.getItem(PROJECT_STORAGE_KEY), persisted);
+  }
+  assert.equal(events, 0);
+  const restored = make(); restored.replaceData(before);
+  assert.equal(JSON.parse(restored.exportData()).version, 2);
+  assert.equal(restored.getClient(client.id).relationship, 'previous');
+  restored.replaceData({ version: 1, projects: [] });
+  assert.equal(JSON.parse(restored.exportData()).version, 2, 'legacy cloud defaults upgrade before subsequent saves');
+});

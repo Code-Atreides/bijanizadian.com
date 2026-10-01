@@ -1,9 +1,10 @@
 /** Local project drafts. Originals are references, never writable source data. */
 export const PROJECT_STORAGE_KEY = 'agencykit-projects-v1';
-const VERSION = 1;
+const VERSION = 2;
 const SEED_TIME = '1970-01-01T00:00:00.000Z';
 const MAX_IMPORT = 5 * 1024 * 1024;
 const MAX_PROJECTS = 100;
+const MAX_CLIENTS = 200;
 const MAX_DRAFTS = 100;
 const MAX_VERSIONS = 20;
 const fitsBackup = value => typeof value === 'string' && value.length <= MAX_IMPORT && new TextEncoder().encode(value).byteLength <= MAX_IMPORT;
@@ -16,6 +17,12 @@ const choice = (value, allowed, fallback) => allowed.includes(value) ? value : f
 const safeId = value => typeof value === 'string' && /^[a-z0-9][a-z0-9_-]{0,79}$/i.test(value) && !['constructor', 'prototype', '__proto__'].includes(value.toLowerCase());
 const stamp = value => typeof value === 'string' && value.length <= 40 && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : SEED_TIME;
 const freshId = prefix => `${prefix}-${globalThis.crypto.randomUUID()}`;
+const clientKey = name => name.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim();
+function legacyClientId(name) {
+  let hash = 14695981039346656037n;
+  for (const byte of new TextEncoder().encode(clientKey(name))) hash = BigInt.asUintN(64, (hash ^ BigInt(byte)) * 1099511628211n);
+  return `client-legacy-${hash.toString(16)}`;
+}
 function url(value) {
   if (typeof value !== 'string' || value.length > 2048 || /[\u0000-\u0020\u007f]/.test(value)) return '';
   try { const parsed = new URL(value); return ['http:', 'https:'].includes(parsed.protocol) && !parsed.username && !parsed.password ? parsed.href : ''; } catch { return ''; }
@@ -60,13 +67,45 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const value = key => own(raw, key) ? raw[key] : base[key];
     return {
       name: text(value('name'), 120, 'Untitled project') || 'Untitled project',
-      client: text(value('client'), 120), description: text(value('description'), 4000),
+      clientId: value('clientId') ?? '', client: text(value('client'), 120), description: text(value('description'), 4000),
       status: choice(value('status'), ['active', 'paused', 'complete'], 'active'),
       brand: { accent: color(brand.accent, '#6366f1'), bg: color(brand.bg, '#f7f7f5'), ink: color(brand.ink, '#242423'), font: choice(brand.font, ['system', 'editorial', 'modern'], 'system'), logo: logo(brand.logo) },
       brief: { audience: text(brief.audience, 1000), goal: text(brief.goal, 1600), tone: text(brief.tone, 500) },
       links: { website: url(links.website), repo: url(links.repo), files: url(links.files) },
       originalIds: originalIds(value('originalIds')),
     };
+  }
+  function clientFields(raw, base = {}) {
+    raw = record(raw);
+    return {
+      name: text(own(raw, 'name') ? raw.name : base.name, 120, 'Untitled client') || 'Untitled client',
+      relationship: choice(own(raw, 'relationship') ? raw.relationship : base.relationship, ['current', 'previous'], 'current'),
+    };
+  }
+  function normalizeClient(raw) {
+    if (!object(raw) || !safeId(raw.id)) throw new TypeError('Invalid client ID.');
+    return { id: raw.id, ...clientFields(raw), createdAt: stamp(raw.createdAt), updatedAt: stamp(raw.updatedAt) };
+  }
+  function clientByName(data, name, time = SEED_TIME) {
+    name = text(name, 120, 'Untitled client') || 'Untitled client';
+    const found = data.clients.find(client => clientKey(client.name) === clientKey(name));
+    if (found) return found;
+    if (data.clients.length >= MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
+    let id = time === SEED_TIME ? legacyClientId(name) : freshId('client');
+    if (data.clients.some(client => client.id === id)) throw new TypeError('Client identities conflict. Import was not saved.');
+    const client = { id, name, relationship: 'current', createdAt: time, updatedAt: time };
+    data.clients.push(client);
+    return client;
+  }
+  function assignClient(data, project, time = SEED_TIME) {
+    const client = project.clientId ? data.clients.find(item => item.id === project.clientId) : clientByName(data, project.client || project.name, time);
+    if (!client || !safeId(client.id)) throw new TypeError('Choose an existing client for this project.');
+    project.clientId = client.id; project.client = client.name;
+  }
+  function linkClients(data) {
+    if (data.clients.length > MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
+    for (const project of data.projects) assignClient(data, project);
+    return data;
   }
   function draftFields(raw, base = {}) {
     raw = record(raw);
@@ -96,7 +135,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
   }
   function seedProject(id) {
     const seed = seeds.get(id);
-    return { id, seeded: true, ...profile({ name: seed.name, description: seed.description, originalIds: seed.items?.map(item => item.id) }), drafts: [], createdAt: SEED_TIME, updatedAt: SEED_TIME };
+    return { id, seeded: true, ...profile({ name: seed.name, client: seed.client || seed.name, description: seed.description, originalIds: seed.items?.map(item => item.id) }), drafts: [], createdAt: SEED_TIME, updatedAt: SEED_TIME };
   }
   function normalizeProject(raw) {
     if (!object(raw) || !safeId(raw.id)) throw new TypeError('Invalid project ID.');
@@ -105,24 +144,29 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const drafts = (raw.drafts || []).map(normalizeDraft);
     if (new Set(drafts.map(draft => draft.id)).size !== drafts.length) throw new TypeError('Duplicate draft IDs.');
     const normalized = { id: raw.id, seeded: seeds.has(raw.id), ...profile(raw), drafts, createdAt: stamp(raw.createdAt), updatedAt: stamp(raw.updatedAt) };
-    normalized.originalIds = originalIds([...normalized.originalIds, ...drafts.map(draft => draft.sourceId), ...(seeds.has(raw.id) ? seedProject(raw.id).originalIds : [])]);
+    const untouchedSeed = seeds.has(raw.id) && normalized.updatedAt === SEED_TIME;
+    normalized.originalIds = originalIds([...(untouchedSeed ? [] : normalized.originalIds), ...drafts.map(draft => draft.sourceId), ...(seeds.has(raw.id) ? seedProject(raw.id).originalIds : [])]);
     return normalized;
   }
   function parse(input) {
     const serialized = typeof input === 'string' ? input : JSON.stringify(input);
     if (!fitsBackup(serialized)) throw new RangeError('Project backup must be smaller than 5 MB.');
     const data = JSON.parse(serialized);
-    if (!object(data) || data.version !== VERSION || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
+    if (!object(data) || ![1, VERSION].includes(data.version) || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
     if (data.projects.length > MAX_PROJECTS) throw new RangeError('A backup can hold at most 100 projects.');
+    if ((data.version === VERSION || data.clients !== undefined) && !Array.isArray(data.clients)) throw new TypeError('Invalid client list.');
+    if ((data.clients || []).length > MAX_CLIENTS) throw new RangeError('A backup can hold at most 200 clients.');
+    const clients = (data.clients || []).map(normalizeClient);
+    if (new Set(clients.map(client => client.id)).size !== clients.length) throw new TypeError('Duplicate client IDs.');
     const projects = data.projects.map(normalizeProject);
     if (new Set(projects.map(project => project.id)).size !== projects.length) throw new TypeError('Duplicate project IDs.');
-    return { version: VERSION, projects };
+    return linkClients({ version: VERSION, clients, projects });
   }
   function withSeeds(data) {
     const projects = [...data.projects];
     for (const id of seeds.keys()) if (!projects.some(project => project.id === id)) projects.push(seedProject(id));
     if (projects.length > MAX_PROJECTS) throw new RangeError('This workspace can hold at most 100 projects.');
-    return { version: VERSION, projects };
+    return linkClients({ version: VERSION, clients: [...(data.clients || [])], projects });
   }
   state = withSeeds({ projects: [] });
   if (!storage || typeof storage.getItem !== 'function' || typeof storage.setItem !== 'function') {
@@ -153,25 +197,45 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
   const locateDraft = (project, id) => { const draft = project.drafts.find(item => item.id === id); if (!draft) throw new RangeError('Draft not found.'); return draft; };
   function mutate(projectId, callback) {
     const next = clone(state), project = locateProject(next, projectId);
-    const result = callback(project);
+    const result = callback(project, next);
     project.updatedAt = new Date().toISOString();
     commit(next);
     return clone(result);
   }
   return {
+    getClients: () => clone(state.clients),
+    getClient: id => clone(state.clients.find(client => client.id === id) || null),
+    createClient(fields = {}) {
+      if (state.clients.length >= MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
+      const now = new Date().toISOString(), next = clone(state);
+      const client = { id: freshId('client'), ...clientFields(fields), createdAt: now, updatedAt: now };
+      next.clients.push(client); commit(next);
+      return clone(client);
+    },
+    updateClient(clientId, patch) {
+      const next = clone(state), client = next.clients.find(item => item.id === clientId);
+      if (!client) throw new RangeError('Client not found.');
+      Object.assign(client, clientFields(patch, client), { updatedAt: new Date().toISOString() });
+      for (const project of next.projects) if (project.clientId === clientId && project.client !== client.name) { project.client = client.name; project.updatedAt = client.updatedAt; }
+      commit(next);
+      return clone(client);
+    },
     getProjects: () => clone(state.projects),
     getProject: id => clone(state.projects.find(project => project.id === id) || null),
     getDraft: (projectId, draftId) => clone(state.projects.find(project => project.id === projectId)?.drafts.find(draft => draft.id === draftId) || null),
     createProject(fields = {}) {
       if (state.projects.length >= MAX_PROJECTS) throw new RangeError('This workspace can hold at most 100 projects.');
-      const now = new Date().toISOString();
+      const now = new Date().toISOString(), next = clone(state);
       const project = { id: freshId('project'), seeded: false, ...profile(fields), drafts: [], createdAt: now, updatedAt: now };
-      commit({ version: VERSION, projects: [...clone(state.projects), project] });
+      assignClient(next, project, now);
+      next.projects.push(project); commit(next);
       return clone(project);
     },
     updateProject(projectId, patch) {
-      return mutate(projectId, project => {
+      return mutate(projectId, (project, next) => {
         Object.assign(project, profile(patch, project));
+        if (own(record(patch), 'client') && !own(record(patch), 'clientId')) project.clientId = '';
+        assignClient(next, project, new Date().toISOString());
         project.originalIds = originalIds([...project.originalIds, ...project.drafts.map(draft => draft.sourceId), ...(seeds.has(projectId) ? seedProject(projectId).originalIds : [])]);
         return project;
       });
@@ -217,7 +281,16 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     },
     importData(input) {
       const incoming = parse(input), next = clone(state);
+      const aliases = new Map();
+      for (const imported of incoming.clients) {
+        const existing = next.clients.find(client => client.id === imported.id)
+          || (imported.id.startsWith('client-legacy-') ? next.clients.find(client => clientKey(client.name) === clientKey(imported.name)) : null);
+        if (!existing) { next.clients.push(imported); continue; }
+        aliases.set(imported.id, existing.id);
+        if (existing.updatedAt === SEED_TIME) Object.assign(existing, clientFields(imported), { updatedAt: imported.updatedAt });
+      }
       for (const imported of incoming.projects) {
+        imported.clientId = aliases.get(imported.clientId) || imported.clientId;
         const existing = next.projects.find(project => project.id === imported.id);
         if (!existing) { next.projects.push(imported); continue; }
         if (existing.seeded && existing.updatedAt === SEED_TIME) Object.assign(existing, profile(imported), { updatedAt: imported.updatedAt });

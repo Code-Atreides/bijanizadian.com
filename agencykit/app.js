@@ -89,7 +89,7 @@ function openProjectSignIn(){
 accountDialog.querySelector('[data-cloud-close]').addEventListener('click',()=>accountDialog.close());
 accountDialog.querySelector('form').addEventListener('submit',async event=>{
   event.preventDefault();const button=event.submitter;button.disabled=true;const feedback=accountDialog.querySelector('[data-cloud-feedback]');feedback.textContent='Connecting…';
-  try{const email=accountDialog.querySelector('input').value;if(projectCloud.getState().needsEmail){await projectCloud.finishSignIn(email);accountDialog.close();location.hash='projects';render();}else{await projectCloud.sendLink(email);feedback.textContent='Check your inbox for the sign-in link. You can close this window.';}}catch(error){feedback.textContent=error.message;}finally{button.disabled=false;}
+  try{const email=accountDialog.querySelector('input').value;if(projectCloud.getState().needsEmail){await projectCloud.finishSignIn(email);accountDialog.close();location.hash='clients';render();}else{await projectCloud.sendLink(email);feedback.textContent='Check your inbox for the sign-in link. You can close this window.';}}catch(error){feedback.textContent=error.message;}finally{button.disabled=false;}
 });
 document.addEventListener('click',async event=>{
   const button=event.target.closest('[data-cloud-login],[data-cloud-signout],[data-cloud-retry],[data-cloud-reload],[data-cloud-backup]');if(!button)return;
@@ -98,11 +98,11 @@ document.addEventListener('click',async event=>{
   button.disabled=true;
   try{if(button.hasAttribute('data-cloud-signout'))await projectCloud.signOut();else if(button.hasAttribute('data-cloud-retry'))await projectCloud.retry();else if(button.hasAttribute('data-cloud-reload')){cloudDownload();await projectCloud.loadCloud();notify('Your edits were backed up. The cloud copy is open.');}}catch(error){notify(error.message);}finally{button.disabled=false;}
 });
-projectCloud=createProjectCloud({store:projectStore,setStorageMode:mode=>{projectStorageMode=mode;},notify,onChange:({reload}={})=>{if(reload){projectsUI.reset?.();if(['project','projects'].includes(state.route))render();}paintProjectAccount();}});
+projectCloud=createProjectCloud({store:projectStore,setStorageMode:mode=>{projectStorageMode=mode;},notify,onChange:({reload}={})=>{if(reload){projectsUI.reset?.();if(['client','clients','project','projects'].includes(state.route))render();}paintProjectAccount();}});
 
 function renderNav() {
   $('#library-nav').innerHTML=navLink('All originals','#library','grid',allArchive.length,state.route==='library'&&state.category==='All')+categories.map(category=>navLink(category,`#library/${category.toLowerCase()}`,categoryIcon(category),allArchive.filter(x=>x.category===category).length,state.route==='library'&&state.category===category)).join('');
-  $('#workspace-nav').innerHTML=navLink('Projects','#projects','collection',projectStore.getProjects().length,['projects','project'].includes(state.route))+navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
+  $('#workspace-nav').innerHTML=navLink('Clients','#clients','collection',projectStore.getClients().length,['clients','client','projects','project'].includes(state.route))+navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
   $('#collections-nav').hidden=!state.collections.length;
   $('#collection-links').innerHTML=state.collections.map(c=>navLink(c.name,`#collection/${encodeURIComponent(c.id)}`,'collection',c.items.length,state.collection===c.id)).join('');
 }
@@ -120,14 +120,14 @@ function grid(items) { return `<div class="grid ${state.compact?'compact':''}">$
 
 function render() {
   renderNav();
-  const projectRoute=['projects','project'].includes(state.route);
+  const projectRoute=['clients','client','projects','project'].includes(state.route);
   document.body.classList.toggle('projects-mode',projectRoute);
   $('#projects-workspace').hidden=!projectRoute;
   document.body.classList.toggle('archive-mode',state.route==='archive');
   document.body.classList.toggle('workspace-mode',state.route!=='archive');
   $('#archive-workspace').hidden=state.route!=='archive';
   $('.app-shell').hidden=state.route==='archive'||projectRoute;
-  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route||(projectRoute&&a.dataset.navRoute==='projects'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route||(projectRoute&&a.dataset.navRoute==='clients'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(state.route==='archive'){renderArchive();archiveMotion.sync();return;}
   document.body.classList.remove('archive-home','archive-results');
   archiveMotion.sync();
@@ -220,7 +220,7 @@ function foundations() {return `<div class="foundation-intro"><span class="eyebr
 
 function route() {
   const parts=location.hash.slice(1).split('/');
-  state.route=['library','archive','saved','foundations','collection','projects','project'].includes(parts[0])?parts[0]:'archive';
+  state.route=['library','archive','saved','foundations','collection','clients','client','projects','project'].includes(parts[0])?parts[0]:'archive';
   state.category=state.route==='library'?(categories.find(c=>c.toLowerCase()===parts[1])||'All'):'All';
   state.project=state.route==='archive'&&archiveProjects.some(p=>p.id===parts[1])?parts[1]:null;
   state.collection=state.route==='collection'?parts[1]:null;
@@ -257,11 +257,11 @@ function fillDetails(id) {
   $('#detail-drawer').classList.toggle('showing-skeleton',skeleton);
   const visual=skeleton?`<div class="skeleton-window" inert><iframe src="${previewUrl}&embed=1" title="${escape(source.name)} skeleton layout" tabindex="-1" aria-hidden="true" loading="eager"></iframe></div>`:`<div class="drawer-preview">${preview(source)}<span class="layout-caption">${escape(source.previewCaption||'Original page · captured September 2026')}</span></div>`;
   const status=source.status==='prototype'?'Local prototype':source.status==='protected'?'Protected workspace':source.status==='contextual'?'Context-specific page':'Original page';
-  $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeletonify ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2>${skeleton?'<span class="detail-ready">Skeleton ready</span>':'<span class="detail-ready">'+(source.status==='prototype'?'Prototype':'Original')+'</span>'}</div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary><p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" data-use-project="${escape(source.id)}">Use in project ${icon('arrow')}</button><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Skeletonify'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
+  $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeletonify ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2>${skeleton?'<span class="detail-ready">Skeleton ready</span>':'<span class="detail-ready">'+(source.status==='prototype'?'Prototype':'Original')+'</span>'}</div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary>${source.sourceHost?`<p class="detail-small">Source site · ${escape(source.sourceHost)}</p>`:''}<p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" data-use-project="${escape(source.id)}">Use in project ${icon('arrow')}</button><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Skeletonify'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
 }
 function setBackgroundInert(value){['.app-shell','#archive-workspace','#projects-workspace','.archive-header','#assistant-launcher'].forEach(selector=>$(selector).inert=value);}
 function openDetails(id) {if($('#detail-overlay').hidden)previousFocus=document.activeElement;closeAssistant(false);detailId=id;detailView='original';fillDetails(id);$('#detail-content').scrollTop=0;$('#detail-overlay').hidden=false;document.body.classList.add('modal-open');setBackgroundInert(true);archiveMotion.sync();$('#detail-close').focus();}
-function closeDetails() {if($('#detail-overlay').hidden)return;$('#detail-overlay').hidden=true;document.body.classList.remove('modal-open');setBackgroundInert(false);detailId=null;if(previousFocus?.isConnected&&previousFocus.getClientRects().length)previousFocus.focus();else (state.route==='archive'?$('#archive-search'):['project','projects'].includes(state.route)?$('#projects-workspace'):$('#search')).focus();}
+function closeDetails() {if($('#detail-overlay').hidden)return;$('#detail-overlay').hidden=true;document.body.classList.remove('modal-open');setBackgroundInert(false);detailId=null;if(previousFocus?.isConnected&&previousFocus.getClientRects().length)previousFocus.focus();else (state.route==='archive'?$('#archive-search'):['client','clients','project','projects'].includes(state.route)?$('#projects-workspace'):$('#search')).focus();}
 function openCollection(selectedId=null) {
   $('#collection-form').reset();
   $('#collection-options').innerHTML=allArchive.map(item=>`<label class="pick-block"><input type="checkbox" name="blocks" value="${item.id}" ${selectedId===item.id?'checked':''}><span>${escape(item.name)}</span><small>${item.category}</small></label>`).join('');
@@ -277,7 +277,7 @@ function askGuide(message) {
   const reply=document.createElement('div');reply.className='assistant-message';
   let answer, matches=[];
   if(/archiv|original|past work/i.test(text)){answer='Search all the original pages, open one you like, then choose “Skeletonify”. You can preview the neutral version and download an editable page for another client.';matches=archiveProjects.map(p=>({name:p.name,href:`#archive/${p.id}`}));}
-  else if(/project|client|draft|brand/i.test(text)){answer='Projects keep your client brief, brand, original work, and editable drafts together. Open an original and choose “Use in project”. Save a version when you want a checkpoint, then export the HTML when it is ready to build on.';matches=[{name:'Your projects',href:'#projects'}];}
+  else if(/project|client|draft|brand/i.test(text)){answer='Clients are organized into Current clients and Previous clients. Each client keeps its projects, briefs, branding, original work, and editable drafts together. Open an original and choose “Use in project”. Save a version when you want a checkpoint, then export the HTML when it is ready to build on.';matches=[{name:'Your clients',href:'#clients'}];}
   else if(/skeleton|download|reus|template/i.test(text)){answer='Start with the original work. Open a page, choose “Skeletonify”, then download the self-contained HTML file. The neutral layout and local demo interactions are ready to edit; connect your own data and services for a client launch.';matches=[{name:'Browse original work',href:'#library'}];}
   else if(/curve|corner|round|design|aesthetic/i.test(text)){answer='The kit has a neutral frame with continuous corners in three sizes. Original project previews keep their own colors. The assistant carries the same curved shape; explore it in Foundations.';matches=[{name:'Explore the foundations',href:'#foundations'}];}
   else if(/collect|bundle|shortlist/i.test(text)){answer='A collection is a shortlist for a client or project. Choose “New collection”, give it a name, and select a few starting points. It stays in this browser; it doesn’t generate a site yet.';}
@@ -328,7 +328,7 @@ document.addEventListener('keydown',event=>{
   const typing=['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName);
   const drawerOpen=!$('#detail-overlay').hidden;
   if(!drawerOpen&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openAssistant();}
-  if(event.key==='/'&&!typing&&!drawerOpen){event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#search')).focus();}
+  if(event.key==='/'&&!typing&&!drawerOpen){event.preventDefault();if(['client','clients','project','projects'].includes(state.route)){$('.archive-header a[href="#archive"]').click();$('#archive-search').focus();}else (state.route==='archive'?$('#archive-search'):$('#search')).focus();}
   if(event.key==='Escape'){if(!$('#detail-overlay').hidden)closeDetails();else if(!$('#assistant-panel').hidden)closeAssistant();else if(!$('#search-suggestions').hidden){toggleSuggestions(false);$('#suggestion-toggle').focus({preventScroll:true});}else closeSidebar();}
   if(event.key==='Tab'&&!$('#detail-overlay').hidden&&!$('#collection-modal').open){const focusable=[...$('#detail-drawer').querySelectorAll('button,a[href]')].filter(x=>!x.disabled);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
 });
@@ -336,7 +336,7 @@ document.querySelectorAll('.archive-header a[href="#archive"]').forEach(link=>li
 window.addEventListener('hashchange',route);
 window.addEventListener('popstate',route);
 $('#archive-about').addEventListener('click',()=>$('#about-modal').showModal());
-$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):['project','projects'].includes(state.route)?$('#projects-workspace'):$('#main-content')).focus();});
+$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):['client','clients','project','projects'].includes(state.route)?$('#projects-workspace'):$('#main-content')).focus();});
 await projectCloud.start();
 route();
-if(projectCloud.getState().needsEmail){location.hash='projects';openProjectSignIn();}
+if(projectCloud.getState().needsEmail){location.hash='clients';openProjectSignIn();}

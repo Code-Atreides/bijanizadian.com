@@ -13,18 +13,22 @@ const decode = value => { try { return decodeURIComponent(value || ''); } catch 
 const statuses = ['draft', 'review', 'live'];
 const statusOptions = current => statuses.map(status => `<option value="${status}" ${current === status ? 'selected' : ''}>${status[0].toUpperCase() + status.slice(1)}</option>`).join('');
 const projectStatusOptions = current => ['active','paused','complete'].map(status => `<option value="${status}" ${current === status ? 'selected' : ''}>${status[0].toUpperCase() + status.slice(1)}</option>`).join('');
+const relationshipOptions = current => ['current','previous'].map(value => `<option value="${value}" ${current === value ? 'selected' : ''}>${value === 'current' ? 'Current client' : 'Previous client'}</option>`).join('');
 const field = (label, name, value, options = {}) => `<label class="pu-field"><span>${escape(label)}</span>${options.multiline ? `<textarea name="${name}" rows="${options.rows || 3}" maxlength="${options.max || 1200}" ${options.required ? 'required' : ''}>${escape(value)}</textarea>` : `<input name="${name}" type="${options.type || 'text'}" value="${escape(value)}" maxlength="${options.max || 160}" ${options.required ? 'required' : ''} ${options.placeholder ? `placeholder="${escape(options.placeholder)}"` : ''}>`}${options.hint ? `<small>${escape(options.hint)}</small>` : ''}</label>`;
 
 /** Render project profiles and independent drafts. All persistence belongs to store. */
 export function createProjectsUI({container, store, catalog, onOpenOriginal, onPreviewDraft, onDownloadDraft, onRender = () => {}, notify = () => {}}) {
   const sources = new Map(catalog.map(item => [item.id, item]));
   const draftBuffers = new Map(), projectBuffers = new Map(), linkBuffers = new Map(), tabs = new Map();
-  let routeParts = [], currentProject = null, currentDraft = null, previewRevision = 0, pendingBackup = null;
+  let routeParts = [], currentClient = null, currentProject = null, currentDraft = null, previewRevision = 0, pendingBackup = null;
   const dialog = document.createElement('dialog');
   dialog.className = 'pu-dialog';
   dialog.setAttribute('aria-labelledby', 'pu-dialog-title');
   document.body.append(dialog);
   const routeFor = project => `#project/${encodeURIComponent(project.id)}`;
+  const clientRoute = client => `#client/${encodeURIComponent(client.id)}`;
+  const clientProjects = client => store.getProjects().filter(project => project.clientId === client.id);
+  const projectClient = project => project.clientId ? store.getClient(project.clientId) : null;
   const draftRoute = (project, draft) => `${routeFor(project)}/draft/${encodeURIComponent(draft.id)}`;
   const bufferKey = (projectId, draftId) => `${projectId}/${draftId}`;
   const announce = message => notify(message);
@@ -42,17 +46,43 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     dialog.showModal();
     requestAnimationFrame(() => dialog.querySelector('input:not([type="hidden"]),select,button')?.focus());
   }
-  const dialogHeading = (title, description) => `<div class="pu-dialog-heading"><div><p class="pu-kicker">AGENCYKIT / PROJECTS</p><h2 id="pu-dialog-title">${escape(title)}</h2></div><button class="pu-close" type="button" data-pu-action="close-dialog" aria-label="Close dialog">×</button></div><p class="pu-dialog-copy">${escape(description)}</p>`;
+  const dialogHeading = (title, description) => `<div class="pu-dialog-heading"><div><p class="pu-kicker">AGENCYKIT / CLIENTS</p><h2 id="pu-dialog-title">${escape(title)}</h2></div><button class="pu-close" type="button" data-pu-action="close-dialog" aria-label="Close dialog">×</button></div><p class="pu-dialog-copy">${escape(description)}</p>`;
   const formError = '<p class="pu-error" data-pu-error role="alert"></p>';
-  function showNewProject() {
-    openDialog(`${dialogHeading('A place for the next thing.', 'Keep the brief, brand, and working drafts together.')}<form data-pu-form="new-project">${field('Project name', 'name', '', {required:true, max:120, placeholder:'e.g. Autumn campaign'})}${field('Client', 'client', '', {max:120, placeholder:'Who is this for?'})}${field('A little context', 'description', '', {multiline:true, max:4000})}${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Create project <span aria-hidden="true">↗</span></button></div></form>`);
+  function clientSelector(selected, allowCreate=false) {
+    const clients=store.getClients();
+    return `<label class="pu-field"><span>Client</span><select name="clientId" required>${['current','previous'].map(relationship=>{const group=clients.filter(client=>client.relationship===relationship);return group.length?`<optgroup label="${relationship==='current'?'Current clients':'Previous clients'}">${group.map(client=>`<option value="${escape(client.id)}" ${client.id===selected?'selected':''}>${escape(client.name)}</option>`).join('')}</optgroup>`:'';}).join('')}${allowCreate?`<option value="__new__" ${clients.length?'':'selected'}>Create a new client…</option>`:''}</select></label>`;
+  }
+  const newClientFields=()=>`<fieldset class="pu-new-project-fields" data-pu-new-client-fields hidden disabled><legend>New client</legend>${field('Client name','newClientName','',{max:120})}<label class="pu-field"><span>Client relationship</span><select name="newClientRelationship">${relationshipOptions('current')}</select></label></fieldset>`;
+  function syncDialogFields() {
+    const form=dialog.querySelector('form');if(!form)return;
+    const projectChoice=form.querySelector('[name="projectId"]'), creatingProject=!projectChoice||projectChoice.value==='__new__';
+    const projectFields=form.querySelector('[data-pu-new-project-fields]');
+    if(projectFields){projectFields.hidden=!creatingProject;projectFields.disabled=!creatingProject;projectFields.querySelector('[name="newName"]').required=creatingProject;}
+    const clientChoice=form.querySelector('[name="clientId"]'), creatingClient=creatingProject&&clientChoice?.value==='__new__', clientFields=form.querySelector('[data-pu-new-client-fields]');
+    if(clientFields){clientFields.hidden=!creatingClient;clientFields.disabled=!creatingClient;clientFields.querySelector('[name="newClientName"]').required=creatingClient;}
+  }
+  function showNewClient(client=null) {
+    openDialog(`${dialogHeading(client?'Client details.':'A home for the relationship.',client?'Keep the client name consistent across every project.':'Create a client, then keep their projects together.')}<form data-pu-form="${client?'edit-client':'new-client'}" ${client?`data-client="${escape(client.id)}"`:''}>${field('Client name','name',client?.name||'',{required:true,max:120,placeholder:'e.g. Acme Studio'})}${client?'':`<label class="pu-field"><span>Client relationship</span><select name="relationship">${relationshipOptions('current')}</select></label>`}${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">${client?'Save client':'Create client'} <span aria-hidden="true">↗</span></button></div></form>`);
+  }
+  function showNewProject(clientId=currentClient?.id || currentProject?.clientId || '') {
+    openDialog(`${dialogHeading('A place for the next thing.', 'A project belongs to one client. Keep its brief, brand, and working drafts together.')}<form data-pu-form="new-project">${field('Project name', 'name', '', {required:true, max:120, placeholder:'e.g. Autumn campaign'})}${clientSelector(clientId,true)}${newClientFields()}${field('A little context', 'description', '', {multiline:true, max:4000})}${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Create project <span aria-hidden="true">↗</span></button></div></form>`);
+    syncDialogFields();
+  }
+  function projectCard(project) {
+    const originals = projectOriginals(project), cover = originals.find(source => source.thumbnail) || sources.get(project.drafts?.[0]?.sourceId);
+    return `<a class="pu-project-card" href="${routeFor(project)}"><div class="pu-project-cover">${cover ? picture(cover) : `<span class="pu-large-monogram" aria-hidden="true">${escape(monogram(project.name))}</span>`}<span class="pu-cover-note">${cover ? 'ORIGINAL WORK' : 'ROOM TO BEGIN'}</span></div><div class="pu-project-card-body"><div class="pu-project-name"><span class="pu-monogram" aria-hidden="true">${escape(monogram(project.name))}</span><div><h2>${escape(project.name)}</h2><p>${escape(project.client || 'Client project')}</p></div><span class="pu-card-arrow" aria-hidden="true">↗</span></div><p class="pu-project-description">${escape(project.description || 'A new home for the work you want to make.')}</p><div class="pu-project-meta"><span>${originals.length} original${originals.length===1?'':'s'} <i>·</i> ${project.drafts?.length||0} draft${project.drafts?.length===1?'':'s'}</span><span class="pu-status">${escape(project.status || 'active')}</span></div></div></a>`;
+  }
+  function clientCard(client) {
+    const projects=clientProjects(client), originals=projects.flatMap(projectOriginals), cover=originals.find(source=>source.thumbnail), drafts=projects.reduce((sum,project)=>sum+(project.drafts?.length||0),0);
+    return `<a class="pu-project-card pu-client-card" href="${clientRoute(client)}"><div class="pu-project-cover">${cover?picture(cover):`<span class="pu-large-monogram" aria-hidden="true">${escape(monogram(client.name))}</span>`}<span class="pu-cover-note">${cover?'FROM THEIR PROJECTS':'ROOM TO BEGIN'}</span></div><div class="pu-project-card-body"><div class="pu-project-name"><span class="pu-monogram" aria-hidden="true">${escape(monogram(client.name))}</span><div><h3>${escape(client.name)}</h3><p>${projects.length} project${projects.length===1?'':'s'} <i>·</i> ${drafts} draft${drafts===1?'':'s'}</p></div><span class="pu-card-arrow" aria-hidden="true">↗</span></div><p class="pu-client-projects">${projects.length?projects.slice(0,3).map(project=>escape(project.name)).join('<span aria-hidden="true"> / </span>')+(projects.length>3?` <span>+${projects.length-3} more</span>`:''):'Start with their first project.'}</p></div></a>`;
   }
   function directory() {
-    const projects = store.getProjects();
-    return `<div class="pu-directory"><header class="pu-directory-heading"><div><p class="pu-kicker">A HOME FOR WHAT COMES NEXT</p><h1>Your projects<span>.</span></h1><p class="pu-lead">Original work, new directions, and the details that hold them together.</p></div><button class="pu-button pu-button-primary" data-pu-action="new-project">New project <span aria-hidden="true">+</span></button></header><div class="pu-account-bar" data-project-account></div><div class="pu-project-grid">${projects.map(project => {
-      const originals = projectOriginals(project), cover = originals.find(source => source.thumbnail) || sources.get(project.drafts?.[0]?.sourceId);
-      return `<a class="pu-project-card" href="${routeFor(project)}"><div class="pu-project-cover">${cover ? picture(cover) : `<span class="pu-large-monogram" aria-hidden="true">${escape(monogram(project.name))}</span>`}<span class="pu-cover-note">${cover ? 'ORIGINAL WORK' : 'ROOM TO BEGIN'}</span></div><div class="pu-project-card-body"><div class="pu-project-name"><span class="pu-monogram" aria-hidden="true">${escape(monogram(project.name))}</span><div><h2>${escape(project.name)}</h2><p>${escape(project.client || 'Independent project')}</p></div><span class="pu-card-arrow" aria-hidden="true">↗</span></div><p class="pu-project-description">${escape(project.description || 'A new home for the work you want to make.')}</p><div class="pu-project-meta"><span>${originals.length} original${originals.length === 1 ? '' : 's'} <i>·</i> ${project.drafts?.length || 0} draft${project.drafts?.length === 1 ? '' : 's'}</span><span class="pu-status">${escape(project.status || 'draft')}</span></div></div></a>`;
-    }).join('')}</div><footer class="pu-directory-footer"><div class="pu-backup-actions"><span>Keep a copy of your workspace.</span><button data-pu-action="export-backup">Export backup</button><button data-pu-action="choose-backup">Import backup</button><input type="file" data-pu-backup accept="application/json,.json" hidden></div></footer></div>`;
+    const clients=store.getClients();
+    return `<div class="pu-directory"><header class="pu-directory-heading"><div><p class="pu-kicker">THE PEOPLE BEHIND THE WORK</p><h1>Your clients<span>.</span></h1><p class="pu-lead">Each relationship, with its projects kept together.</p></div><button class="pu-button pu-button-primary" data-pu-action="new-client">New client <span aria-hidden="true">+</span></button></header><div class="pu-account-bar" data-project-account></div>${['current','previous'].map(relationship=>{const group=clients.filter(client=>client.relationship===relationship);return `<section class="pu-client-section" aria-labelledby="pu-${relationship}-clients"><div class="pu-section-heading"><h2 id="pu-${relationship}-clients">${relationship==='current'?'Current clients':'Previous clients'} <span>${group.length}</span></h2></div>${group.length?`<div class="pu-project-grid">${group.map(clientCard).join('')}</div>`:`<div class="pu-clients-empty"><p>${relationship==='current'?'No current clients yet.':'No previous clients yet.'}</p><span>${relationship==='current'?'Add a client to give their projects a home.':'When a relationship moves on, keep its projects here.'}</span></div>`}</section>`;}).join('')}<footer class="pu-directory-footer"><div class="pu-backup-actions"><span>Keep a copy of your workspace.</span><button data-pu-action="export-backup">Export backup</button><button data-pu-action="choose-backup">Import backup</button><input type="file" data-pu-backup accept="application/json,.json" hidden></div></footer></div>`;
+  }
+  function clientProfile(client) {
+    const projects=clientProjects(client), previous=client.relationship==='previous';
+    return `<div class="pu-profile pu-client-profile"><a class="pu-back" href="#clients"><span aria-hidden="true">←</span> All clients</a><header class="pu-profile-heading"><span class="pu-profile-monogram" aria-hidden="true">${escape(monogram(client.name))}</span><div><p class="pu-kicker">CLIENT PROFILE <span class="pu-status">${previous?'Previous client':'Current client'}</span></p><h1>${escape(client.name)}<span>.</span></h1><p class="pu-lead">${projects.length} project${projects.length===1?'':'s'}, with their original work, brand, and working drafts.</p></div></header><div class="pu-account-bar" data-project-account></div><div class="pu-client-management"><p>Client relationship <span>${previous?'Previous':'Current'}</span></p><div><button type="button" class="pu-text-link" data-pu-action="edit-client">Edit client name</button><button type="button" class="pu-button" data-pu-action="client-relationship" data-relationship="${previous?'current':'previous'}">Move to ${previous?'current':'previous'} clients <span aria-hidden="true">↗</span></button></div><small>Project progress stays as it is. You can move this client back at any time.</small></div><section class="pu-client-project-section"><div class="pu-section-heading"><div><p class="pu-kicker">THE WORK TOGETHER</p><h2>Projects <span>${projects.length}</span></h2></div><button type="button" class="pu-button pu-button-primary" data-pu-action="new-project">New project <span aria-hidden="true">+</span></button></div>${projects.length?`<div class="pu-project-grid">${projects.map(projectCard).join('')}</div>`:'<div class="pu-empty"><span class="pu-empty-mark" aria-hidden="true">+</span><h3>The first project starts here.</h3><p>Create a project, then bring in original work to make something new.</p><button type="button" class="pu-button" data-pu-action="new-project">Create a project ↗</button></div>'}</section></div>`;
   }
   function originalCard(source) {
     return `<article class="pu-original-card"><button type="button" class="pu-original-preview" data-pu-action="open-original" data-source="${escape(source.id)}" aria-label="Open original ${escape(source.name)}">${picture(source)}<span>View original <i aria-hidden="true">↗</i></span></button><div class="pu-original-caption"><button type="button" data-pu-action="open-original" data-source="${escape(source.id)}">${escape(source.name)}</button><span>${escape(source.category)} <i>·</i> ${source.status === 'prototype' ? 'Prototype' : 'Original'}</span></div></article>`;
@@ -65,7 +95,7 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     const model = projectBuffers.get(project.id) || project;
     const brand = model.brand || {}, brief = model.brief || {};
     const fonts = ['system', 'editorial', 'modern'];
-    return `<form data-pu-form="project-brand" class="pu-profile-form"><section class="pu-form-section"><div><p class="pu-kicker">THE BASICS</p><h2>Project details.</h2><p>A little context makes the next decision easier.</p></div><div class="pu-field-grid">${field('Project name', 'name', model.name, {required:true, max:120})}${field('Client', 'client', model.client, {max:120})}${field('Description', 'description', model.description, {multiline:true, max:4000})}<label class="pu-field"><span>Status</span><select name="status">${projectStatusOptions(model.status)}</select></label></div></section><section class="pu-form-section"><div><p class="pu-kicker">A FAMILIAR FEELING</p><h2>Brand.</h2><p>These choices carry through to every draft in this project.</p></div><div class="pu-field-grid"><div class="pu-color-fields">${[['Accent','accent','#c7c7c2'],['Background','bg','#f7f7f2'],['Text','ink','#262623']].map(([label,key,fallback])=>`<label class="pu-field pu-color-field"><span>${label}</span><input type="color" name="brand-${key}" value="${/^#[a-f\d]{6}$/i.test(brand[key] || '') ? escape(brand[key]) : fallback}"></label>`).join('')}</div><label class="pu-field"><span>Typeface</span><select name="brand-font">${fonts.map(font=>`<option value="${escape(font)}" ${brand.font===font?'selected':''}>${escape(({system:'System sans',editorial:'Editorial serif',modern:'Modern sans'})[font]||font)}</option>`).join('')}</select></label><div class="pu-logo-field"><span>Logo</span><div class="pu-logo-preview" data-pu-logo-preview>${brand.logo?`<img src="${escape(brand.logo)}" alt="Project logo">`:'<span>No logo added</span>'}</div><input type="hidden" name="brand-logo" value="${escape(brand.logo || '')}"><label class="pu-logo-upload">Choose image<input type="file" data-pu-logo-file accept="image/png,image/jpeg,image/webp"></label><button type="button" class="pu-text-link" data-pu-action="remove-logo" ${brand.logo?'':'hidden'}>Remove logo</button><small>PNG, JPEG, or WebP · up to 130 KB. Included in exported drafts.</small></div></div></section><section class="pu-form-section"><div><p class="pu-kicker">THE BRIEF</p><h2>What are we making?</h2><p>A shared point of reference for the work.</p></div><div class="pu-field-grid">${field('Audience', 'brief-audience', brief.audience, {multiline:true, rows:2, max:1000})}${field('Goal', 'brief-goal', brief.goal, {multiline:true, rows:3, max:1600})}${field('Tone', 'brief-tone', brief.tone, {max:500, placeholder:'e.g. Warm, direct, quietly confident'})}</div></section><div class="pu-form-footer"><p class="pu-save-state" data-pu-save-state role="status">${projectBuffers.has(project.id)?'Unsaved changes':'Brand shared across this project.'}</p>${formError}<button class="pu-button pu-button-primary" type="submit">Save project <span aria-hidden="true">↗</span></button></div></form>`;
+    return `<form data-pu-form="project-brand" class="pu-profile-form"><section class="pu-form-section"><div><p class="pu-kicker">THE BASICS</p><h2>Project details.</h2><p>A little context makes the next decision easier.</p></div><div class="pu-field-grid">${field('Project name', 'name', model.name, {required:true, max:120})}${clientSelector(model.clientId)}${field('Description', 'description', model.description, {multiline:true, max:4000})}<label class="pu-field"><span>Project status</span><select name="status">${projectStatusOptions(model.status)}</select></label></div></section><section class="pu-form-section"><div><p class="pu-kicker">A FAMILIAR FEELING</p><h2>Brand.</h2><p>These choices carry through to every draft in this project.</p></div><div class="pu-field-grid"><div class="pu-color-fields">${[['Accent','accent','#c7c7c2'],['Background','bg','#f7f7f2'],['Text','ink','#262623']].map(([label,key,fallback])=>`<label class="pu-field pu-color-field"><span>${label}</span><input type="color" name="brand-${key}" value="${/^#[a-f\d]{6}$/i.test(brand[key] || '') ? escape(brand[key]) : fallback}"></label>`).join('')}</div><label class="pu-field"><span>Typeface</span><select name="brand-font">${fonts.map(font=>`<option value="${escape(font)}" ${brand.font===font?'selected':''}>${escape(({system:'System sans',editorial:'Editorial serif',modern:'Modern sans'})[font]||font)}</option>`).join('')}</select></label><div class="pu-logo-field"><span>Logo</span><div class="pu-logo-preview" data-pu-logo-preview>${brand.logo?`<img src="${escape(brand.logo)}" alt="Project logo">`:'<span>No logo added</span>'}</div><input type="hidden" name="brand-logo" value="${escape(brand.logo || '')}"><label class="pu-logo-upload">Choose image<input type="file" data-pu-logo-file accept="image/png,image/jpeg,image/webp"></label><button type="button" class="pu-text-link" data-pu-action="remove-logo" ${brand.logo?'':'hidden'}>Remove logo</button><small>PNG, JPEG, or WebP · up to 130 KB. Included in exported drafts.</small></div></div></section><section class="pu-form-section"><div><p class="pu-kicker">THE BRIEF</p><h2>What are we making?</h2><p>A shared point of reference for the work.</p></div><div class="pu-field-grid">${field('Audience', 'brief-audience', brief.audience, {multiline:true, rows:2, max:1000})}${field('Goal', 'brief-goal', brief.goal, {multiline:true, rows:3, max:1600})}${field('Tone', 'brief-tone', brief.tone, {max:500, placeholder:'e.g. Warm, direct, quietly confident'})}</div></section><div class="pu-form-footer"><p class="pu-save-state" data-pu-save-state role="status">${projectBuffers.has(project.id)?'Unsaved changes':'Brand shared across this project.'}</p>${formError}<button class="pu-button pu-button-primary" type="submit">Save project <span aria-hidden="true">↗</span></button></div></form>`;
   }
   function linksPanel(project) {
     const links = linkBuffers.get(project.id) || project.links || {};
@@ -73,7 +103,8 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
   }
   function profile(project) {
     const tab = tabs.get(project.id) || 'work';
-    return `<div class="pu-profile"><a class="pu-back" href="#projects"><span aria-hidden="true">←</span> All projects</a><header class="pu-profile-heading"><span class="pu-profile-monogram" aria-hidden="true">${escape(monogram(project.name))}</span><div><p class="pu-kicker">${escape(project.client || 'PROJECT PROFILE')} <span class="pu-status">${escape(project.status)}</span></p><h1>${escape(project.name)}<span>.</span></h1><p class="pu-lead">${escape(project.description || 'A place for the work, and whatever comes next.')}</p></div></header><div class="pu-account-bar" data-project-account></div><nav class="pu-tabs" role="tablist" aria-label="Project sections">${[['work','Work'],['brand','Brand & brief'],['links','Links']].map(([key,label])=>`<button type="button" role="tab" id="pu-tab-${key}" aria-controls="pu-profile-panel" aria-selected="${tab===key}" tabindex="${tab===key?0:-1}" data-pu-tab="${key}">${label}</button>`).join('')}</nav><div id="pu-profile-panel" role="tabpanel" aria-labelledby="pu-tab-${tab}">${tab==='brand'?brandPanel(project):tab==='links'?linksPanel(project):workPanel(project)}</div><footer class="pu-profile-footer"><span>${dateLabel(project.updatedAt)?`Updated ${escape(dateLabel(project.updatedAt))}`:'From the archive'}</span></footer></div>`;
+    const client = projectClient(project);
+    return `<div class="pu-profile"><a class="pu-back" href="${client?clientRoute(client):'#clients'}"><span aria-hidden="true">←</span> ${client?escape(client.name):'All clients'}</a><header class="pu-profile-heading"><span class="pu-profile-monogram" aria-hidden="true">${escape(monogram(project.name))}</span><div><p class="pu-kicker">${escape(project.client || 'PROJECT PROFILE')} <span class="pu-status">${escape(project.status)}</span></p><h1>${escape(project.name)}<span>.</span></h1><p class="pu-lead">${escape(project.description || 'A place for the work, and whatever comes next.')}</p></div></header><div class="pu-account-bar" data-project-account></div><nav class="pu-tabs" role="tablist" aria-label="Project sections">${[['work','Work'],['brand','Brand & brief'],['links','Links']].map(([key,label])=>`<button type="button" role="tab" id="pu-tab-${key}" aria-controls="pu-profile-panel" aria-selected="${tab===key}" tabindex="${tab===key?0:-1}" data-pu-tab="${key}">${label}</button>`).join('')}</nav><div id="pu-profile-panel" role="tabpanel" aria-labelledby="pu-tab-${tab}">${tab==='brand'?brandPanel(project):tab==='links'?linksPanel(project):workPanel(project)}</div><footer class="pu-profile-footer"><span>${dateLabel(project.updatedAt)?`Updated ${escape(dateLabel(project.updatedAt))}`:'From the archive'}</span></footer></div>`;
   }
   function draftEditor(project, savedDraft) {
     const draft = draftBuffers.get(bufferKey(project.id, savedDraft.id)) || savedDraft;
@@ -88,7 +119,7 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
   }
   function brandFromForm(form) {
     const data = new FormData(form);
-    return {...currentProject,name:String(data.get('name')||''),client:String(data.get('client')||''),description:String(data.get('description')||''),status:String(data.get('status')||'draft'),brand:Object.fromEntries(['accent','bg','ink','font','logo'].map(key=>[key,String(data.get(`brand-${key}`)||'')])),brief:Object.fromEntries(['audience','goal','tone'].map(key=>[key,String(data.get(`brief-${key}`)||'')]))};
+    return {...currentProject,name:String(data.get('name')||''),clientId:String(data.get('clientId')||''),description:String(data.get('description')||''),status:String(data.get('status')||'active'),brand:Object.fromEntries(['accent','bg','ink','font','logo'].map(key=>[key,String(data.get(`brand-${key}`)||'')])),brief:Object.fromEntries(['audience','goal','tone'].map(key=>[key,String(data.get(`brief-${key}`)||'')]))};
   }
   function validateUrl(value, label) { if (value && !safeUrl(value)) throw new Error(`${label} must be an http or https URL without credentials.`); }
   function validateDraft(draft) { validateUrl(draft.liveUrl,'Live URL');if(draft.status==='live'&&!draft.liveUrl)throw new Error('Add the published page URL before marking this draft live.'); }
@@ -114,15 +145,17 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
   }
   function render(parts = location.hash.slice(1).split('/')) {
     routeParts = Array.isArray(parts) ? parts : String(parts).replace(/^#/,'').split('/');
-    const active = ['projects','project'].includes(routeParts[0]);
+    const active = ['clients','client','projects','project'].includes(routeParts[0]);
     container.hidden = !active;
     container.classList.add('projects-space');
     document.body.classList.toggle('projects-mode',active);
-    if (!active) { currentProject=null;currentDraft=null;return false; }
+    if (!active) { currentClient=null;currentProject=null;currentDraft=null;return false; }
+    currentClient = routeParts[0]==='client'?store.getClient(decode(routeParts[1])):null;
     currentProject = routeParts[0]==='project'?store.getProject(decode(routeParts[1])):null;
     currentDraft = currentProject && routeParts[2]==='draft'?store.getDraft(currentProject.id,decode(routeParts[3])):null;
-    if (routeParts[0]==='projects') container.innerHTML=directory();
-    else if (!currentProject || (routeParts[2]==='draft'&&!currentDraft)) container.innerHTML='<div class="pu-empty pu-missing"><h1>This project is not here.</h1><p>It may belong to another browser or backup.</p><a class="pu-button" href="#projects">Back to projects ↗</a></div>';
+    if (['clients','projects'].includes(routeParts[0])) container.innerHTML=directory();
+    else if(routeParts[0]==='client')container.innerHTML=currentClient?clientProfile(currentClient):'<div class="pu-empty pu-missing"><h1>This client is not here.</h1><p>It may belong to another workspace or backup.</p><a class="pu-button" href="#clients">Back to clients ↗</a></div>';
+    else if (!currentProject || (routeParts[2]==='draft'&&!currentDraft)) container.innerHTML='<div class="pu-empty pu-missing"><h1>This project is not here.</h1><p>It may belong to another workspace or backup.</p><a class="pu-button" href="#clients">Back to clients ↗</a></div>';
     else container.innerHTML=currentDraft?draftEditor(currentProject,currentDraft):profile(currentProject);
     if(currentDraft)updatePreview();
     onRender();
@@ -132,8 +165,17 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     const source=sources.get(sourceId);
     if(!source){announce('This original is no longer in the catalog.');return;}
     const projects=store.getProjects();
-    openDialog(`${dialogHeading('Use in a project.', `Start an independent draft from ${source.name}. The original will stay as it is.`)}<form data-pu-form="use-original" data-source="${escape(sourceId)}"><label class="pu-field"><span>Project</span><select name="projectId">${projects.map(project=>`<option value="${escape(project.id)}">${escape(project.name)}${project.client?` · ${escape(project.client)}`:''}</option>`).join('')}<option value="__new__" ${projects.length?'':'selected'}>Create a new project…</option></select></label><fieldset class="pu-new-project-fields" ${projects.length?'hidden':''}><legend>New project</legend>${field('Project name','newName','',{max:120})}${field('Client','newClient','',{max:120})}</fieldset>${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Create draft <span aria-hidden="true">↗</span></button></div></form>`);
-    dialog.querySelector('[name="newName"]').required=!projects.length;
+    const clients=store.getClients();
+    const groups=clients.map(client=>{const contained=projects.filter(project=>project.clientId===client.id);return contained.length?`<optgroup label="${escape(client.name)} · ${client.relationship==='previous'?'Previous client':'Current client'}">${contained.map(project=>`<option value="${escape(project.id)}" ${project.id===currentProject?.id?'selected':''}>${escape(project.name)}</option>`).join('')}</optgroup>`:'';}).join('');
+    openDialog(`${dialogHeading('Use in a project.', `Start an independent draft from ${source.name}. The original will stay as it is.`)}<form data-pu-form="use-original" data-source="${escape(sourceId)}"><label class="pu-field"><span>Project, grouped by client</span><select name="projectId">${groups}<option value="__new__" ${projects.length?'':'selected'}>Create a new project…</option></select></label><fieldset class="pu-new-project-fields" data-pu-new-project-fields ${projects.length?'hidden disabled':''}><legend>New project</legend>${field('Project name','newName','',{max:120})}${clientSelector(currentProject?.clientId||currentClient?.id||'',true)}${newClientFields()}</fieldset>${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Create draft <span aria-hidden="true">↗</span></button></div></form>`);
+    syncDialogFields();
+  }
+  function requireName(value,label){const name=String(value||'').trim();if(!name)throw new Error(`Add a ${label.toLowerCase()} to continue.`);return name;}
+  function clientFromForm(data){
+    const id=String(data.get('clientId')||'');
+    if(id==='__new__')return store.createClient({name:requireName(data.get('newClientName'),'Client name'),relationship:String(data.get('newClientRelationship')||'current')}).id;
+    if(!store.getClient(id))throw new Error('Choose an existing client.');
+    return id;
   }
   function downloadBackup() {
     const data=store.exportData(), blob=new Blob([typeof data==='string'?data:JSON.stringify(data,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), link=document.createElement('a');
@@ -147,6 +189,9 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     try {
       if(action==='close-dialog')dialog.close();
       else if(action==='new-project')showNewProject();
+      else if(action==='new-client')showNewClient();
+      else if(action==='edit-client'&&currentClient)showNewClient(currentClient);
+      else if(action==='client-relationship'&&currentClient){store.updateClient(currentClient.id,{relationship:button.dataset.relationship});render(routeParts);announce(`Client moved to ${button.dataset.relationship} clients.`);}
       else if(action==='open-original')onOpenOriginal?.(button.dataset.source);
       else if(action==='export-backup')downloadBackup();
       else if(action==='choose-backup')container.querySelector('[data-pu-backup]')?.click();
@@ -169,21 +214,26 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     const form=event.target.closest('[data-pu-form]');if(!form)return;
     event.preventDefault();const data=new FormData(form);
     try {
-      if(form.dataset.puForm==='new-project'){
-        const project=store.createProject({name:String(data.get('name')||'').trim(),client:String(data.get('client')||'').trim(),description:String(data.get('description')||'').trim()});dialog.close();location.hash=routeFor(project);announce('Project created.');
+      if(form.dataset.puForm==='new-client'){
+        const client=store.createClient({name:requireName(data.get('name'),'Client name'),relationship:String(data.get('relationship')||'current')});dialog.close();location.hash=clientRoute(client);announce('Client created.');
+      } else if(form.dataset.puForm==='edit-client'){
+        store.updateClient(form.dataset.client,{name:requireName(data.get('name'),'Client name')});dialog.close();render(routeParts);announce('Client name saved across their projects.');
+      } else if(form.dataset.puForm==='new-project'){
+        const name=requireName(data.get('name'),'Project name'), clientId=clientFromForm(data);
+        const project=store.createProject({name,clientId,description:String(data.get('description')||'').trim()});dialog.close();location.hash=routeFor(project);announce('Project created.');
       } else if(form.dataset.puForm==='use-original'){
         let projectId=String(data.get('projectId')||'');
-        if(projectId==='__new__')projectId=store.createProject({name:String(data.get('newName')||'').trim(),client:String(data.get('newClient')||'').trim()}).id;
+        if(projectId==='__new__'){const name=requireName(data.get('newName'),'Project name'),clientId=clientFromForm(data);projectId=store.createProject({name,clientId}).id;}
         const project=store.getProject(projectId), draft=store.createDraft(projectId,form.dataset.source);dialog.close();location.hash=draftRoute(project,draft);announce('An independent draft is ready.');
       } else if(form.dataset.puForm==='draft'){
         if(savedDraftFromForm()){render(routeParts);announce('Draft saved.');}
       } else if(form.dataset.puForm==='project-brand'){
         const project=brandFromForm(form);
-        store.updateProject(currentProject.id,{name:project.name,client:project.client,description:project.description,status:project.status,brand:project.brand,brief:project.brief});projectBuffers.delete(currentProject.id);render(routeParts);announce('Project and brand saved.');
+        store.updateProject(currentProject.id,{name:requireName(project.name,'Project name'),clientId:project.clientId,description:project.description,status:project.status,brand:project.brand,brief:project.brief});projectBuffers.delete(currentProject.id);render(routeParts);announce('Project and brand saved.');
       } else if(form.dataset.puForm==='project-links'){
         const links=Object.fromEntries(['website','repo','files'].map(key=>[key,String(data.get(key)||'').trim()]));Object.entries(links).forEach(([key,value])=>validateUrl(value,key));store.updateProject(currentProject.id,{links});linkBuffers.delete(currentProject.id);render(routeParts);announce('Project links saved.');
       } else if(form.dataset.puForm==='import-backup'){
-        store.importData(pendingBackup);pendingBackup=null;dialog.close();render(['projects']);if(location.hash!=='#projects')location.hash='#projects';announce('Project backup merged.');
+        store.importData(pendingBackup);pendingBackup=null;dialog.close();render(['clients']);if(location.hash!=='#clients')location.hash='#clients';announce('Client and project backup merged.');
       }
     } catch(error){report(error,form);}
   }
@@ -224,16 +274,16 @@ export function createProjectsUI({container, store, catalog, onOpenOriginal, onP
     try {
       if(file.size>5*1024*1024)throw new Error('Choose a project backup smaller than 5 MB.');
       const text=await file.text();JSON.parse(text);pendingBackup=text;
-      openDialog(`${dialogHeading('Merge a project backup.', `Add projects, brands, drafts, and versions from ${file.name}.`)}<form data-pu-form="import-backup"><p class="pu-dialog-copy">Your existing edits stay in place. New projects, drafts, and saved versions from this backup are added.</p>${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Merge backup <span aria-hidden="true">↗</span></button></div></form>`);
+      openDialog(`${dialogHeading('Merge a workspace backup.', `Add clients, projects, brands, drafts, and versions from ${file.name}.`)}<form data-pu-form="import-backup"><p class="pu-dialog-copy">Your existing edits stay in place. New clients, projects, drafts, and saved versions from this backup are added.</p>${formError}<div class="pu-dialog-actions"><button type="button" class="pu-button" data-pu-action="close-dialog">Cancel</button><button class="pu-button pu-button-primary" type="submit">Merge backup <span aria-hidden="true">↗</span></button></div></form>`);
     }catch(error){announce(errorText(error));}
   });
   container.addEventListener('submit',handleSubmit);
   dialog.addEventListener('click',handleClick);
   dialog.addEventListener('submit',handleSubmit);
   dialog.addEventListener('change',event=>{
-    if(event.target.name!=='projectId')return;
-    const creating=event.target.value==='__new__', fields=dialog.querySelector('.pu-new-project-fields');fields.hidden=!creating;fields.querySelector('[name="newName"]').required=creating;
-    if(creating)fields.querySelector('input')?.focus();
+    if(!['projectId','clientId'].includes(event.target.name))return;
+    syncDialogFields();
+    if(event.target.value==='__new__')dialog.querySelector(event.target.name==='projectId'?'[name="newName"]':'[name="newClientName"]')?.focus();
   });
   return {render,openUse,close(){if(dialog.open)dialog.close();},reset(){draftBuffers.clear();projectBuffers.clear();linkBuffers.clear();tabs.clear();pendingBackup=null;previewRevision++;if(dialog.open)dialog.close();}};
 }

@@ -38,6 +38,24 @@ body.projects-mode .assistant-launcher{display:none}
 .pu-project-name p{margin:4px 0 0;font-size:10px;color:#77777c;overflow-wrap:anywhere}
 .pu-card-arrow{color:#696970;align-self:flex-start;margin-top:3px;font-size:17px}
 .pu-project-description{margin:22px 0 23px;color:#86868c;line-height:1.75;font-size:11px;min-height:39px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pu-client-section+.pu-client-section{margin-top:51px}
+.pu-client-section>.pu-section-heading{padding-bottom:15px;border-bottom:1px solid #ffffff0c;margin-bottom:23px}
+.pu-client-section>.pu-section-heading h2{font-size:23px}
+.pu-client-card .pu-project-name h3{font-size:21px;letter-spacing:-.6px;overflow-wrap:anywhere}
+.pu-client-card .pu-project-name p i{font-style:normal;color:#4f4f58;margin-inline:4px}
+.pu-client-projects{font-size:10px;line-height:1.8;color:#8d8d97;margin:21px 0 0;overflow-wrap:anywhere}
+.pu-client-projects>span{color:#53535e;margin-inline:3px}
+.pu-clients-empty{padding:25px 28px;border:1px dashed #ffffff13;border-radius:21px;background:#ffffff01}
+.pu-clients-empty p{margin:0 0 5px;font-size:12px;color:#93939d}
+.pu-clients-empty>span{font-size:10px;line-height:1.7;color:#63636f}
+.pu-client-management{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:15px 24px;padding:21px 0 24px;margin:0 0 38px;border-block:1px solid #ffffff0c}
+.pu-client-management>p{margin:0;color:#676773;font-size:10px}
+.pu-client-management>p>span{color:#b9b9c1;margin-left:12px}
+.pu-client-management>div{display:flex;align-items:center;gap:21px;flex-wrap:wrap}
+.pu-client-management .pu-button{min-height:34px;padding:9px 12px;font-size:9px!important;gap:13px}
+.pu-client-management>small{font-size:9px;line-height:1.7;color:#60606d;flex-basis:100%}
+.pu-client-project-section>.pu-section-heading{align-items:center;margin-bottom:26px}
+.pu-new-project-fields .pu-new-project-fields{margin-top:3px;padding-top:17px}
 .pu-project-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:9px;color:#6f6f75;flex-wrap:wrap}
 .pu-project-meta i,.pu-original-caption i{font-style:normal;margin:0 5px;color:#515157}
 .pu-status{display:inline-flex;align-items:center;gap:5px;border:1px solid #ffffff13;border-radius:99px;padding:4px 8px;color:#a5a5a7;font-size:8px;line-height:1;text-transform:capitalize;letter-spacing:.1px;white-space:nowrap}
@@ -193,3 +211,4 @@ body.projects-mode .assistant-launcher{display:none}
 @media(prefers-reduced-motion:reduce){.pu-project-card,.pu-button,.pu-original-preview,.pu-draft-card,.pu-original-preview>span{transition:none}.pu-project-card:hover{transform:none}}
 @media(max-width:550px){.pu-account-bar{margin:-6px 0 28px}.project-account-dialog{padding:24px!important}.project-account-dialog input{font-size:16px}.archive-header{padding-inline:16px;gap:9px}.archive-header nav{gap:10px}.archive-header nav a,.archive-header nav button{font-size:9px}.archive-header .archive-brand{font-size:17px}.archive-header .archive-brand-mark{display:none}}
 @media(max-width:360px){.archive-header{padding-inline:13px;gap:7px}.archive-header nav{gap:8px}.archive-header nav a,.archive-header nav button{font-size:8px}.archive-header .archive-brand{font-size:16px}}
+@media(max-width:550px){.pu-client-section+.pu-client-section{margin-top:36px}.pu-client-section>.pu-section-heading h2{font-size:22px}.pu-clients-empty{padding:21px;border-radius:18px}.pu-clients-empty>span{font-size:9px}.pu-client-management{gap:17px;margin-bottom:30px}.pu-client-management>div{width:100%;gap:17px}.pu-client-management>small{font-size:8px}.pu-client-project-section>.pu-section-heading{gap:17px}.pu-client-project-section>.pu-section-heading>.pu-button{min-height:35px;padding:10px 12px;gap:17px;font-size:9px!important}}

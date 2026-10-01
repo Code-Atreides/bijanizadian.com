@@ -1,10 +1,11 @@
 // Original work and verified original-interface previews, September 2026.
 // Internal previews use original access screens or explicitly fictional sample data.
+// Client grouping is curated independently from each original sourceHost/sourceUrl.
 export const archiveProjects = [
   {
     "id": "fomo",
     "name": "fomo",
-    "description": "Campus experiences, chapter journeys, and the Irrigation workspace.",
+    "description": "Campus experiences, chapter journeys, original pages, and the tools behind fomo.",
     "items": [
       {
         "id": "fomo-campus",
@@ -58,7 +59,8 @@ export const archiveProjects = [
             "recruit campus ambassadors",
             "choose a campus pathway"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-greek-wars",
@@ -113,7 +115,8 @@ export const archiveProjects = [
             "show campus standings",
             "explain prizes and qualification"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-clan",
@@ -167,7 +170,8 @@ export const archiveProjects = [
             "track member signup progress",
             "guide members into the app"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-clan-claim",
@@ -219,7 +223,8 @@ export const archiveProjects = [
             "create a chapter member link",
             "collect chapter contact details"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-onboard",
@@ -269,7 +274,8 @@ export const archiveProjects = [
             "onboard a fraternity",
             "collect chapter and school details"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-refer",
@@ -318,7 +324,8 @@ export const archiveProjects = [
             "refer a fraternity",
             "copy a shareable invitation"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-dinners",
@@ -370,7 +377,8 @@ export const archiveProjects = [
             "explain a sponsored dinner program",
             "host a campus event"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-dinner-application",
@@ -419,7 +427,8 @@ export const archiveProjects = [
             "collect event host applications",
             "one question at a time"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-campus-visit",
@@ -472,7 +481,8 @@ export const archiveProjects = [
             "collect travel preferences",
             "request a college visit"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-assistant",
@@ -576,7 +586,8 @@ export const archiveProjects = [
             "show connected page journeys",
             "browse program entry points"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-irrigation",
@@ -634,7 +645,8 @@ export const archiveProjects = [
             "review next actions",
             "remember conversations"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-campus-original",
@@ -689,7 +701,8 @@ export const archiveProjects = [
             "recruit a college team",
             "explore events and opportunities"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-campus-connected",
@@ -744,7 +757,8 @@ export const archiveProjects = [
             "show the national competition",
             "recruit campus ambassadors"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-campus-wars",
@@ -799,7 +813,8 @@ export const archiveProjects = [
             "compare campus standings",
             "review a competition entry"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-gameday",
@@ -853,7 +868,8 @@ export const archiveProjects = [
             "follow game day activity",
             "compare a head to head scoreboard"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-crewsheet",
@@ -907,7 +923,8 @@ export const archiveProjects = [
             "assign event responsibilities",
             "open a shared crew sheet"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-claim-links",
@@ -962,7 +979,8 @@ export const archiveProjects = [
             "find the right chapter link",
             "team access screen"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-invite",
@@ -1014,7 +1032,8 @@ export const archiveProjects = [
             "switch between program offers",
             "download an invitation graphic"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-hq-visit",
@@ -1066,7 +1085,8 @@ export const archiveProjects = [
             "request a time to visit HQ",
             "collect meeting preferences"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "fomo-campus-manual",
@@ -1122,276 +1142,8 @@ export const archiveProjects = [
             "train a campus team",
             "organize a team handbook"
           ]
-        }
-      }
-    ]
-  },
-  {
-    "id": "milo-messina",
-    "name": "Milo Messina",
-    "description": "Portfolio pages, fomo program journeys, protected operations references, and visual studies.",
-    "items": [
-      {
-        "id": "milo-home",
-        "name": "Milo portfolio",
-        "category": "Pages",
-        "description": "A personal portfolio with featured work and a visual index of projects.",
-        "sourcePath": "milomessina/index.html",
-        "sourceUrl": "https://milomessina.com/",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "finished",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
-        "thumbnail": "/agencykit/thumbnails/milo-home.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Portfolio introduction",
-          "Featured projects",
-          "Visual project index",
-          "Selected collaborations",
-          "Contact and navigation"
-        ],
-        "tags": [
-          "milo",
-          "portfolio",
-          "projects",
-          "personal",
-          "home",
-          "gallery"
-        ],
-        "relatedRoutes": [
-          {
-            "name": "Commit metadata API",
-            "url": "https://milomessina.com/api/commits",
-            "kind": "endpoint",
-            "httpStatus": 200,
-            "notes": "Metadata-only HEAD check; JSON payload not fetched."
-          }
-        ],
-        "searchMeta": {
-          "visual": [
-            "retro desktop",
-            "Mac inspired",
-            "mountain wallpaper",
-            "overlapping windows",
-            "dock icons",
-            "large typography"
-          ],
-          "features": [
-            "portfolio",
-            "project index",
-            "featured work",
-            "contact links",
-            "desktop navigation"
-          ],
-          "phrases": [
-            "show a personal portfolio",
-            "browse projects in desktop windows",
-            "retro computer website"
-          ]
-        }
-      },
-      {
-        "id": "milo-photos",
-        "name": "Photography",
-        "category": "Pages",
-        "description": "A photography gallery with a focused image-browsing experience.",
-        "sourcePath": "milomessina/photos/index.html",
-        "sourceUrl": "https://milomessina.com/photos",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "finished",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
-        "thumbnail": "/agencykit/thumbnails/milo-photos.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Gallery navigation",
-          "Photo grid",
-          "Image viewer",
-          "Previous and next image"
-        ],
-        "tags": [
-          "milo",
-          "photography",
-          "photos",
-          "images",
-          "gallery"
-        ],
-        "searchMeta": {
-          "visual": [
-            "retro desktop",
-            "Mac inspired",
-            "mountain wallpaper",
-            "photo grid",
-            "file icons",
-            "dock icons"
-          ],
-          "features": [
-            "photography gallery",
-            "image browsing",
-            "image viewer",
-            "previous and next navigation"
-          ],
-          "phrases": [
-            "browse a photo collection",
-            "photography as desktop files",
-            "open images in a gallery"
-          ]
-        }
-      },
-      {
-        "id": "milo-cars",
-        "name": "The Garage",
-        "category": "Pages",
-        "description": "A vehicle showcase combining a collection view and interactive model presentation.",
-        "sourcePath": "milomessina/cars/index.html",
-        "sourceUrl": "https://milomessina.com/cars",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "finished",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
-        "thumbnail": "/agencykit/thumbnails/milo-cars.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Garage introduction",
-          "Vehicle collection",
-          "Model viewer",
-          "Vehicle details",
-          "Collection navigation"
-        ],
-        "tags": [
-          "milo",
-          "cars",
-          "garage",
-          "vehicles",
-          "3d",
-          "collection",
-          "gallery"
-        ],
-        "searchMeta": {
-          "visual": [
-            "light",
-            "gray",
-            "white",
-            "3d",
-            "car models",
-            "minimal",
-            "large canvas"
-          ],
-          "features": [
-            "vehicle collection",
-            "model viewer",
-            "car selection",
-            "model rotation",
-            "collection navigation"
-          ],
-          "phrases": [
-            "browse a virtual garage",
-            "interactive 3d car viewer",
-            "showcase vehicle models"
-          ]
-        }
-      },
-      {
-        "id": "milo-car-model-sources",
-        "name": "Garage model sources",
-        "category": "Tools",
-        "description": "A reference directory for the garage models and visual presentation.",
-        "sourcePath": "milomessina/cars/model-sources.html",
-        "sourceUrl": "https://milomessina.com/cars/model-sources.html",
-        "sourceAliases": [],
-        "preview": "directory",
-        "status": "finished",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
-        "thumbnail": "/agencykit/thumbnails/milo-car-model-sources.jpg",
-        "skeletonKey": "directory",
-        "skeletonSections": [
-          "Source collection",
-          "Model references",
-          "Attribution links",
-          "Lighting study"
-        ],
-        "tags": [
-          "milo",
-          "cars",
-          "models",
-          "sources",
-          "references",
-          "directory"
-        ],
-        "searchMeta": {
-          "visual": [
-            "dark",
-            "green",
-            "text table",
-            "dense rows",
-            "underlined links"
-          ],
-          "features": [
-            "reference directory",
-            "model sources",
-            "attribution",
-            "status table",
-            "resource links"
-          ],
-          "phrases": [
-            "find model source credits",
-            "compare vehicle model references",
-            "organize resource links"
-          ]
-        }
-      },
-      {
-        "id": "milo-arya",
-        "name": "Spatial studio",
-        "category": "Pages",
-        "description": "A spatial studio page presenting a scanned office environment.",
-        "sourcePath": "Published route: milomessina.com/arya",
-        "sourceUrl": "https://milomessina.com/arya",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "finished",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. No matching file exists in the inspected local checkouts; this entry is based on the published route and page headings.",
-        "thumbnail": "/agencykit/thumbnails/milo-arya.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Spatial introduction",
-          "Room preview",
-          "Scan navigation",
-          "Scene details"
-        ],
-        "tags": [
-          "milo",
-          "arya",
-          "spatial",
-          "studio",
-          "office",
-          "3d",
-          "gallery"
-        ],
-        "searchMeta": {
-          "visual": [
-            "light",
-            "white",
-            "gray",
-            "3d",
-            "dollhouse view",
-            "cutaway",
-            "side controls"
-          ],
-          "features": [
-            "room scan viewer",
-            "spatial navigation",
-            "floor plan",
-            "view modes",
-            "cutaway controls"
-          ],
-          "phrases": [
-            "explore a scanned office",
-            "show a room in 3d",
-            "switch between dollhouse and floor plan"
-          ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       },
       {
         "id": "milo-landingpage",
@@ -1442,7 +1194,8 @@ export const archiveProjects = [
             "immersive college landing page",
             "choose a campus opportunity"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo",
@@ -1494,7 +1247,8 @@ export const archiveProjects = [
             "choose a campus team role",
             "explain an internship opportunity"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-apply",
@@ -1547,7 +1301,8 @@ export const archiveProjects = [
             "dark application form",
             "collect student team applications"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-campuswars",
@@ -1613,7 +1368,8 @@ export const archiveProjects = [
             "browse chapters in 3d",
             "join a campus competition"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-girls",
@@ -1667,7 +1423,8 @@ export const archiveProjects = [
             "collect interests and details",
             "route visitors by what they want to do"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-onboard",
@@ -1719,7 +1476,8 @@ export const archiveProjects = [
             "connect an account to a chapter",
             "finish member onboarding"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-onboard-links",
@@ -1773,7 +1531,8 @@ export const archiveProjects = [
             "copy a chapter invitation",
             "distribute member links"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-refer",
@@ -1834,7 +1593,8 @@ export const archiveProjects = [
             "claim a personal referral code",
             "explain a referral program"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-report",
@@ -1887,7 +1647,8 @@ export const archiveProjects = [
             "report what happened this week",
             "submit team activity"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomo-submit",
@@ -1942,7 +1703,8 @@ export const archiveProjects = [
             "apply to create content",
             "submit a social post"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-fomoportal",
@@ -1995,7 +1757,8 @@ export const archiveProjects = [
             "choose a program from cards",
             "central campus portal"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-hq-visit-form",
@@ -2058,7 +1821,8 @@ export const archiveProjects = [
             "request a time to visit HQ",
             "collect meeting preferences"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-visit-form-dev",
@@ -2114,7 +1878,999 @@ export const archiveProjects = [
             "calendar visit request",
             "choose a preferred meeting time"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-arrivals",
+        "name": "Parachute arrivals study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/arrivals-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/arrivals-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-arrivals.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Scene controls",
+          "Arrival animation",
+          "Variant comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "parachute",
+          "arrivals",
+          "motion"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "gray blue sky",
+            "campus building",
+            "spotlight",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "arrival animation",
+            "parachutes",
+            "replay controls",
+            "day and night",
+            "pause"
+          ],
+          "phrases": [
+            "preview parachute arrivals",
+            "compare campus arrival animations",
+            "test a game-like scene"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-banner",
+        "name": "Village banner study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/banner-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/banner-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-banner.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Banner options",
+          "Village preview",
+          "Comparison controls"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "banner",
+          "village",
+          "branding"
+        ],
+        "searchMeta": {
+          "visual": [
+            "off white",
+            "colorful",
+            "black cards",
+            "banner grid",
+            "Greek letters",
+            "large numbers"
+          ],
+          "features": [
+            "visual study",
+            "banner comparison",
+            "chapter branding",
+            "progress display",
+            "reward display"
+          ],
+          "phrases": [
+            "compare chapter banner designs",
+            "show signup progress on a banner",
+            "explore Greek letter graphics"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-campus-hill",
+        "name": "Campus hill study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/campus-hill-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/campus-hill-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-campus-hill.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Terrain preview",
+          "Campus scene",
+          "View controls"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "campus",
+          "hill",
+          "terrain"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "campus aerial",
+            "brick buildings",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "terrain preview",
+            "campus scene",
+            "camera views",
+            "day and night",
+            "pause"
+          ],
+          "phrases": [
+            "inspect a virtual campus landscape",
+            "compare campus camera views",
+            "preview a campus quad"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-construction",
+        "name": "Construction crew study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/construction-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/construction-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-construction.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Crew variants",
+          "Construction scene",
+          "Animation preview"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "construction",
+          "crew",
+          "animation"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "building frame",
+            "aerial view",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "construction animation",
+            "crew variants",
+            "chapter selection",
+            "playback controls"
+          ],
+          "phrases": [
+            "preview a building under construction",
+            "review construction crew animation",
+            "compare construction variants"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-helipad",
+        "name": "Helipad scene study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/helipad-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/helipad-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-helipad.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Scene overview",
+          "Character placement",
+          "Helipad preview"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "helipad",
+          "scene",
+          "characters"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "muted green",
+            "helicopter",
+            "helipad",
+            "aerial view",
+            "timeline bar"
+          ],
+          "features": [
+            "visual study",
+            "helicopter arrival",
+            "camera shots",
+            "character placement",
+            "playback timeline",
+            "day and night"
+          ],
+          "phrases": [
+            "preview a helicopter arrival",
+            "compare cinematic camera shots",
+            "scrub a scene timeline"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-human",
+        "name": "Campus people study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/human-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/human-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-human.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Character collection",
+          "Figure variants",
+          "Scale comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "people",
+          "human",
+          "character"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "crowds",
+            "campus buildings",
+            "green",
+            "close-up figures",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "character variants",
+            "crowd preview",
+            "scale comparison",
+            "camera views",
+            "pause"
+          ],
+          "phrases": [
+            "inspect a campus crowd",
+            "compare low poly people",
+            "preview characters at different scales"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-intro",
+        "name": "Intro visual study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/intro-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/intro-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-intro.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Opening composition",
+          "Scene layers",
+          "Animation preview"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "intro",
+          "opening",
+          "motion"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "campus aerial",
+            "text overlay",
+            "full screen scene",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "intro composition",
+            "reveal animation",
+            "scene layers",
+            "join action"
+          ],
+          "phrases": [
+            "preview a campus intro",
+            "place a call to action over a 3d scene",
+            "review an opening reveal"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-leaderboard",
+        "name": "Leaderboard study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/leaderboard-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/leaderboard-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-leaderboard.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Board composition",
+          "Ranking rows",
+          "Layout comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "leaderboard",
+          "ranking",
+          "interface"
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "3d",
+            "scoreboard",
+            "ranking rows",
+            "white text",
+            "gold accent"
+          ],
+          "features": [
+            "visual study",
+            "leaderboard",
+            "rankings",
+            "progress display",
+            "mock data controls",
+            "state comparison"
+          ],
+          "phrases": [
+            "compare leaderboard states",
+            "show chapter rankings on a board",
+            "preview a 3d scoreboard"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-scale",
+        "name": "Village scale study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/scale-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/scale-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-scale.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Large scene preview",
+          "Density controls",
+          "Scale comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "scale",
+          "performance",
+          "village"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "street view",
+            "campus buildings",
+            "crowds",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "scene scale",
+            "density controls",
+            "camera views",
+            "day and night",
+            "activity pause"
+          ],
+          "phrases": [
+            "compare a crowded campus scene",
+            "test village scale",
+            "inspect scene density"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-school-banner",
+        "name": "School banner study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/school-banner-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/school-banner-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-school-banner.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "School options",
+          "Banner collection",
+          "Visual comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "school",
+          "banner",
+          "identity"
+        ],
+        "searchMeta": {
+          "visual": [
+            "off white",
+            "colorful",
+            "banner grid",
+            "school logos",
+            "large letters",
+            "serif heading"
+          ],
+          "features": [
+            "visual study",
+            "school branding",
+            "banner comparison",
+            "logo collection",
+            "color palettes"
+          ],
+          "phrases": [
+            "compare school banner designs",
+            "browse campus branding variations",
+            "show school colors"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-skyline",
+        "name": "Campus skyline study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/skyline-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/skyline-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-skyline.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Architecture collection",
+          "Skyline composition",
+          "Scene preview"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "skyline",
+          "architecture",
+          "buildings"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "gray blue",
+            "green",
+            "building grid",
+            "aerial view",
+            "miniature buildings"
+          ],
+          "features": [
+            "visual study",
+            "architecture collection",
+            "building selection",
+            "camera views",
+            "skyline comparison"
+          ],
+          "phrases": [
+            "compare campus architecture",
+            "browse miniature building models",
+            "inspect a village skyline"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-stadium",
+        "name": "Stadium scene study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/stadium-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/stadium-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-stadium.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Stadium composition",
+          "Scene preview",
+          "View controls"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "stadium",
+          "sports",
+          "scene"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "green",
+            "purple seating",
+            "football stadium",
+            "aerial view",
+            "game-like"
+          ],
+          "features": [
+            "visual study",
+            "stadium preview",
+            "camera views",
+            "day and night",
+            "touchdown animation",
+            "fireworks"
+          ],
+          "phrases": [
+            "explore a virtual football stadium",
+            "compare stadium camera angles",
+            "preview stadium celebrations"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-study-vehicle",
+        "name": "Village vehicle study",
+        "category": "Tools",
+        "description": "A public visual study used to review the Campus Wars scene.",
+        "sourcePath": "milomessina/fomo/campuswars/tests/vehicle-gallery.html",
+        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/vehicle-gallery.html",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "prototype",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
+        "thumbnail": "/agencykit/thumbnails/milo-study-vehicle.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Vehicle collection",
+          "Scene placement",
+          "Visual comparison"
+        ],
+        "tags": [
+          "milo",
+          "fomo",
+          "campuswars",
+          "visual",
+          "study",
+          "prototype",
+          "gallery",
+          "vehicle",
+          "cars",
+          "village"
+        ],
+        "searchMeta": {
+          "visual": [
+            "3d",
+            "low poly",
+            "gray blue",
+            "blue car",
+            "minimal",
+            "large canvas"
+          ],
+          "features": [
+            "visual study",
+            "vehicle variants",
+            "model comparison",
+            "sedan",
+            "crossover",
+            "shuttle"
+          ],
+          "phrases": [
+            "compare village vehicle models",
+            "preview a low poly car",
+            "switch between vehicle types"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      }
+    ]
+  },
+  {
+    "id": "milo-messina",
+    "name": "Milo Messina",
+    "description": "Personal pages and other work collected in the Milo Messina archive.",
+    "items": [
+      {
+        "id": "milo-home",
+        "name": "Milo portfolio",
+        "category": "Pages",
+        "description": "A personal portfolio with featured work and a visual index of projects.",
+        "sourcePath": "milomessina/index.html",
+        "sourceUrl": "https://milomessina.com/",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "finished",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
+        "thumbnail": "/agencykit/thumbnails/milo-home.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Portfolio introduction",
+          "Featured projects",
+          "Visual project index",
+          "Selected collaborations",
+          "Contact and navigation"
+        ],
+        "tags": [
+          "milo",
+          "portfolio",
+          "projects",
+          "personal",
+          "home",
+          "gallery"
+        ],
+        "relatedRoutes": [
+          {
+            "name": "Commit metadata API",
+            "url": "https://milomessina.com/api/commits",
+            "kind": "endpoint",
+            "httpStatus": 200,
+            "notes": "Metadata-only HEAD check; JSON payload not fetched."
+          }
+        ],
+        "searchMeta": {
+          "visual": [
+            "retro desktop",
+            "Mac inspired",
+            "mountain wallpaper",
+            "overlapping windows",
+            "dock icons",
+            "large typography"
+          ],
+          "features": [
+            "portfolio",
+            "project index",
+            "featured work",
+            "contact links",
+            "desktop navigation"
+          ],
+          "phrases": [
+            "show a personal portfolio",
+            "browse projects in desktop windows",
+            "retro computer website"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-photos",
+        "name": "Photography",
+        "category": "Pages",
+        "description": "A photography gallery with a focused image-browsing experience.",
+        "sourcePath": "milomessina/photos/index.html",
+        "sourceUrl": "https://milomessina.com/photos",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "finished",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
+        "thumbnail": "/agencykit/thumbnails/milo-photos.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Gallery navigation",
+          "Photo grid",
+          "Image viewer",
+          "Previous and next image"
+        ],
+        "tags": [
+          "milo",
+          "photography",
+          "photos",
+          "images",
+          "gallery"
+        ],
+        "searchMeta": {
+          "visual": [
+            "retro desktop",
+            "Mac inspired",
+            "mountain wallpaper",
+            "photo grid",
+            "file icons",
+            "dock icons"
+          ],
+          "features": [
+            "photography gallery",
+            "image browsing",
+            "image viewer",
+            "previous and next navigation"
+          ],
+          "phrases": [
+            "browse a photo collection",
+            "photography as desktop files",
+            "open images in a gallery"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-cars",
+        "name": "The Garage",
+        "category": "Pages",
+        "description": "A vehicle showcase combining a collection view and interactive model presentation.",
+        "sourcePath": "milomessina/cars/index.html",
+        "sourceUrl": "https://milomessina.com/cars",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "finished",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
+        "thumbnail": "/agencykit/thumbnails/milo-cars.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Garage introduction",
+          "Vehicle collection",
+          "Model viewer",
+          "Vehicle details",
+          "Collection navigation"
+        ],
+        "tags": [
+          "milo",
+          "cars",
+          "garage",
+          "vehicles",
+          "3d",
+          "collection",
+          "gallery"
+        ],
+        "searchMeta": {
+          "visual": [
+            "light",
+            "gray",
+            "white",
+            "3d",
+            "car models",
+            "minimal",
+            "large canvas"
+          ],
+          "features": [
+            "vehicle collection",
+            "model viewer",
+            "car selection",
+            "model rotation",
+            "collection navigation"
+          ],
+          "phrases": [
+            "browse a virtual garage",
+            "interactive 3d car viewer",
+            "showcase vehicle models"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-car-model-sources",
+        "name": "Garage model sources",
+        "category": "Tools",
+        "description": "A reference directory for the garage models and visual presentation.",
+        "sourcePath": "milomessina/cars/model-sources.html",
+        "sourceUrl": "https://milomessina.com/cars/model-sources.html",
+        "sourceAliases": [],
+        "preview": "directory",
+        "status": "finished",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. ",
+        "thumbnail": "/agencykit/thumbnails/milo-car-model-sources.jpg",
+        "skeletonKey": "directory",
+        "skeletonSections": [
+          "Source collection",
+          "Model references",
+          "Attribution links",
+          "Lighting study"
+        ],
+        "tags": [
+          "milo",
+          "cars",
+          "models",
+          "sources",
+          "references",
+          "directory"
+        ],
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "green",
+            "text table",
+            "dense rows",
+            "underlined links"
+          ],
+          "features": [
+            "reference directory",
+            "model sources",
+            "attribution",
+            "status table",
+            "resource links"
+          ],
+          "phrases": [
+            "find model source credits",
+            "compare vehicle model references",
+            "organize resource links"
+          ]
+        },
+        "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "milo-arya",
+        "name": "Spatial studio",
+        "category": "Pages",
+        "description": "A spatial studio page presenting a scanned office environment.",
+        "sourcePath": "Published route: milomessina.com/arya",
+        "sourceUrl": "https://milomessina.com/arya",
+        "sourceAliases": [],
+        "preview": "gallery",
+        "status": "finished",
+        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. No matching file exists in the inspected local checkouts; this entry is based on the published route and page headings.",
+        "thumbnail": "/agencykit/thumbnails/milo-arya.jpg",
+        "skeletonKey": "gallery",
+        "skeletonSections": [
+          "Spatial introduction",
+          "Room preview",
+          "Scan navigation",
+          "Scene details"
+        ],
+        "tags": [
+          "milo",
+          "arya",
+          "spatial",
+          "studio",
+          "office",
+          "3d",
+          "gallery"
+        ],
+        "searchMeta": {
+          "visual": [
+            "light",
+            "white",
+            "gray",
+            "3d",
+            "dollhouse view",
+            "cutaway",
+            "side controls"
+          ],
+          "features": [
+            "room scan viewer",
+            "spatial navigation",
+            "floor plan",
+            "view modes",
+            "cutaway controls"
+          ],
+          "phrases": [
+            "explore a scanned office",
+            "show a room in 3d",
+            "switch between dollhouse and floor plan"
+          ]
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-visit-console",
@@ -2173,7 +2929,8 @@ export const archiveProjects = [
             "team login screen",
             "access invoice operations"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-invoice-beta",
@@ -2228,7 +2985,8 @@ export const archiveProjects = [
             "show a two week internship plan",
             "guide participants through joining"
           ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       },
       {
         "id": "milo-chapter-data",
@@ -2283,711 +3041,8 @@ export const archiveProjects = [
             "open an internal data workspace",
             "minimal dark access screen"
           ]
-        }
-      },
-      {
-        "id": "milo-study-arrivals",
-        "name": "Parachute arrivals study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/arrivals-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/arrivals-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-arrivals.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Scene controls",
-          "Arrival animation",
-          "Variant comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "parachute",
-          "arrivals",
-          "motion"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "gray blue sky",
-            "campus building",
-            "spotlight",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "arrival animation",
-            "parachutes",
-            "replay controls",
-            "day and night",
-            "pause"
-          ],
-          "phrases": [
-            "preview parachute arrivals",
-            "compare campus arrival animations",
-            "test a game-like scene"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-banner",
-        "name": "Village banner study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/banner-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/banner-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-banner.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Banner options",
-          "Village preview",
-          "Comparison controls"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "banner",
-          "village",
-          "branding"
-        ],
-        "searchMeta": {
-          "visual": [
-            "off white",
-            "colorful",
-            "black cards",
-            "banner grid",
-            "Greek letters",
-            "large numbers"
-          ],
-          "features": [
-            "visual study",
-            "banner comparison",
-            "chapter branding",
-            "progress display",
-            "reward display"
-          ],
-          "phrases": [
-            "compare chapter banner designs",
-            "show signup progress on a banner",
-            "explore Greek letter graphics"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-campus-hill",
-        "name": "Campus hill study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/campus-hill-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/campus-hill-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-campus-hill.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Terrain preview",
-          "Campus scene",
-          "View controls"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "campus",
-          "hill",
-          "terrain"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "campus aerial",
-            "brick buildings",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "terrain preview",
-            "campus scene",
-            "camera views",
-            "day and night",
-            "pause"
-          ],
-          "phrases": [
-            "inspect a virtual campus landscape",
-            "compare campus camera views",
-            "preview a campus quad"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-construction",
-        "name": "Construction crew study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/construction-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/construction-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-construction.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Crew variants",
-          "Construction scene",
-          "Animation preview"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "construction",
-          "crew",
-          "animation"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "building frame",
-            "aerial view",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "construction animation",
-            "crew variants",
-            "chapter selection",
-            "playback controls"
-          ],
-          "phrases": [
-            "preview a building under construction",
-            "review construction crew animation",
-            "compare construction variants"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-helipad",
-        "name": "Helipad scene study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/helipad-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/helipad-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-helipad.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Scene overview",
-          "Character placement",
-          "Helipad preview"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "helipad",
-          "scene",
-          "characters"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "muted green",
-            "helicopter",
-            "helipad",
-            "aerial view",
-            "timeline bar"
-          ],
-          "features": [
-            "visual study",
-            "helicopter arrival",
-            "camera shots",
-            "character placement",
-            "playback timeline",
-            "day and night"
-          ],
-          "phrases": [
-            "preview a helicopter arrival",
-            "compare cinematic camera shots",
-            "scrub a scene timeline"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-human",
-        "name": "Campus people study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/human-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/human-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-human.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Character collection",
-          "Figure variants",
-          "Scale comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "people",
-          "human",
-          "character"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "crowds",
-            "campus buildings",
-            "green",
-            "close-up figures",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "character variants",
-            "crowd preview",
-            "scale comparison",
-            "camera views",
-            "pause"
-          ],
-          "phrases": [
-            "inspect a campus crowd",
-            "compare low poly people",
-            "preview characters at different scales"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-intro",
-        "name": "Intro visual study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/intro-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/intro-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-intro.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Opening composition",
-          "Scene layers",
-          "Animation preview"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "intro",
-          "opening",
-          "motion"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "campus aerial",
-            "text overlay",
-            "full screen scene",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "intro composition",
-            "reveal animation",
-            "scene layers",
-            "join action"
-          ],
-          "phrases": [
-            "preview a campus intro",
-            "place a call to action over a 3d scene",
-            "review an opening reveal"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-leaderboard",
-        "name": "Leaderboard study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/leaderboard-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/leaderboard-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-leaderboard.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Board composition",
-          "Ranking rows",
-          "Layout comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "leaderboard",
-          "ranking",
-          "interface"
-        ],
-        "searchMeta": {
-          "visual": [
-            "dark",
-            "3d",
-            "scoreboard",
-            "ranking rows",
-            "white text",
-            "gold accent"
-          ],
-          "features": [
-            "visual study",
-            "leaderboard",
-            "rankings",
-            "progress display",
-            "mock data controls",
-            "state comparison"
-          ],
-          "phrases": [
-            "compare leaderboard states",
-            "show chapter rankings on a board",
-            "preview a 3d scoreboard"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-scale",
-        "name": "Village scale study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/scale-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/scale-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-scale.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Large scene preview",
-          "Density controls",
-          "Scale comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "scale",
-          "performance",
-          "village"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "street view",
-            "campus buildings",
-            "crowds",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "scene scale",
-            "density controls",
-            "camera views",
-            "day and night",
-            "activity pause"
-          ],
-          "phrases": [
-            "compare a crowded campus scene",
-            "test village scale",
-            "inspect scene density"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-school-banner",
-        "name": "School banner study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/school-banner-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/school-banner-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-school-banner.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "School options",
-          "Banner collection",
-          "Visual comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "school",
-          "banner",
-          "identity"
-        ],
-        "searchMeta": {
-          "visual": [
-            "off white",
-            "colorful",
-            "banner grid",
-            "school logos",
-            "large letters",
-            "serif heading"
-          ],
-          "features": [
-            "visual study",
-            "school branding",
-            "banner comparison",
-            "logo collection",
-            "color palettes"
-          ],
-          "phrases": [
-            "compare school banner designs",
-            "browse campus branding variations",
-            "show school colors"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-skyline",
-        "name": "Campus skyline study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/skyline-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/skyline-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-skyline.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Architecture collection",
-          "Skyline composition",
-          "Scene preview"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "skyline",
-          "architecture",
-          "buildings"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "gray blue",
-            "green",
-            "building grid",
-            "aerial view",
-            "miniature buildings"
-          ],
-          "features": [
-            "visual study",
-            "architecture collection",
-            "building selection",
-            "camera views",
-            "skyline comparison"
-          ],
-          "phrases": [
-            "compare campus architecture",
-            "browse miniature building models",
-            "inspect a village skyline"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-stadium",
-        "name": "Stadium scene study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/stadium-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/stadium-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-stadium.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Stadium composition",
-          "Scene preview",
-          "View controls"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "stadium",
-          "sports",
-          "scene"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "green",
-            "purple seating",
-            "football stadium",
-            "aerial view",
-            "game-like"
-          ],
-          "features": [
-            "visual study",
-            "stadium preview",
-            "camera views",
-            "day and night",
-            "touchdown animation",
-            "fireworks"
-          ],
-          "phrases": [
-            "explore a virtual football stadium",
-            "compare stadium camera angles",
-            "preview stadium celebrations"
-          ]
-        }
-      },
-      {
-        "id": "milo-study-vehicle",
-        "name": "Village vehicle study",
-        "category": "Tools",
-        "description": "A public visual study used to review the Campus Wars scene.",
-        "sourcePath": "milomessina/fomo/campuswars/tests/vehicle-gallery.html",
-        "sourceUrl": "https://milomessina.com/fomo/campuswars/tests/vehicle-gallery.html",
-        "sourceAliases": [],
-        "preview": "gallery",
-        "status": "prototype",
-        "notes": "Source design with a neutral frontend starter. Real authentication, data, and backend services require separate integration. The live page returned HTTP 200 with its expected title on 2026-09-29; submissions were not tested. A design/test surface, not a production participant workflow. The neutral gallery starter uses placeholders rather than original source media.",
-        "thumbnail": "/agencykit/thumbnails/milo-study-vehicle.jpg",
-        "skeletonKey": "gallery",
-        "skeletonSections": [
-          "Vehicle collection",
-          "Scene placement",
-          "Visual comparison"
-        ],
-        "tags": [
-          "milo",
-          "fomo",
-          "campuswars",
-          "visual",
-          "study",
-          "prototype",
-          "gallery",
-          "vehicle",
-          "cars",
-          "village"
-        ],
-        "searchMeta": {
-          "visual": [
-            "3d",
-            "low poly",
-            "gray blue",
-            "blue car",
-            "minimal",
-            "large canvas"
-          ],
-          "features": [
-            "visual study",
-            "vehicle variants",
-            "model comparison",
-            "sedan",
-            "crossover",
-            "shuttle"
-          ],
-          "phrases": [
-            "compare village vehicle models",
-            "preview a low poly car",
-            "switch between vehicle types"
-          ]
-        }
+        },
+        "sourceHost": "milomessina.com"
       }
     ]
   },
@@ -3049,7 +3104,8 @@ export const archiveProjects = [
             "turn an idea into a build request",
             "ask about scope timing and budget"
           ]
-        }
+        },
+        "sourceHost": "bijanizadian.com"
       }
     ]
   }

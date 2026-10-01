@@ -80,7 +80,7 @@ export function createProjectCloud({store,setStorageMode,onChange=()=>{},notify=
     getState:()=>({signedIn:!!auth,ready,applying,email:auth?.email||'',status,message,conflict,busy,needsEmail:!!code,dirty}),
     async sendLink(email){
       email=cleanEmail(email);if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw Error('Enter a valid email address.');
-      await api('sendOobCode',{requestType:'EMAIL_SIGNIN',email,continueUrl:'https://bijanizadian.com/agencykit#projects',canHandleCodeInApp:true});
+      await api('sendOobCode',{requestType:'EMAIL_SIGNIN',email,continueUrl:'https://bijanizadian.com/agencykit#clients',canHandleCodeInApp:true});
       try{localStorage.setItem('agencykit-signin-email',email);}catch{}
       status='Check your email';message='Open the sign-in link on this device to connect your workspace.';emit();
     },
@@ -88,7 +88,7 @@ export function createProjectCloud({store,setStorageMode,onChange=()=>{},notify=
       if(!code)throw Error('Open the sign-in link from your email.');
       const result=await api('signInWithEmailLink',{email:cleanEmail(email),oobCode:code});
       auth={uid:result.localId,email:result.email,idToken:result.idToken,refreshToken:result.refreshToken,expiresAt:Date.now()+Number(result.expiresIn)*1000};rememberAuth();
-      code='';history.replaceState(null,'','/agencykit#projects');await connect();
+      code='';history.replaceState(null,'','/agencykit#clients');await connect();
     },
     async signOut(){
       if(dirty){await flush();if(dirty)throw Error('Export your unsynced work or retry the connection before signing out.');}
