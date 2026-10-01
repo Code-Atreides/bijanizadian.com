@@ -1,3 +1,6 @@
+import { createProjectCloud } from './project-cloud.js';
+import { createProjectStore } from './project-store.js';
+import { createProjectsUI } from './projects-ui.js';
 import { blocks, categories, filterItems, searchArchive, searchArchiveDetailed } from './catalog.js';
 import { archiveProjects } from './archive-data.js';
 import { createArchiveMotion } from './archive-motion.js';
@@ -50,9 +53,56 @@ let toastTimer, detailId = null, detailView = 'original', previousFocus = null;
 function notify(message) { $('#toast').textContent=message; $('#toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),2600); }
 function persist() { try { localStorage.setItem('gtm-kit-v1',JSON.stringify({saved:state.saved,collections:state.collections})); } catch { notify('Browser storage is unavailable. Changes last for this visit.'); } }
 function navLink(label,href,name,count,active=false) { return `<a class="nav-item ${active?'active':''}" href="${href}" ${active?'aria-current="page"':''}>${icon(name,'nav-icon')}<span>${escape(label)}</span>${count===undefined?'':`<span class="nav-count">${count}</span>`}</a>`; }
+let projectStorageMode='local', projectCloud;
+const projectStorage={getItem(key){return localStorage.getItem(key);},setItem(key,value){const cloud=projectCloud?.getState();if(cloud?.signedIn&&!cloud.ready&&!cloud.applying)throw Error('Wait for the shared workspace to connect, or sign out to edit locally.');if(projectStorageMode==='shared')sessionStorage.setItem('agencykit-shared-cache',value);else localStorage.setItem(key,value);}};
+const projectStore=createProjectStore({storage:projectStorage,catalog:allArchive,archiveProjects,onError:()=>notify('Your changes could not be saved. Export a backup before closing.')});
+const projectsUI=createProjectsUI({container:$('#projects-workspace'),store:projectStore,catalog:allArchive,notify,onOpenOriginal:openDetails,onRender:paintProjectAccount,
+  onPreviewDraft({draft,project,source,frame}) {
+    const send=()=>frame.contentWindow?.postMessage({type:'agencykit-draft-preview',sourceId:source.id,project,draft},location.origin);
+    frame.onload=send;
+    const url='/agencykit/skeleton?item='+encodeURIComponent(source.id)+'&embed=1';
+    if(frame.getAttribute('src')!==url)frame.src=url;else send();
+  },
+  onDownloadDraft({draft,project,source}){downloadSkeleton(source,{draft,project});notify('Your editable project page is downloading.');}
+});
+
+const accountDialog=document.createElement('dialog');accountDialog.className='modal project-account-dialog';accountDialog.setAttribute('aria-labelledby','cloud-title');
+accountDialog.innerHTML='<form id="cloud-form"><div class="modal-header"><h2 id="cloud-title">Your agency workspace.</h2><button type="button" class="icon-button" data-cloud-close aria-label="Close sign-in">×</button></div><p>Sign in with your approved email. We’ll send a one-time link.</p><label class="field">Email address<input name="email" type="email" autocomplete="email" required maxlength="254"></label><p class="cloud-dialog-note">Your local drafts stay in this browser. Sign-in opens the separate shared workspace; use a backup to bring local work across.</p><p data-cloud-feedback role="status"></p><div class="modal-actions"><button class="primary-button" type="submit">Send sign-in link</button></div></form>';
+document.body.append(accountDialog);
+function paintProjectAccount(){
+  if(!projectCloud)return;const cloud=projectCloud.getState();
+  document.querySelectorAll('[data-project-account]').forEach(element=>{
+    element.innerHTML='<span class="cloud-state">'+escape(cloud.status)+(cloud.signedIn?' <small>· '+escape(cloud.email)+'</small>':' <small>· this browser</small>')+'</span>'+
+      (cloud.message?'<span class="cloud-message">'+escape(cloud.message)+'</span>':'')+
+      (!cloud.signedIn?'<button class="quiet-button" data-cloud-login>'+(cloud.needsEmail?'Finish sign-in':'Connect cloud')+'</button>':
+       (cloud.conflict?'<button class="quiet-button" data-cloud-backup>Export my edits</button><button class="quiet-button" data-cloud-reload>Load cloud copy</button>':(!cloud.ready||cloud.status==='Not synced'?'<button class="quiet-button" data-cloud-retry>Retry sync</button>':''))+'<button class="quiet-button" data-cloud-signout>Sign out</button>');
+  });
+}
+function cloudDownload(){const blob=new Blob([projectStore.exportData()],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='agencykit-project-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function openProjectSignIn(){
+  const cloud=projectCloud.getState();accountDialog.querySelector('[data-cloud-feedback]').textContent='';
+  accountDialog.querySelector('button[type="submit"]').textContent=cloud.needsEmail?'Finish sign-in':'Send sign-in link';
+  accountDialog.querySelector('#cloud-title').textContent=cloud.needsEmail?'Confirm your email.':'Your agency workspace.';
+  try{accountDialog.querySelector('input').value=localStorage.getItem('agencykit-signin-email')||'';}catch{}
+  accountDialog.showModal();accountDialog.querySelector('input').focus();
+}
+accountDialog.querySelector('[data-cloud-close]').addEventListener('click',()=>accountDialog.close());
+accountDialog.querySelector('form').addEventListener('submit',async event=>{
+  event.preventDefault();const button=event.submitter;button.disabled=true;const feedback=accountDialog.querySelector('[data-cloud-feedback]');feedback.textContent='Connecting…';
+  try{const email=accountDialog.querySelector('input').value;if(projectCloud.getState().needsEmail){await projectCloud.finishSignIn(email);accountDialog.close();location.hash='projects';render();}else{await projectCloud.sendLink(email);feedback.textContent='Check your inbox for the sign-in link. You can close this window.';}}catch(error){feedback.textContent=error.message;}finally{button.disabled=false;}
+});
+document.addEventListener('click',async event=>{
+  const button=event.target.closest('[data-cloud-login],[data-cloud-signout],[data-cloud-retry],[data-cloud-reload],[data-cloud-backup]');if(!button)return;
+  if(button.hasAttribute('data-cloud-login')){openProjectSignIn();return;}
+  if(button.hasAttribute('data-cloud-backup')){cloudDownload();return;}
+  button.disabled=true;
+  try{if(button.hasAttribute('data-cloud-signout'))await projectCloud.signOut();else if(button.hasAttribute('data-cloud-retry'))await projectCloud.retry();else if(button.hasAttribute('data-cloud-reload')){cloudDownload();await projectCloud.loadCloud();notify('Your edits were backed up. The cloud copy is open.');}}catch(error){notify(error.message);}finally{button.disabled=false;}
+});
+projectCloud=createProjectCloud({store:projectStore,setStorageMode:mode=>{projectStorageMode=mode;},notify,onChange:({reload}={})=>{if(reload){projectsUI.reset?.();if(['project','projects'].includes(state.route))render();}paintProjectAccount();}});
+
 function renderNav() {
   $('#library-nav').innerHTML=navLink('All originals','#library','grid',allArchive.length,state.route==='library'&&state.category==='All')+categories.map(category=>navLink(category,`#library/${category.toLowerCase()}`,categoryIcon(category),allArchive.filter(x=>x.category===category).length,state.route==='library'&&state.category===category)).join('');
-  $('#workspace-nav').innerHTML=navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
+  $('#workspace-nav').innerHTML=navLink('Projects','#projects','collection',projectStore.getProjects().length,['projects','project'].includes(state.route))+navLink('Saved','#saved','bookmark',state.saved.length,state.route==='saved')+navLink('Archive','#archive','archive',allArchive.length,state.route==='archive')+navLink('Foundations','#foundations','curve',undefined,state.route==='foundations');
   $('#collections-nav').hidden=!state.collections.length;
   $('#collection-links').innerHTML=state.collections.map(c=>navLink(c.name,`#collection/${encodeURIComponent(c.id)}`,'collection',c.items.length,state.collection===c.id)).join('');
 }
@@ -70,14 +120,18 @@ function grid(items) { return `<div class="grid ${state.compact?'compact':''}">$
 
 function render() {
   renderNav();
+  const projectRoute=['projects','project'].includes(state.route);
+  document.body.classList.toggle('projects-mode',projectRoute);
+  $('#projects-workspace').hidden=!projectRoute;
   document.body.classList.toggle('archive-mode',state.route==='archive');
   document.body.classList.toggle('workspace-mode',state.route!=='archive');
   $('#archive-workspace').hidden=state.route!=='archive';
-  $('.app-shell').hidden=state.route==='archive';
-  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  $('.app-shell').hidden=state.route==='archive'||projectRoute;
+  document.querySelectorAll('[data-nav-route]').forEach(a=>{if(a.dataset.navRoute===state.route||(projectRoute&&a.dataset.navRoute==='projects'))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(state.route==='archive'){renderArchive();archiveMotion.sync();return;}
   document.body.classList.remove('archive-home','archive-results');
   archiveMotion.sync();
+  if(projectRoute){projectsUI.render(location.hash.slice(1).split('/'));paintProjectAccount();return;}
   const inArchive=state.route==='archive';
   const collection=state.collections.find(c=>c.id===state.collection);
   const heading=state.route==='saved'?'Saved for later.':inArchive?'The archive.':state.route==='foundations'?'A familiar feeling.':collection?`${collection.name}.`:state.category==='All'?'Choose an original.':`${state.category}.`;
@@ -166,7 +220,7 @@ function foundations() {return `<div class="foundation-intro"><span class="eyebr
 
 function route() {
   const parts=location.hash.slice(1).split('/');
-  state.route=['library','archive','saved','foundations','collection'].includes(parts[0])?parts[0]:'archive';
+  state.route=['library','archive','saved','foundations','collection','projects','project'].includes(parts[0])?parts[0]:'archive';
   state.category=state.route==='library'?(categories.find(c=>c.toLowerCase()===parts[1])||'All'):'All';
   state.project=state.route==='archive'&&archiveProjects.some(p=>p.id===parts[1])?parts[1]:null;
   state.collection=state.route==='collection'?parts[1]:null;
@@ -203,11 +257,11 @@ function fillDetails(id) {
   $('#detail-drawer').classList.toggle('showing-skeleton',skeleton);
   const visual=skeleton?`<div class="skeleton-window" inert><iframe src="${previewUrl}&embed=1" title="${escape(source.name)} skeleton layout" tabindex="-1" aria-hidden="true" loading="eager"></iframe></div>`:`<div class="drawer-preview">${preview(source)}<span class="layout-caption">${escape(source.previewCaption||'Original page · captured September 2026')}</span></div>`;
   const status=source.status==='prototype'?'Local prototype':source.status==='protected'?'Protected workspace':source.status==='contextual'?'Context-specific page':'Original page';
-  $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeletonify ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2>${skeleton?'<span class="detail-ready">Skeleton ready</span>':'<span class="detail-ready">'+(source.status==='prototype'?'Prototype':'Original')+'</span>'}</div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary><p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Skeletonify'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
+  $('#detail-content').innerHTML=`<div class="detail-view-switch" role="group" aria-label="Preview version"><button data-detail-view="original" aria-pressed="${!skeleton}">Original</button><button data-detail-view="skeleton" aria-pressed="${skeleton}">Skeletonify ${icon('arrow')}</button></div>${visual}<div class="drawer-body"><div class="detail-heading"><h2 id="detail-title">${escape(source.name)}</h2>${skeleton?'<span class="detail-ready">Skeleton ready</span>':'<span class="detail-ready">'+(source.status==='prototype'?'Prototype':'Original')+'</span>'}</div><p class="detail-description">${skeleton?'A neutral frontend starting point based on this page. Change the brand, copy, and content for your next client.':escape(source.description)}</p>${skeleton?`<div class="skeleton-includes"><span>${icon('check')} Editable HTML + CSS</span><span>${icon('check')} Works on mobile</span><span>${icon('check')} Local demo interactions</span></div><p class="detail-small">One self-contained HTML file. Forms and data are examples; connect your own services when you build the client version.</p><a class="skeleton-full-link" href="${previewUrl}" target="_blank" rel="noopener noreferrer">Try the full-size skeleton ${icon('external')}</a>`:`<div class="detail-status">${icon('archive')}<span>${escape(source.project||source.origin)} · ${status}</span></div>`}${source.skeletonSections?.length?`<div class="detail-label">${skeleton?'PAGE STRUCTURE':'INSIDE THIS PAGE'}</div><ul class="detail-list">${source.skeletonSections.map(x=>`<li>${icon('check')}${escape(x)}</li>`).join('')}</ul>`:''}${!skeleton?`<details class="source-details"><summary>About the original</summary><p class="source-path">${escape(source.sourcePath)}</p><p class="detail-small">${escape(source.notes)}</p></details>`:''}</div><div class="drawer-footer"><button class="primary-button" data-use-project="${escape(source.id)}">Use in project ${icon('arrow')}</button><button class="primary-button" ${skeleton?`data-download-skeleton="${escape(source.id)}"`:'data-detail-view="skeleton"'}>${skeleton?'Download skeleton':'Skeletonify'} ${icon('arrow')}</button><button class="quiet-button" data-save="${escape(source.id)}">${icon('bookmark')}${state.saved.includes(source.id)?'Saved':'Save'}</button><button class="quiet-button" data-collect="${escape(source.id)}">Collect</button>${!skeleton&&source.sourceUrl?`<a class="text-button" href="${escape(source.sourceUrl)}" target="_blank" rel="noopener noreferrer">Open original site ${icon('external')}</a>`:''}</div>`;
 }
-function setBackgroundInert(value){['.app-shell','#archive-workspace','.archive-header','#assistant-launcher'].forEach(selector=>$(selector).inert=value);}
+function setBackgroundInert(value){['.app-shell','#archive-workspace','#projects-workspace','.archive-header','#assistant-launcher'].forEach(selector=>$(selector).inert=value);}
 function openDetails(id) {if($('#detail-overlay').hidden)previousFocus=document.activeElement;closeAssistant(false);detailId=id;detailView='original';fillDetails(id);$('#detail-content').scrollTop=0;$('#detail-overlay').hidden=false;document.body.classList.add('modal-open');setBackgroundInert(true);archiveMotion.sync();$('#detail-close').focus();}
-function closeDetails() {if($('#detail-overlay').hidden)return;$('#detail-overlay').hidden=true;document.body.classList.remove('modal-open');setBackgroundInert(false);detailId=null;if(previousFocus?.isConnected&&previousFocus.getClientRects().length)previousFocus.focus();else (state.route==='archive'?$('#archive-search'):$('#search')).focus();}
+function closeDetails() {if($('#detail-overlay').hidden)return;$('#detail-overlay').hidden=true;document.body.classList.remove('modal-open');setBackgroundInert(false);detailId=null;if(previousFocus?.isConnected&&previousFocus.getClientRects().length)previousFocus.focus();else (state.route==='archive'?$('#archive-search'):['project','projects'].includes(state.route)?$('#projects-workspace'):$('#search')).focus();}
 function openCollection(selectedId=null) {
   $('#collection-form').reset();
   $('#collection-options').innerHTML=allArchive.map(item=>`<label class="pick-block"><input type="checkbox" name="blocks" value="${item.id}" ${selectedId===item.id?'checked':''}><span>${escape(item.name)}</span><small>${item.category}</small></label>`).join('');
@@ -223,6 +277,7 @@ function askGuide(message) {
   const reply=document.createElement('div');reply.className='assistant-message';
   let answer, matches=[];
   if(/archiv|original|past work/i.test(text)){answer='Search all the original pages, open one you like, then choose “Skeletonify”. You can preview the neutral version and download an editable page for another client.';matches=archiveProjects.map(p=>({name:p.name,href:`#archive/${p.id}`}));}
+  else if(/project|client|draft|brand/i.test(text)){answer='Projects keep your client brief, brand, original work, and editable drafts together. Open an original and choose “Use in project”. Save a version when you want a checkpoint, then export the HTML when it is ready to build on.';matches=[{name:'Your projects',href:'#projects'}];}
   else if(/skeleton|download|reus|template/i.test(text)){answer='Start with the original work. Open a page, choose “Skeletonify”, then download the self-contained HTML file. The neutral layout and local demo interactions are ready to edit; connect your own data and services for a client launch.';matches=[{name:'Browse original work',href:'#library'}];}
   else if(/curve|corner|round|design|aesthetic/i.test(text)){answer='The kit has a neutral frame with continuous corners in three sizes. Original project previews keep their own colors. The assistant carries the same curved shape; explore it in Foundations.';matches=[{name:'Explore the foundations',href:'#foundations'}];}
   else if(/collect|bundle|shortlist/i.test(text)){answer='A collection is a shortlist for a client or project. Choose “New collection”, give it a name, and select a few starting points. It stays in this browser; it doesn’t generate a site yet.';}
@@ -239,6 +294,8 @@ function closeSidebar(){document.body.classList.remove('nav-open');$('#sidebar-b
 $('#mobile-menu').innerHTML=icon('menu');$('#search-icon').innerHTML=icon('search');$('#view-toggle').innerHTML=icon('grid');$('#assistant-send').innerHTML=icon('up');
 $('#assistant-suggestions').innerHTML=['Find a portal for onboarding','Explore the project archive','How do collections work?'].map(q=>`<button type="button" data-question="${escape(q)}">${escape(q)}${icon('arrow')}</button>`).join('');
 document.addEventListener('click',event=>{
+  const use=event.target.closest('[data-use-project]');
+  if(use){closeDetails();projectsUI.openUse(use.dataset.useProject);return;}
   const version=event.target.closest('[data-detail-view]');
   if(version&&detailId){detailView=version.dataset.detailView;fillDetails(detailId);$('#detail-content').scrollTop=0;$('#detail-content [data-detail-view="'+detailView+'"]')?.focus();return;}
   const download=event.target.closest('[data-download-skeleton]');
@@ -267,7 +324,7 @@ $('#assistant-launcher').addEventListener('click',()=>$('#assistant-panel').hidd
 $('#assistant-form').addEventListener('submit',e=>{e.preventDefault();askGuide($('#assistant-question').value);});
 $('#mobile-menu').addEventListener('click',()=>{const open=!document.body.classList.contains('nav-open');document.body.classList.toggle('nav-open',open);$('#sidebar-backdrop').hidden=!open;$('#mobile-menu').setAttribute('aria-expanded',String(open));});$('#sidebar-backdrop').addEventListener('click',closeSidebar);
 document.addEventListener('keydown',event=>{
-  if($('#collection-modal').open||$('#about-modal').open)return;
+  if(document.querySelector('dialog[open]'))return;
   const typing=['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName);
   const drawerOpen=!$('#detail-overlay').hidden;
   if(!drawerOpen&&(event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==='k'){event.preventDefault();openAssistant();}
@@ -279,5 +336,7 @@ document.querySelectorAll('.archive-header a[href="#archive"]').forEach(link=>li
 window.addEventListener('hashchange',route);
 window.addEventListener('popstate',route);
 $('#archive-about').addEventListener('click',()=>$('#about-modal').showModal());
-$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#main-content')).focus();});
+$('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):['project','projects'].includes(state.route)?$('#projects-workspace'):$('#main-content')).focus();});
+await projectCloud.start();
 route();
+if(projectCloud.getState().needsEmail){location.hash='projects';openProjectSignIn();}

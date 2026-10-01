@@ -17,7 +17,12 @@ if(!item){
 }else{
   document.title=`${item.name} skeleton — agencykit`;
   document.querySelector('#preview-title').textContent=item.name;
-  const cleanup=mountSkeleton(root,item);
+  let cleanup=mountSkeleton(root,item);
+  // The editor sends text/theme data only. Rendered HTML is never accepted.
+  if(embed)window.addEventListener('message',event=>{
+    if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=='agencykit-draft-preview'||event.data.sourceId!==item.id)return;
+    cleanup();cleanup=mountSkeleton(root,item,{project:event.data.project,draft:event.data.draft});
+  });
   window.addEventListener('pagehide',event=>{if(!event.persisted)cleanup();});
   const button=document.querySelector('#preview-download');button.disabled=false;
   button.addEventListener('click',()=>{

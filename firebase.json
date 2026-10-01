@@ -71,6 +71,15 @@
     ],
     "headers": [
       {
+        "source": "/agencykit",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://bijanizadian-84e48-default-rtdb.firebaseio.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+          }
+        ]
+      },
+      {
         "source": "**",
         "headers": [
           {
@@ -109,7 +118,7 @@
           },
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://bijanizadian-84e48-default-rtdb.firebaseio.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
           }
         ]
       },

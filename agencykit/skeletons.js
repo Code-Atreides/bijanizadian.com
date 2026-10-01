@@ -126,11 +126,51 @@ function invoice() {
   return `${nav([['Line items','#items'],['Demo details','#details']])}<main class="sk-wrap"><section class="sk-section" id="items"><p class="sk-kicker">Your studio · Local calculator</p><h1>A simple invoice.</h1><p class="sk-lead">Build a sample total from quantities and rates. Nothing is stored, sent, or paid.</p><div class="sk-field-row" style="margin-bottom:26px"><label>Sample client<input placeholder="Example client" maxlength="120" autocomplete="off"></label><label>Sample project<input placeholder="Example project" maxlength="120" autocomplete="off"></label></div><div class="sk-table-wrap"><table class="sk-table sk-invoice-table"><thead><tr><th scope="col">Item</th><th scope="col">Quantity</th><th scope="col">Rate (USD)</th><th scope="col">Total</th><th scope="col">Edit</th></tr></thead><tbody data-invoice-lines>${invoiceRow('Planning','1','125')}${invoiceRow('Design','2','75')}${invoiceRow('Review','0.5','60')}</tbody></table></div><div class="sk-invoice-summary"><button class="sk-button sk-secondary" type="button" data-invoice-add>Add line item ${arrow}</button><strong>Sample total <output data-invoice-total aria-label="Sample invoice total">—</output></strong></div><p class="sk-note" data-invoice-status role="status"></p></section>${section('details','A calculation, ready to adapt.','Frontend demo only. Reloading clears your changes.',`<p class="sk-invoice-note">Quantities and rates accept up to two decimal places. Each line rounds to the nearest cent before adding the total. This sample does not add taxes, discounts, payment links, or invoice delivery.</p>`)}${footer()}</main>`;
 }
 
-function markup(item) {
+
+/** Accept only text and bounded theme values; client input never becomes markup. */
+export function draftTheme(custom = {}) {
+  const project=custom.project||{}, draft=custom.draft||{}, brand=project.brand||{}, copy=draft.copy||{};
+  const color=(value,fallback)=>/^#[a-f0-9]{6}$/i.test(value||'')?value:fallback;
+  const text=(value,max)=>typeof value==='string'?value.slice(0,max):'';
+  const logo=typeof brand.logo==='string'&&brand.logo.length<700000&&/^data:image\/(?:png|jpeg|webp);base64,[a-z0-9+/=]+$/i.test(brand.logo)?brand.logo:'';
+  return {name:text(project.name,120),title:text(copy.title,240),description:text(copy.description,4000),eyebrow:text(copy.eyebrow,120),cta:text(copy.cta,120),logo,
+    accent:color(brand.accent,'#343430'),bg:color(brand.bg,'#f7f7f2'),ink:color(brand.ink,'#444435'),font:({system:'-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',editorial:'Georgia,"Times New Roman",serif',modern:'Arial,Helvetica,sans-serif'})[brand.font]||'-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif'};
+}
+function draftCSS(custom) {
+  if(!custom)return '';
+  const t=draftTheme(custom);
+  return '.sk{--bg:'+t.bg+';--ink:'+t.ink+';--surface:color-mix(in srgb,'+t.bg+' 94%, '+t.ink+');--line:color-mix(in srgb,'+t.ink+' 18%, '+t.bg+');background:'+t.bg+';color:'+t.ink+';font-family:'+t.font+'}.sk p,.sk label,.sk small{color:color-mix(in srgb,'+t.ink+' 72%, '+t.bg+')}.sk .sk-kicker{color:color-mix(in srgb,'+t.ink+' 65%, '+t.bg+')!important}.sk .sk-button:not(.sk-secondary),.sk .sk-launcher{background:'+t.accent+';border-color:'+t.accent+';color:'+contrastInk(t.accent)+'!important}.sk .sk-progress>span{background:'+t.accent+'}.sk .sk-brand img{max-height:34px;max-width:130px;object-fit:contain}.sk :is(h1,h2,h3){overflow-wrap:anywhere}.sk .sk-lead{white-space:pre-line}';
+}
+function contrastInk(hex) {
+  const rgb=hex.slice(1).match(/../g).map(c=>{const n=parseInt(c,16)/255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4;});
+  return .2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2]>.179?'#161616':'#ffffff';
+}
+function draftSurfaces(custom) {
+  if(!custom)return '';
+  return '.sk :is(.sk-form-panel,.sk-stats>div,.sk-table-wrap,.sk-task-column,.sk-detail-panel,.sk-chat,.sk-score,.sk-step-list>div,input,select,textarea){background:var(--surface);color:var(--ink);border-color:var(--line)}.sk :is(.sk-side,.sk-art,.sk-callout,.sk-copybox,.sk-pill,.sk-chat-note,.sk-gallery-visual){background:color-mix(in srgb,var(--bg) 90%,var(--ink));color:var(--ink);border-color:var(--line)}.sk :is(.sk-table td,.sk-table th,.sk-stat,.sk-big-number,.sk-form-panel legend,.sk-list li){color:var(--ink)}.sk .sk-button.sk-secondary{color:var(--ink)!important;border-color:var(--line)}';
+}
+function customizeMarkup(html,custom) {
+  if(!custom)return html;
+  const t=draftTheme(custom);
+  if(t.name){html=html.replace(/(<a class="sk-brand"[^>]*>)[\s\S]*?(<\/a>)/g,(_,a,b)=>a+(t.logo?'<img src="'+escape(t.logo)+'" alt="'+escape(t.name)+'">':escape(t.name))+b).replace('<span>Your project.</span>','<span>'+escape(t.name)+'</span>');}
+  if(t.title)html=html.replace(/(<h1\b[^>]*>)[\s\S]*?(<\/h1>)/,(_,a,b)=>a+escape(t.title)+b);
+  if(t.title&&!html.includes('<h1'))html=html.replace(/(<h2\b[^>]*>)[\s\S]*?(<\/h2>)/,(_,a,b)=>a+escape(t.title)+b);
+  if(t.eyebrow)html=html.replace(/(<p class="sk-kicker"[^>]*>)[\s\S]*?(<\/p>)/,(_,a,b)=>a+escape(t.eyebrow)+b);
+  if(t.description){
+    if(/<p class="sk-lead"/.test(html))html=html.replace(/(<p class="sk-lead"[^>]*>)[\s\S]*?(<\/p>)/,(_,a,b)=>a+escape(t.description)+b);
+    else if(/<\/h1>\s*<p>/.test(html))html=html.replace(/(<\/h1>\s*<p>)[\s\S]*?(<\/p>)/,(_,a,b)=>a+escape(t.description)+b);
+    else if(html.includes('<h1'))html=html.replace('</h1>','</h1><p class="sk-lead">'+escape(t.description)+'</p>');
+    else html=html.replace(/(<\/h2>\s*<p>)[\s\S]*?(<\/p>)/,(_,a,b)=>a+escape(t.description)+b);
+  }
+  if(t.cta)html=html.replace(/(<(?:a|button) class="sk-button"[^>]*>)[\s\S]*?(<\/(?:a|button)>)/,(_,a,b)=>a+escape(t.cta)+' '+arrow+b);
+  return html;
+}
+
+function markup(item,custom) {
   const family=skeletonFamily(item);
   const renderers={'campaign-page':campaign,'event-page':eventPage,'application-form':application,'referral-flow':referral,'member-portal':portal,'relationship-workspace':workspace,assistant,directory,handbook,'crew-planner':crew,gallery,invoice};
   const labels=Array.isArray(item.skeletonSections)?item.skeletonSections.filter(s=>typeof s==='string').slice(0,10):[];
-  return `<div class="sk" id="top" data-skeleton-family="${family}">${renderers[family](item)}${family!=='assistant'&&labels.length?`<div class="sk-wrap"><details class="sk-structure"><summary>Layout notes</summary><ol>${labels.map(s=>`<li>${escape(s.slice(0,160))}</li>`).join('')}</ol></details></div>`:''}<div class="sk-toast" data-toast role="status" hidden></div></div>`;
+  return `<div class="sk" id="top" data-skeleton-family="${family}">${customizeMarkup(renderers[family](item),custom)}${family!=='assistant'&&labels.length?`<div class="sk-wrap"><details class="sk-structure"><summary>Layout notes</summary><ol>${labels.map(s=>`<li>${escape(s.slice(0,160))}</li>`).join('')}</ol></details></div>`:''}<div class="sk-toast" data-toast role="status" hidden></div></div>`;
 }
 
 /** Shared initializer; kept self-contained so the download can inline it. */
@@ -202,26 +242,26 @@ function attachInteractions(root) {
   return ()=>{controller.abort();clearTimeout(toastTimer);};
 }
 
-export function mountSkeleton(container, item = {}) {
+export function mountSkeleton(container, item = {}, custom) {
   const style=document.createElement('style');
-  style.textContent=STYLES;
+  style.textContent=STYLES+draftCSS(custom)+draftSurfaces(custom);
   const content=document.createElement('div');
-  content.innerHTML=markup(item);
+  content.innerHTML=markup(item,custom);
   container.replaceChildren(style,content);
   return attachInteractions(content.querySelector('.sk'));
 }
 
-export function buildSkeletonDocument(item = {}) {
+export function buildSkeletonDocument(item = {}, custom) {
   const family=skeletonFamily(item);
-  return `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>Your project — ${escape(family.replaceAll('-',' '))} starter</title><style>html,body{margin:0;padding:0} ${STYLES}</style></head><body>\n<!-- Edit the neutral copy, structure, and styles below. All example interactions are local. -->\n${markup(item)}\n<script>const calculateInvoice=${calculateInvoice.toString()};\n(${attachInteractions.toString()})(document.querySelector('.sk'));<\/script>\n</body></html>`;
+  return `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'"><title>${escape(custom?.project?.name||'Your project')} — ${escape(family.replaceAll('-',' '))} starter</title><style>html,body{margin:0;padding:0} ${STYLES}${draftCSS(custom)}${draftSurfaces(custom)}</style></head><body>\n<!-- Edit the neutral copy, structure, and styles below. All example interactions are local. -->\n${markup(item,custom)}\n<script>const calculateInvoice=${calculateInvoice.toString()};\n(${attachInteractions.toString()})(document.querySelector('.sk'));<\/script>\n</body></html>`;
 }
 
-export function downloadSkeleton(item = {}) {
-  const file=new Blob([buildSkeletonDocument(item)],{type:'text/html;charset=utf-8'});
+export function downloadSkeleton(item = {}, custom) {
+  const file=new Blob([buildSkeletonDocument(item,custom)],{type:'text/html;charset=utf-8'});
   const url=URL.createObjectURL(file);
   const anchor=document.createElement('a');
   anchor.href=url;
-  anchor.download=`${String(item.id||'your-project').replace(/[^a-z0-9_-]/gi,'-').slice(0,80)}-skeleton.html`;
+  anchor.download=`${String(custom?.draft?.name||item.id||'your-project').replace(/[^a-z0-9_-]/gi,'-').slice(0,80)}-skeleton.html`;
   document.body.append(anchor);anchor.click();anchor.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

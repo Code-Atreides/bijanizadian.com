@@ -110,6 +110,26 @@
       "$code": {
         ".read": true
       }
+    },
+    "agencykitWorkspace": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com' && newData.exists()",
+      ".validate": "newData.hasChildren(['payload', 'revision', 'updatedBy', 'updatedAt']) && ((!data.exists() && newData.child('revision').val() == 1) || (data.exists() && newData.child('revision').val() == data.child('revision').val() + 1))",
+      "payload": {
+        ".validate": "newData.isString() && newData.val().length <= 4194304"
+      },
+      "revision": {
+        ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() % 1 == 0"
+      },
+      "updatedBy": {
+        ".validate": "newData.isString() && newData.val() == auth.uid"
+      },
+      "updatedAt": {
+        ".validate": "newData.isNumber() && newData.val() == now"
+      },
+      "$other": {
+        ".validate": false
+      }
     }
   }
 }
