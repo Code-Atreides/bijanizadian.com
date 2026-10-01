@@ -1,6 +1,27 @@
 // Original work and verified original-interface previews, September 2026.
 // Internal previews use original access screens or explicitly fictional sample data.
-// Client grouping is curated independently from each original sourceHost/sourceUrl.
+// Client ownership is independent from the personal domains used to publish work.
+export const publishingDomains = [
+  {
+    "id": "milo-messina",
+    "name": "milomessina.com",
+    "url": "https://milomessina.com",
+    "aliases": [
+      "Milo Messina",
+      "milomessina.com"
+    ]
+  },
+  {
+    "id": "bijan-izadian",
+    "name": "bijanizadian.com",
+    "url": "https://bijanizadian.com",
+    "aliases": [
+      "Bijan Izadian",
+      "bijanizadian.com"
+    ]
+  }
+];
+
 export const archiveProjects = [
   {
     "id": "fomo",
@@ -2598,12 +2619,15 @@ export const archiveProjects = [
         },
         "sourceHost": "milomessina.com"
       }
-    ]
+    ],
+    "client": "fomo"
   },
   {
-    "id": "milo-messina",
-    "name": "Milo Messina",
-    "description": "Personal pages and other work collected in the Milo Messina archive.",
+    "id": "unassigned",
+    "name": "Unassigned work",
+    "client": null,
+    "seedProject": false,
+    "description": "Pages kept in the archive until they are associated with a client project.",
     "items": [
       {
         "id": "milo-home",
@@ -3043,14 +3067,7 @@ export const archiveProjects = [
           ]
         },
         "sourceHost": "milomessina.com"
-      }
-    ]
-  },
-  {
-    "id": "bijan-izadian",
-    "name": "Bijan Izadian",
-    "description": "Project intake and client-facing go-to-market tools.",
-    "items": [
+      },
       {
         "id": "bijan-build-request",
         "name": "Build request",

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createProjectStore, PROJECT_STORAGE_KEY } from '../agencykit/project-store.js';
-import { archiveProjects as originals } from '../agencykit/archive-data.js';
+import { archiveProjects as originals, publishingDomains } from '../agencykit/archive-data.js';
 
 const catalog = [
   { id: 'source-a', name: 'Campus page', projectId: 'fomo', sourceUrl: 'https://example.com/campus', description: 'Original copy.' },
@@ -9,9 +9,9 @@ const catalog = [
   { id: 'source-c', name: 'Contact page', projectId: 'bijan', sourceUrl: 'https://example.com/contact' },
 ];
 const archiveProjects = [
-  { id: 'fomo', name: 'fomo', description: 'Campus work.', items: [catalog[0]] },
-  { id: 'milo', name: 'Milo', description: 'Client work.', items: [catalog[1]] },
-  { id: 'bijan', name: 'Bijan', description: 'Studio work.', items: [catalog[2]] },
+  { id: 'fomo', name: 'fomo', client: 'fomo', description: 'Campus work.', items: [catalog[0]] },
+  { id: 'milo', name: 'Milo', client: 'Milo', description: 'Client work.', items: [catalog[1]] },
+  { id: 'bijan', name: 'Bijan', client: 'Bijan', description: 'Studio work.', items: [catalog[2]] },
 ];
 function memory(initial = {}) {
   const data = new Map(Object.entries(initial));
@@ -23,9 +23,10 @@ const payload = projects => ({ version: 1, projects });
 test('the real archive seeds deterministic profiles without writing or changing originals', () => {
   const sourceCatalog = originals.flatMap(project => project.items.map(item => ({ ...item, projectId: project.id })));
   const before = JSON.stringify(originals), storage = memory();
-  const store = createProjectStore({ storage, catalog: sourceCatalog, archiveProjects: originals });
-  assert.deepEqual(store.getProjects().map(project => project.id), originals.map(project => project.id));
-  for (const project of originals) {
+  const store = createProjectStore({ storage, catalog: sourceCatalog, archiveProjects: originals, publishingDomains });
+  const seededOriginals = originals.filter(project => project.seedProject !== false);
+  assert.deepEqual(store.getProjects().map(project => project.id), seededOriginals.map(project => project.id));
+  for (const project of seededOriginals) {
     const seeded = store.getProject(project.id);
     assert.equal(seeded.name, project.name);
     assert.deepEqual(seeded.originalIds, project.items.map(item => item.id));
@@ -34,7 +35,8 @@ test('the real archive seeds deterministic profiles without writing or changing 
   }
   assert.deepEqual(storage.writes, []);
   assert.equal(JSON.stringify(originals), before);
-  assert.deepEqual(createProjectStore({ storage, catalog: sourceCatalog, archiveProjects: originals }).getProjects(), store.getProjects());
+  assert.deepEqual(createProjectStore({ storage, catalog: sourceCatalog, archiveProjects: originals, publishingDomains }).getProjects(), store.getProjects());
+  assert.deepEqual(store.getClients().map(client => client.name), ['fomo'], 'publishing domains are not seeded as clients');
 });
 
 test('profile edits persist, partial nested updates preserve other fields, and notifications are detached', () => {
@@ -242,7 +244,7 @@ test('legacy version-one data migrates clients deterministically without rewriti
   assert.equal(storage.writes.length, 0);
   assert.deepEqual(make(memory({ [PROJECT_STORAGE_KEY]: raw })).getClients(), migrated.getClients());
   const exported = JSON.parse(migrated.exportData());
-  assert.equal(exported.version, 2);
+  assert.equal(exported.version, 3);
   assert.ok(exported.clients.length >= 4);
 });
 
@@ -270,16 +272,22 @@ test('several projects can share a client whose rename and relationship remain i
   assert.equal(store.getClient(client.id).name, 'Acme Studio');
 });
 
-test('assignment supports existing client IDs and compatible name-based creation without changing the original', () => {
+test('assignment supports explicit clients and leaves project names unassigned without changing the original', () => {
   const store = make(), client = store.createClient({ name: 'Acme' });
   const first = store.createProject({ name: 'Campaign', client: '  ACME  ' });
   assert.equal(first.clientId, client.id);
   const named = store.createProject({ name: 'New customer' });
-  assert.equal(store.getClient(named.clientId).name, 'New customer');
+  assert.equal(named.clientId, null);
+  assert.equal(named.client, '');
+  assert.ok(!store.getClients().some(item => item.name === 'New customer'));
+  const other = store.createClient({ name: 'Actual customer' });
   const draft = store.createDraft(first.id, 'source-a');
-  store.updateProject(first.id, { clientId: named.clientId, client: 'Ignored conflicting label' });
-  assert.equal(store.getProject(first.id).client, 'New customer');
+  store.updateProject(first.id, { clientId: other.id, client: 'Ignored conflicting label' });
+  assert.equal(store.getProject(first.id).client, 'Actual customer');
   assert.equal(store.getDraft(first.id, draft.id).sourceId, 'source-a');
+  store.updateProject(first.id, { clientId: null });
+  assert.equal(store.getProject(first.id).clientId, null);
+  assert.equal(store.getProject(first.id).client, '');
   store.updateProject(first.id, { client: 'Acme' });
   assert.equal(store.getProject(first.id).clientId, client.id, 'old client-text updates still work');
   const before = store.exportData();
@@ -352,21 +360,109 @@ test('untouched seeded inventories adopt corrected sources while edited profiles
   assert.ok(store.getClients().every(client => client.relationship === 'current'));
 });
 
-test('version two requires client records and rejects incomplete replacements without changing state', () => {
+test('newer formats require client records and reject incomplete replacements without changing state', () => {
   const storage = memory(), store = make(storage);
   const client = store.createClient({ name: 'Previous client', relationship: 'previous' });
   store.createProject({ name: 'Preserved project', clientId: client.id });
   const before = store.exportData(), persisted = storage.getItem(PROJECT_STORAGE_KEY);
   let events = 0; store.subscribe(() => { events += 1; });
   for (const method of ['replaceData', 'importData']) {
-    assert.throws(() => store[method]({ version: 2, projects: [] }), /client list/);
+    for (const version of [2, 3]) assert.throws(() => store[method]({ version, projects: [] }), /client list/);
     assert.equal(store.exportData(), before);
     assert.equal(storage.getItem(PROJECT_STORAGE_KEY), persisted);
   }
   assert.equal(events, 0);
   const restored = make(); restored.replaceData(before);
-  assert.equal(JSON.parse(restored.exportData()).version, 2);
+  assert.equal(JSON.parse(restored.exportData()).version, 3);
   assert.equal(restored.getClient(client.id).relationship, 'previous');
   restored.replaceData({ version: 1, projects: [] });
-  assert.equal(JSON.parse(restored.exportData()).version, 2, 'legacy cloud defaults upgrade before subsequent saves');
+  assert.equal(JSON.parse(restored.exportData()).version, 3, 'legacy cloud defaults upgrade before subsequent saves');
+});
+
+const sourceOnlySeeds = [archiveProjects[0], { id: 'unassigned', name: 'Unassigned originals', client: null, seedProject: false, items: catalog.slice(1) }];
+const correctedStore = (storage = memory()) => createProjectStore({ storage, catalog, archiveProjects: sourceOnlySeeds, publishingDomains });
+const mistakenClients = [
+  { id: 'client-legacy-8698114e7eb628e8', name: 'Milo Messina', relationship: 'previous' },
+  { id: 'client-legacy-62a5e2b4fd7ebd93', name: 'Bijan Izadian', relationship: 'current' },
+];
+
+test('old publishing clients disappear while edited source projects keep their complete draft history unassigned', () => {
+  const legacy = {
+    version: 2, clients: [...mistakenClients, { id: 'client-acme', name: 'Actual Acme', relationship: 'previous' }],
+    projects: [
+      { id: 'milo-messina', name: 'Milo Messina', clientId: mistakenClients[0].id, client: 'Milo Messina', originalIds: ['source-b'], drafts: [] },
+      { id: 'bijan-izadian', name: 'Bijan Izadian', clientId: mistakenClients[1].id, client: 'Bijan Izadian', originalIds: ['source-c'], updatedAt: '2026-01-01T00:00:00.000Z', brand: { accent: '#123456', font: 'editorial' }, brief: { goal: 'Keep this brief' }, drafts: [{ id: 'personal-draft', sourceId: 'source-c', name: 'Personal draft', copy: { title: 'Keep my page' }, versions: [{ id: 'personal-version', label: 'Approved', snapshot: { copy: { title: 'Earlier draft' } } }] }] },
+      { id: 'client-project', name: 'Real engagement', clientId: 'client-acme', status: 'complete' },
+    ],
+  };
+  const storage = memory({ [PROJECT_STORAGE_KEY]: JSON.stringify(legacy) }), store = correctedStore(storage);
+  assert.equal(store.getProject('milo-messina'), null, 'untouched source inventory is still available in the archive');
+  const preserved = store.getProject('bijan-izadian');
+  assert.equal(preserved.clientId, null);
+  assert.equal(preserved.client, '');
+  assert.equal(preserved.brand.accent, '#123456');
+  assert.equal(preserved.brand.font, 'editorial');
+  assert.equal(preserved.brief.goal, 'Keep this brief');
+  assert.deepEqual(preserved.originalIds, ['source-c']);
+  assert.equal(preserved.drafts[0].id, 'personal-draft');
+  assert.equal(preserved.drafts[0].sourceId, 'source-c');
+  assert.equal(preserved.drafts[0].copy.title, 'Keep my page');
+  assert.equal(preserved.drafts[0].versions[0].snapshot.copy.title, 'Earlier draft');
+  assert.equal(store.getClient('client-acme').relationship, 'previous');
+  assert.equal(store.getProject('client-project').client, 'Actual Acme');
+  assert.deepEqual(new Set(store.getClients().map(client => client.name)), new Set(['Actual Acme', 'fomo']));
+  assert.equal(storage.writes.length, 0, 'migration on load does not overwrite its source');
+  const once = store.exportData();
+  store.importData(legacy); store.importData(legacy);
+  assert.equal(store.exportData(), once, 'old backups cannot resurrect source-only projects or false clients');
+  const restored = correctedStore(); restored.replaceData(store.exportData());
+  assert.deepEqual(restored.getProjects(), store.getProjects());
+  assert.deepEqual(restored.getClients(), store.getClients());
+  assert.equal(JSON.parse(restored.exportData()).version, 3);
+});
+
+test('legacy blank fomo assignments use the explicit seed client while v3 and custom unassignment stay intentional', () => {
+  for (const version of [1, 2]) {
+    const input = { version, ...(version === 2 ? { clients: [] } : {}), projects: [
+      { id: 'fomo', name: 'Edited fomo workspace', client: '', clientId: null, updatedAt: '2026-01-01T00:00:00.000Z', brand: { accent: '#abcdef' } },
+      { id: 'custom-project', name: 'A project title, not a client', client: '' },
+      { id: 'personal-work', name: 'Portfolio edits', client: 'www.milomessina.com', drafts: [{ id: 'retained-draft', sourceId: 'source-b' }] },
+    ] };
+    const store = correctedStore(memory({ [PROJECT_STORAGE_KEY]: JSON.stringify(input) }));
+    assert.equal(store.getProject('fomo').client, 'fomo');
+    assert.equal(store.getProject('fomo').brand.accent, '#abcdef');
+    assert.equal(store.getProject('custom-project').clientId, null);
+    assert.equal(store.getProject('personal-work').clientId, null);
+    assert.equal(store.getDraft('personal-work', 'retained-draft').sourceId, 'source-b');
+    assert.deepEqual(store.getClients().map(client => client.name), ['fomo']);
+  }
+  const explicit = correctedStore();
+  explicit.replaceData({ version: 3, clients: [], projects: [{ id: 'fomo', name: 'fomo', clientId: null, client: '' }] });
+  assert.equal(explicit.getProject('fomo').clientId, null);
+  assert.deepEqual(explicit.getClients(), []);
+});
+
+test('publishing identities cannot be created or renamed as clients and never arise from a project title', () => {
+  const store = correctedStore(), client = store.createClient({ name: 'Actual customer' });
+  const before = store.exportData();
+  for (const name of ['Milo Messina', 'Bijan Izadian', 'milomessina.com', 'www.bijanizadian.com', 'https://milomessina.com']) {
+    assert.throws(() => store.createClient({ name }), /Publishing domains/);
+    assert.throws(() => store.updateClient(client.id, { name }), /Publishing domains/);
+    assert.throws(() => store.createProject({ name: 'Misassigned', client: name }), /Publishing domains/);
+    assert.equal(store.exportData(), before);
+  }
+  const project = store.createProject({ name: 'Milo Messina' });
+  assert.equal(project.clientId, null);
+  assert.equal(project.client, '');
+  assert.equal(store.getProjects().some(item => item.id === 'unassigned'), false);
+  const draft = store.createDraft(project.id, 'source-b');
+  assert.equal(draft.sourceId, 'source-b', 'unassigned originals remain usable without fabricating a client');
+});
+
+test('a user-corrected real client is preserved even when its ID came from an old publishing client', () => {
+  const store = correctedStore();
+  store.replaceData({ version: 2, clients: [{ id: mistakenClients[0].id, name: 'Actual customer', relationship: 'previous' }], projects: [{ id: 'client-work', name: 'Campaign', clientId: mistakenClients[0].id, client: 'Milo Messina' }] });
+  assert.equal(store.getClient(mistakenClients[0].id).name, 'Actual customer');
+  assert.equal(store.getClient(mistakenClients[0].id).relationship, 'previous');
+  assert.equal(store.getProject('client-work').client, 'Actual customer');
 });

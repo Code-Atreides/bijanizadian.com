@@ -1,6 +1,6 @@
 /** Local project drafts. Originals are references, never writable source data. */
 export const PROJECT_STORAGE_KEY = 'agencykit-projects-v1';
-const VERSION = 2;
+const VERSION = 3;
 const SEED_TIME = '1970-01-01T00:00:00.000Z';
 const MAX_IMPORT = 5 * 1024 * 1024;
 const MAX_PROJECTS = 100;
@@ -43,7 +43,7 @@ const color = (value, fallback) => typeof value === 'string' && /^#[0-9a-f]{6}$/
  * Import merges new records; local edited records win collisions. Untouched seeded
  * profiles can adopt backup settings. Malformed prior storage is backed up before
  * the first replacement write. No cloud, network, or authentication is involved. */
-export function createProjectStore({ storage, catalog = [], archiveProjects = [], onError = () => {} } = {}) {
+export function createProjectStore({ storage, catalog = [], archiveProjects = [], publishingDomains = [], onError = () => {} } = {}) {
   const sources = new Map();
   for (const item of catalog) {
     if (!safeId(item?.id) || sources.has(item.id)) throw new TypeError('Catalog source IDs must be unique and safe.');
@@ -51,9 +51,29 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
   }
   const seeds = new Map();
   for (const project of archiveProjects) {
+    if (project?.seedProject === false) continue;
     if (!safeId(project?.id) || seeds.has(project.id)) throw new TypeError('Archive project IDs must be unique and safe.');
     seeds.set(project.id, project);
   }
+  const domainNames = new Set(), oldSourceProjects = new Set(['milo-messina', 'bijan-izadian']);
+  const oldDomainClients = new Set(['client-legacy-8698114e7eb628e8', 'client-legacy-62a5e2b4fd7ebd93']);
+  const domainKey = value => {
+    let normalized = clientKey(text(value, 2048));
+    try { if (/^https?:\/\//.test(normalized)) normalized = new URL(normalized).hostname; } catch { /* Keep invalid URL-like names as plain text. */ }
+    return normalized.replace(/^www\./, '').replace(/[/.]+$/, '');
+  };
+  for (const domain of [
+    { id: 'milo-messina', name: 'milomessina.com', aliases: ['Milo Messina'] },
+    { id: 'bijan-izadian', name: 'bijanizadian.com', aliases: ['Bijan Izadian'] },
+    ...publishingDomains,
+  ]) {
+    if (safeId(domain.id)) oldSourceProjects.add(domain.id);
+    for (const name of [domain.name, domain.url, ...(domain.aliases || [])].filter(value => typeof value === 'string' && value.trim())) {
+      domainNames.add(domainKey(name)); oldDomainClients.add(legacyClientId(name));
+    }
+  }
+  const isDomainName = name => Boolean(name) && domainNames.has(domainKey(name));
+  const requireClientName = name => { if (isDomainName(name)) throw new TypeError('Publishing domains are source locations, not clients. Choose an actual client name.'); };
   const listeners = new Set();
   let state, unreadable = null, recoveryRaw = null, recoverySaved = false;
   const report = error => { try { onError(error); } catch { /* Reporting cannot change save semantics. */ } };
@@ -67,7 +87,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const value = key => own(raw, key) ? raw[key] : base[key];
     return {
       name: text(value('name'), 120, 'Untitled project') || 'Untitled project',
-      clientId: value('clientId') ?? '', client: text(value('client'), 120), description: text(value('description'), 4000),
+      clientId: value('clientId') || null, client: text(value('client'), 120), description: text(value('description'), 4000),
       status: choice(value('status'), ['active', 'paused', 'complete'], 'active'),
       brand: { accent: color(brand.accent, '#6366f1'), bg: color(brand.bg, '#f7f7f5'), ink: color(brand.ink, '#242423'), font: choice(brand.font, ['system', 'editorial', 'modern'], 'system'), logo: logo(brand.logo) },
       brief: { audience: text(brief.audience, 1000), goal: text(brief.goal, 1600), tone: text(brief.tone, 500) },
@@ -88,6 +108,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
   }
   function clientByName(data, name, time = SEED_TIME) {
     name = text(name, 120, 'Untitled client') || 'Untitled client';
+    requireClientName(name);
     const found = data.clients.find(client => clientKey(client.name) === clientKey(name));
     if (found) return found;
     if (data.clients.length >= MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
@@ -98,13 +119,35 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     return client;
   }
   function assignClient(data, project, time = SEED_TIME) {
-    const client = project.clientId ? data.clients.find(item => item.id === project.clientId) : clientByName(data, project.client || project.name, time);
+    if (!project.clientId && !project.client) { project.clientId = null; project.client = ''; return; }
+    const client = project.clientId ? data.clients.find(item => item.id === project.clientId) : clientByName(data, project.client, time);
     if (!client || !safeId(client.id)) throw new TypeError('Choose an existing client for this project.');
     project.clientId = client.id; project.client = client.name;
   }
   function linkClients(data) {
     if (data.clients.length > MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
     for (const project of data.projects) assignClient(data, project);
+    return data;
+  }
+  function removePublishingClients(data, inputVersion) {
+    const falseIds = new Set(data.clients.filter(client => isDomainName(client.name)).map(client => client.id));
+    const actualIds = new Set(data.clients.filter(client => !falseIds.has(client.id)).map(client => client.id));
+    data.clients = data.clients.filter(client => !falseIds.has(client.id));
+    data.projects = data.projects.filter(project => {
+      if (inputVersion < VERSION && !project.clientId && !project.client && typeof seeds.get(project.id)?.client === 'string') project.client = text(seeds.get(project.id).client, 120);
+      // A user-renamed real client is authoritative even if its ID began as one
+      // of the mistaken legacy clients. Do not undo that explicit correction.
+      const explicitActual = actualIds.has(project.clientId) || (!project.clientId && project.client && !isDomainName(project.client));
+      const falseClient = falseIds.has(project.clientId) || (!explicitActual && (isDomainName(project.client) || oldDomainClients.has(project.clientId)));
+      const oldSource = inputVersion < VERSION && oldSourceProjects.has(project.id) && !explicitActual;
+      if (falseClient || oldSource) { project.clientId = null; project.client = ''; }
+      if (!oldSource) return true;
+      const defaults = profile({}).brand;
+      const untouched = project.updatedAt === SEED_TIME && !project.drafts.length && isDomainName(project.name)
+        && project.status === 'active' && JSON.stringify(project.brand) === JSON.stringify(defaults)
+        && Object.values(project.brief).every(value => !value) && Object.values(project.links).every(value => !value);
+      return !untouched;
+    });
     return data;
   }
   function draftFields(raw, base = {}) {
@@ -135,7 +178,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
   }
   function seedProject(id) {
     const seed = seeds.get(id);
-    return { id, seeded: true, ...profile({ name: seed.name, client: seed.client || seed.name, description: seed.description, originalIds: seed.items?.map(item => item.id) }), drafts: [], createdAt: SEED_TIME, updatedAt: SEED_TIME };
+    return { id, seeded: true, ...profile({ name: seed.name, client: seed.client || '', description: seed.description, originalIds: seed.items?.map(item => item.id) }), drafts: [], createdAt: SEED_TIME, updatedAt: SEED_TIME };
   }
   function normalizeProject(raw) {
     if (!object(raw) || !safeId(raw.id)) throw new TypeError('Invalid project ID.');
@@ -152,15 +195,15 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const serialized = typeof input === 'string' ? input : JSON.stringify(input);
     if (!fitsBackup(serialized)) throw new RangeError('Project backup must be smaller than 5 MB.');
     const data = JSON.parse(serialized);
-    if (!object(data) || ![1, VERSION].includes(data.version) || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
+    if (!object(data) || ![1, 2, VERSION].includes(data.version) || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
     if (data.projects.length > MAX_PROJECTS) throw new RangeError('A backup can hold at most 100 projects.');
-    if ((data.version === VERSION || data.clients !== undefined) && !Array.isArray(data.clients)) throw new TypeError('Invalid client list.');
+    if ((data.version >= 2 || data.clients !== undefined) && !Array.isArray(data.clients)) throw new TypeError('Invalid client list.');
     if ((data.clients || []).length > MAX_CLIENTS) throw new RangeError('A backup can hold at most 200 clients.');
     const clients = (data.clients || []).map(normalizeClient);
     if (new Set(clients.map(client => client.id)).size !== clients.length) throw new TypeError('Duplicate client IDs.');
     const projects = data.projects.map(normalizeProject);
     if (new Set(projects.map(project => project.id)).size !== projects.length) throw new TypeError('Duplicate project IDs.');
-    return linkClients({ version: VERSION, clients, projects });
+    return linkClients(removePublishingClients({ version: VERSION, clients, projects }, data.version));
   }
   function withSeeds(data) {
     const projects = [...data.projects];
@@ -209,6 +252,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       if (state.clients.length >= MAX_CLIENTS) throw new RangeError('This workspace can hold at most 200 clients.');
       const now = new Date().toISOString(), next = clone(state);
       const client = { id: freshId('client'), ...clientFields(fields), createdAt: now, updatedAt: now };
+      requireClientName(client.name);
       next.clients.push(client); commit(next);
       return clone(client);
     },
@@ -216,6 +260,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       const next = clone(state), client = next.clients.find(item => item.id === clientId);
       if (!client) throw new RangeError('Client not found.');
       Object.assign(client, clientFields(patch, client), { updatedAt: new Date().toISOString() });
+      requireClientName(client.name);
       for (const project of next.projects) if (project.clientId === clientId && project.client !== client.name) { project.client = client.name; project.updatedAt = client.updatedAt; }
       commit(next);
       return clone(client);
@@ -235,6 +280,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       return mutate(projectId, (project, next) => {
         Object.assign(project, profile(patch, project));
         if (own(record(patch), 'client') && !own(record(patch), 'clientId')) project.clientId = '';
+        if (own(record(patch), 'clientId') && !patch.clientId) project.client = '';
         assignClient(next, project, new Date().toISOString());
         project.originalIds = originalIds([...project.originalIds, ...project.drafts.map(draft => draft.sourceId), ...(seeds.has(projectId) ? seedProject(projectId).originalIds : [])]);
         return project;
