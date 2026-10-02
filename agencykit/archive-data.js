@@ -1,6 +1,6 @@
-// Original work and verified original-interface previews, September 2026.
+// Original work and verified original-interface previews, September–October 2026.
 // Internal previews use original access screens or explicitly fictional sample data.
-// Client ownership is independent from the personal domains used to publish work.
+// Client ownership is independent from the domains used to publish work.
 export const publishingDomains = [
   {
     "id": "milo-messina",
@@ -18,6 +18,24 @@ export const publishingDomains = [
     "aliases": [
       "Bijan Izadian",
       "bijanizadian.com"
+    ]
+  },
+  {
+    "id": "fomo-campus",
+    "name": "fomocampus.com",
+    "url": "https://www.fomocampus.com",
+    "aliases": [
+      "fomocampus.com",
+      "www.fomocampus.com"
+    ]
+  },
+  {
+    "id": "jesse-baizer",
+    "name": "jessebaizer.com",
+    "url": "https://jessebaizer.com",
+    "aliases": [
+      "Jesse Baizer",
+      "jessebaizer.com"
     ]
   }
 ];
@@ -2618,6 +2636,780 @@ export const archiveProjects = [
           ]
         },
         "sourceHost": "milomessina.com"
+      },
+      {
+        "id": "fomocampus-landing",
+        "name": "FOMO Campus — chapter rewards",
+        "category": "Pages",
+        "description": "A chapter recruitment landing page with a payout calculator, tracker and Rewards-link instructions, referrals, and FAQs.",
+        "skeletonKey": "campaign-page",
+        "preview": "landing",
+        "skeletonSections": [
+          "Brand and navigation",
+          "Chapter recruitment hero",
+          "Member payout calculator",
+          "Tracker and Rewards-link guide",
+          "Referral rewards",
+          "Common questions"
+        ],
+        "tags": [
+          "campus",
+          "college",
+          "chapter",
+          "landing",
+          "campaign",
+          "recruitment",
+          "payout",
+          "calculator",
+          "rewards",
+          "referral",
+          "fomo",
+          "fomocampus.com",
+          "fomocampus"
+        ],
+        "status": "finished",
+        "sourcePath": "fomocampus.com/fomo/",
+        "sourceUrl": "https://www.fomocampus.com/fomo/",
+        "sourceHost": "fomocampus.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/fomocampus-landing.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "lavender",
+            "blue buttons",
+            "split layout",
+            "large typography",
+            "calculator card"
+          ],
+          "features": [
+            "chapter recruitment",
+            "payout calculator",
+            "onboarding instructions",
+            "app screenshot guide",
+            "referral rewards",
+            "FAQ"
+          ],
+          "phrases": [
+            "recruit a chapter",
+            "calculate member rewards",
+            "explain the chapter signup journey"
+          ]
+        }
+      },
+      {
+        "id": "fomocampus-onboard",
+        "name": "FOMO Campus — chapter registration",
+        "category": "Forms",
+        "description": "Chapter registration with organizer contact details, school, chapter, role, and active-member count.",
+        "skeletonKey": "application-form",
+        "preview": "form",
+        "skeletonSections": [
+          "Registration introduction",
+          "Organizer details",
+          "School and chapter",
+          "Role and member count",
+          "Submission and tracker link"
+        ],
+        "tags": [
+          "campus",
+          "chapter",
+          "registration",
+          "onboarding",
+          "signup",
+          "intake",
+          "form",
+          "fomo",
+          "fomocampus.com",
+          "fomocampus"
+        ],
+        "status": "finished",
+        "sourcePath": "fomocampus.com/fomo/onboard/",
+        "sourceUrl": "https://www.fomocampus.com/fomo/onboard/",
+        "sourceHost": "fomocampus.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/fomocampus-onboard.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "light",
+            "lavender",
+            "white card",
+            "blue buttons",
+            "split layout",
+            "stepper"
+          ],
+          "features": [
+            "chapter registration",
+            "organizer contact details",
+            "school selection",
+            "member count",
+            "tracker link"
+          ],
+          "phrases": [
+            "register a new chapter",
+            "collect chapter organizer details"
+          ]
+        }
+      },
+      {
+        "id": "fomocampus-refer",
+        "name": "FOMO Campus — refer a chapter",
+        "category": "Forms",
+        "description": "A name-to-referral-link form with a copy action and chapter referral reward tiers.",
+        "skeletonKey": "referral-flow",
+        "preview": "referral",
+        "skeletonSections": [
+          "Referral introduction",
+          "Name input",
+          "Personal link",
+          "Copy and share",
+          "Reward tiers"
+        ],
+        "tags": [
+          "campus",
+          "chapter",
+          "referral",
+          "share",
+          "attribution",
+          "rewards",
+          "form",
+          "fomo",
+          "fomocampus.com",
+          "fomocampus"
+        ],
+        "status": "finished",
+        "sourcePath": "fomocampus.com/fomo/refer/",
+        "sourceUrl": "https://www.fomocampus.com/fomo/refer/",
+        "sourceHost": "fomocampus.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/fomocampus-refer.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "white",
+            "light",
+            "blue buttons",
+            "centered form",
+            "reward tiers"
+          ],
+          "features": [
+            "referral link generator",
+            "copy link",
+            "reward tiers"
+          ],
+          "phrases": [
+            "refer another chapter",
+            "create a personal share link"
+          ]
+        }
+      },
+      {
+        "id": "jesse-registration",
+        "name": "Greek Wars — chapter tracker",
+        "category": "Portals",
+        "description": "The chapter registration entry and tracker, with chapter payout and referral calculators. The base URL shows the site’s example chapter.",
+        "status": "contextual",
+        "skeletonKey": "member-portal",
+        "preview": "portal",
+        "skeletonSections": [
+          "Chapter identity",
+          "Member payout calculator",
+          "Referral calculator",
+          "Chapter progress",
+          "Registration and sign-in actions"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "registration",
+          "tracker",
+          "portal",
+          "payout",
+          "calculator",
+          "referral",
+          "progress",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original tracker · site-provided example chapter · October 2026",
+        "sourcePath": "jessebaizer.com/registration/",
+        "sourceUrl": "https://jessebaizer.com/registration/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. The base URL renders the original site’s example chapter; a chapter-specific link supplies a real chapter. The example was not created by Agencykit. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-registration.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "green",
+            "gold",
+            "stacked cards",
+            "sliders",
+            "progress bar"
+          ],
+          "features": [
+            "chapter progress",
+            "member payout calculator",
+            "referral calculator",
+            "registration entry"
+          ],
+          "phrases": [
+            "track chapter signup progress",
+            "calculate chapter rewards"
+          ]
+        }
+      },
+      {
+        "id": "jesse-clans",
+        "name": "Greek Wars — chapter leaderboard",
+        "category": "Pages",
+        "description": "A chapter standings page with time-range controls, registration, reward information, and the Greek Village entry.",
+        "skeletonKey": "event-page",
+        "preview": "event",
+        "skeletonSections": [
+          "Competition introduction",
+          "Registration action",
+          "Greek Village entry",
+          "Standings and time ranges",
+          "How it works"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "clans",
+          "competition",
+          "leaderboard",
+          "standings",
+          "rewards",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "status": "finished",
+        "sourcePath": "jessebaizer.com/fomo/clans/",
+        "sourceUrl": "https://jessebaizer.com/fomo/clans/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-clans.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "split layout",
+            "leaderboard rows",
+            "progress bars"
+          ],
+          "features": [
+            "chapter leaderboard",
+            "time-range controls",
+            "chapter registration",
+            "Greek Village link"
+          ],
+          "phrases": [
+            "show campus standings",
+            "compare chapter progress"
+          ]
+        }
+      },
+      {
+        "id": "jesse-clans-create",
+        "name": "Greek Wars — register a chapter",
+        "category": "Forms",
+        "description": "A three-step chapter onboarding form covering the organizer, chapter, and referral, with account setup along the way.",
+        "skeletonKey": "application-form",
+        "preview": "form",
+        "skeletonSections": [
+          "Program introduction",
+          "Organizer and contact details",
+          "Account setup",
+          "School and chapter",
+          "Referral and confirmation"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "registration",
+          "onboarding",
+          "signup",
+          "referral",
+          "account",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "status": "finished",
+        "sourcePath": "jessebaizer.com/fomo/clans/create/",
+        "sourceUrl": "https://jessebaizer.com/fomo/clans/create/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-clans-create.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "split layout",
+            "stepper",
+            "form fields"
+          ],
+          "features": [
+            "multistep registration",
+            "organizer details",
+            "school selection",
+            "account setup",
+            "referral attribution"
+          ],
+          "phrases": [
+            "onboard a chapter in three steps",
+            "register an organizer and their chapter"
+          ]
+        }
+      },
+      {
+        "id": "jesse-prizes",
+        "name": "Greek Wars — chapter and ambassador rewards",
+        "category": "Pages",
+        "description": "A rewards page with chapter and ambassador views, milestone tiers, speed bonuses, referral rewards, rules, and FAQs.",
+        "skeletonKey": "campaign-page",
+        "preview": "landing",
+        "skeletonSections": [
+          "Chapter and ambassador views",
+          "Reward milestones",
+          "Speed bonus",
+          "Chapter referrals",
+          "Rules and FAQs",
+          "Registration action"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "ambassador",
+          "prizes",
+          "rewards",
+          "tiers",
+          "referral",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "status": "finished",
+        "sourcePath": "jessebaizer.com/fomo/prizes/",
+        "sourceUrl": "https://jessebaizer.com/fomo/prizes/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-prizes.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "blue buttons",
+            "tabs",
+            "milestone timeline"
+          ],
+          "features": [
+            "reward tiers",
+            "chapter and ambassador tabs",
+            "milestone progress",
+            "referral rewards",
+            "FAQ"
+          ],
+          "phrases": [
+            "explain program rewards",
+            "compare chapter and ambassador incentives"
+          ]
+        }
+      },
+      {
+        "id": "jesse-login",
+        "name": "FOMO — sign in and claim a chapter",
+        "category": "Forms",
+        "description": "An account entry page with sign-in, chapter-claim, and ambassador application views.",
+        "skeletonKey": "application-form",
+        "preview": "form",
+        "skeletonSections": [
+          "Account introduction",
+          "Sign-in form",
+          "Chapter claim-code form",
+          "Ambassador application",
+          "Registration link"
+        ],
+        "tags": [
+          "login",
+          "signin",
+          "authentication",
+          "account",
+          "claim",
+          "chapter",
+          "ambassador",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "status": "finished",
+        "sourcePath": "jessebaizer.com/fomo/login/",
+        "sourceUrl": "https://jessebaizer.com/fomo/login/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-login.jpg",
+        "previewCaption": "Original page · captured October 2026",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "centered form",
+            "tabs"
+          ],
+          "features": [
+            "sign in",
+            "chapter claim",
+            "ambassador application",
+            "password visibility"
+          ],
+          "phrases": [
+            "claim a chapter account",
+            "sign in to the chapter dashboard"
+          ]
+        }
+      },
+      {
+        "id": "jesse-dashboard",
+        "name": "FOMO — chapter dashboard",
+        "category": "Portals",
+        "description": "The account-protected chapter dashboard entry. Its public preview is the sign-in screen; dashboard contents require access.",
+        "status": "protected",
+        "skeletonKey": "member-portal",
+        "preview": "portal",
+        "skeletonSections": [
+          "Dashboard entry",
+          "Sign-in redirect",
+          "Account access"
+        ],
+        "tags": [
+          "chapter",
+          "dashboard",
+          "portal",
+          "account",
+          "login",
+          "protected",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Public sign-in screen · dashboard requires access · October 2026",
+        "sourcePath": "jessebaizer.com/fomo/dashboard/",
+        "sourceUrl": "https://jessebaizer.com/fomo/dashboard/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. An anonymous browser is redirected to sign-in with the dashboard as its return destination. Dashboard contents were not accessed or verified. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-dashboard.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "centered form",
+            "tabs"
+          ],
+          "features": [
+            "account-protected dashboard entry",
+            "sign-in redirect"
+          ],
+          "phrases": [
+            "find the chapter dashboard",
+            "open a protected member portal"
+          ]
+        }
+      },
+      {
+        "id": "jesse-clans-internal",
+        "name": "Greek Wars — roster admin",
+        "category": "Portals",
+        "description": "An admin-gated roster workspace for chapter submissions and contacts. The preview shows only the public access screen.",
+        "status": "protected",
+        "skeletonKey": "relationship-workspace",
+        "preview": "directory",
+        "skeletonSections": [
+          "Admin access screen",
+          "Roster workspace entry",
+          "Submissions and chapter contacts"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "roster",
+          "admin",
+          "internal",
+          "contacts",
+          "crm",
+          "protected",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original admin access screen · October 2026",
+        "sourcePath": "jessebaizer.com/fomo/clans/internal/",
+        "sourceUrl": "https://jessebaizer.com/fomo/clans/internal/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. Only the public admin gate was opened. Workspace purpose is described by the original frontend; protected records and authenticated controls were not accessed or tested. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-clans-internal.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "centered form",
+            "minimal"
+          ],
+          "features": [
+            "admin access gate",
+            "roster workspace entry",
+            "chapter contacts"
+          ],
+          "phrases": [
+            "find the chapter roster admin",
+            "manage chapter contacts"
+          ]
+        }
+      },
+      {
+        "id": "jesse-clans-onboarded",
+        "name": "Greek Wars — chapter follow-up workspace",
+        "category": "Portals",
+        "description": "An admin-gated chapter follow-up workspace organized around onboarding stages and conversations. The preview shows its access screen.",
+        "status": "protected",
+        "skeletonKey": "relationship-workspace",
+        "preview": "directory",
+        "skeletonSections": [
+          "Admin access screen",
+          "Chapter stage workspace entry",
+          "Conversation and follow-up workflow"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "onboarding",
+          "admin",
+          "internal",
+          "crm",
+          "conversations",
+          "followup",
+          "protected",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original admin access screen · October 2026",
+        "sourcePath": "jessebaizer.com/fomo/clans/onboarded/",
+        "sourceUrl": "https://jessebaizer.com/fomo/clans/onboarded/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. Only the public admin gate was opened. Stages and follow-up purpose come from the original frontend; protected chapter records and conversations were not accessed. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-clans-onboarded.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "blue buttons",
+            "centered form",
+            "minimal"
+          ],
+          "features": [
+            "admin access gate",
+            "chapter stage workspace entry",
+            "conversation follow ups"
+          ],
+          "phrases": [
+            "follow up with onboarded chapters",
+            "keep track of chapter conversations"
+          ]
+        }
+      },
+      {
+        "id": "jesse-join",
+        "name": "Greek Wars — member join",
+        "category": "Forms",
+        "description": "A member join page using a fomo username and email. A chapter referral link supplies the joining context.",
+        "status": "contextual",
+        "skeletonKey": "application-form",
+        "preview": "form",
+        "skeletonSections": [
+          "Member invitation",
+          "Join action",
+          "Existing-member details",
+          "Chapter context",
+          "Footer links"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "member",
+          "join",
+          "signup",
+          "referral",
+          "form",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original join page · chapter link required · October 2026",
+        "sourcePath": "jessebaizer.com/fomo/join/",
+        "sourceUrl": "https://jessebaizer.com/fomo/join/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. The supplied base URL was captured without adding a chapter ref parameter. Joining requires the chapter-specific referral context. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-join.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "blue buttons",
+            "centered hero",
+            "large typography"
+          ],
+          "features": [
+            "member signup",
+            "fomo username and email",
+            "chapter referral context"
+          ],
+          "phrases": [
+            "join a chapter through a referral",
+            "collect a member fomo username"
+          ]
+        }
+      },
+      {
+        "id": "jesse-trip",
+        "name": "FOMO — creator trip portal",
+        "category": "Portals",
+        "description": "A creator travel portal with a branded entrance, flight map, daily and weekly views, and an admin-gated management area.",
+        "skeletonKey": "crew-planner",
+        "preview": "dashboard",
+        "skeletonSections": [
+          "Branded entrance",
+          "Travel overview",
+          "Flight map",
+          "Daily and weekly views",
+          "Flight log",
+          "Admin access"
+        ],
+        "tags": [
+          "creator",
+          "trip",
+          "travel",
+          "flight",
+          "map",
+          "calendar",
+          "planning",
+          "portal",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original trip entrance · October 2026",
+        "status": "finished",
+        "sourcePath": "jessebaizer.com/fomo/trip/",
+        "sourceUrl": "https://jessebaizer.com/fomo/trip/",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. The original public entrance was captured. Travel functions are described by the public frontend. No flight was logged and the admin area was not unlocked. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-trip.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "space",
+            "planet",
+            "blue",
+            "centered hero",
+            "large typography"
+          ],
+          "features": [
+            "branded entrance",
+            "flight map",
+            "daily and weekly views",
+            "flight log",
+            "admin access"
+          ],
+          "phrases": [
+            "plan creator travel",
+            "view flights on a map"
+          ]
+        }
+      },
+      {
+        "id": "jesse-referral",
+        "name": "Greek Wars — Sigma Alpha Epsilon referral",
+        "category": "Portals",
+        "description": "The supplied referral entry for Sigma Alpha Epsilon at the University of Arizona, opening its chapter registration tracker.",
+        "status": "contextual",
+        "skeletonKey": "referral-flow",
+        "preview": "referral",
+        "skeletonSections": [
+          "Shared referral entry",
+          "Registration redirect",
+          "Chapter tracker",
+          "Member signup pathway"
+        ],
+        "tags": [
+          "greekwars",
+          "chapter",
+          "referral",
+          "attribution",
+          "share",
+          "registration",
+          "tracker",
+          "Sigma Alpha Epsilon",
+          "University of Arizona",
+          "fomo",
+          "jessebaizer.com",
+          "jesse",
+          "baizer",
+          "jessebaizer"
+        ],
+        "previewCaption": "Original referral destination · October 2026",
+        "sourcePath": "jessebaizer.com/fomo/referral/b4a13avl",
+        "sourceUrl": "https://jessebaizer.com/fomo/referral/b4a13avl",
+        "sourceHost": "jessebaizer.com",
+        "notes": "Original public page captured on 2026-10-02 in a clean, signed-out browser. The user-supplied /fomo/referral/b4a13avl URL redirects to /registration/?ref=b4a13avl. The archive preserves the original shared URL; this is an entry into the existing registration experience, not a separate page design. No forms were submitted. Skeletonify provides a neutral frontend starter; original backend services, authentication, and live data require separate integration.",
+        "thumbnail": "/agencykit/thumbnails/jesse-referral.jpg",
+        "searchMeta": {
+          "visual": [
+            "dark",
+            "purple",
+            "green",
+            "gold",
+            "stacked cards",
+            "sliders",
+            "progress bar"
+          ],
+          "features": [
+            "shared referral URL",
+            "referral attribution",
+            "registration tracker"
+          ],
+          "phrases": [
+            "open a shared chapter referral",
+            "preserve referral context during registration"
+          ]
+        }
       }
     ],
     "client": "fomo"
