@@ -244,7 +244,7 @@ test('legacy version-one data migrates clients deterministically without rewriti
   assert.equal(storage.writes.length, 0);
   assert.deepEqual(make(memory({ [PROJECT_STORAGE_KEY]: raw })).getClients(), migrated.getClients());
   const exported = JSON.parse(migrated.exportData());
-  assert.equal(exported.version, 3);
+  assert.equal(exported.version, 4);
   assert.ok(exported.clients.length >= 4);
 });
 
@@ -367,16 +367,16 @@ test('newer formats require client records and reject incomplete replacements wi
   const before = store.exportData(), persisted = storage.getItem(PROJECT_STORAGE_KEY);
   let events = 0; store.subscribe(() => { events += 1; });
   for (const method of ['replaceData', 'importData']) {
-    for (const version of [2, 3]) assert.throws(() => store[method]({ version, projects: [] }), /client list/);
+    for (const version of [2, 3, 4]) assert.throws(() => store[method]({ version, projects: [] }), /client list/);
     assert.equal(store.exportData(), before);
     assert.equal(storage.getItem(PROJECT_STORAGE_KEY), persisted);
   }
   assert.equal(events, 0);
   const restored = make(); restored.replaceData(before);
-  assert.equal(JSON.parse(restored.exportData()).version, 3);
+  assert.equal(JSON.parse(restored.exportData()).version, 4);
   assert.equal(restored.getClient(client.id).relationship, 'previous');
   restored.replaceData({ version: 1, projects: [] });
-  assert.equal(JSON.parse(restored.exportData()).version, 3, 'legacy cloud defaults upgrade before subsequent saves');
+  assert.equal(JSON.parse(restored.exportData()).version, 4, 'legacy cloud defaults upgrade before subsequent saves');
 });
 
 const sourceOnlySeeds = [archiveProjects[0], { id: 'unassigned', name: 'Unassigned originals', client: null, seedProject: false, items: catalog.slice(1) }];
@@ -418,7 +418,7 @@ test('old publishing clients disappear while edited source projects keep their c
   const restored = correctedStore(); restored.replaceData(store.exportData());
   assert.deepEqual(restored.getProjects(), store.getProjects());
   assert.deepEqual(restored.getClients(), store.getClients());
-  assert.equal(JSON.parse(restored.exportData()).version, 3);
+  assert.equal(JSON.parse(restored.exportData()).version, 4);
 });
 
 test('legacy blank fomo assignments use the explicit seed client while v3 and custom unassignment stay intentional', () => {

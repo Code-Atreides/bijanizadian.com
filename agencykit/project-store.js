@@ -1,6 +1,8 @@
 /** Local project drafts. Originals are references, never writable source data. */
 export const PROJECT_STORAGE_KEY = 'agencykit-projects-v1';
-const VERSION = 3;
+const VERSION = 4;
+const REVIEW_KEYS = ['content', 'brand', 'links', 'services', 'mobile', 'privacy'];
+const reviewFields = raw => Object.fromEntries(REVIEW_KEYS.map(key => [key, raw?.[key] === true]));
 const SEED_TIME = '1970-01-01T00:00:00.000Z';
 const MAX_IMPORT = 5 * 1024 * 1024;
 const MAX_PROJECTS = 100;
@@ -134,12 +136,12 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const actualIds = new Set(data.clients.filter(client => !falseIds.has(client.id)).map(client => client.id));
     data.clients = data.clients.filter(client => !falseIds.has(client.id));
     data.projects = data.projects.filter(project => {
-      if (inputVersion < VERSION && !project.clientId && !project.client && typeof seeds.get(project.id)?.client === 'string') project.client = text(seeds.get(project.id).client, 120);
+      if (inputVersion < 3 && !project.clientId && !project.client && typeof seeds.get(project.id)?.client === 'string') project.client = text(seeds.get(project.id).client, 120);
       // A user-renamed real client is authoritative even if its ID began as one
       // of the mistaken legacy clients. Do not undo that explicit correction.
       const explicitActual = actualIds.has(project.clientId) || (!project.clientId && project.client && !isDomainName(project.client));
       const falseClient = falseIds.has(project.clientId) || (!explicitActual && (isDomainName(project.client) || oldDomainClients.has(project.clientId)));
-      const oldSource = inputVersion < VERSION && oldSourceProjects.has(project.id) && !explicitActual;
+      const oldSource = inputVersion < 3 && oldSourceProjects.has(project.id) && !explicitActual;
       if (falseClient || oldSource) { project.clientId = null; project.client = ''; }
       if (!oldSource) return true;
       const defaults = profile({}).brand;
@@ -159,6 +161,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       status: choice(value('status'), ['draft', 'review', 'live'], 'draft'),
       copy: { eyebrow: text(copy.eyebrow, 120), title: text(copy.title, 240), description: text(copy.description, 4000), cta: text(copy.cta, 120) },
       liveUrl: url(value('liveUrl')),
+      review: reviewFields(value('review')),
     };
   }
   function provenance(sourceId) {
@@ -195,7 +198,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const serialized = typeof input === 'string' ? input : JSON.stringify(input);
     if (!fitsBackup(serialized)) throw new RangeError('Project backup must be smaller than 5 MB.');
     const data = JSON.parse(serialized);
-    if (!object(data) || ![1, 2, VERSION].includes(data.version) || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
+    if (!object(data) || ![1, 2, 3, VERSION].includes(data.version) || !Array.isArray(data.projects)) throw new TypeError('Unsupported project backup format.');
     if (data.projects.length > MAX_PROJECTS) throw new RangeError('A backup can hold at most 100 projects.');
     if ((data.version >= 2 || data.clients !== undefined) && !Array.isArray(data.clients)) throw new TypeError('Invalid client list.');
     if ((data.clients || []).length > MAX_CLIENTS) throw new RangeError('A backup can hold at most 200 clients.');
@@ -245,6 +248,12 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     commit(next);
     return clone(result);
   }
+  function addDraft(project, sourceId) {
+    const now = new Date().toISOString(), source = sources.get(sourceId);
+    const draft = { id: freshId('draft'), sourceId, ...draftFields({ name: `${source.name || 'Original'} draft`, copy: { eyebrow: project.client || project.name, title: 'Your next chapter.', description: 'A clear introduction to what you do and who it is for.', cta: 'Get started' } }), provenance: provenance(sourceId), createdAt: now, updatedAt: now, versions: [] };
+    project.drafts.push(draft); project.originalIds = originalIds([...project.originalIds, sourceId]);
+    return draft;
+  }
   return {
     getClients: () => clone(state.clients),
     getClient: id => clone(state.clients.find(client => client.id === id) || null),
@@ -278,7 +287,12 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     },
     updateProject(projectId, patch) {
       return mutate(projectId, (project, next) => {
+        const previousBrand = JSON.stringify(project.brand);
         Object.assign(project, profile(patch, project));
+        if (JSON.stringify(project.brand) !== previousBrand) for (const draft of project.drafts) {
+          draft.review = { ...draft.review, brand: false, mobile: false };
+          draft.updatedAt = new Date().toISOString();
+        }
         if (own(record(patch), 'client') && !own(record(patch), 'clientId')) project.clientId = '';
         if (own(record(patch), 'clientId') && !patch.clientId) project.client = '';
         assignClient(next, project, new Date().toISOString());
@@ -290,16 +304,26 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       if (!sources.has(sourceId)) throw new RangeError('Choose an existing original for this draft.');
       return mutate(projectId, project => {
         if (project.drafts.length >= MAX_DRAFTS) throw new RangeError('A project can hold at most 100 drafts.');
-        const now = new Date().toISOString(), source = sources.get(sourceId);
-        const draft = { id: freshId('draft'), sourceId, ...draftFields({ name: `${source.name || 'Original'} draft`, copy: { eyebrow: project.client || project.name, title: 'Your next chapter.', description: 'A clear introduction to what you do and who it is for.', cta: 'Get started' } }), provenance: provenance(sourceId), createdAt: now, updatedAt: now, versions: [] };
-        project.drafts.push(draft); project.originalIds = originalIds([...project.originalIds, sourceId]);
-        return draft;
+        return addDraft(project, sourceId);
+      });
+    },
+    // A journey is one atomic save. Reusing it keeps existing edits intact.
+    createDrafts(projectId, sourceIds) {
+      if (!Array.isArray(sourceIds) || !sourceIds.length || sourceIds.some(id => !sources.has(id))) throw new RangeError('Choose existing originals for this journey.');
+      const ids = [...new Set(sourceIds)];
+      return mutate(projectId, project => {
+        const missing = ids.filter(id => !project.drafts.some(draft => draft.sourceId === id));
+        if (project.drafts.length + missing.length > MAX_DRAFTS) throw new RangeError('A project can hold at most 100 drafts.');
+        return ids.map(id => project.drafts.find(draft => draft.sourceId === id) || addDraft(project, id));
       });
     },
     updateDraft(projectId, draftId, patch) {
       return mutate(projectId, project => {
         const draft = locateDraft(project, draftId);
-        Object.assign(draft, draftFields(patch, draft), { updatedAt: new Date().toISOString() });
+        const updated = draftFields(patch, draft);
+        if (JSON.stringify(draft.copy) !== JSON.stringify(updated.copy)) Object.assign(updated.review, {content:false, links:false, mobile:false});
+        if (draft.liveUrl !== updated.liveUrl) updated.review = reviewFields();
+        Object.assign(draft, updated, { updatedAt: new Date().toISOString() });
         return draft;
       });
     },
@@ -315,7 +339,7 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
       return mutate(projectId, project => {
         const draft = locateDraft(project, draftId), version = draft.versions.find(item => item.id === versionId);
         if (!version) throw new RangeError('Version not found.');
-        Object.assign(draft, draftFields(version.snapshot), { updatedAt: new Date().toISOString() });
+        Object.assign(draft, draftFields(version.snapshot), { review: reviewFields(), updatedAt: new Date().toISOString() });
         return draft;
       });
     },
