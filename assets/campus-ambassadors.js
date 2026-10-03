@@ -8,27 +8,68 @@
     president: { kicker: '05 / 05 · the team builder', title: 'campus president.', name: 'Campus President', description: 'You see the bigger picture and help everyone find their place in it. Bring the campus team together around a shared plan.', tasks: ['Coordinate your campus team', 'Turn ideas into clear next steps', 'Keep the team connected with fomo'] }
   };
   const buttons = Array.from(document.querySelectorAll('[data-role]'));
-  const title = document.getElementById('role-title');
-  if (!buttons.length || !title) return;
-  buttons.forEach(button => button.addEventListener('click', () => {
-    const key = button.dataset.role;
+  const preview = document.getElementById('role-preview');
+  if (!buttons.length || !preview) return;
+
+  function renderRole(target, key) {
     const role = roles[key];
-    if (!role) return;
-    buttons.forEach(option => option.setAttribute('aria-pressed', String(option === button)));
-    document.getElementById('role-kicker').textContent = role.kicker;
-    title.textContent = role.title;
-    document.getElementById('role-description').textContent = role.description;
-    document.getElementById('role-tasks').replaceChildren(...role.tasks.map(task => {
+    target.querySelector('.role-kicker').textContent = role.kicker;
+    target.querySelector('h3').textContent = role.title;
+    target.querySelector('p:not(.role-kicker)').textContent = role.description;
+    target.querySelector('.role-tasks').replaceChildren(...role.tasks.map(task => {
       const item = document.createElement('li');
       item.textContent = task;
       return item;
     }));
-    const link = document.getElementById('role-apply');
+    const link = target.querySelector('.role-apply');
     link.href = '/campus/ambassadors/apply?role=' + key;
     link.textContent = 'Apply for ' + role.name + ' ';
     const arrow = document.createElement('span');
     arrow.setAttribute('aria-hidden', 'true');
     arrow.textContent = '↗';
     link.append(arrow);
+  }
+
+  // Reserve the tallest role at this exact width so changing roles never moves
+  // the controls or any of the sections that follow the finder.
+  let measuredWidth = 0;
+  function stabilizePreview(force = false) {
+    const width = preview.getBoundingClientRect().width;
+    if (!width || (!force && Math.abs(width - measuredWidth) < .5)) return;
+    measuredWidth = width;
+    const measurement = preview.cloneNode(true);
+    measurement.removeAttribute('id');
+    measurement.removeAttribute('aria-live');
+    measurement.removeAttribute('aria-atomic');
+    measurement.setAttribute('aria-hidden', 'true');
+    measurement.setAttribute('inert', '');
+    measurement.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+    measurement.style.cssText = 'position:fixed;left:-10000px;top:0;visibility:hidden;pointer-events:none;min-height:0;height:auto;width:' + width + 'px;';
+    preview.after(measurement);
+    let height = 0;
+    try {
+      Object.keys(roles).forEach(key => {
+        renderRole(measurement, key);
+        height = Math.max(height, measurement.getBoundingClientRect().height);
+      });
+    } finally {
+      measurement.remove();
+    }
+    preview.style.minHeight = Math.ceil(height) + 'px';
+  }
+
+  buttons.forEach(button => button.addEventListener('click', () => {
+    const key = button.dataset.role;
+    if (!roles[key]) return;
+    buttons.forEach(option => option.setAttribute('aria-pressed', String(option === button)));
+    renderRole(preview, key);
   }));
+
+  stabilizePreview();
+  if (document.fonts) document.fonts.ready.then(() => stabilizePreview(true));
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(() => stabilizePreview()).observe(preview);
+  } else {
+    window.addEventListener('resize', () => stabilizePreview());
+  }
 })();

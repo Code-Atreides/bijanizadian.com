@@ -25,6 +25,11 @@
   var requestedRole = new URLSearchParams(window.location.search).get('role');
   if (roles.indexOf(requestedRole) !== -1) form.elements.role.value = requestedRole;
 
+  function focusAndReveal(element, scrollTarget) {
+    element.focus({ preventScroll: true });
+    (scrollTarget || element).scrollIntoView({ block: 'start', behavior: 'auto' });
+  }
+
   function phoneDigits(value) {
     var digits = value.replace(/[^0-9]/g, '');
     if (digits.length === 11 && digits.charAt(0) === '1') digits = digits.slice(1);
@@ -94,7 +99,7 @@
     status.textContent = '';
     formError.textContent = message;
     formError.hidden = false;
-    formError.focus();
+    focusAndReveal(formError);
   }
 
   function finish() {
@@ -106,7 +111,7 @@
     status.textContent = '';
     form.hidden = true;
     success.hidden = false;
-    success.focus();
+    focusAndReveal(success);
   }
 
   // The existing campus application backend is write-only. Initialize it only
@@ -133,7 +138,7 @@
       if (!validate(field, true) && !firstInvalid) firstInvalid = field;
     });
     if (firstInvalid) {
-      firstInvalid.focus();
+      focusAndReveal(firstInvalid, firstInvalid.closest('.field'));
       firstInvalid.reportValidity();
       return;
     }
