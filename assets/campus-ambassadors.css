@@ -81,6 +81,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .nav { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .brand { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; font-size: 31px; letter-spacing: -1.5px; white-space: nowrap; }
 .brand svg { width: 40px; height: 40px; fill: var(--purple); flex: none; }
+.brand-wordmark { display: block; width: auto; height: .77em; flex: none; }
 .brand-divider { height: 23px; width: 1px; background: #dcdce4; margin-inline: 12px; }
 .brand .brand-campus { font-size: 17px; letter-spacing: -.4px; font-weight: 400; color: var(--muted); }
 .nav nav { display: flex; align-items: center; gap: 30px; }
