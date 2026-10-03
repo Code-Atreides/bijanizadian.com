@@ -1,7 +1,7 @@
 /* The archive's frame, shared by every agencykit workspace. */
 :root {
-  --canvas:#0c0c0c; --paper:#171717; --ink:#ededeb; --muted:#8a8a87;
-  --faint:#5b5b58; --line:#292929; --line-strong:#393939; --soft:#222222;
+  --canvas:#0c0c0c; --paper:#171717; --ink:#ededeb; --muted:#aaa9a5;
+  --faint:#92928d; --line:#292929; --line-strong:#393939; --soft:#222222;
   --r-control:16px; --r-card:22px; --r-panel:28px; --r-modal:32px;
   --shadow:0 24px 80px #0005;
   color-scheme:dark; background:var(--canvas); color:var(--ink);
@@ -18,10 +18,10 @@ body.workspace-mode .archive-header nav :is(a,button):hover,body.workspace-mode 
 .pu-directory-heading .pu-kicker {display:none}
 .workspace-mode .page-header {align-items:flex-end;margin:0 0 38px;gap:24px}
 .workspace-mode .page-title {font:400 32px/1.15 var(--font);letter-spacing:-1px;color:var(--ink);margin:0 0 12px}
-.workspace-mode .page-description {font-size:12px;line-height:1.8;color:var(--muted);max-width:510px}
+.workspace-mode .page-description {font-size:16px;line-height:1.8;color:var(--muted);max-width:510px}
 .workspace-mode #page-eyebrow {display:none}
 .workspace-mode .page-header-actions {padding:0;align-self:center}
-.quiet-button,.primary-button {min-height:38px;padding:10px 15px;border-radius:999px;border:1px solid var(--line-strong);font-size:11px;font-weight:400;background:var(--soft);color:#c9c9c5}
+.quiet-button,.primary-button {min-height:38px;padding:10px 15px;border-radius:999px;border:1px solid var(--line-strong);font-size:15px;font-weight:400;background:var(--soft);color:#c9c9c5}
 .quiet-button:hover {background:#2c2c2c;border-color:#51514e;color:var(--ink)}
 .primary-button {background:#e8e8e4;border-color:#e8e8e4;color:#202020}
 .primary-button:hover {background:#fff;border-color:#fff}
@@ -39,48 +39,48 @@ body.workspace-mode .archive-header nav :is(a,button):hover,body.workspace-mode 
 .workspace-mode #view-toggle {width:38px;height:38px;margin:0;padding:10px;border:1px solid var(--line);background:#171717;color:#8a8a87;border-radius:50%}
 .workspace-mode #view-toggle[aria-pressed=true] {background:#303030;color:#ededeb}
 .library-navigation {display:flex;flex-wrap:wrap;gap:6px;margin:0 0 30px}
-.library-navigation .nav-item,.collections-tray .nav-item {width:auto;min-height:33px;margin:0;padding:7px 12px;border:1px solid transparent;border-radius:999px;color:#8a8a87;background:transparent;font-size:11px;font-weight:400;gap:7px;box-shadow:none}
+.library-navigation .nav-item,.collections-tray .nav-item {width:auto;min-height:33px;margin:0;padding:7px 12px;border:1px solid transparent;border-radius:999px;color:#8a8a87;background:transparent;font-size:15px;font-weight:400;gap:7px;box-shadow:none}
 .library-navigation .nav-item.active,.collections-tray .nav-item.active {background:#222222;border-color:#ffffff12;color:#ededeb}
 .library-navigation .nav-item:hover,.collections-tray .nav-item:hover {background:#1b1b1b;color:#ededeb}
 .library-navigation .nav-icon,.collections-tray .nav-icon {display:none}
-.library-navigation .nav-count,.collections-tray .nav-count {margin:0;color:#70706c;font-size:9px}
-.collections-tray {margin:0 0 24px;color:#999994;font-size:11px}
+.library-navigation .nav-count,.collections-tray .nav-count {margin:0;color:#70706c;font-size:13px}
+.collections-tray {margin:0 0 24px;color:#999994;font-size:15px}
 .collections-tray summary {cursor:pointer;list-style:none;display:flex;align-items:center;gap:13px;width:fit-content;padding:8px 12px;background:#171717;border:1px solid #ffffff0b;border-radius:999px}
 .collections-tray summary::-webkit-details-marker {display:none}
 .collections-tray[open] summary>span {transform:rotate(180deg)}
 .collections-tray nav {display:flex;flex-wrap:wrap;gap:6px;padding-top:12px}
 .workspace-mode .section-heading {align-items:center;margin:0 0 23px;color:var(--muted)}
-.workspace-mode .section-heading>span:first-child {font-size:11px;font-weight:400;letter-spacing:0;color:#aaa9a5}
-.workspace-mode .section-heading .section-description {margin:0;font-size:10px;color:#777773}
-.workspace-mode .section-count {margin-left:8px;padding:0 4px;background:none;color:#666662;font-size:10px!important}
+.workspace-mode .section-heading>span:first-child {font-size:15px;font-weight:400;letter-spacing:0;color:#aaa9a5}
+.workspace-mode .section-heading .section-description {margin:0;font-size:14px;color:#777773}
+.workspace-mode .section-count {margin-left:8px;padding:0 4px;background:none;color:#666662;font-size:14px!important}
 .workspace-mode .grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:34px 25px}
 .workspace-mode .block-card {overflow:visible;background:none;border:0;border-radius:0;box-shadow:none;transform:none}
 .workspace-mode .card-preview {width:100%;min-height:0;aspect-ratio:16/10;max-height:none;padding:0;border:1px solid #ffffff10;border-radius:12px;background:#171717;transition:transform .2s,border-color .2s}
 .workspace-mode .card-preview:hover {transform:translateY(-3px);border-color:#ffffff35}
 .workspace-mode .card-preview>.source-screenshot {display:block;width:100%;height:100%;object-fit:contain;object-position:center;border-radius:inherit}
 .workspace-mode .card-meta {padding:13px 2px 0}
-.workspace-mode .card-title {font-size:11px;line-height:1.6;font-weight:400;letter-spacing:0;color:#d4d4d0}
-.workspace-mode .card-description {font-size:10px;line-height:1.7;color:#7c7c77;min-height:0;margin:6px 0 10px;-webkit-line-clamp:2}
+.workspace-mode .card-title {font-size:15px;line-height:1.6;font-weight:400;letter-spacing:0;color:#d4d4d0}
+.workspace-mode .card-description {font-size:14px;line-height:1.7;color:#7c7c77;min-height:0;margin:6px 0 10px;-webkit-line-clamp:2}
 .workspace-mode .card-menu {height:26px;width:26px;margin:-3px -2px 0 0;padding:6px;border-radius:50%;color:#6b6b67}
 .workspace-mode .card-menu:hover {background:#222;color:#ddd}
 .workspace-mode .card-menu.is-saved {color:#d4d4d0}
 .workspace-mode .card-menu.is-saved svg {fill:currentColor;stroke:currentColor}
 .workspace-mode .card-bottom {justify-content:flex-start;gap:9px}
-.workspace-mode .category-label {font-size:9px;color:#747470}
+.workspace-mode .category-label {font-size:13px;color:#747470}
 .workspace-mode .category-label svg {display:none}
-.workspace-mode .status-tag {padding:0;border:0;background:none;color:#62625e;font-size:9px}
+.workspace-mode .status-tag {padding:0;border:0;background:none;color:#62625e;font-size:13px}
 .workspace-mode .status-tag:before {background:#4e4e4a}
-.workspace-mode .preview-open {background:#222222ed;color:#ddd;border:1px solid #ffffff10;border-radius:999px;font-size:9px;box-shadow:none}
+.workspace-mode .preview-open {background:#222222ed;color:#ddd;border:1px solid #ffffff10;border-radius:999px;font-size:13px;box-shadow:none}
 .workspace-mode .grid.compact {grid-template-columns:repeat(5,minmax(0,1fr));gap:27px 20px}
 .workspace-mode .grid.compact .card-preview {min-height:0;max-height:none;padding:0}
 .workspace-mode .grid.compact .card-description {display:none}
-.workspace-mode .workspace-footer {border:0;margin-top:48px;padding-top:0;gap:16px;flex-wrap:wrap;color:#5e5e5a;font-size:9px}
+.workspace-mode .workspace-footer {border:0;margin-top:48px;padding-top:0;gap:16px;flex-wrap:wrap;color:#5e5e5a;font-size:13px}
 .workspace-footer a {text-decoration:none;color:#777773}
 .workspace-footer a:hover {color:#ededeb}
 .workspace-mode .empty-state {padding:80px 24px;border:0;background:none;color:#8a8a87}
 .workspace-mode .empty-state h2 {font:400 24px/1.25 var(--font);letter-spacing:-.6px;color:#d4d4d0}
 .workspace-mode .empty-state svg {color:#6d6d68}
-.workspace-mode .empty-state p {font-size:11px;line-height:1.8}
+.workspace-mode .empty-state p {font-size:15px;line-height:1.8}
 .workspace-mode .foundation-intro h2,.workspace-mode .foundation-bottom h2,.workspace-mode .voice-example {font-family:var(--font);font-weight:400;font-style:normal;color:#d4d4d0;letter-spacing:-.7px}
 .workspace-mode .foundation-intro h2 {font-size:29px}
 .workspace-mode .foundation-bottom h2 {font-size:23px}
@@ -95,8 +95,8 @@ body.workspace-mode .archive-header nav :is(a,button):hover,body.workspace-mode 
 .modal::backdrop {background:#0009;backdrop-filter:blur(8px)}
 .modal-header h2 {font:400 27px/1.2 var(--font);color:var(--ink);letter-spacing:-.8px}
 .modal-header .eyebrow {letter-spacing:.4px;text-transform:none;color:#777773}
-.modal .modal-description,.modal.about-modal>p {color:#aaa9a5;font-size:12px;line-height:1.8}
-.modal .field {color:#aaa9a5;font-size:11px}
+.modal .modal-description,.modal.about-modal>p {color:#aaa9a5;font-size:16px;line-height:1.8}
+.modal .field {color:#aaa9a5;font-size:15px}
 .modal .field input,.modal .field textarea,.modal .field select {background:#222;color:#ededeb;border-color:#ffffff12;border-radius:14px;padding:12px 13px}
 .modal .field input::placeholder,.modal .field textarea::placeholder {color:#686864}
 .modal .collection-picker legend {color:#aaa9a5}
@@ -136,15 +136,15 @@ body.workspace-mode .archive-header nav :is(a,button):hover,body.workspace-mode 
   .workspace-mode .grid,.workspace-mode .grid.compact {grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 18px}
   .workspace-mode .search-box {flex:1;width:auto}
   .workspace-mode .toolbar {flex-wrap:nowrap}
-  .workspace-mode .card-description {font-size:9px}
-  .workspace-mode .section-heading .section-description {font-size:9px}
+  .workspace-mode .card-description {font-size:13px}
+  .workspace-mode .section-heading .section-description {font-size:13px}
   .workspace-mode .foundation-bottom {grid-template-columns:1fr}
 }
 @media(max-width:550px) {
   body .archive-header {padding-inline:16px;gap:9px}
   body.workspace-mode .archive-header {padding-inline:16px}
   .archive-header nav {gap:10px}
-  .archive-header nav a,.archive-header nav button {font-size:9px}
+  .archive-header nav a,.archive-header nav button {font-size:13px}
   .archive-header .archive-brand {font-size:17px}
   body.workspace-mode .archive-header nav,body.archive-home .archive-header nav {padding-inline:0}
   .workspace-mode .content {padding:98px 20px 65px}
@@ -152,26 +152,64 @@ body.workspace-mode .archive-header nav :is(a,button):hover,body.workspace-mode 
   .workspace-mode .page-header {display:block}
   .workspace-mode .page-header-actions {margin-top:18px;padding:0}
   .workspace-mode .page-title {font-size:28px}
-  .workspace-mode .page-description {font-size:11px}
+  .workspace-mode .page-description {font-size:15px}
   .workspace-mode .library-navigation {gap:3px;margin-bottom:25px}
-  .library-navigation .nav-item {padding:7px 9px;font-size:10px;min-height:34px}
-  .library-navigation .nav-count {font-size:8px}
+  .library-navigation .nav-item {padding:7px 9px;font-size:14px;min-height:34px}
+  .library-navigation .nav-count {font-size:12px}
   .workspace-mode .card-preview {border-radius:9px}
   .workspace-mode .card-meta {padding:10px 0 0}
-  .workspace-mode .card-title {font-size:11px}
+  .workspace-mode .card-title {font-size:15px}
   .workspace-mode .card-menu {width:25px;flex:none}
   .workspace-mode .grid {gap:26px 16px}
-  .workspace-mode .section-heading .section-description {max-width:148px;font-size:8px}
+  .workspace-mode .section-heading .section-description {max-width:148px;font-size:12px}
   .modal .field input,.modal .field textarea,.modal .field select,.assistant-input input {font-size:16px}
   .workspace-mode .curve-study {padding:24px 16px}
 }
 @media(max-width:360px) {
   body .archive-header,body.workspace-mode .archive-header {padding-inline:13px;gap:7px}
   .archive-header nav {gap:8px}
-  .archive-header nav a,.archive-header nav button {font-size:8px}
+  .archive-header nav a,.archive-header nav button {font-size:12px}
   .archive-header .archive-brand {font-size:16px}
 }
 @media(prefers-reduced-motion:reduce) {
   .workspace-mode .card-preview {transition:none}
   .workspace-mode .card-preview:hover {transform:none}
+}
+
+/* Shared reading and interaction sizes, including narrow screens. */
+body .archive-header nav :is(a,button){font-size:15px;min-height:44px;color:#b5b5b0}
+body.workspace-mode .archive-header nav :is(a,button){color:#b5b5b0}
+body .archive-header nav [aria-current=page]{color:#f3f3f0}
+.workspace-mode .card-title{font-size:17px;line-height:1.4;font-weight:500}
+.workspace-mode .card-description,.workspace-mode .page-description{font-size:16px;line-height:1.65;color:#aaa9a5}
+.workspace-mode .category-label,.workspace-mode .status-tag,.workspace-mode .section-heading .section-description,.workspace-mode .workspace-footer{font-size:13px;color:#aaa9a5}
+.workspace-mode .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.quiet-button,.primary-button,.library-navigation .nav-item{min-height:44px}
+.modal .field :is(input,textarea,select),.assistant-input input{font-size:16px}
+.assistant-status,.assistant-note,.guide-label{font-size:13px;color:#aaa9a5;letter-spacing:0}
+.assistant-header strong{font-size:16px}
+#assistant-intro>p,.assistant-message,.assistant-message.user,.assistant-suggestions button,.guide-match{font-size:15px;line-height:1.6}
+.assistant-suggestions button,.guide-match{min-height:44px}
+.toast{font-size:14px;line-height:1.5}
+.modal .modal-description,.modal.about-modal>p{font-size:16px;line-height:1.65}
+.help-steps{padding-left:24px;margin:24px 0;color:#bbb;line-height:1.65}
+.help-steps li+li{margin-top:18px}
+.help-steps strong{display:block;color:#ededeb;font-weight:500}
+@media(max-width:1000px){.workspace-mode .grid,.workspace-mode .grid.compact{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){
+  body .archive-header,body.workspace-mode .archive-header,body.archive-mode .archive-header{height:106px;padding:10px 18px;align-items:flex-start;justify-content:flex-start;flex-direction:column;gap:1px}
+  body .archive-header .archive-brand{font-size:21px;min-height:35px}
+  body .archive-header nav{width:100%;gap:20px;justify-content:space-between;padding:0;background:transparent}
+  body .archive-header nav :is(a,button){font-size:14px;min-height:44px}
+  .workspace-mode .content,.projects-space{padding-top:142px}
+  .workspace-mode .page-description{font-size:16px}
+  .workspace-mode .grid,.workspace-mode .grid.compact{gap:28px 20px}
+}
+@media(max-width:550px){
+  .workspace-mode .grid,.workspace-mode .grid.compact{grid-template-columns:minmax(0,1fr)}
+  .workspace-mode .card-title{font-size:17px}
+  .workspace-mode .card-description{font-size:15px}
+  .workspace-mode .section-heading{flex-wrap:wrap;gap:8px}
+  .workspace-mode .section-heading .section-description{max-width:none;font-size:13px}
+  body .archive-header nav{gap:10px}
 }

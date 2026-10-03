@@ -3,6 +3,7 @@ const finite = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(
 const clamp = (value, low, high) => Math.max(low, Math.min(high, value));
 const ASPECT = 16 / 9;
 const CAPTION_HEIGHT = 36;
+const RESULT_CAPTION_HEIGHT = 74;
 
 function seededRandom(seed) {
   let state = 2166136261;
@@ -68,24 +69,26 @@ function homeLayout(width, height, seed) {
  * Coordinates are relative to the actual archive canvas, not the viewport.
  * Home fills an overscanned canvas and deliberately continues behind fixed UI.
  * Results use bounded grid placement, with an optional protected exclusion.
- * Every slot includes a 36px caption area, including the hover caption at home.
+ * Results reserve two readable title lines and a metadata line. Home keeps
+ * its existing decorative spacing because those tiles have no visible labels.
  */
 export function generateArchiveLayout({ width = 0, height = 0, home = true, exclusion = null, seed = 0 } = {}) {
   width = Math.max(0, finite(width));
   height = Math.max(0, finite(height));
   if (home) return homeLayout(width, height, seed);
+  const captionHeight = RESULT_CAPTION_HEIGHT;
   const mobile = width < 600;
   const tablet = width < 1000;
   const edge = 8;
   const gap = mobile ? 14 : 22;
   const minWidth = mobile ? 80 : tablet ? 100 : 130;
-  const maxWidth = home ? (mobile ? 150 : 225) : 250;
-  const columns = mobile ? 2 : tablet ? 4 : home ? 6 : 5;
-  const maxRows = home ? 3 : 4;
-  const maxCapacity = mobile ? 8 : tablet ? 12 : home ? 18 : 20;
+  const maxWidth = 280;
+  const columns = mobile ? 2 : tablet ? 3 : 4;
+  const maxRows = 3;
+  const maxCapacity = mobile ? 6 : tablet ? 9 : 12;
   const inner = { x: edge, y: edge, width: Math.max(0, width - edge * 2), height: Math.max(0, height - edge * 2) };
-  const empty = () => ({ width, height, slots: [], capacity: 0, columns, rows: 0, captionHeight: CAPTION_HEIGHT });
-  if (inner.width < minWidth || inner.height < minWidth / ASPECT + CAPTION_HEIGHT) return empty();
+  const empty = () => ({ width, height, slots: [], capacity: 0, columns, rows: 0, captionHeight });
+  if (inner.width < minWidth || inner.height < minWidth / ASPECT + captionHeight) return empty();
 
   let regions = [inner];
   if (exclusion && finite(exclusion.width) > 0 && finite(exclusion.height) > 0) {
@@ -112,7 +115,7 @@ export function generateArchiveLayout({ width = 0, height = 0, home = true, excl
   for (const [regionIndex, region] of regions.entries()) {
     const fittingColumns = Math.floor((region.width + gap) / (minWidth + gap));
     const regionColumns = Math.min(columns, fittingColumns);
-    const regionRows = Math.min(maxRows, Math.floor((region.height + gap) / (minWidth / ASPECT + CAPTION_HEIGHT + gap)));
+    const regionRows = Math.min(maxRows, Math.floor((region.height + gap) / (minWidth / ASPECT + captionHeight + gap)));
     if (regionColumns < 1 || regionRows < 1) continue;
     mostRows = Math.max(mostRows, regionRows);
     const cellWidth = (region.width - (regionColumns - 1) * gap) / regionColumns;
@@ -121,10 +124,10 @@ export function generateArchiveLayout({ width = 0, height = 0, home = true, excl
       for (let column = 0; column < regionColumns; column += 1) {
         const ordinal = row * regionColumns + column + regionIndex * 3;
         const variation = home ? [0.88, 1, 0.82, 0.95, 0.9, 0.84][ordinal % 6] : 1;
-        const availableWidth = Math.min(cellWidth, (cellHeight - CAPTION_HEIGHT) * ASPECT, maxWidth);
+        const availableWidth = Math.min(cellWidth, (cellHeight - captionHeight) * ASPECT, maxWidth);
         const tileWidth = Math.max(minWidth, availableWidth * variation);
         const visualHeight = tileWidth / ASPECT;
-        const tileHeight = visualHeight + CAPTION_HEIGHT;
+        const tileHeight = visualHeight + captionHeight;
         const freeX = Math.max(0, cellWidth - tileWidth);
         const freeY = Math.max(0, cellHeight - tileHeight);
         const horizontalBias = home ? [0.32, 0.68, 0.48][ordinal % 3] : 0.5;
@@ -135,7 +138,7 @@ export function generateArchiveLayout({ width = 0, height = 0, home = true, excl
           width: tileWidth,
           height: tileHeight,
           visualHeight,
-          captionHeight: CAPTION_HEIGHT,
+          captionHeight,
         });
       }
     }
@@ -145,7 +148,7 @@ export function generateArchiveLayout({ width = 0, height = 0, home = true, excl
   // for more tiles than the intended visual density.
   const capacity = Math.min(maxCapacity, candidates.length);
   const slots = capacity === candidates.length ? candidates : Array.from({ length: capacity }, (_, i) => candidates[Math.floor((i + 0.5) * candidates.length / capacity)]);
-  return { width, height, slots, capacity, columns, rows: mostRows, captionHeight: CAPTION_HEIGHT };
+  return { width, height, slots, capacity, columns, rows: mostRows, captionHeight };
 }
 
 /** Fisher–Yates on a copy. The optional RNG makes deliberate shuffles testable. */

@@ -8,10 +8,10 @@ body.archive-mode #archive-canvas{position:relative;display:block;width:100%;hei
 body.archive-mode #archive-canvas>.archive-tile{position:absolute;display:flex;align-items:center;justify-content:flex-start;transform:none;margin:0;padding:0;transition:none}
 body.archive-mode #archive-canvas .tile-visual{height:var(--tile-visual-height);min-height:0;max-height:none;flex:none;align-items:center}
 body.archive-mode #archive-canvas .tile-visual img{width:100%;height:100%;max-height:none;object-fit:contain;object-position:center}
-body.archive-mode #archive-canvas .tile-caption{position:absolute;top:var(--tile-visual-height);left:0;width:100%;height:36px;min-height:0;max-height:36px;padding-top:7px;gap:2px;overflow:hidden}
+body.archive-mode #archive-canvas .tile-caption{position:absolute;top:var(--tile-visual-height);left:0;width:100%;height:74px;min-height:0;max-height:74px;padding-top:9px;gap:4px;overflow:hidden}
 body.archive-mode #archive-canvas .tile-caption strong,body.archive-mode #archive-canvas .tile-caption>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-body.archive-mode #archive-canvas .tile-caption strong{font-size:10px;line-height:14px}
-body.archive-mode #archive-canvas .tile-caption>span{font-size:8px;line-height:11px}
+body.archive-mode #archive-canvas .tile-caption strong{font-size:14px;line-height:14px}
+body.archive-mode #archive-canvas .tile-caption>span{font-size:12px;line-height:11px}
 body.archive-mode #archive-search-stage{transition:none}
 /* The fixed workspace is its own stacking context. Keep the header clear so
    the search field remains visible when it moves into the top row. */
@@ -20,13 +20,13 @@ body.archive-mode .archive-controls{display:flex;flex-wrap:nowrap;gap:7px;width:
 body.archive-mode .archive-pagination{display:flex;align-items:center;gap:3px;padding:0}
 body.archive-mode .archive-pagination button{width:30px;padding:4px;font-size:15px}
 body.archive-mode .archive-pagination button:disabled{opacity:.28;cursor:default}
-body.archive-mode .archive-controls #archive-count{display:inline;min-width:68px;padding-inline:3px;font-size:9px;text-align:center}
+body.archive-mode .archive-controls #archive-count{display:inline;min-width:68px;padding-inline:3px;font-size:13px;text-align:center}
 body.archive-mode #archive-shuffle{white-space:nowrap}
-body.archive-mode .archive-footnote{max-width:160px;font-size:8px}
+body.archive-mode .archive-footnote{max-width:160px;font-size:12px}
 body.archive-mode .archive-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:20px}
 body.archive-mode #search-suggestions{max-height:42dvh;overflow:auto;overscroll-behavior:contain}
 @media(max-width:1100px){body.archive-mode #archive-gallery{inset:96px 65px 126px}body.archive-results #archive-gallery{inset:190px 35px 112px}body.archive-mode .archive-footnote{display:none}}
-@media(max-width:720px){body.archive-mode #archive-gallery{inset:80px 18px 142px}body.archive-results #archive-gallery{inset:188px 18px 142px}body.archive-mode .archive-controls{bottom:max(17px,env(safe-area-inset-bottom));left:16px;right:76px;transform:none;width:auto;max-width:none;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px;border-radius:18px}body.archive-mode .archive-filters{width:100%;justify-content:space-between;gap:5px}body.archive-mode .archive-filters label{flex:1;min-width:0}body.archive-mode .archive-filters select{width:100%;max-width:none;height:28px;padding-inline:5px;font-size:9px}body.archive-mode .archive-controls #archive-count{min-width:68px;font-size:9px}body.archive-mode .archive-pagination button{height:28px;width:28px}body.archive-mode #archive-reset{font-size:8px;height:28px}body.archive-mode #archive-shuffle{height:28px;font-size:9px}body.archive-mode #archive-canvas .tile-caption strong{font-size:9px}body.archive-mode .assistant-launcher{right:18px;bottom:max(19px,env(safe-area-inset-bottom))}}
+@media(max-width:720px){body.archive-mode #archive-gallery{inset:80px 18px 142px}body.archive-results #archive-gallery{inset:188px 18px 142px}body.archive-mode .archive-controls{bottom:max(17px,env(safe-area-inset-bottom));left:16px;right:76px;transform:none;width:auto;max-width:none;flex-wrap:wrap;justify-content:center;gap:6px;padding:8px;border-radius:18px}body.archive-mode .archive-filters{width:100%;justify-content:space-between;gap:5px}body.archive-mode .archive-filters label{flex:1;min-width:0}body.archive-mode .archive-filters select{width:100%;max-width:none;height:28px;padding-inline:5px;font-size:13px}body.archive-mode .archive-controls #archive-count{min-width:68px;font-size:13px}body.archive-mode .archive-pagination button{height:28px;width:28px}body.archive-mode #archive-reset{font-size:12px;height:28px}body.archive-mode #archive-shuffle{height:28px;font-size:13px}body.archive-mode #archive-canvas .tile-caption strong{font-size:13px}body.archive-mode .assistant-launcher{right:18px;bottom:max(19px,env(safe-area-inset-bottom))}}
 @media(max-height:600px) and (min-width:721px){body.archive-mode #archive-gallery{inset:78px 72px 90px}body.archive-results #archive-gallery{inset:126px 38px 88px}body.archive-mode .archive-controls{bottom:14px}body.archive-mode .archive-header{height:64px}body.archive-results #archive-search-stage{top:65px}body.archive-mode #search-suggestions{max-height:34dvh}}
 
 /* In a short window, the search belongs above the collage. Keep real preview
@@ -39,15 +39,15 @@ body.archive-mode #search-suggestions{max-height:42dvh;overflow:auto;overscroll-
   body.archive-mode .search-prefix,body.archive-mode #archive-search{font-size:17px}
   body.archive-mode #archive-submit{width:34px;height:34px}
   body.archive-mode #archive-submit svg{width:17px;height:17px}
-  body.archive-mode .suggestion-toggle{min-height:23px;margin-top:4px;padding-block:4px;font-size:8px}
+  body.archive-mode .suggestion-toggle{min-height:23px;margin-top:4px;padding-block:4px;font-size:12px}
   body.archive-mode #archive-gallery{inset:140px 38px 82px}
   body.archive-mode #search-suggestions{max-height:calc(100dvh - 180px)}
   body.archive-mode .archive-controls{bottom:max(12px,env(safe-area-inset-bottom))}
   body.archive-mode .archive-footnote{display:none}
   body.archive-mode .archive-space-needed{padding:6px;text-align:center}
   body.archive-mode .archive-space-needed h2{font-size:15px;margin-bottom:6px}
-  body.archive-mode .archive-space-needed p{font-size:10px;line-height:1.5;margin-bottom:8px;max-width:320px}
-  body.archive-mode .archive-space-needed a{color:#b9b9b3;font-size:10px;text-decoration:underline;text-underline-offset:3px}
+  body.archive-mode .archive-space-needed p{font-size:14px;line-height:1.5;margin-bottom:8px;max-width:320px}
+  body.archive-mode .archive-space-needed a{color:#b9b9b3;font-size:14px;text-decoration:underline;text-underline-offset:3px}
 }
 @media(max-height:567px) and (max-width:720px){
   body.archive-mode .archive-header{padding-inline:18px}
@@ -71,13 +71,48 @@ body.archive-home .archive-footnote{padding:5px 7px;border-radius:8px;background
 body.archive-results .suggestion-toggle{display:none}
 body.archive-mode #archive-result-controls{display:flex;align-items:center;justify-content:center;gap:13px;min-height:26px;margin:7px auto 0;padding:0;background:none;border:0;color:#8c8c88}
 body.archive-mode #archive-result-controls[hidden],body.archive-mode #archive-result-controls [hidden]{display:none}
-body.archive-mode #archive-result-controls #archive-count{padding:0;font-size:9px;line-height:18px;white-space:nowrap;font-variant-numeric:tabular-nums}
+body.archive-mode #archive-result-controls #archive-count{padding:0;font-size:13px;line-height:18px;white-space:nowrap;font-variant-numeric:tabular-nums}
 body.archive-mode #archive-result-controls .archive-pagination{display:flex;align-items:center;gap:4px;padding:0}
 body.archive-mode #archive-result-controls .archive-pagination button{display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:7px;background:transparent;color:#bdbdb6;font-size:15px;line-height:1;cursor:pointer}
 body.archive-mode #archive-result-controls .archive-pagination button:hover:not(:disabled){background:#ffffff08;color:#f0f0eb}
 body.archive-mode #archive-result-controls .archive-pagination button:disabled{opacity:.28;cursor:default}
 body.archive-mode #archive-result-controls .archive-pagination button:focus-visible{outline:1px solid #d0d0c8;outline-offset:2px}
-body.archive-mode #archive-search-feedback{max-width:100%;margin:2px auto 0;padding:0 10px;overflow:hidden;color:#858580;font-size:9px;line-height:14px;text-align:center;text-overflow:ellipsis;white-space:nowrap}
+body.archive-mode #archive-search-feedback{max-width:100%;margin:2px auto 0;padding:0 10px;overflow:hidden;color:#858580;font-size:13px;line-height:14px;text-align:center;text-overflow:ellipsis;white-space:nowrap}
 body.archive-mode #archive-search-feedback[hidden]{display:none}
 @media(max-height:600px) and (min-width:721px){body.archive-results.archive-corrected #archive-gallery{top:190px}}
 @media(max-height:567px){body.archive-results.archive-corrected #archive-gallery{top:158px}}
+
+/* Keep titles readable without changing the decorative home collage. */
+body.archive-mode #archive-canvas .tile-caption strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;font-size:16px;line-height:20px;max-height:40px;font-weight:500;color:#ededeb}
+body.archive-mode #archive-canvas .tile-caption>span{font-size:13px;line-height:18px;color:#aaa9a5}
+body.archive-mode .archive-footnote{max-width:310px;font-size:13px;line-height:1.5;color:#b4b4af}
+body.archive-mode #archive-result-controls{min-height:40px;margin-top:8px;color:#b4b4af}
+body.archive-mode #archive-result-controls #archive-count{font-size:14px;line-height:20px}
+body.archive-mode #archive-result-controls .archive-pagination button{width:40px;height:40px;font-size:20px;border-radius:50%}
+body.archive-mode #archive-search-feedback{font-size:13px;line-height:19px;white-space:normal;color:#bbb}
+body.archive-mode .suggestion-toggle{min-height:40px;font-size:14px;color:#c5c5c0;padding:8px 15px}
+body.archive-results #archive-search-stage{top:92px}
+body.archive-results #archive-gallery{inset:218px 48px 70px}
+body.archive-results.archive-corrected #archive-gallery{top:245px}
+body.archive-mode .archive-empty h2{font-size:24px}
+body.archive-mode .archive-empty p{font-size:16px;line-height:1.6;color:#aaa9a5}
+body.archive-mode .archive-empty button{font-size:15px;min-height:44px}
+@media(max-width:720px){
+  body.archive-results #archive-search-stage{top:112px}
+  body.archive-results #archive-gallery{inset:230px 18px 80px}
+  body.archive-results.archive-corrected #archive-gallery{top:258px}
+  body.archive-mode #archive-canvas .tile-caption strong{font-size:15px}
+  body.archive-mode .search-prefix,body.archive-mode #archive-search{font-size:18px}
+}
+@media(max-height:567px){
+  body.archive-results #archive-search-stage{top:60px}
+  body.archive-results #archive-gallery{inset:162px 24px 16px}
+  body.archive-results.archive-corrected #archive-gallery{top:186px}
+  body.archive-mode #archive-result-controls{margin-top:2px}
+  body.archive-results .assistant-launcher{display:none}
+}
+@media(max-height:567px) and (max-width:720px){
+  body.archive-results #archive-search-stage{top:108px}
+  body.archive-results #archive-gallery{inset:210px 18px 12px}
+  body.archive-results.archive-corrected #archive-gallery{top:234px}
+}

@@ -12,8 +12,9 @@ function assertGeometry(layout, exclusion) {
     assert.ok(slot.x+slot.width <= layout.width+1e-7, 'slot clips horizontally');
     assert.ok(slot.y+slot.height <= layout.height+1e-7, 'slot clips vertically');
     assert.ok(Math.abs(slot.width/slot.visualHeight-16/9)<1e-7);
-    assert.equal(slot.captionHeight,36);
-    assert.ok(Math.abs(slot.height-slot.visualHeight-36)<1e-7);
+    assert.equal(slot.captionHeight,layout.captionHeight);
+    assert.ok(slot.captionHeight>=36);
+    assert.ok(Math.abs(slot.height-slot.visualHeight-slot.captionHeight)<1e-7);
     if(exclusion) assert.equal(overlaps(slot,exclusion),false,'slot enters fixed-search exclusion');
   }
   for(let i=0;i<layout.slots.length;i++) for(let j=i+1;j<layout.slots.length;j++) assert.equal(overlaps(layout.slots[i],layout.slots[j]),false,'tiles overlap');
@@ -55,6 +56,7 @@ test('results are bounded with real caption space across narrow and wide canvase
   for(const width of [284,339,500,648,904,1160,1320,1800]) for(const height of [258,358,490,650,850]){
     const result=generateArchiveLayout({width,height,home:false});
     assertGeometry(result);
+    assert.ok(result.captionHeight>=70,'results need room for two readable title lines and metadata');
     assert.ok(result.capacity>=2);
     assert.ok(result.capacity<=20);
   }
@@ -63,7 +65,7 @@ test('results are bounded with real caption space across narrow and wide canvase
 test('compact landscape keeps previews reachable below the fixed search without a center exclusion',()=>{
   for(const [width,height] of [[320,375],[667,375],[812,375],[844,390],[932,430],[1366,400]]){
     const small=width<=720;
-    const canvasWidth=width-(small?36:76),canvasHeight=height-140-(small?110:82);
+    const canvasWidth=width-(small?36:48),canvasHeight=height-(small?210:162)-(small?12:16);
     const result=generateArchiveLayout({width:canvasWidth,height:canvasHeight,home:false});
     assertGeometry(result);
     assert.ok(result.capacity>=2,`compact archive unreachable at ${width}x${height}`);
