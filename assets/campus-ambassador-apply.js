@@ -48,7 +48,9 @@
 
   function validationMessage(field) {
     var value = field.value.trim();
+    if (!value && !field.required) return '';
     if (!value) return field.tagName === 'SELECT' ? 'Choose a role, or select “Wherever I’m needed”.' : 'Please fill in this field.';
+    if (field.name === 'tiktok' && value.length > 200) return 'Keep your TikTok handle or profile link to 200 characters or fewer.';
     if (field.name === 'email') {
       if (value.length >= 200 || !emailPattern.test(value)) return 'Enter a complete email address, like you@school.edu (under 200 characters).';
       var domain = value.split('@').pop().toLowerCase();
@@ -154,7 +156,10 @@
     }
 
     var data = {};
-    fields.forEach(function (field) { data[field.name] = field.value.trim(); });
+    fields.forEach(function (field) {
+      var value = field.value.trim();
+      if (field.required || value) data[field.name] = value;
+    });
     data.instagram = instagramHandle(data.instagram);
     var digits = phoneDigits(data.phone);
     data.phone = digits.slice(0, 3) + '-' + digits.slice(3, 6) + '-' + digits.slice(6);

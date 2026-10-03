@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=2">
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
-  <script defer src="/assets/campus-ambassador-apply.js?v=2"></script>
+  <script defer src="/assets/campus-ambassador-apply.js?v=3"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to application</a>
@@ -45,7 +45,7 @@
     <section class="application-card" aria-labelledby="application-title">
       <form id="ambassador-apply-form" class="application-form" method="post">
         <h2 id="application-title">A little about you.</h2>
-        <p class="application-note">All fields are required.</p>
+        <p class="application-note">All fields are required except TikTok.</p>
         <noscript><p class="form-error">Enable JavaScript to submit this application, or email <a href="mailto:hello@fomo.family">hello@fomo.family</a> with your answers.</p></noscript>
         <div class="field">
           <label for="first_name">First name</label>
@@ -76,6 +76,12 @@
           <p id="instagram-error" class="field-error" hidden></p>
         </div>
         <div class="field">
+          <label for="tiktok">TikTok <span>(optional)</span></label>
+          <input id="tiktok" name="tiktok" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@yourhandle" maxlength="200" aria-describedby="tiktok-help tiktok-error">
+          <p id="tiktok-help" class="help">Your handle or profile link, if you have one.</p>
+          <p id="tiktok-error" class="field-error" hidden></p>
+        </div>
+        <div class="field">
           <label for="school">School</label>
           <input id="school" name="school" type="text" autocomplete="organization" placeholder="Your college or university" aria-describedby="school-error" required>
           <p id="school-error" class="field-error" hidden></p>
@@ -85,8 +91,8 @@
           <select id="role" name="role" aria-describedby="role-error" required>
             <option value="" disabled selected>Choose a role</option>
             <option value="president">Campus President — bring the team together</option>
-            <option value="growth">Growth — introduce your campus to fomo</option>
-            <option value="partnerships">Partnerships — connect people and organizations</option>
+            <option value="growth">Growth — recruit and onboard students</option>
+            <option value="partnerships">Partnerships — collaborate with campus organizations</option>
             <option value="content">Content — tell your campus’s story</option>
             <option value="culture">Culture — make things happen in person</option>
             <option value="any">Wherever I’m needed</option>
