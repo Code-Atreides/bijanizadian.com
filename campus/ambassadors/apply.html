@@ -15,7 +15,7 @@
   <link rel="icon" type="image/svg+xml" href="/assets/campus-favicon.svg">
   <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=6">
+  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=7">
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
   <script defer src="/assets/campus-ambassador-apply.js?v=3"></script>
@@ -44,8 +44,10 @@
 
     <section class="application-card" aria-labelledby="application-title">
       <form id="ambassador-apply-form" class="application-form" method="post">
-        <h2 id="application-title">A little about you.</h2>
-        <p class="application-note">All fields are required except TikTok.</p>
+        <div class="form-heading">
+          <h2 id="application-title">A little about you.</h2>
+          <p class="application-note">All fields are required except TikTok.</p>
+        </div>
         <noscript><p class="form-error">Enable JavaScript to submit this application, or email <a href="mailto:hello@fomo.family">hello@fomo.family</a> with your answers.</p></noscript>
         <div class="field">
           <label for="first_name">First name</label>
@@ -81,12 +83,12 @@
           <p id="tiktok-help" class="help">Your handle or profile link, if you have one.</p>
           <p id="tiktok-error" class="field-error" hidden></p>
         </div>
-        <div class="field">
+        <div class="field field-wide">
           <label for="school">School</label>
           <input id="school" name="school" type="text" autocomplete="organization" placeholder="Your college or university" aria-describedby="school-error" required>
           <p id="school-error" class="field-error" hidden></p>
         </div>
-        <div class="field">
+        <div class="field field-wide">
           <label for="role">Where do you see yourself?</label>
           <select id="role" name="role" aria-describedby="role-error" required>
             <option value="" disabled selected>Choose a role</option>
@@ -99,7 +101,7 @@
           </select>
           <p id="role-error" class="field-error" hidden></p>
         </div>
-        <div class="field">
+        <div class="field field-wide">
           <label for="why">Why you, and why your campus?</label>
           <textarea id="why" name="why" rows="5" minlength="20" maxlength="3999" aria-describedby="why-help why-error" required></textarea>
           <p id="why-help" class="help">A few sentences about your skills, campus connections, and the work you’d like to take on. At least 20 characters.</p>
