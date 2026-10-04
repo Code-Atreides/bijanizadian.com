@@ -9,6 +9,7 @@
   };
   const buttons = Array.from(document.querySelectorAll('[data-role]'));
   const preview = document.getElementById('role-preview');
+  const select = document.querySelector('[data-role-select]');
   if (!buttons.length || !preview) return;
 
   function renderRole(target, key) {
@@ -58,12 +59,18 @@
     preview.style.minHeight = Math.ceil(height) + 'px';
   }
 
-  buttons.forEach(button => button.addEventListener('click', () => {
-    const key = button.dataset.role;
+  function selectRole(key) {
     if (!roles[key]) return;
-    buttons.forEach(option => option.setAttribute('aria-pressed', String(option === button)));
+    buttons.forEach(option => option.setAttribute('aria-pressed', String(option.dataset.role === key)));
+    if (select) select.value = key;
     renderRole(preview, key);
-  }));
+  }
+  buttons.forEach(button => button.addEventListener('click', () => selectRole(button.dataset.role)));
+  if (select) {
+    select.value = buttons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.role || 'president';
+    select.addEventListener('change', () => selectRole(select.value));
+    select.closest('.role-finder').dataset.roleReady = 'true';
+  }
 
   stabilizePreview();
   if (document.fonts) document.fonts.ready.then(() => stabilizePreview(true));

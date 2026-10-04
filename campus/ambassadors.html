@@ -13,10 +13,10 @@
   <link rel="canonical" href="https://bijanizadian.com/campus/ambassadors">
   <link rel="icon" href="/assets/campus-favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=7">
-  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=3">
-  <script src="/assets/campus-ambassadors.js?v=7" defer></script>
-  <script src="/assets/campus-ambassador-roadmap.js?v=2" defer></script>
+  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=8">
+  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=4">
+  <script src="/assets/campus-ambassadors.js?v=8" defer></script>
+  <script src="/assets/campus-ambassador-roadmap.js?v=3" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -46,6 +46,13 @@
           <button class="role-option" type="button" data-role="content" aria-pressed="false" aria-controls="role-preview">Tell the story</button>
           <button class="role-option" type="button" data-role="growth" aria-pressed="false" aria-controls="role-preview">Recruit students</button>
         </div>
+        <select class="role-select" data-role-select aria-label="Choose your internship role" aria-controls="role-preview">
+          <option value="president">Campus President</option>
+          <option value="partnerships">Partnerships</option>
+          <option value="culture">Culture</option>
+          <option value="content">Content</option>
+          <option value="growth">Growth</option>
+        </select>
         <div class="role-preview" id="role-preview" aria-live="polite" aria-atomic="true">
           <p class="role-kicker" id="role-kicker">01 / 05 · the team builder</p>
           <h3 id="role-title">campus president.</h3>
@@ -67,11 +74,12 @@
       <div class="roadmap-heading"><div><p class="eyebrow">the work, step by step</p><h2 id="how-title">from your first task<br>to your first payout.</h2></div><p>Know what’s expected, share your work, and get paid for results.</p></div>
       <div class="roadmap-panel">
         <ol class="roadmap-steps" aria-label="From assignment to payment">
-          <li><button type="button" class="roadmap-step" data-roadmap-step="0" data-state="current" aria-pressed="true" aria-controls="roadmap-example"><span class="roadmap-number">01</span><span><strong>Get a clear brief</strong><span class="roadmap-step-description">Know the task, what you’ll submit, and how pay works.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="1" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">02</span><span><strong>Do the work</strong><span class="roadmap-step-description">Create the post, bring in students, or help run a campus event.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="2" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">03</span><span><strong>Submit for review</strong><span class="roadmap-step-description">Share your links or results so the team can verify your work.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="3" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">04</span><span><strong>Get paid</strong><span class="roadmap-step-description">Earn money for verified results or milestones.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="0" data-state="current" aria-pressed="true" aria-controls="roadmap-example"><span class="roadmap-number">01</span><span class="roadmap-mobile-label" aria-hidden="true">Brief</span><span><strong>Get a clear brief</strong><span class="roadmap-step-description">Know the task, what you’ll submit, and how pay works.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="1" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">02</span><span class="roadmap-mobile-label" aria-hidden="true">Work</span><span><strong>Do the work</strong><span class="roadmap-step-description">Create the post, bring in students, or help run a campus event.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="2" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">03</span><span class="roadmap-mobile-label" aria-hidden="true">Review</span><span><strong>Submit for review</strong><span class="roadmap-step-description">Share your links or results so the team can verify your work.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="3" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">04</span><span class="roadmap-mobile-label" aria-hidden="true">Pay</span><span><strong>Get paid</strong><span class="roadmap-step-description">Earn money for verified results or milestones.</span></span></button></li>
         </ol>
+        <p class="roadmap-mobile-summary" aria-hidden="true"><strong data-roadmap-summary-title>Get a clear brief</strong><span data-roadmap-summary-description>Know the task, what you?ll submit, and how pay works.</span></p>
         <div class="roadmap-demo" id="roadmap-example" role="group" aria-label="Example: a campus video">
           <div class="roadmap-demo-header"><span class="roadmap-example">Example: a campus video</span><button class="roadmap-toggle" type="button" data-roadmap-toggle data-playing="true" aria-label="Pause roadmap animation"><svg class="roadmap-pause-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2h2v8H3zm4 0h2v8H7z"/></svg><svg class="roadmap-play-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 2 7 4-7 4z"/></svg><span data-roadmap-toggle-label>Pause</span></button></div>
           <div class="roadmap-canvas" aria-hidden="true">

@@ -9,6 +9,8 @@
     const toggleLabel = roadmap.querySelector('[data-roadmap-toggle-label]');
     const stageLabel = roadmap.querySelector('[data-roadmap-stage-label]');
     const stageCount = roadmap.querySelector('[data-roadmap-stage-count]');
+    const summaryTitle = roadmap.querySelector('[data-roadmap-summary-title]');
+    const summaryDescription = roadmap.querySelector('[data-roadmap-summary-description]');
     if (steps.length !== 4 || scenes.length !== steps.length || !toggle || !toggleLabel) return;
 
     stageLabel?.setAttribute('aria-live', 'off');
@@ -34,6 +36,8 @@
       });
       if (stageLabel) stageLabel.textContent = scenes[active].dataset.label || steps[active].querySelector('strong')?.textContent || '';
       if (stageCount) stageCount.textContent = `${String(active + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`;
+      if (summaryTitle) summaryTitle.textContent = steps[active].querySelector('strong').textContent;
+      if (summaryDescription) summaryDescription.textContent = steps[active].querySelector('.roadmap-step-description').textContent;
     };
 
     const updatePlayback = () => {
@@ -91,6 +95,7 @@
       }, { threshold: 0.3 }).observe(roadmap.querySelector('.roadmap-panel'));
     }
 
+    if (summaryTitle && summaryDescription) roadmap.dataset.roadmapEnhanced = 'true';
     render(0);
     updatePlayback();
   });
