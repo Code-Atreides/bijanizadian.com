@@ -84,13 +84,13 @@ for (const page of pages) {
     }
   }
 }
-for (const cssFile of ['assets/campus-landing.css','assets/campus-directory.css','assets/campus-ambassadors.css','assets/fomo-system.css','assets/manual-header.css','assets/greekwars-invite.css']) {
+for (const cssFile of ['assets/campus-landing.css','assets/campus-directory.css','assets/campus-ambassadors.css','assets/campus-ambassador-roadmap.css','assets/fomo-system.css','assets/manual-header.css','assets/greekwars-invite.css']) {
   const css = fs.readFileSync(path.join(root,cssFile),'utf8');
   for (const [,asset] of css.matchAll(/url\(['"]?([^'"\)]+)['"]?\)/g)) {
     if (asset.startsWith('/') && !localFile(new URL(asset,'https://bijanizadian.com'))) fail(`${cssFile}: missing ${asset}`);
   }
 }
-for (const jsFile of ['assets/manual-header.js','assets/greekwars-invite.js','assets/campus-ambassadors.js','assets/campus-ambassador-apply.js']) {
+for (const jsFile of ['assets/manual-header.js','assets/greekwars-invite.js','assets/campus-ambassadors.js','assets/campus-ambassador-roadmap.js','assets/campus-ambassador-apply.js']) {
   try { new vm.Script(fs.readFileSync(path.join(root,jsFile),'utf8'), { filename: jsFile }); }
   catch(e) { fail(`${jsFile}: ${e.message}`); }
 }

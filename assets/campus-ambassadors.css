@@ -133,9 +133,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .role-preview { display: flex; flex-direction: column; background: #fff; border-radius: 19px; padding: 25px 24px; margin-top: 24px; min-height: 360px; }
 .role-kicker { font-size: 10px; line-height: 1.5; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
 .role-preview h3 { font-size: 33px; font-weight: 500; letter-spacing: -1.4px; line-height: 1.1; color: var(--purple); margin-top: 12px; }
-.role-preview > p:not(.role-kicker) { color: var(--muted); font-size: 14px; line-height: 1.6; margin-top: 12px; }
+.role-preview > p:not(.role-kicker) { color: var(--muted); font-size: 15px; line-height: 1.6; margin-top: 12px; }
 .role-tasks { list-style: none; padding: 0; margin: 18px 0 22px; }
-.role-tasks li { position: relative; padding-left: 18px; font-size: 13px; line-height: 1.5; margin-top: 9px; }
+.role-tasks li { position: relative; padding-left: 18px; font-size: 14px; line-height: 1.5; margin-top: 9px; }
 .role-tasks li::before { content: ''; position: absolute; top: 7px; left: 0; width: 5px; height: 5px; background: var(--purple); border-radius: 50%; }
 .role-apply { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: auto; padding-top: 17px; border-top: 1px solid var(--line); color: var(--purple); font-weight: 500; font-size: 13px; line-height: 1.5; }
 .role-apply span { font-size: 20px; }
@@ -143,24 +143,6 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .role-finder .finder-note { margin-top: 17px; text-align: center; font-size: 11px; line-height: 1.5; color: var(--muted); }
 
 h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 500; }
-.how { border-top: 1px solid var(--line); padding-top: 64px; }
-.section-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; margin-bottom: 36px; }
-.section-heading h2 { margin-top: 15px; }
-.section-heading > p { max-width: 280px; font-size: 16px; line-height: 1.6; color: var(--muted); padding-bottom: 3px; }
-.steps { margin: 0; padding: 0; list-style: none; }
-.steps > li { display: grid; grid-template-columns: 54px minmax(0, 1fr) 260px; gap: 26px; align-items: center; border-top: 1px solid var(--line); padding: 30px 0; min-height: 144px; }
-.step-number { align-self: start; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--tint); color: var(--purple); font-size: 13px; font-weight: 500; margin-top: 2px; }
-.step-content h3 { font-size: 25px; line-height: 1.2; font-weight: 500; letter-spacing: -.9px; }
-.step-content p { font-size: 16px; line-height: 1.6; color: var(--muted); margin-top: 9px; max-width: 460px; }
-.step-visual { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; position: relative; min-width: 0; }
-.mini-pill { padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; white-space: nowrap; font-size: 13px; background: #fff; }
-.mini-pill.purple { background: var(--tint); color: var(--purple); border-color: transparent; }
-.flow-arrow { font-size: 17px; color: #8d8d9f; }
-.chat-bubble { background: var(--purple); color: #fff; padding: 15px 21px; border-radius: 15px 15px 3px 15px; font-size: 15px; transform: rotate(-3deg); }
-.payoff { background: var(--tint); border-radius: 18px; display: flex; align-items: center; gap: 19px; padding: 26px 28px; margin-top: 12px; }
-.payoff-icon { display: grid; place-items: center; background: var(--purple); color: #fff; width: 42px; height: 42px; border-radius: 50%; font-size: 25px; flex-shrink: 0; }
-.payoff p { font-size: 19px; line-height: 1.55; letter-spacing: -.3px; }
-.payoff p span { color: var(--muted); font-size: 14px; letter-spacing: 0; }
 .text-link { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--purple); margin-left: auto; white-space: nowrap; }
 .text-link:hover { color: var(--purple-dark); }
 .ambassador-intro { display: grid; grid-template-columns: 1.13fr 1fr; gap: 80px; padding-block: 0 var(--section-space); }
@@ -228,9 +210,6 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .nav nav { gap: 22px; }
   .role-finder { padding: 25px; }
   .hero-lede { font-size: 22px; }
-  .steps > li { grid-template-columns: 48px minmax(0, 1fr) 220px; gap: 20px; }
-  .step-visual { gap: 7px; }
-  .mini-pill { padding: 11px 12px; font-size: 12px; }
   .application-layout { gap: 45px; }
 }
 
@@ -252,17 +231,6 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .role-options { gap: 8px; }
   .role-option { padding-inline: 16px; }
   h2 { font-size: 37px; }
-  .how { padding-top: 48px; }
-  .section-heading { display: block; margin-bottom: 27px; }
-  .section-heading > p { margin-top: 18px; max-width: 380px; }
-  .steps > li { grid-template-columns: 43px minmax(0, 1fr); gap: 17px; padding-block: 27px; min-height: 0; }
-  .step-number { width: 37px; height: 37px; }
-  .step-content h3 { font-size: 23px; }
-  .step-content p { font-size: 15px; }
-  .step-visual { display: none; }
-  .payoff { flex-wrap: wrap; padding: 24px; gap: 14px; }
-  .payoff p { flex: 1; font-size: 17px; }
-  .payoff .text-link { margin-left: 56px; width: calc(100% - 56px); }
   .ambassador-intro { grid-template-columns: 1fr; gap: 24px; padding-block: 0 var(--section-space); }
   .intro-copy { padding: 0; }
   .intro-copy p { font-size: 16px; }
@@ -300,13 +268,8 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .role-option { padding: 11px 12px; font-size: 12px; }
   .role-preview { padding: 23px 20px; margin-top: 20px; }
   .role-preview h3 { font-size: 30px; }
-  .role-tasks li { font-size: 12px; }
+  .role-tasks li { font-size: 13px; }
   h2 { font-size: 34px; }
-  .step-content h3 { font-size: 22px; }
-  .payoff { padding: 22px 20px; gap: 12px; }
-  .payoff-icon { width: 36px; height: 36px; font-size: 22px; }
-  .payoff .text-link { margin-left: 48px; width: calc(100% - 48px); }
-  .payoff p span { font-size: 13px; }
   .faq summary { font-size: 16px; }
   .closing h2 { font-size: 39px; }
   .footer > span { font-size: 11px; }
@@ -330,7 +293,6 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .brand { font-size: 24px; }
   .brand svg { width: 28px; height: 28px; }
   .button-small { padding-inline: 12px; font-size: 12px; gap: 8px; }
-  .step-visual { flex-wrap: wrap; }
   .role-apply { min-height: 58px; }
 }
 
