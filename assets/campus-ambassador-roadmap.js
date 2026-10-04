@@ -7,7 +7,12 @@
     const progress = [...roadmap.querySelectorAll('[data-roadmap-progress]')];
     const toggle = roadmap.querySelector('[data-roadmap-toggle]');
     const toggleLabel = roadmap.querySelector('[data-roadmap-toggle-label]');
+    const stageLabel = roadmap.querySelector('[data-roadmap-stage-label]');
+    const stageCount = roadmap.querySelector('[data-roadmap-stage-count]');
     if (steps.length !== 4 || scenes.length !== steps.length || !toggle || !toggleLabel) return;
+
+    stageLabel?.setAttribute('aria-live', 'off');
+    stageCount?.setAttribute('aria-live', 'off');
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let active = 0;
@@ -17,9 +22,18 @@
 
     const render = (index) => {
       active = index;
-      steps.forEach((step, item) => step.setAttribute('aria-pressed', String(item === active)));
+      steps.forEach((step, item) => {
+        step.setAttribute('aria-pressed', String(item === active));
+        step.dataset.state = item === active ? 'current' : item < active ? 'complete' : 'upcoming';
+      });
       scenes.forEach((scene, item) => scene.classList.toggle('is-active', item === active));
-      progress.forEach((segment, item) => segment.classList.toggle('is-active', item <= active));
+      progress.forEach((segment, item) => {
+        segment.classList.toggle('is-active', item <= active);
+        segment.classList.toggle('is-current', item === active);
+        segment.classList.toggle('is-complete', item < active);
+      });
+      if (stageLabel) stageLabel.textContent = scenes[active].dataset.label || steps[active].querySelector('strong')?.textContent || '';
+      if (stageCount) stageCount.textContent = `${String(active + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`;
     };
 
     const updatePlayback = () => {
@@ -30,16 +44,32 @@
       toggleLabel.textContent = playing ? 'Pause' : 'Play';
       toggle.setAttribute('aria-label', playing ? 'Pause roadmap animation' : 'Play roadmap animation');
       toggle.hidden = reducedMotion.matches;
-      if (playing && visible && !document.hidden) {
+      const running = playing && visible && !document.hidden;
+      roadmap.dataset.playback = running ? 'running' : 'paused';
+      if (running) {
         timer = window.setInterval(() => render((active + 1) % steps.length), 4800);
       }
     };
 
+    const selectStep = (index) => {
+      wantsPlayback = false;
+      render(index);
+      updatePlayback();
+    };
+
     steps.forEach((step, index) => {
-      step.addEventListener('click', () => {
-        wantsPlayback = false;
-        render(index);
-        updatePlayback();
+      step.addEventListener('click', () => selectStep(index));
+      step.addEventListener('keydown', (event) => {
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        let next;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = (index + 1) % steps.length;
+        else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = (index - 1 + steps.length) % steps.length;
+        else if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = steps.length - 1;
+        else return;
+        event.preventDefault();
+        selectStep(next);
+        steps[next].focus();
       });
     });
 

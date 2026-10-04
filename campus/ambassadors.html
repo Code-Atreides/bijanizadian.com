@@ -14,9 +14,9 @@
   <link rel="icon" href="/assets/campus-favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=6">
-  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=1">
+  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=2">
   <script src="/assets/campus-ambassadors.js?v=7" defer></script>
-  <script src="/assets/campus-ambassador-roadmap.js?v=1" defer></script>
+  <script src="/assets/campus-ambassador-roadmap.js?v=2" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -64,33 +64,33 @@
     </section>
 
     <section class="ambassador-roadmap wrap" id="how-it-works" data-roadmap aria-labelledby="how-title">
-      <div class="roadmap-heading"><div><p class="eyebrow">the work, step by step</p><h2 id="how-title">from your first task<br>to your first payout.</h2></div><p>Once you join the team, here’s how the work moves.</p></div>
+      <div class="roadmap-heading"><div><p class="eyebrow">the work, step by step</p><h2 id="how-title">from your first task<br>to your first payout.</h2></div><p>Know what’s expected, share your work, and get paid for results.</p></div>
       <div class="roadmap-panel">
         <ol class="roadmap-steps" aria-label="From assignment to payment">
-          <li><button type="button" class="roadmap-step" data-roadmap-step="0" aria-pressed="true"><span class="roadmap-number">01</span><span><strong>Know the target</strong><span class="roadmap-step-description">Agree on the result or milestone you’re working toward and how you’ll be paid.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="1" aria-pressed="false"><span class="roadmap-number">02</span><span><strong>Do the work</strong><span class="roadmap-step-description">Create the video, bring in students, or run the campus activity in your brief.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="2" aria-pressed="false"><span class="roadmap-number">03</span><span><strong>Share your results</strong><span class="roadmap-step-description">Send your links, screenshots, and results so the team can check your progress.</span></span></button></li>
-          <li><button type="button" class="roadmap-step" data-roadmap-step="3" aria-pressed="false"><span class="roadmap-number">04</span><span><strong>Get paid</strong><span class="roadmap-step-description">Get paid for the agreed results or milestones once the team approves them.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="0" data-state="current" aria-pressed="true" aria-controls="roadmap-example"><span class="roadmap-number">01</span><span><strong>Get a clear brief</strong><span class="roadmap-step-description">Know the task, what you’ll submit, and how pay works.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="1" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">02</span><span><strong>Do the work</strong><span class="roadmap-step-description">Create the post, bring in students, or help run a campus event.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="2" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">03</span><span><strong>Submit for review</strong><span class="roadmap-step-description">Share your links or results so the team can verify your work.</span></span></button></li>
+          <li><button type="button" class="roadmap-step" data-roadmap-step="3" aria-pressed="false" aria-controls="roadmap-example"><span class="roadmap-number">04</span><span><strong>Get paid</strong><span class="roadmap-step-description">Earn money for verified results or milestones.</span></span></button></li>
         </ol>
-        <div class="roadmap-demo">
-          <div class="roadmap-demo-header"><span class="roadmap-example">Example assignment</span><button class="roadmap-toggle" type="button" data-roadmap-toggle data-playing="true" aria-label="Pause roadmap animation"><svg class="roadmap-pause-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2h2v8H3zm4 0h2v8H7z"/></svg><svg class="roadmap-play-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 2 7 4-7 4z"/></svg><span data-roadmap-toggle-label>Pause</span></button></div>
+        <div class="roadmap-demo" id="roadmap-example" role="group" aria-label="Example: a campus video">
+          <div class="roadmap-demo-header"><span class="roadmap-example">Example: a campus video</span><button class="roadmap-toggle" type="button" data-roadmap-toggle data-playing="true" aria-label="Pause roadmap animation"><svg class="roadmap-pause-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2h2v8H3zm4 0h2v8H7z"/></svg><svg class="roadmap-play-icon" viewBox="0 0 12 12" aria-hidden="true"><path d="m3 2 7 4-7 4z"/></svg><span data-roadmap-toggle-label>Pause</span></button></div>
           <div class="roadmap-canvas" aria-hidden="true">
-            <div class="roadmap-scene is-active" data-roadmap-scene="0">
-              <div class="roadmap-paper"><div class="roadmap-paper-top"><span>Your next task</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="5" width="13" height="15" rx="2"/><path d="M8 3h5v4H8zm0 9h5m-5 4h5m4-3 3-3v7l-3-3"/></svg></div><h3>Create a<br>campus video.</h3><div class="roadmap-brief-row"><span>Post</span><strong>Verified by the team</strong></div><div class="roadmap-brief-row"><span>Payment</span><strong>Varies with performance</strong></div></div>
-              <span class="roadmap-sticker"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m3 7 3 3 5-6"/></svg>Create. Post. Get verified.</span>
+            <div class="roadmap-scene is-active" data-roadmap-scene="0" data-label="The brief">
+              <div class="roadmap-paper"><div class="roadmap-paper-top"><span>Your content brief</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="5" width="13" height="15" rx="2"/><path d="M8 3h5v4H8zm0 9h5m-5 4h5m4-3 3-3v7l-3-3"/></svg></div><h3>Create a<br>campus video.</h3><div class="roadmap-brief-row"><span>You make</span><strong>A post about fomo</strong></div><div class="roadmap-brief-row"><span>Your pay</span><strong>Varies with performance</strong></div></div>
+              <span class="roadmap-sticker"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m3 7 3 3 5-6"/></svg>Your campus. Your take.</span>
             </div>
-            <div class="roadmap-scene" data-roadmap-scene="1">
+            <div class="roadmap-scene" data-roadmap-scene="1" data-label="Create &amp; post">
               <div class="roadmap-video"><div class="roadmap-video-image"><span class="roadmap-video-tag">a day on campus</span><svg viewBox="0 0 136 160" fill="none"><path d="M-20 111 86 0l77 126v34H-20z" fill="#8F9EED"/><path d="m-30 153 83-89 109 83v13H-30z" fill="#8491D9"/><path d="M-8 160v-27a32 32 0 0 1 64 0v27" fill="#465AC6"/><circle cx="24" cy="105" r="14" fill="#E5C3B5"/><path d="M41 160v-52a33 33 0 0 1 66 0v52" fill="#F0ECEF"/><circle cx="74" cy="79" r="15" fill="#AD796E"/><path d="M68 65c15-9 25 9 17 15l-4-8-17 5-3-8z" fill="#434053"/><path d="M92 160v-24a29 29 0 0 1 58 0v24" fill="#7274BE"/><circle cx="122" cy="111" r="13" fill="#DAB798"/></svg><span class="roadmap-video-play">▶</span><span class="roadmap-video-caption">your campus.<br>your point of view.</span></div></div>
-              <div class="roadmap-video-tools"><strong>Make it your own.</strong><span>Capture the moment</span><span>Edit the story</span><span>Follow your brief</span></div>
+              <div class="roadmap-video-tools"><strong>Film. Edit. Post.</strong><span>Follow your brief</span><span>Make it your own</span><span>Publish your video</span></div>
             </div>
-            <div class="roadmap-scene" data-roadmap-scene="2">
+            <div class="roadmap-scene" data-roadmap-scene="2" data-label="Post verification">
               <div class="roadmap-paper roadmap-proof"><div class="roadmap-paper-top"><span>Post verification</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5M12 3v12M7 8l5-5 5 5"/></svg></div><h3>Submit your post.</h3><div class="roadmap-proof-link"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m6 10 4-4M5 8l-2 2a2.8 2.8 0 0 0 4 4l2-2M7 4l2-2a2.8 2.8 0 0 1 4 4l-2 2"/></svg><span>Published post link</span></div><div class="roadmap-proof-file"><span>↗</span><span>Performance screenshot<small>How your post performed</small></span></div><div class="roadmap-proof-status"><span>Ready for verification</span><span>↗</span></div></div>
             </div>
-            <div class="roadmap-scene" data-roadmap-scene="3">
+            <div class="roadmap-scene" data-roadmap-scene="3" data-label="Performance pay">
               <div class="roadmap-paper roadmap-receipt"><span class="roadmap-receipt-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></span><p>Post verified</p><h3>Paid for performance.</h3><div class="roadmap-receipt-line"><span>Payment</span><strong>Varies by performance</strong></div></div><i class="roadmap-confetti"></i><i class="roadmap-confetti"></i><i class="roadmap-confetti"></i>
             </div>
           </div>
-          <div class="roadmap-demo-footer" aria-hidden="true"><span class="roadmap-demo-caption">A campus video, from brief to paid results.</span><span class="roadmap-progress"><span class="is-active" data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span></span></div>
+          <div class="roadmap-demo-footer" aria-hidden="true"><span class="roadmap-demo-caption"><span class="roadmap-stage-count" data-roadmap-stage-count>01 / 04</span><span data-roadmap-stage-label>The brief</span></span><span class="roadmap-progress"><span class="is-active is-current" data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span></span></div>
         </div>
       </div>
     </section>
