@@ -134,8 +134,7 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .role-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; max-width: 440px; }
 .role-option { min-height: 42px; padding: 11px 14px; font-size: 13px; line-height: 1.3; color: #565c77; border: 1px solid #dfe3f5; border-radius: 50px; background: transparent; transition: border-color .15s, background .15s, color .15s; }
 .role-option:hover { background: #e9edff; border-color: #c4cdfc; }
-.role-option[aria-pressed='true'] { color: #fff; background: var(--purple); border-color: var(--purple); }
-.role-select { display: none; }
+.role-option[aria-selected='true'] { color: #fff; background: var(--purple); border-color: var(--purple); }
 .role-preview { display: flex; flex-direction: column; background: #fff; border-radius: 19px; padding: 24px; margin-top: 20px; min-height: 336px; }
 .role-kicker { font-size: 10px; line-height: 1.5; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
 .role-preview h3 { font-size: 33px; font-weight: 500; letter-spacing: -1.4px; line-height: 1.1; color: var(--purple); margin-top: 12px; }
@@ -311,8 +310,10 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .hero h1 { margin-top: 16px; }
   .hero-lede { margin-top: 20px; }
   .role-finder { padding: 18px 16px; }
-  .role-finder[data-role-ready] > p:not(.cta-note), .role-finder[data-role-ready] .role-options { display: none; }
-  .role-finder[data-role-ready] .role-select { display: block; width: 100%; min-height: 44px; margin-top: 14px; padding: 10px 34px 10px 12px; border: 1px solid #dfe3f5; border-radius: 12px; background: #fff; color: var(--ink); font-size: 16px; }
+  .role-finder[data-role-ready] > p:not(.cta-note) { display: none; }
+  .role-options { flex-wrap: nowrap; max-width: none; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scroll-padding-inline: 6px; scrollbar-width: none; margin: 8px -6px 0; padding: 6px; }
+  .role-options::-webkit-scrollbar { display: none; }
+  .role-option { flex: 0 0 auto; min-height: 44px; padding: 11px 15px; font-size: 13px; white-space: nowrap; scroll-snap-align: center; }
   .role-preview { padding: 18px; margin-top: 14px; }
   .role-preview h3 { font-size: 28px; margin-top: 8px; }
   .role-preview > p:not(.role-kicker) { margin-top: 8px; line-height: 1.5; }

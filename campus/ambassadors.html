@@ -13,9 +13,9 @@
   <link rel="canonical" href="https://bijanizadian.com/campus/ambassadors">
   <link rel="icon" href="/assets/campus-favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=8">
+  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=9">
   <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=4">
-  <script src="/assets/campus-ambassadors.js?v=9" defer></script>
+  <script src="/assets/campus-ambassadors.js?v=10" defer></script>
   <script src="/assets/campus-ambassador-roadmap.js?v=3" defer></script>
 </head>
 <body>
@@ -39,21 +39,14 @@
       <div class="role-finder" id="find-your-role" aria-labelledby="finder-title">
         <div class="role-finder-top"><h2 id="finder-title">find your kind of work.</h2><span class="finder-tag">five roles</span></div>
         <p>Pick a role to see what you’ll do.</p>
-        <div class="role-options" role="group" aria-label="Explore campus internship roles">
-          <button class="role-option" type="button" data-role="president" aria-pressed="true" aria-controls="role-preview">Lead the team</button>
-          <button class="role-option" type="button" data-role="partnerships" aria-pressed="false" aria-controls="role-preview">Build partnerships</button>
-          <button class="role-option" type="button" data-role="culture" aria-pressed="false" aria-controls="role-preview">Make the plans</button>
-          <button class="role-option" type="button" data-role="content" aria-pressed="false" aria-controls="role-preview">Tell the story</button>
-          <button class="role-option" type="button" data-role="growth" aria-pressed="false" aria-controls="role-preview">Recruit students</button>
+        <div class="role-options" role="tablist" aria-label="Explore campus internship roles">
+          <button class="role-option" type="button" role="tab" id="role-tab-president" data-role="president" aria-selected="true" tabindex="0" aria-controls="role-preview">Lead the team</button>
+          <button class="role-option" type="button" role="tab" id="role-tab-partnerships" data-role="partnerships" aria-selected="false" tabindex="-1" aria-controls="role-preview">Build partnerships</button>
+          <button class="role-option" type="button" role="tab" id="role-tab-culture" data-role="culture" aria-selected="false" tabindex="-1" aria-controls="role-preview">Make the plans</button>
+          <button class="role-option" type="button" role="tab" id="role-tab-content" data-role="content" aria-selected="false" tabindex="-1" aria-controls="role-preview">Tell the story</button>
+          <button class="role-option" type="button" role="tab" id="role-tab-growth" data-role="growth" aria-selected="false" tabindex="-1" aria-controls="role-preview">Recruit students</button>
         </div>
-        <select class="role-select" data-role-select aria-label="Choose your internship role" aria-controls="role-preview">
-          <option value="president">Campus President</option>
-          <option value="partnerships">Partnerships</option>
-          <option value="culture">Culture</option>
-          <option value="content">Content</option>
-          <option value="growth">Growth</option>
-        </select>
-        <div class="role-preview" id="role-preview" aria-live="polite" aria-atomic="true">
+        <div class="role-preview" id="role-preview" role="tabpanel" aria-labelledby="role-tab-president" tabindex="0">
           <p class="role-kicker" id="role-kicker">01 / 05 · the team builder</p>
           <h3 id="role-title">campus president.</h3>
           <p id="role-description">Lead fomo at your school. Bring the team together, set priorities, and turn campus ideas into finished work.</p>

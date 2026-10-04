@@ -9,8 +9,19 @@
   };
   const buttons = Array.from(document.querySelectorAll('[data-role]'));
   const preview = document.getElementById('role-preview');
-  const select = document.querySelector('[data-role-select]');
+  const options = document.querySelector('.role-options');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   if (!buttons.length || !preview) return;
+
+  function revealRole(button, animate = true) {
+    if (!options || options.scrollWidth <= options.clientWidth) return;
+    const rail = options.getBoundingClientRect();
+    const tab = button.getBoundingClientRect();
+    options.scrollTo({
+      left: options.scrollLeft + tab.left - rail.left - (options.clientWidth - tab.width) / 2,
+      behavior: animate && !reducedMotion.matches ? 'smooth' : 'auto'
+    });
+  }
 
   function renderRole(target, key) {
     const role = roles[key];
@@ -57,20 +68,38 @@
       measurement.remove();
     }
     preview.style.minHeight = Math.ceil(height) + 'px';
+    const activeButton = buttons.find(button => button.getAttribute('aria-selected') === 'true');
+    if (activeButton) revealRole(activeButton, false);
   }
 
   function selectRole(key) {
     if (!roles[key]) return;
-    buttons.forEach(option => option.setAttribute('aria-pressed', String(option.dataset.role === key)));
-    if (select) select.value = key;
+    buttons.forEach(option => {
+      const selected = option.dataset.role === key;
+      option.setAttribute('aria-selected', String(selected));
+      option.tabIndex = selected ? 0 : -1;
+    });
+    const activeButton = buttons.find(button => button.dataset.role === key);
+    preview.setAttribute('aria-labelledby', activeButton.id);
     renderRole(preview, key);
+    revealRole(activeButton);
   }
-  buttons.forEach(button => button.addEventListener('click', () => selectRole(button.dataset.role)));
-  if (select) {
-    select.value = buttons.find(button => button.getAttribute('aria-pressed') === 'true')?.dataset.role || 'president';
-    select.addEventListener('change', () => selectRole(select.value));
-    select.closest('.role-finder').dataset.roleReady = 'true';
-  }
+  buttons.forEach((button, index) => {
+    button.addEventListener('click', () => selectRole(button.dataset.role));
+    button.addEventListener('keydown', event => {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      let next;
+      if (event.key === 'ArrowRight') next = (index + 1) % buttons.length;
+      else if (event.key === 'ArrowLeft') next = (index - 1 + buttons.length) % buttons.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = buttons.length - 1;
+      else return;
+      event.preventDefault();
+      selectRole(buttons[next].dataset.role);
+      buttons[next].focus({ preventScroll: true });
+    });
+  });
+  preview.closest('.role-finder').dataset.roleReady = 'true';
 
   stabilizePreview();
   if (document.fonts) document.fonts.ready.then(() => stabilizePreview(true));
