@@ -11,6 +11,9 @@
     const stageCount = roadmap.querySelector('[data-roadmap-stage-count]');
     const summaryTitle = roadmap.querySelector('[data-roadmap-summary-title]');
     const summaryDescription = roadmap.querySelector('[data-roadmap-summary-description]');
+    const viewTabs = roadmap.querySelector('[data-roadmap-view-tabs]');
+    const viewButtons = [...roadmap.querySelectorAll('[data-roadmap-view]')];
+    const viewPanels = [...roadmap.querySelectorAll('[data-roadmap-view-panel]')];
     if (steps.length !== 4 || scenes.length !== steps.length || !toggle || !toggleLabel) return;
 
     stageLabel?.setAttribute('aria-live', 'off');
@@ -21,6 +24,7 @@
     let visible = false;
     let wantsPlayback = !reducedMotion.matches;
     let timer = null;
+    let currentView = 'example';
 
     const render = (index) => {
       active = index;
@@ -48,7 +52,7 @@
       toggleLabel.textContent = playing ? 'Pause' : 'Play';
       toggle.setAttribute('aria-label', playing ? 'Pause roadmap animation' : 'Play roadmap animation');
       toggle.hidden = reducedMotion.matches;
-      const running = playing && visible && !document.hidden;
+      const running = playing && currentView === 'example' && visible && !document.hidden;
       roadmap.dataset.playback = running ? 'running' : 'paused';
       if (running) {
         timer = window.setInterval(() => render((active + 1) % steps.length), 4800);
@@ -81,6 +85,44 @@
       wantsPlayback = !wantsPlayback;
       updatePlayback();
     });
+
+    const selectView = (view) => {
+      currentView = view;
+      viewTabs.dataset.selectedView = view;
+      viewButtons.forEach((button) => {
+        const selected = button.dataset.roadmapView === view;
+        button.setAttribute('aria-selected', String(selected));
+        button.tabIndex = selected ? 0 : -1;
+      });
+      viewPanels.forEach((panel) => {
+        const selected = panel.dataset.roadmapViewPanel === view;
+        panel.setAttribute('aria-hidden', String(!selected));
+        panel.inert = !selected;
+        panel.tabIndex = selected ? 0 : -1;
+      });
+      updatePlayback();
+    };
+
+    if (viewTabs && viewButtons.length === 2 && viewPanels.length === 2) {
+      viewButtons.forEach((button, index) => {
+        button.addEventListener('click', () => selectView(button.dataset.roadmapView));
+        button.addEventListener('keydown', (event) => {
+          if (event.altKey || event.ctrlKey || event.metaKey) return;
+          let next;
+          if (event.key === 'ArrowRight') next = (index + 1) % viewButtons.length;
+          else if (event.key === 'ArrowLeft') next = (index - 1 + viewButtons.length) % viewButtons.length;
+          else if (event.key === 'Home') next = 0;
+          else if (event.key === 'End') next = viewButtons.length - 1;
+          else return;
+          event.preventDefault();
+          selectView(viewButtons[next].dataset.roadmapView);
+          viewButtons[next].focus({ preventScroll: true });
+        });
+      });
+      roadmap.dataset.roadmapViewsReady = 'true';
+      viewTabs.hidden = false;
+      selectView('overview');
+    }
 
     document.addEventListener('visibilitychange', updatePlayback);
     reducedMotion.addEventListener('change', () => {

@@ -14,9 +14,9 @@
   <link rel="icon" href="/assets/campus-favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=9">
-  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=6">
+  <link rel="stylesheet" href="/assets/campus-ambassador-roadmap.css?v=7">
   <script src="/assets/campus-ambassadors.js?v=11" defer></script>
-  <script src="/assets/campus-ambassador-roadmap.js?v=3" defer></script>
+  <script src="/assets/campus-ambassador-roadmap.js?v=4" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -64,7 +64,22 @@
     </section>
 
     <section class="ambassador-roadmap wrap" id="how-it-works" data-roadmap aria-labelledby="how-title">
-      <div class="roadmap-heading"><div><p class="eyebrow">the work, step by step</p><h2 id="how-title">from your first task<br>to your first payout.</h2></div><p>Know what’s expected, share your work, and get paid for what you do.</p></div>
+      <div class="roadmap-heading"><div><p class="eyebrow">the work, step by step</p><h2 id="how-title">how it works.</h2></div>
+      <div class="roadmap-view-tabs" role="tablist" aria-label="How the internship works" data-roadmap-view-tabs data-selected-view="overview" hidden>
+        <button type="button" role="tab" id="roadmap-overview-tab" data-roadmap-view="overview" aria-controls="roadmap-overview-view" aria-selected="true" tabindex="0">Overview</button>
+        <button type="button" role="tab" id="roadmap-example-tab" data-roadmap-view="example" aria-controls="roadmap-example-view" aria-selected="false" tabindex="-1"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="m5 3 8 5-8 5z"/></svg>Example</button>
+      </div>
+      </div>
+      <div class="roadmap-views">
+      <div class="roadmap-view" id="roadmap-overview-view" role="tabpanel" aria-labelledby="roadmap-overview-tab" tabindex="0" data-roadmap-view-panel="overview">
+        <ol class="roadmap-overview" aria-label="Your start with fomo">
+          <li><span class="roadmap-overview-number" aria-hidden="true">01</span><div><h3>tell us about you.</h3><p>Pick a role and share a little about yourself and your campus.</p></div><div class="roadmap-overview-art" aria-hidden="true"><span>your campus</span><i>→</i><span>your role ↗</span></div></li>
+          <li><span class="roadmap-overview-number" aria-hidden="true">02</span><div><h3>connect with the team.</h3><p>If it’s a fit, talk through your role, your work, and how pay works.</p></div><div class="roadmap-overview-art" aria-hidden="true"><span>meet your team.</span></div></li>
+          <li><span class="roadmap-overview-number" aria-hidden="true">03</span><div><h3>bring your campus into it.</h3><p>Create content, meet students, or help make campus events happen.</p></div><div class="roadmap-overview-art" aria-hidden="true"><span>people</span><i>+</i><span>ideas</span></div></li>
+          <li><span class="roadmap-overview-number" aria-hidden="true">04</span><div><h3>share what’s working.</h3><p>Share your progress and ideas for what to try next.</p></div><div class="roadmap-overview-art" aria-hidden="true"><span>learn. build. repeat. ↗</span></div></li>
+        </ol>
+      </div>
+      <div class="roadmap-view" id="roadmap-example-view" role="tabpanel" aria-labelledby="roadmap-example-tab" tabindex="0" data-roadmap-view-panel="example">
       <div class="roadmap-panel">
         <ol class="roadmap-steps" aria-label="From assignment to payment">
           <li><button type="button" class="roadmap-step" data-roadmap-step="0" data-state="current" aria-pressed="true" aria-controls="roadmap-example"><span class="roadmap-number">01</span><span class="roadmap-mobile-label" aria-hidden="true">Brief</span><span><strong>Get a clear brief</strong><span class="roadmap-step-description">Know the task, what you’ll submit, and how pay works.</span></span></button></li>
@@ -123,6 +138,8 @@
           </div>
           <div class="roadmap-demo-footer" aria-hidden="true"><span class="roadmap-demo-caption"><span class="roadmap-stage-count" data-roadmap-stage-count>01 / 04</span><span data-roadmap-stage-label>The brief</span></span><span class="roadmap-progress"><span class="is-active is-current" data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span><span data-roadmap-progress></span></span></div>
         </div>
+      </div>
+      </div>
       </div>
     </section>
 
