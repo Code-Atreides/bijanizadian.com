@@ -55,7 +55,7 @@
       const running = playing && currentView === 'example' && visible && !document.hidden;
       roadmap.dataset.playback = running ? 'running' : 'paused';
       if (running) {
-        timer = window.setInterval(() => render((active + 1) % steps.length), 4800);
+        timer = window.setInterval(() => render((active + 1) % steps.length), 3800);
       }
     };
 

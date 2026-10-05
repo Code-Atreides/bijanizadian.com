@@ -123,7 +123,7 @@
 .roadmap-progress span { position: relative; width: 24px; height: 3px; overflow: hidden; border-radius: 4px; background: #cdd5f7; }
 .roadmap-progress span::after { content: ''; display: block; height: 100%; background: var(--purple); transform: scaleX(0); transform-origin: left; }
 .roadmap-progress .is-complete::after, .roadmap-progress .is-current::after { transform: scaleX(1); }
-.ambassador-roadmap[data-playback="running"] .roadmap-progress .is-current::after { animation: roadmap-progress-fill 4.8s linear both; }
+.ambassador-roadmap[data-playback="running"] .roadmap-progress .is-current::after { animation: roadmap-progress-fill 3.8s linear both; }
 @keyframes roadmap-progress-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @media (max-width: 1000px) {
   .roadmap-steps { padding: 14px; }
