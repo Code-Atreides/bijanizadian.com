@@ -1,0 +1,51 @@
+/* fomo Campus — recommended house tokens.
+   Use core blue for Campus identity; cyan belongs to social campaigns.
+   Pair white button text with --fomo-action. Use pale/highlight decoratively.
+   Aeonik is the house default; existing Poppins ExtraBold is a campaign exception. */
+:root {
+  --fomo-blue: #516AF6;
+  --fomo-electric: #4A36FF;
+  --fomo-highlight: #ACB8F9;
+  --fomo-ink: #0B091F;
+  --fomo-pale: #EAEDFF;
+  --fomo-white: #FFFFFF;
+  --fomo-action: #4057DF;
+
+  --fomo-social-signal: #0099F7;
+  --fomo-social-canvas: #000000;
+
+  --fomo-light-canvas: #FFFFFF;
+  --fomo-light-text: #141322;
+  --fomo-light-muted: #666675;
+  --fomo-light-tint: #F4F5FF;
+  --fomo-light-line: #EAEAEF;
+  --fomo-light-surface: #F8F8FA;
+
+  --fomo-dark-canvas: #060510;
+  --fomo-dark-surface: #12111A;
+  --fomo-dark-raised: #161522;
+  --fomo-dark-text: #F7F7F7;
+  --fomo-dark-muted: #9899A3;
+  --fomo-dark-line: #33343D;
+
+  --fomo-font-family: Aeonik, Arial, sans-serif;
+  --fomo-weight-regular: 400;
+  --fomo-weight-medium: 500;
+  --fomo-weight-bold: 700;
+
+  /* Light editorial web defaults. Add data-fomo-theme="dark" for dark web. */
+  --fomo-canvas: var(--fomo-light-canvas);
+  --fomo-surface: var(--fomo-light-surface);
+  --fomo-text: var(--fomo-light-text);
+  --fomo-muted: var(--fomo-light-muted);
+  --fomo-line: var(--fomo-light-line);
+  --fomo-link: var(--fomo-action);
+}
+[data-fomo-theme="dark"] {
+  --fomo-canvas: var(--fomo-dark-canvas);
+  --fomo-surface: var(--fomo-dark-surface);
+  --fomo-text: var(--fomo-dark-text);
+  --fomo-muted: var(--fomo-dark-muted);
+  --fomo-line: var(--fomo-dark-line);
+  --fomo-link: var(--fomo-highlight);
+}
