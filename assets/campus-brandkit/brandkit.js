@@ -18,11 +18,11 @@
       for (const format of ['grid', 'story']) {
         const file = `/assets/campus-brandkit/downloads/campus-${format}-${key}`;
         const preview = document.getElementById(`${format}-preview`);
-        preview.src = `${file}.png`;
+        preview.src = `${file}.png?v=3`;
         preview.alt = `${theme.name} ${format === 'grid' ? 'grid post' : 'story'} with the campus logo and your campus your people headline`;
         for (const extension of ['svg', 'png']) {
           const link = document.getElementById(`${format}-${extension}`);
-          link.href = `${file}.${extension}`;
+          link.href = `${file}.${extension}?v=3`;
           link.setAttribute('aria-label', `Download ${theme.name.toLowerCase()} ${format} ${extension.toUpperCase()}`);
         }
       }
