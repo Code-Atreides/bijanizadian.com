@@ -22,10 +22,12 @@ a:hover{text-decoration:underline}::selection{background:#EAEDFF;color:var(--ink
 
 /* Persistent index, with the proportions of a reference-book contents page. */
 .index{position:fixed;inset:0 auto 0 0;width:214px;padding:36px 25px 24px;background:#FAFAFB;border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:20}
-.index-brand{display:block;width:max-content}.index-brand:hover{text-decoration:none}
+.index-brand{display:block;width:max-content;max-width:100%}.index-brand:hover{text-decoration:none}
 .index-cap{width:65px;margin-bottom:19px}
 .index-lockup{display:flex;align-items:baseline;gap:4px;font-size:23px;letter-spacing:-1px;line-height:1}
 .index-lockup img{width:59px;height:auto}.index-lockup>span{font-weight:500}
+/* Path lockup: parent dimmed, leaf at full strength, slashes in electric blue. The leaf wraps under the sidebar lockup. */
+.index-lockup{flex-wrap:wrap;row-gap:5px}.index-lockup i{font-style:normal;color:#4A36FF}.lockup-parent{color:rgba(20,19,34,.55)}
 .index-meta{margin-top:29px;padding-top:19px;border-top:1px solid var(--line);display:grid;gap:3px;font-size:12px}
 .index-meta>span:last-child{font-size:10px;color:var(--muted)}
 .index nav{display:flex;flex-direction:column;margin-top:32px;gap:2px}
@@ -227,7 +229,7 @@ i[style*="--chip"]{display:inline-block;width:14px;height:14px;border:1px solid 
   .web-sample{padding:23px}.web-sample>p{font-size:31px}.support-strip{gap:17px}.toast{left:calc(50% + 92px)}
 }
 @media(max-width:960px){
-  .campaign-grid{grid-template-columns:1fr 1fr}.index-group{display:none}
+  .campaign-grid{grid-template-columns:1fr 1fr}.index-group{display:none}.index-lockup{flex-wrap:nowrap;gap:2px}
   :root{scroll-padding-top:128px}
   .index{position:sticky;inset:0 0 auto;width:100%;padding:15px 24px 0;display:grid;grid-template-columns:1fr auto;background:#FAFAFBf5;backdrop-filter:blur(12px)}
   .index-brand{display:flex;align-items:center;gap:12px}.index-cap{width:40px;margin:0}.index-lockup{font-size:21px}.index-lockup img{width:54px}
