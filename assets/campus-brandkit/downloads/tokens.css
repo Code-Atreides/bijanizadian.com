@@ -1,9 +1,11 @@
-/* fomo Campus — recommended house tokens.
-   Use core blue for Campus identity; cyan belongs to social campaigns.
-   Pair white button text with --fomo-action. Use pale/highlight decoratively.
-   Aeonik is the house default; existing Poppins ExtraBold is a campaign exception. */
+/* fomo campus house tokens.
+   All six colorways work across grid posts, stories, and web compositions.
+   Campus purple is #516AF6; --fomo-blue remains a compatibility alias.
+   Keep theme text and canvas pairings together for readable small text.
+   Aeonik is the house default. */
 :root {
-  --fomo-blue: #516AF6;
+  --fomo-purple: #516AF6;
+  --fomo-blue: var(--fomo-purple);
   --fomo-electric: #4A36FF;
   --fomo-highlight: #ACB8F9;
   --fomo-ink: #0B091F;
@@ -48,4 +50,50 @@
   --fomo-muted: var(--fomo-dark-muted);
   --fomo-line: var(--fomo-dark-line);
   --fomo-link: var(--fomo-highlight);
+}
+
+/* Shared composition themes: apply to either a grid post or a story.
+   Use --fomo-composition-display for large type and --fomo-composition-text
+   for body copy. --fomo-composition-accent is also safe for small labels. */
+[data-fomo-colorway="purple"] {
+  --fomo-composition-canvas: #516AF6;
+  --fomo-composition-display: #FFFFFF;
+  --fomo-composition-logo: #FFFFFF;
+  --fomo-composition-text: #060510;
+  --fomo-composition-accent: #060510;
+}
+[data-fomo-colorway="electric"] {
+  --fomo-composition-canvas: #4A36FF;
+  --fomo-composition-display: #FFFFFF;
+  --fomo-composition-logo: #FFFFFF;
+  --fomo-composition-text: #FFFFFF;
+  --fomo-composition-accent: #FFFFFF;
+}
+[data-fomo-colorway="cyan"] {
+  --fomo-composition-canvas: #0099F7;
+  --fomo-composition-display: #0B091F;
+  --fomo-composition-logo: #0B091F;
+  --fomo-composition-text: #0B091F;
+  --fomo-composition-accent: #0B091F;
+}
+[data-fomo-colorway="lavender"] {
+  --fomo-composition-canvas: #EAEDFF;
+  --fomo-composition-display: #0B091F;
+  --fomo-composition-logo: #0B091F;
+  --fomo-composition-text: #0B091F;
+  --fomo-composition-accent: #4057DF;
+}
+[data-fomo-colorway="ink"] {
+  --fomo-composition-canvas: #0B091F;
+  --fomo-composition-display: #FFFFFF;
+  --fomo-composition-logo: #FFFFFF;
+  --fomo-composition-text: #FFFFFF;
+  --fomo-composition-accent: #ACB8F9;
+}
+[data-fomo-colorway="white"] {
+  --fomo-composition-canvas: #FFFFFF;
+  --fomo-composition-display: #516AF6;
+  --fomo-composition-logo: #516AF6;
+  --fomo-composition-text: #0B091F;
+  --fomo-composition-accent: #4057DF;
 }
