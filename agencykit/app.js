@@ -14,8 +14,7 @@ const archiveMotion = createArchiveMotion({
   isActive: () => document.body.classList.contains('archive-home')
     && !document.body.classList.contains('modal-open')
     && !document.querySelector('dialog[open]')
-    && $('#assistant-panel').hidden && $('#search-suggestions').hidden
-    && !document.activeElement?.matches('input,textarea,select'),
+    && $('#assistant-panel').hidden && $('#search-suggestions').hidden,
 });
 const escape = value => String(value ?? '').replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
 const shapes = {

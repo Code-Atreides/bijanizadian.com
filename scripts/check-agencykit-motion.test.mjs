@@ -116,14 +116,29 @@ test('route eligibility is rechecked during frames and sync is safe to repeat', 
   assert.equal(s.frames.size, 1, 'eligible route can restart on a new pointer move');
 });
 
-test('blur and visibility suspend motion; destroy removes every listener and scheduled frame', t => {
+test('typing in a field keeps the collage still; Tab still clears motion', t => {
+  const s = scene(t);
+  const field = { closest: selector => selector.includes('input') ? field : null };
+  s.move(); s.tick();
+  const placed = s.canvas.style.transform;
+  for (const key of ['f', 'o', 'Backspace', 'Enter']) s.doc.emit('keydown', { key, target: field });
+  assert.equal(s.canvas.style.transform, placed, 'typing a search does not snap the collage');
+  s.move({ clientX: 0, clientY: 0 });
+  assert.equal(s.frames.size, 1, 'hover still drives the collage while the field has focus');
+  s.doc.emit('keydown', { key: 'Tab', target: field });
+  assert.equal(s.canvas.style.transform, undefined);
+  assert.equal(s.frames.size, 0);
+});
+
+test('blur recenters without blocking the next hover; hidden pages suspend motion; destroy removes every listener and scheduled frame', t => {
   const s = scene(t);
   s.move(); s.tick();
   s.view.emit('blur');
-  s.move();
   assert.equal(s.frames.size, 0);
   assert.equal(s.canvas.style.transform, undefined);
-  s.view.emit('focus'); s.move(); s.tick();
+  s.move(); // Hovering an unfocused window beside another app.
+  assert.equal(s.frames.size, 1, 'motion resumes without the window regaining focus');
+  s.tick();
   s.doc.visibilityState = 'hidden'; s.doc.emit('visibilitychange');
   s.move();
   assert.equal(s.frames.size, 0);

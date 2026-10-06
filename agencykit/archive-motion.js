@@ -24,12 +24,13 @@ export function createArchiveMotion({ canvas, isActive }) {
   let frame = null;
   let lastFrameTime = null;
   let pointerHeld = false;
-  let windowFocused = true;
   let keyboardInput = true;
   let destroyed = false;
 
+  // Window focus is deliberately not required: a browser beside another app
+  // still receives hover, and the collage should follow it without a click.
   function eligible() {
-    return !destroyed && windowFocused && doc.visibilityState !== 'hidden'
+    return !destroyed && doc.visibilityState !== 'hidden'
       && finePointer.matches && !reducedMotion.matches && isActive();
   }
 
@@ -114,9 +115,15 @@ export function createArchiveMotion({ canvas, isActive }) {
     return Boolean(target?.closest?.('a, button, input, textarea, select, summary, [tabindex], [contenteditable="true"]'));
   }
 
+  function isTextEntry(target) {
+    return Boolean(target?.closest?.('input, textarea, select, [contenteditable="true"]'));
+  }
+
   function onKeyDown(event) {
     if (['Shift', 'Control', 'Alt', 'Meta'].includes(event.key)) return;
     keyboardInput = true;
+    // Typing a search leaves the collage where the pointer put it.
+    if (event.key !== 'Tab' && isTextEntry(event.target)) return;
     if (!pointerHeld && (event.key === 'Tab' || isControl(event.target))) reset();
   }
 
@@ -132,8 +139,6 @@ export function createArchiveMotion({ canvas, isActive }) {
     reset();
   }
 
-  function onBlur() { windowFocused = false; reset(); }
-  function onFocus() { windowFocused = true; }
   function onVisibilityChange() { reset(); }
 
   function listen(target, type, handler, options) {
@@ -149,8 +154,8 @@ export function createArchiveMotion({ canvas, isActive }) {
   listen(doc, 'keydown', onKeyDown);
   listen(doc, 'focusin', onFocusIn);
   listen(doc, 'visibilitychange', onVisibilityChange);
-  listen(view, 'blur', onBlur);
-  listen(view, 'focus', onFocus);
+  // Recenter when the window loses focus; the next hover resumes motion.
+  listen(view, 'blur', reset);
   listen(view, 'resize', onResize, { passive: true });
   // Clear motion before caching, while keeping listeners for a BFCache return.
   listen(view, 'pagehide', reset);
