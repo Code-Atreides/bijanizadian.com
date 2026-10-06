@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-labelledby="title description">
   <title id="title">fomo campus — growth milestone story template, white</title>
-  <desc id="description">A large editable count and a clear people-on-fomo message. White colorway. 9:16 story; 1080 × 1920. The same pattern is available in six colorways and both formats.</desc>
+  <desc id="description">A large editable active-user count: fomo hit [count] active users. White colorway. 9:16 story; 1080 × 1920. The same pattern is available in six colorways and both formats.</desc>
   <metadata>Editable Aeonik text. Replace every bracketed placeholder before publishing. Counts, rates, totals, eligibility terms, and context must be supplied for the current campaign. School and chapter logos are paired placeholders, not invented marks. The campus mark and fomo wordmark paths are unchanged from the masters. Gradients and glows apply only to the background. Keep essential content inside the 72 px side margins; story quiet zones are 250 px at the top and 340 px at the bottom.</metadata>
   <defs>
     <style>text{font-family:Aeonik,Arial,sans-serif}</style>
@@ -22,10 +22,10 @@
     <use href="#fomo-campus-mark" xlink:href="#fomo-campus-mark" x="858" y="268" width="150" height="100.403"/>
   </g>
   <g id="editable-growth-message">
-      <text x="72" y="610" font-size="61" fill="#0B091F" font-weight="700" letter-spacing="-2">made for connection.</text>
+      <text x="72" y="610" font-size="61" fill="#0B091F" font-weight="700" letter-spacing="-2">fomo hit</text>
       <text x="72" y="974" font-size="232" fill="#0B091F" font-weight="700" letter-spacing="-10">[count]</text>
-      <text x="72" y="1090" font-size="99" fill="#0B091F" font-weight="700" letter-spacing="-4">people on fomo.</text>
-      <text x="76" y="1270" font-size="34" fill="#0B091F" font-weight="400">[one line of verified context]</text>
+      <text x="72" y="1090" font-size="99" fill="#0B091F" font-weight="700" letter-spacing="-4">active users.</text>
+      <text x="76" y="1270" font-size="34" fill="#0B091F" font-weight="400">we’re just getting started.</text>
     </g>
   <g id="editable-call-to-action">
     <path d="M72 1468 H1008" fill="none" stroke="#0B091F" stroke-opacity=".25" stroke-width="1.5"/>

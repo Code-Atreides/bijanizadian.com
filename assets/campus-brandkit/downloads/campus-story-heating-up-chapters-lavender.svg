@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-labelledby="title description">
+  <title id="title">fomo campus — heating up chapters story template, lavender</title>
+  <desc id="description">Today’s heating-up chapters: five rows pairing each school with its chapter, with the school and chapter logos on either side. Lavender colorway. 9:16 story; 1080 × 1920. The same pattern is available in six colorways and both formats.</desc>
+  <metadata>Editable Aeonik text. Replace every bracketed placeholder before publishing. Counts, rates, totals, eligibility terms, and context must be supplied for the current campaign. School and chapter logos are paired placeholders, not invented marks. The campus mark and fomo wordmark paths are unchanged from the masters. Gradients and glows apply only to the background. Keep essential content inside the 72 px side margins; story quiet zones are 250 px at the top and 340 px at the bottom.</metadata>
+  <defs>
+    <style>text{font-family:Aeonik,Arial,sans-serif}</style>
+    
+    <symbol id="fomo-wordmark" viewBox="0 0 352 113"><path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+<path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+<path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+<path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/></symbol>
+    
+    <radialGradient id="glow" cx="0.5" cy="0.05" r="0.6"><stop stop-color="#FFFFFF" stop-opacity="0.4"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+  </defs>
+  <g id="background"><rect width="1080" height="1920" fill="#EAEDFF"/><rect width="1080" height="1920" fill="url(#glow)"/></g>
+  <g id="brand" color="#0B091F">
+    <use href="#fomo-wordmark" xlink:href="#fomo-wordmark" x="362" y="280" width="149.522" height="48"/>
+    <text x="525" y="327" font-size="48" fill="#0B091F" font-weight="500">/campus</text>
+  </g>
+  <g id="editable-headline">
+      <text x="540" y="418" font-size="32" fill="#0B091F" font-weight="500" text-anchor="middle" letter-spacing="10">TODAY’S</text>
+      <text x="540" y="548" font-size="128" fill="#0B091F" font-weight="700" text-anchor="middle" letter-spacing="-5">Heating Up</text>
+      <text x="235" y="680" font-size="128" fill="#0B091F" font-weight="700" letter-spacing="-5">Chapters</text>
+      <g id="series-icon" fill="#516AF6" transform="translate(768 588) scale(1.2778)"><path fill-rule="evenodd" d="M30 0C33 14 47 22 52 38C57 54 49 70 30 72C11 70 3 56 8 41C11 32 17 27 20 18C24 26 25 31 29 33C31 22 27 10 30 0ZM30 44C34 50 38 54 37 60C36 66 24 66 23 60C22 54 27 50 30 44Z"/></g>
+    </g><g id="editable-chapter-rows">
+      <g id="chapter-row-1">
+        
+        <g id="replace-row-1-school-logo"><rect x="72" y="765" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="124" y="813" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[school</text><text x="124" y="837" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+        <path d="M202 774 V860" fill="none" stroke="#0B091F" stroke-opacity=".35" stroke-width="2"/>
+        <text x="228" y="811" font-size="32" fill="#0B091F" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
+        <text x="228" y="857" font-size="44" fill="#0B091F" font-weight="700">[CHAPTER NAME]</text>
+        <g id="replace-row-1-chapter-logo"><rect x="904" y="765" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="956" y="813" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[chapter</text><text x="956" y="837" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+      </g>
+      <g id="chapter-row-2">
+        <path d="M72 890 H1008" fill="none" stroke="#0B091F" stroke-opacity=".25" stroke-width="1.5"/>
+        <g id="replace-row-2-school-logo"><rect x="72" y="911" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="124" y="959" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[school</text><text x="124" y="983" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+        <path d="M202 920 V1006" fill="none" stroke="#0B091F" stroke-opacity=".35" stroke-width="2"/>
+        <text x="228" y="957" font-size="32" fill="#0B091F" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
+        <text x="228" y="1003" font-size="44" fill="#0B091F" font-weight="700">[CHAPTER NAME]</text>
+        <g id="replace-row-2-chapter-logo"><rect x="904" y="911" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="956" y="959" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[chapter</text><text x="956" y="983" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+      </g>
+      <g id="chapter-row-3">
+        <path d="M72 1036 H1008" fill="none" stroke="#0B091F" stroke-opacity=".25" stroke-width="1.5"/>
+        <g id="replace-row-3-school-logo"><rect x="72" y="1057" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="124" y="1105" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[school</text><text x="124" y="1129" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+        <path d="M202 1066 V1152" fill="none" stroke="#0B091F" stroke-opacity=".35" stroke-width="2"/>
+        <text x="228" y="1103" font-size="32" fill="#0B091F" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
+        <text x="228" y="1149" font-size="44" fill="#0B091F" font-weight="700">[CHAPTER NAME]</text>
+        <g id="replace-row-3-chapter-logo"><rect x="904" y="1057" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="956" y="1105" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[chapter</text><text x="956" y="1129" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+      </g>
+      <g id="chapter-row-4">
+        <path d="M72 1182 H1008" fill="none" stroke="#0B091F" stroke-opacity=".25" stroke-width="1.5"/>
+        <g id="replace-row-4-school-logo"><rect x="72" y="1203" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="124" y="1251" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[school</text><text x="124" y="1275" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+        <path d="M202 1212 V1298" fill="none" stroke="#0B091F" stroke-opacity=".35" stroke-width="2"/>
+        <text x="228" y="1249" font-size="32" fill="#0B091F" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
+        <text x="228" y="1295" font-size="44" fill="#0B091F" font-weight="700">[CHAPTER NAME]</text>
+        <g id="replace-row-4-chapter-logo"><rect x="904" y="1203" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="956" y="1251" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[chapter</text><text x="956" y="1275" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+      </g>
+      <g id="chapter-row-5">
+        <path d="M72 1328 H1008" fill="none" stroke="#0B091F" stroke-opacity=".25" stroke-width="1.5"/>
+        <g id="replace-row-5-school-logo"><rect x="72" y="1349" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="124" y="1397" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[school</text><text x="124" y="1421" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+        <path d="M202 1358 V1444" fill="none" stroke="#0B091F" stroke-opacity=".35" stroke-width="2"/>
+        <text x="228" y="1395" font-size="32" fill="#0B091F" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
+        <text x="228" y="1441" font-size="44" fill="#0B091F" font-weight="700">[CHAPTER NAME]</text>
+        <g id="replace-row-5-chapter-logo"><rect x="904" y="1349" width="104" height="104" rx="2" fill="none" stroke="#0B091F" stroke-opacity=".45"/>
+          <text x="956" y="1397" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">[chapter</text><text x="956" y="1421" font-size="18" fill="#0B091F" font-weight="400" text-anchor="middle">logo]</text></g>
+      </g>
+    </g><g id="editable-closer">
+      <text x="540" y="1554" font-size="52" fill="#0B091F" font-weight="700" text-anchor="middle" letter-spacing="-1">have fomo?</text>
+    </g>
+  
+</svg>
