@@ -97,3 +97,72 @@
   --fomo-composition-text: #0B091F;
   --fomo-composition-accent: #4057DF;
 }
+
+/* Campaign atmosphere: the electric campaign surface.
+   Deep violet and reward cyan are supporting colors for campaign graphics.
+   The six shared colorways above stay unchanged. Apply atmosphere behind
+   content; never blur or add effects to the logos. */
+:root {
+  --fomo-campaign-deep-violet: #3521D4;
+  --fomo-campaign-reward-cyan: #72DDFF;
+  --fomo-campaign-gradient: linear-gradient(135deg, #4A36FF 0%, #3521D4 100%);
+  --fomo-campaign-white-glow: radial-gradient(ellipse at 65% 40%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 58%);
+  --fomo-campaign-atmosphere: var(--fomo-campaign-white-glow), var(--fomo-campaign-gradient);
+  --fomo-campaign-text: #FFFFFF;
+  --fomo-campaign-large-emphasis: var(--fomo-campaign-reward-cyan);
+  --fomo-campaign-max-glow-opacity: 0.08;
+  --fomo-campaign-loop-duration: 7s;
+  --fomo-campaign-min-reading-hold: 3s;
+}
+/* Use a single glow layer, capped at 8% white. White small text remains readable
+   across the gradient (at least 5.62:1 at the maximum permitted glow).
+   Reward cyan is for large emphasis only: at least 24px regular / 19px bold
+   in web use; keep essential 1080px social labels >=32px and rewards larger.
+   Motion is optional: 6–8s loop, >=3s reading hold.
+   Always provide the complete static poster for reduced motion and fallback. */
+
+/* Campaign colorways: the four campaign patterns in the six shared colorways.
+   Use --fomo-campaign-display for large type, --fomo-campaign-emphasis for the
+   one focal figure, and --fomo-campaign-body for everything smaller. */
+[data-fomo-campaign-colorway="purple"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 50% 10%, rgba(172, 184, 249, 0.3) 0%, rgba(172, 184, 249, 0) 70%), #516AF6;
+  --fomo-campaign-display: #FFFFFF;
+  --fomo-campaign-emphasis: #0B091F;
+  --fomo-campaign-body: #060510;
+  --fomo-campaign-logo: #FFFFFF;
+}
+[data-fomo-campaign-colorway="electric"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 65% 40%, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 57.99999999999999%), linear-gradient(135deg, #4A36FF 0%, #3521D4 100%);
+  --fomo-campaign-display: #FFFFFF;
+  --fomo-campaign-emphasis: #72DDFF;
+  --fomo-campaign-body: #FFFFFF;
+  --fomo-campaign-logo: #FFFFFF;
+}
+[data-fomo-campaign-colorway="cyan"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 65% 40%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 57.99999999999999%), #0099F7;
+  --fomo-campaign-display: #0B091F;
+  --fomo-campaign-emphasis: #0B091F;
+  --fomo-campaign-body: #0B091F;
+  --fomo-campaign-logo: #0B091F;
+}
+[data-fomo-campaign-colorway="lavender"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 50% 5%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 60%), #EAEDFF;
+  --fomo-campaign-display: #0B091F;
+  --fomo-campaign-emphasis: #516AF6;
+  --fomo-campaign-body: #0B091F;
+  --fomo-campaign-logo: #0B091F;
+}
+[data-fomo-campaign-colorway="ink"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 50% 0%, rgba(34, 29, 75, 1) 0%, rgba(34, 29, 75, 0) 80%), #0B091F;
+  --fomo-campaign-display: #FFFFFF;
+  --fomo-campaign-emphasis: #72DDFF;
+  --fomo-campaign-body: #FFFFFF;
+  --fomo-campaign-logo: #FFFFFF;
+}
+[data-fomo-campaign-colorway="white"] {
+  --fomo-campaign-background: radial-gradient(ellipse at 50% 0%, rgba(234, 237, 255, 0.5) 0%, rgba(234, 237, 255, 0) 55.00000000000001%), #FFFFFF;
+  --fomo-campaign-display: #0B091F;
+  --fomo-campaign-emphasis: #516AF6;
+  --fomo-campaign-body: #0B091F;
+  --fomo-campaign-logo: #516AF6;
+}

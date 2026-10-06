@@ -8,7 +8,7 @@
     ink: { name: 'Ink', description: 'Ink field · white display type and mark · light blue details' },
     white: { name: 'White', description: 'White field · purple display type and mark · ink details' }
   };
-  const controls = document.querySelector('.colorway-controls');
+  const controls = document.querySelector('#social .colorway-controls');
   if (controls) {
     controls.addEventListener('change', event => {
       if (!event.target.matches('input[name="colorway"]')) return;
@@ -31,6 +31,66 @@
       document.getElementById('pairing-description').textContent = theme.description;
     });
     controls.hidden = false;
+  }
+
+  const campaignColorways = {
+    purple: 'Purple field with a light-blue glow · white display type and mark · near-black details and emphasis',
+    electric: 'Electric to deep violet gradient · white type and mark · reward cyan emphasis',
+    cyan: 'Cyan field · ink type, emphasis, and mark',
+    lavender: 'Lavender field with a white glow · ink type and mark · purple emphasis',
+    ink: 'Ink field with an indigo halo · white type and mark · reward cyan emphasis',
+    white: 'White field with a lavender halo · ink type · purple mark and emphasis'
+  };
+  const campaignSection = document.getElementById('campaigns');
+  const campaignInputs = campaignSection ? campaignSection.querySelectorAll('.campaign-colorways, .campaign-format-controls') : [];
+  if (campaignInputs.length) {
+    const state = { colorway: 'electric', format: 'story' };
+    const updateCampaigns = () => {
+      const { colorway, format } = state;
+      const colorwayName = colorways[colorway].name;
+      const formatName = format === 'story' ? 'story' : 'grid';
+      campaignSection.querySelectorAll('[data-campaign-recipe]').forEach(card => {
+        const recipe = card.dataset.campaignRecipe;
+        const name = card.dataset.campaignName;
+        const preview = card.querySelector('[data-campaign-preview]');
+        preview.src = `/assets/campus-brandkit/previews/campaign-${format}-${recipe}-${colorway}.webp?v=4`;
+        preview.height = format === 'story' ? 960 : 675;
+        preview.alt = `${name} ${formatName} template, ${colorwayName.toLowerCase()} colorway, with editable placeholders`;
+        const open = card.querySelector('[data-campaign-open]');
+        open.href = `/assets/campus-brandkit/downloads/campus-${format}-${recipe}-${colorway}.png?v=4`;
+        open.setAttribute('aria-label', `Open ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${formatName} artwork`);
+        card.querySelectorAll('[data-campaign-file]').forEach(link => {
+          const [fileFormat, extension] = link.dataset.campaignFile.split('-');
+          link.href = `/assets/campus-brandkit/downloads/campus-${fileFormat}-${recipe}-${colorway}.${extension}?v=4`;
+          link.setAttribute('aria-label', `Download ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${fileFormat} ${extension.toUpperCase()}`);
+        });
+      });
+      campaignSection.querySelectorAll('[data-campaign-format]').forEach(label => {
+        label.textContent = format === 'story' ? 'Story / 9:16' : 'Grid / 4:5';
+      });
+      campaignSection.querySelectorAll('[data-campaign-colorway-name]').forEach(label => { label.textContent = colorwayName; });
+      campaignSection.querySelector('[data-campaign-pairing]').textContent = campaignColorways[colorway];
+    };
+    campaignSection.addEventListener('change', event => {
+      if (event.target.matches('input[name="campaign-colorway"]') && campaignColorways[event.target.value]) state.colorway = event.target.value;
+      else if (event.target.matches('input[name="campaign-format"]') && ['grid', 'story'].includes(event.target.value)) state.format = event.target.value;
+      else return;
+      updateCampaigns();
+    });
+    campaignInputs.forEach(fieldset => { fieldset.hidden = false; });
+  }
+
+  const motion = document.querySelector('[data-motion]');
+  if (motion) {
+    const toggle = motion.querySelector('.motion-toggle');
+    toggle.addEventListener('click', () => {
+      const paused = motion.classList.toggle('is-paused');
+      toggle.textContent = paused ? 'Play' : 'Pause';
+    });
+    // Off-screen, the loop stops with everything still in step.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(([entry]) => motion.classList.toggle('is-offscreen', !entry.isIntersecting)).observe(motion);
+    }
   }
 
   const status = document.getElementById('copy-status');
