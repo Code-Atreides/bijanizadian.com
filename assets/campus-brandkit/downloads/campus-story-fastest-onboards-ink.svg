@@ -21,7 +21,7 @@
       <text x="540" y="418" font-size="32" fill="#FFFFFF" font-weight="500" text-anchor="middle" letter-spacing="10">THIS WEEK’S</text>
       <text x="540" y="548" font-size="128" fill="#FFFFFF" font-weight="700" text-anchor="middle" letter-spacing="-5">Fastest</text>
       <text x="215" y="680" font-size="128" fill="#FFFFFF" font-weight="700" letter-spacing="-5">Onboards</text>
-      <g id="series-icon" fill="#72DDFF" transform="translate(789 588) scale(1.2778)"><path d="M36 0L6 42H28L22 72L54 28H32Z"/></g>
+      <g id="series-icon" fill="#ACB8F9" transform="translate(789 588) scale(1.2778)"><path d="M36 0L6 42H28L22 72L54 28H32Z"/></g>
     </g><g id="editable-column-labels">
       <text x="72" y="770" font-size="32" fill="#FFFFFF" font-weight="400">chapter</text>
       <text x="1008" y="770" font-size="32" fill="#FFFFFF" font-weight="400" text-anchor="end">time to onboard</text>

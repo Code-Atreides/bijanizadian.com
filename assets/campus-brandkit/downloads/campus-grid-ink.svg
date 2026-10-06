@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1350" viewBox="0 0 1080 1350" role="img" aria-labelledby="title description">
-  <title id="title">fomo campus — campus ink grid template</title>
+  <title id="title">fomo campus — fomo ink grid template</title>
   <desc id="description">Editable 1080 by 1350 grid template. Your campus, your people. The same colorway and message are available for both grid posts and stories.</desc>
-  <metadata>fomo campus brand kit. All six colorways are interchangeable across grid posts and stories. Text remains editable in Aeonik with Arial as fallback. Replace bracketed text before publishing. Essential content uses 72 px side margins, with a 250 px top and 340 px bottom quiet zone for stories. FOMO wordmark and graduation cap path data are unchanged from the supplied assets; only their color and proportional size change.</metadata>
+  <metadata>fomo campus brand kit. All four colorways are interchangeable across grid posts and stories, one for each background the fomo brand kit allows. Text remains editable in Aeonik with Arial as fallback. Replace bracketed text before publishing. Essential content uses 72 px side margins, with a 250 px top and 340 px bottom quiet zone for stories. FOMO wordmark and graduation cap path data are unchanged from the supplied assets; only their color and proportional size change.</metadata>
   <defs>
     <style>text{font-family:Aeonik,Arial,sans-serif} .headline{font-size:164px;font-weight:700;letter-spacing:-7px} .label{font-size:32px;font-weight:500} .context{font-size:32px;font-weight:400}</style>
     <symbol id="fomo-campus-mark" viewBox="0 0 620 415"><g fill="currentColor" fill-rule="evenodd">
@@ -19,17 +19,17 @@
   <g id="brand" color="#FFFFFF">
     <use href="#fomo-wordmark" xlink:href="#fomo-wordmark" x="72" y="92" width="117" height="37.560"/>
     <text x="205" y="129" fill="#FFFFFF" font-size="38" font-weight="500">/campus</text>
-    <use href="#fomo-campus-mark" xlink:href="#fomo-campus-mark" x="736" y="208" width="272" height="182.065"/>
+    <use href="#fomo-campus-mark" xlink:href="#fomo-campus-mark" x="736" y="208" width="272" height="205.227"/>
   </g>
   <g id="editable-message">
-    <text x="72" y="350" class="label" fill="#ACB8F9">[campus name]</text>
+    <text x="72" y="350" class="label" fill="#EAEDFF">[campus name]</text>
     <text x="72" y="584" class="headline" fill="#FFFFFF">your campus</text>
     <text x="72" y="754" class="headline" fill="#FFFFFF">your people</text>
     <text x="72" y="854" class="context" fill="#FFFFFF">[one line of context]</text>
   </g>
   <g id="editable-call-to-action">
     <path d="M72 1160 H1008" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="2"/>
-    <text x="72" y="1222" fill="#ACB8F9" font-size="36" font-weight="500">dm “fomo” to get the link</text>
-    <path d="M954 1210 H1004 M986 1192 L1004 1210 L986 1228" fill="none" stroke="#ACB8F9" stroke-width="3"/>
+    <text x="72" y="1222" fill="#EAEDFF" font-size="36" font-weight="500">dm “fomo” to get the link</text>
+    <path d="M954 1210 H1004 M986 1192 L1004 1210 L986 1228" fill="none" stroke="#EAEDFF" stroke-width="3"/>
   </g>
 </svg>

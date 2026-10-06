@@ -1,12 +1,10 @@
 (() => {
   'use strict';
   const colorways = {
-    purple: { name: 'Purple', description: 'Purple field · white display type and mark · near-black details and CTA' },
-    electric: { name: 'Electric', description: 'Electric field · white display type, details, mark and CTA' },
-    cyan: { name: 'Cyan', description: 'Cyan field · ink display type, details, mark and CTA' },
-    lavender: { name: 'Lavender', description: 'Lavender field · ink display type and mark · dark purple accents' },
-    ink: { name: 'Ink', description: 'Ink field · white display type and mark · light blue details' },
-    white: { name: 'White', description: 'White field · purple display type and mark · ink details' }
+    purple: { name: 'Purple', description: 'Campus purple field · white type, mark, and details · pale lavender label and CTA' },
+    lavender: { name: 'Lavender', description: 'Pale lavender field · ink type, mark, and details' },
+    ink: { name: 'Ink', description: 'Ink field · white type, mark, and details · pale lavender label and CTA' },
+    white: { name: 'White', description: 'White field · campus purple display type and mark · ink details' }
   };
   const controls = document.querySelector('#social .colorway-controls');
   if (controls) {
@@ -18,11 +16,11 @@
       for (const format of ['grid', 'story']) {
         const file = `/assets/campus-brandkit/downloads/campus-${format}-${key}`;
         const preview = document.getElementById(`${format}-preview`);
-        preview.src = `${file}.png?v=3`;
+        preview.src = `${file}.png?v=5`;
         preview.alt = `${theme.name} ${format === 'grid' ? 'grid post' : 'story'} with the campus logo and your campus your people headline`;
         for (const extension of ['svg', 'png']) {
           const link = document.getElementById(`${format}-${extension}`);
-          link.href = `${file}.${extension}?v=3`;
+          link.href = `${file}.${extension}?v=5`;
           link.setAttribute('aria-label', `Download ${theme.name.toLowerCase()} ${format} ${extension.toUpperCase()}`);
         }
       }
@@ -34,17 +32,15 @@
   }
 
   const campaignColorways = {
-    purple: 'Purple field with a light-blue glow · white display type and mark · near-black details and emphasis',
-    electric: 'Electric to deep violet gradient · white type and mark · reward cyan emphasis',
-    cyan: 'Cyan field · ink type, emphasis, and mark',
+    purple: 'fomo brand gradient with electric depth · white type, mark, and emphasis',
     lavender: 'Lavender field with a white glow · ink type and mark · purple emphasis',
-    ink: 'Ink field with an indigo halo · white type and mark · reward cyan emphasis',
+    ink: 'fomo technical gradient · white type and mark · light blue highlight',
     white: 'White field with a lavender halo · ink type · purple mark and emphasis'
   };
   const campaignSection = document.getElementById('campaigns');
   const campaignInputs = campaignSection ? campaignSection.querySelectorAll('.campaign-colorways, .campaign-format-controls') : [];
   if (campaignInputs.length) {
-    const state = { colorway: 'electric', format: 'story' };
+    const state = { colorway: 'purple', format: 'story' };
     const updateCampaigns = () => {
       const { colorway, format } = state;
       const colorwayName = colorways[colorway].name;
@@ -53,15 +49,15 @@
         const recipe = card.dataset.campaignRecipe;
         const name = card.dataset.campaignName;
         const preview = card.querySelector('[data-campaign-preview]');
-        preview.src = `/assets/campus-brandkit/previews/campaign-${format}-${recipe}-${colorway}.webp?v=4`;
+        preview.src = `/assets/campus-brandkit/previews/campaign-${format}-${recipe}-${colorway}.webp?v=5`;
         preview.height = format === 'story' ? 960 : 675;
         preview.alt = `${name} ${formatName} template, ${colorwayName.toLowerCase()} colorway, with editable placeholders`;
         const open = card.querySelector('[data-campaign-open]');
-        open.href = `/assets/campus-brandkit/downloads/campus-${format}-${recipe}-${colorway}.png?v=4`;
+        open.href = `/assets/campus-brandkit/downloads/campus-${format}-${recipe}-${colorway}.png?v=5`;
         open.setAttribute('aria-label', `Open ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${formatName} artwork`);
         card.querySelectorAll('[data-campaign-file]').forEach(link => {
           const [fileFormat, extension] = link.dataset.campaignFile.split('-');
-          link.href = `/assets/campus-brandkit/downloads/campus-${fileFormat}-${recipe}-${colorway}.${extension}?v=4`;
+          link.href = `/assets/campus-brandkit/downloads/campus-${fileFormat}-${recipe}-${colorway}.${extension}?v=5`;
           link.setAttribute('aria-label', `Download ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${fileFormat} ${extension.toUpperCase()}`);
         });
       });

@@ -39,8 +39,8 @@
     </g></g>
     <g id="editable-approved-offer">
       <rect id="reward-panel" x="72" y="922" width="936" height="208" rx="10" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity=".2" stroke-width="1.5"/>
-      <text x="112" y="1040" font-size="115" fill="#72DDFF" font-weight="700" letter-spacing="-4">[rate]</text>
-      <text x="968" y="1040" font-size="115" fill="#72DDFF" font-weight="700" text-anchor="end" letter-spacing="-4">[total]</text>
+      <text x="112" y="1040" font-size="115" fill="#ACB8F9" font-weight="700" letter-spacing="-4">[rate]</text>
+      <text x="968" y="1040" font-size="115" fill="#ACB8F9" font-weight="700" text-anchor="end" letter-spacing="-4">[total]</text>
       <text x="114" y="1092" font-size="32" fill="#FFFFFF" font-weight="400">reward per eligible signup</text>
       <text x="968" y="1092" font-size="32" fill="#FFFFFF" font-weight="400" text-anchor="end">chapter goal</text>
     </g>

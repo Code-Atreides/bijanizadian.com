@@ -21,19 +21,19 @@
       <text x="540" y="206" font-size="32" fill="#FFFFFF" font-weight="500" text-anchor="middle" letter-spacing="10">THIS WEEK’S</text>
       <text x="540" y="318" font-size="112" fill="#FFFFFF" font-weight="700" text-anchor="middle" letter-spacing="-4">Top</text>
       <text x="271" y="434" font-size="112" fill="#FFFFFF" font-weight="700" letter-spacing="-4">Chapters</text>
-      <g id="series-icon" fill="#72DDFF" transform="translate(741 353) scale(1.1250)"><path d="M2 22L16 36L30 12L44 36L58 22L52 62H8Z"/><path d="M8 66H52V72H8Z"/></g>
+      <g id="series-icon" fill="#ACB8F9" transform="translate(741 353) scale(1.1250)"><path d="M2 22L16 36L30 12L44 36L58 22L52 62H8Z"/><path d="M8 66H52V72H8Z"/></g>
     </g><g id="editable-column-labels">
       <text x="176" y="500" font-size="32" fill="#FFFFFF" font-weight="400">chapter</text>
       <text x="980" y="500" font-size="32" fill="#FFFFFF" font-weight="400" text-anchor="end">[what’s counted]</text>
     </g><g id="editable-chapter-rows">
       <g id="rank-1">
         <rect id="leader-panel" x="72" y="524" width="936" height="116" rx="10" fill="#FFFFFF" fill-opacity="0.07" stroke="#FFFFFF" stroke-opacity=".2" stroke-width="1.5"/>
-        <text x="124" y="604" font-size="64" fill="#72DDFF" font-weight="700" text-anchor="middle">1</text>
+        <text x="124" y="604" font-size="64" fill="#ACB8F9" font-weight="700" text-anchor="middle">1</text>
         <g id="replace-rank-1-school-logo"><rect x="176" y="538" width="88" height="88" rx="2" fill="none" stroke="#FFFFFF" stroke-opacity=".45"/>
           <text x="220" y="578" font-size="18" fill="#FFFFFF" font-weight="400" text-anchor="middle">[school</text><text x="220" y="602" font-size="18" fill="#FFFFFF" font-weight="400" text-anchor="middle">logo]</text></g>
         <text x="292" y="576" font-size="32" fill="#FFFFFF" font-weight="500" letter-spacing="3">[SCHOOL NAME]</text>
         <text x="292" y="622" font-size="44" fill="#FFFFFF" font-weight="700">[CHAPTER NAME]</text>
-        <text x="980" y="600" font-size="52" fill="#72DDFF" font-weight="700" text-anchor="end" letter-spacing="-1">[count]</text>
+        <text x="980" y="600" font-size="52" fill="#ACB8F9" font-weight="700" text-anchor="end" letter-spacing="-1">[count]</text>
       </g>
       <g id="rank-2">
         

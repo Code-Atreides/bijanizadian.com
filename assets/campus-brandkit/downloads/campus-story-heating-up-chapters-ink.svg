@@ -21,7 +21,7 @@
       <text x="540" y="418" font-size="32" fill="#FFFFFF" font-weight="500" text-anchor="middle" letter-spacing="10">TODAY’S</text>
       <text x="540" y="548" font-size="128" fill="#FFFFFF" font-weight="700" text-anchor="middle" letter-spacing="-5">Heating Up</text>
       <text x="235" y="680" font-size="128" fill="#FFFFFF" font-weight="700" letter-spacing="-5">Chapters</text>
-      <g id="series-icon" fill="#72DDFF" transform="translate(768 588) scale(1.2778)"><path fill-rule="evenodd" d="M30 0C33 14 47 22 52 38C57 54 49 70 30 72C11 70 3 56 8 41C11 32 17 27 20 18C24 26 25 31 29 33C31 22 27 10 30 0ZM30 44C34 50 38 54 37 60C36 66 24 66 23 60C22 54 27 50 30 44Z"/></g>
+      <g id="series-icon" fill="#ACB8F9" transform="translate(768 588) scale(1.2778)"><path fill-rule="evenodd" d="M30 0C33 14 47 22 52 38C57 54 49 70 30 72C11 70 3 56 8 41C11 32 17 27 20 18C24 26 25 31 29 33C31 22 27 10 30 0ZM30 44C34 50 38 54 37 60C36 66 24 66 23 60C22 54 27 50 30 44Z"/></g>
     </g><g id="editable-chapter-rows">
       <g id="chapter-row-1">
         
