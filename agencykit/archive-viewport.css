@@ -129,3 +129,14 @@ body.archive-mode #archive-types button[aria-pressed=true]{background:#ededeb;bo
 body.archive-mode #archive-types button[aria-pressed=true] span{color:#5c5c57}
 body.archive-mode #archive-types button:focus-visible{outline:1px solid #d0d0c8;outline-offset:2px}
 @media(max-width:720px){body.archive-mode #archive-result-controls{gap:8px}body.archive-mode #archive-types{-webkit-mask-image:linear-gradient(90deg,#000 86%,transparent);mask-image:linear-gradient(90deg,#000 86%,transparent)}body.archive-mode #archive-types button{min-height:32px;padding:5px 11px;font-size:13px}}
+
+/* /agencykit?motion=check readout. Read-only and never catches the pointer. */
+.motion-check{position:fixed;z-index:200;right:16px;bottom:16px;display:grid;gap:6px;max-width:min(360px,calc(100vw - 32px));padding:14px 16px;border:1px solid #ffffff1f;border-radius:16px;background:#141414f2;color:#d8d8d2;font-size:13px;line-height:1.5;pointer-events:none;box-shadow:0 10px 40px #0009}
+.motion-check strong{display:flex;align-items:center;gap:8px;color:#fff;font-size:14px;font-weight:500}
+.motion-check i{flex:none;width:9px;height:9px;border-radius:50%;background:#e0a33c}
+.motion-check i.on{background:#3fcf7a}
+.motion-check i.off{background:#ef5a4a}
+.motion-check dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:4px 0 0}
+.motion-check dl div{display:contents}
+.motion-check dt{color:#8a8a84}
+.motion-check dd{margin:0;font-variant-numeric:tabular-nums}

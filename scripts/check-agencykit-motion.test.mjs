@@ -151,3 +151,24 @@ test('blur recenters without blocking the next hover; hidden pages suspend motio
   s.move(); s.motion.sync();
   assert.equal(s.frames.size, 0);
 });
+
+test('status explains why motion is off and remembers the last pointer type', t => {
+  const s = scene(t);
+  assert.deepEqual(s.motion.status().reasons, []);
+  assert.equal(s.motion.status().pointerType, '');
+  s.move({ pointerType: 'touch' });
+  assert.equal(s.motion.status().pointerType, 'touch');
+  s.move(); s.tick();
+  const moving = s.motion.status();
+  assert.equal(moving.pointerType, 'mouse');
+  assert.ok(Math.abs(moving.x) > 0, 'reports the current offset');
+  s.reduced.matches = true;
+  s.setActive(false);
+  assert.deepEqual(s.motion.status().reasons, ['reduced-motion', 'paused']);
+  s.reduced.matches = false; s.setActive(true);
+  s.view.innerWidth = 700;
+  assert.deepEqual(s.motion.status().reasons, ['narrow']);
+  s.view.innerWidth = 1440;
+  s.doc.emit('pointerdown', { pointerType: 'mouse', target: { closest: () => null } });
+  assert.deepEqual(s.motion.status().reasons, ['button-held']);
+});

@@ -26,6 +26,7 @@ export function createArchiveMotion({ canvas, isActive }) {
   let pointerHeld = false;
   let keyboardInput = true;
   let destroyed = false;
+  let lastPointerType = '';
 
   // Window focus is deliberately not required: a browser beside another app
   // still receives hover, and the collage should follow it without a click.
@@ -82,6 +83,7 @@ export function createArchiveMotion({ canvas, isActive }) {
   }
 
   function onPointerMove(event) {
+    lastPointerType = event.pointerType || '';
     // A touchscreen must not move the collage, including hybrid laptops.
     if (event.pointerType !== 'mouse') return;
     keyboardInput = false;
@@ -96,6 +98,7 @@ export function createArchiveMotion({ canvas, isActive }) {
   }
 
   function onPointerDown(event) {
+    lastPointerType = event.pointerType || '';
     keyboardInput = false;
     if (event.pointerType !== 'mouse') { reset(); return; }
     // Keep the hit target in exactly the same position until its click fires.
@@ -165,6 +168,17 @@ export function createArchiveMotion({ canvas, isActive }) {
   reset();
   return {
     sync() { if (!destroyed) reset(); },
+    /** Why the collage is or isn't following the pointer, for the motion check. */
+    status() {
+      const reasons = [];
+      if (doc.visibilityState === 'hidden') reasons.push('page-hidden');
+      if (view.innerWidth < 721) reasons.push('narrow');
+      else if (!view.matchMedia('(hover: hover) and (pointer: fine)').matches) reasons.push('no-hover-pointer');
+      if (reducedMotion.matches) reasons.push('reduced-motion');
+      if (!isActive()) reasons.push('paused');
+      if (pointerHeld) reasons.push('button-held');
+      return { reasons, pointerType: lastPointerType, x: currentX, y: currentY };
+    },
     destroy() {
       if (destroyed) return;
       reset();

@@ -267,6 +267,31 @@ window.addEventListener('hashchange',route);
 window.addEventListener('popstate',route);
 $('#archive-about').addEventListener('click',()=>$('#about-modal').showModal());
 $('.skip-link').addEventListener('click',event=>{event.preventDefault();(state.route==='archive'?$('#archive-search'):$('#projects-workspace')).focus();});
+// /agencykit?motion=check shows, live, why the home collage is or isn't
+// following the cursor. It only reads state; it never changes the motion.
+function motionPauseReason(){
+  if(state.route!=='archive')return 'It only runs on the home collage. You’re in Make.';
+  if(!document.body.classList.contains('archive-home'))return 'It only runs on the home collage, not on search results.';
+  if(!$('#detail-overlay').hidden)return 'A page preview is open.';
+  if(document.querySelector('dialog[open]'))return 'A dialog is open.';
+  if(!$('#search-suggestions').hidden)return '“Try a search” ideas are open. Close them to resume.';
+  return 'Paused.';
+}
+if(new URLSearchParams(location.search).get('motion')==='check'){
+  const panel=document.createElement('aside');panel.className='motion-check';panel.setAttribute('aria-label','Cursor effect check');document.body.append(panel);
+  const words={'page-hidden':'This tab is in the background.',narrow:'The window is narrower than 721px. Make it wider.','no-hover-pointer':'Your browser reports a touchscreen or pen as the main pointer, not a mouse or trackpad.','reduced-motion':'Your computer asks for reduced motion (Windows: Settings → Accessibility → Visual effects → Animation effects).','button-held':'A mouse button is held down.'};
+  let queued=false;
+  const paint=()=>{
+    queued=false;const s=archiveMotion.status(),offset=Math.abs(s.x)+Math.abs(s.y)>0.5;
+    const why=s.reasons.map(reason=>reason==='paused'?motionPauseReason():words[reason]);
+    if(s.pointerType&&s.pointerType!=='mouse')why.push(`Your last input was ${s.pointerType}. The effect follows only a mouse or trackpad.`);
+    const label=why.length?'off':offset?'on, following your cursor':s.pointerType?'on':'move your mouse across the page';
+    panel.innerHTML=`<strong><i class="${why.length?'off':offset?'on':'ready'}"></i>Cursor effect: ${label}</strong>${why.map(reason=>`<span>${escape(reason)}</span>`).join('')}<dl><div><dt>Last input</dt><dd>${escape(s.pointerType||'none yet')}</dd></div><div><dt>Collage offset</dt><dd>${Math.round(s.x)}px, ${Math.round(s.y)}px</dd></div><div><dt>Window</dt><dd>${innerWidth} × ${innerHeight}</dd></div></dl>`;
+  };
+  const queue=()=>{if(!queued){queued=true;requestAnimationFrame(paint);}};
+  ['pointermove','pointerdown','pointerup','keydown','focusin','click'].forEach(type=>document.addEventListener(type,queue,{passive:true}));
+  addEventListener('resize',queue);setInterval(queue,400);paint();
+}
 await projectCloud.start();
 moveShortlistsIntoProjects();
 route();
