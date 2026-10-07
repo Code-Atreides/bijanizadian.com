@@ -33,7 +33,7 @@ export const brandKits = [{
     'Keep amounts attached to their purpose, pay to its context, and fundraisers to the beneficiary.',
     'Replace placeholders only with confirmed names, dates, or figures.',
   ],
-  examples: [['Headline', 'your campus / your approach'], ['Action', 'dm “fomo” to get the link'], ['Application', 'Become an intern']],
+  examples: [['Headline', 'your campus / your approach'], ['Action', 'dm “fomo” to get the link'], ['Application', 'Become an ambassador']],
   avoid: 'Rainbow gradients, neon green, orange or yellow, metallic effects, and crypto gloss.',
   // The kit's light web surface. Its dark surface uses a translucent button
   // that drafts cannot reproduce yet, and the kit recommends light for forms.

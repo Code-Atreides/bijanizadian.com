@@ -24,6 +24,11 @@ test('the fomo campus kit matches its published tokens', () => {
   assert.equal(kit.type.family, tokens.typography.family.$value[0]);
 });
 
+test('voice rules and examples still read word for word on the published kit page', () => {
+  const page = readFileSync(new URL('campus/brandkit.html', root), 'utf8').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ');
+  for (const line of [...kit.voice, ...kit.examples.map(([, example]) => example)]) assert.ok(page.includes(line), `brandkit.html still says: ${line}`);
+});
+
 test('every kit asset and logo is a real file in the published site', () => {
   for (const each of brandKits) {
     const paths = [each.logo.src, each.tokensUrl, ...each.assets.flatMap(group => group.files || []).flatMap(item => [item.svg, item.png, item.css, item.json]).filter(Boolean)];
