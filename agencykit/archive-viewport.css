@@ -116,3 +116,16 @@ body.archive-mode .archive-empty button{font-size:15px;min-height:44px}
   body.archive-results #archive-gallery{inset:210px 18px 12px}
   body.archive-results.archive-corrected #archive-gallery{top:234px}
 }
+
+/* Page-type chips under search results. Scroll sideways instead of wrapping
+   so the results row keeps its height at every width. */
+body.archive-mode #archive-result-controls{position:relative;left:50%;width:max-content;max-width:calc(100vw - 32px);margin:8px 0 0;transform:translateX(-50%)}
+body.archive-mode #archive-types{display:flex;gap:5px;min-width:0;overflow-x:auto;scrollbar-width:none;padding:2px}
+body.archive-mode #archive-types::-webkit-scrollbar{display:none}
+body.archive-mode #archive-types button{flex:none;min-height:34px;padding:6px 13px;border:1px solid #ffffff17;border-radius:999px;background:transparent;color:#c5c5c0;font-size:14px;line-height:20px;white-space:nowrap;cursor:pointer;transition:background .14s,color .14s}
+body.archive-mode #archive-types button span{margin-left:2px;color:#8c8c88;font-variant-numeric:tabular-nums}
+body.archive-mode #archive-types button:hover{background:#ffffff0d;color:#f0f0eb}
+body.archive-mode #archive-types button[aria-pressed=true]{background:#ededeb;border-color:#ededeb;color:#121212}
+body.archive-mode #archive-types button[aria-pressed=true] span{color:#5c5c57}
+body.archive-mode #archive-types button:focus-visible{outline:1px solid #d0d0c8;outline-offset:2px}
+@media(max-width:720px){body.archive-mode #archive-result-controls{gap:8px}body.archive-mode #archive-types{-webkit-mask-image:linear-gradient(90deg,#000 86%,transparent);mask-image:linear-gradient(90deg,#000 86%,transparent)}body.archive-mode #archive-types button{min-height:32px;padding:5px 11px;font-size:13px}}
