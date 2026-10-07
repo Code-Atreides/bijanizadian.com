@@ -40,6 +40,7 @@ function logo(value) {
   } catch { return ''; }
 }
 const color = (value, fallback) => typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value) ? value.toLowerCase() : fallback;
+const DEFAULT_BRAND = { accent: '#6366f1', bg: '#f7f7f5', ink: '#242423', font: 'system', logo: '' };
 
 /** All reads are detached snapshots. Mutations persist before notifying listeners.
  * Import merges new records; local edited records win collisions. Untouched seeded
@@ -87,11 +88,16 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     const brief = { ...record(base.brief), ...record(raw.brief) };
     const links = { ...record(base.links), ...record(raw.links) };
     const value = key => own(raw, key) ? raw[key] : base[key];
+    const normalizedBrand = { accent: color(brand.accent, '#6366f1'), bg: color(brand.bg, '#f7f7f5'), ink: color(brand.ink, '#242423'), font: choice(brand.font, ['system', 'editorial', 'modern'], 'system'), logo: logo(brand.logo) };
+    // Projects follow their client's brand kit unless they chose a custom
+    // brand. Older records with an edited brand keep it as custom.
+    const untouchedBrand = JSON.stringify(normalizedBrand) === JSON.stringify(DEFAULT_BRAND);
     return {
       name: text(value('name'), 120, 'Untitled project') || 'Untitled project',
       clientId: value('clientId') || null, client: text(value('client'), 120), description: text(value('description'), 4000),
       status: choice(value('status'), ['active', 'paused', 'complete'], 'active'),
-      brand: { accent: color(brand.accent, '#6366f1'), bg: color(brand.bg, '#f7f7f5'), ink: color(brand.ink, '#242423'), font: choice(brand.font, ['system', 'editorial', 'modern'], 'system'), logo: logo(brand.logo) },
+      brandMode: choice(value('brandMode'), ['kit', 'custom'], choice(base.brandMode, ['kit', 'custom'], untouchedBrand ? 'kit' : 'custom')),
+      brand: normalizedBrand,
       brief: { audience: text(brief.audience, 1000), goal: text(brief.goal, 1600), tone: text(brief.tone, 500) },
       links: { website: url(links.website), repo: url(links.repo), files: url(links.files) },
       originalIds: originalIds(value('originalIds')),
@@ -287,9 +293,9 @@ export function createProjectStore({ storage, catalog = [], archiveProjects = []
     },
     updateProject(projectId, patch) {
       return mutate(projectId, (project, next) => {
-        const previousBrand = JSON.stringify(project.brand);
+        const previousBrand = JSON.stringify([project.brand, project.brandMode]);
         Object.assign(project, profile(patch, project));
-        if (JSON.stringify(project.brand) !== previousBrand) for (const draft of project.drafts) {
+        if (JSON.stringify([project.brand, project.brandMode]) !== previousBrand) for (const draft of project.drafts) {
           draft.review = { ...draft.review, brand: false, mobile: false };
           draft.updatedAt = new Date().toISOString();
         }

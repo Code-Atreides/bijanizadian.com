@@ -257,3 +257,57 @@ body.projects-mode .assistant-launcher{display:none}
   .pu-profile-heading .pu-lead{font-size:16px}
   .pu-profile-heading .pu-kicker{font-size:12px}
 }
+
+/* Client brand kits */
+.pu-brand-kit{margin-top:64px;padding-top:44px;border-top:1px solid #ffffff10;scroll-margin-top:96px;outline:0}
+.pu-kit-lead{max-width:660px;margin:0 0 30px;color:#9a9a92;font-size:15px;line-height:1.7}
+.pu-kit-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr);gap:18px}
+.pu-kit-block{min-width:0;padding:22px;border:1px solid #ffffff10;border-radius:22px;background:#121212}
+.pu-kit-block h3,.pu-kit-assets h3{margin:0 0 16px;color:#8a8a84;font-size:12px;font-weight:450;letter-spacing:1.1px;text-transform:uppercase}
+.pu-kit-block h3.pu-kit-subhead{margin-top:28px}
+.pu-kit-block small{display:block;color:#7c7c74;font-size:12px;line-height:1.6}
+.pu-kit-colors{display:grid;gap:12px;margin:0;padding:0;list-style:none}
+.pu-kit-colors li{display:grid;grid-template-columns:30px minmax(0,1fr) auto;column-gap:12px;align-items:center}
+.pu-kit-chip{grid-row:span 2;width:30px;height:30px;border:1px solid #ffffff26;border-radius:9px}
+.pu-kit-colors strong{color:#e8e8e2;font-size:14px;font-weight:500}
+.pu-kit-colors code{color:#9a9a92;font-size:12px}
+.pu-kit-colors small{grid-column:2/4}
+.pu-kit-logo{display:grid;place-items:center;height:128px;margin-bottom:10px;border-radius:14px;background:#eaedff}
+.pu-kit-logo img{width:auto;max-width:70%;max-height:86px}
+.pu-kit-type{margin:0 0 10px;color:#f0f0ea;font-family:Aeonik,Arial,sans-serif;font-size:34px;font-weight:500;line-height:1.1}
+.pu-kit-list{display:grid;gap:7px;margin:0 0 12px;padding:0;list-style:none;color:#bdbdb6;font-size:13px;line-height:1.5}
+.pu-kit-voice li{padding-left:14px;text-indent:-14px}
+.pu-kit-voice li::before{content:'·';display:inline-block;width:14px;text-indent:0;color:#6f6f68}
+.pu-kit-examples{display:grid;gap:10px;margin:18px 0}
+.pu-kit-examples dt{color:#7c7c74;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.pu-kit-examples dd{margin:2px 0 0;color:#e8e8e2;font-size:15px}
+.pu-kit-avoid{margin:0;color:#9a9a92;font-size:13px;line-height:1.6}
+.pu-kit-avoid strong{color:#d8d8d2;font-weight:500;margin-right:4px}
+.pu-kit-assets{margin-top:30px}
+.pu-kit-asset-groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-items:start}
+.pu-kit-asset-group{border:1px solid #ffffff10;border-radius:18px;background:#121212}
+.pu-kit-asset-group summary{display:grid;gap:3px;padding:16px 18px;cursor:pointer;list-style:none}
+.pu-kit-asset-group summary::-webkit-details-marker{display:none}
+.pu-kit-asset-group summary strong{color:#e8e8e2;font-size:14px;font-weight:500}
+.pu-kit-asset-group summary span{color:#7c7c74;font-size:12px}
+.pu-kit-asset-group ul{display:grid;gap:9px;margin:0;padding:0 18px 16px;list-style:none}
+.pu-kit-asset-group li{display:flex;align-items:center;gap:8px;color:#bdbdb6;font-size:13px}
+.pu-kit-asset-group li>span{flex:1;min-width:0}
+.pu-kit-asset-group li a{padding:3px 9px;border:1px solid #ffffff1f;border-radius:999px;color:#d8d8d2;font-size:12px;text-decoration:none}
+.pu-kit-asset-group li a:hover{background:#ffffff10;color:#fff}
+.pu-kit-campaigns{margin:0;padding:0 18px 16px}
+@media(max-width:960px){.pu-kit-grid{grid-template-columns:1fr}}
+
+/* Settings: brand source */
+.pu-brand-source{display:grid;gap:10px;margin:0;padding:0;border:0}
+.pu-brand-source legend{margin-bottom:10px;padding:0;color:#a0a098;font-size:13px}
+.pu-brand-option{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid #ffffff14;border-radius:16px;cursor:pointer}
+.pu-brand-option:has(input:checked){border-color:#ffffff3d;background:#ffffff08}
+.pu-brand-option input{margin-top:3px;accent-color:#ededeb}
+.pu-brand-option strong{display:block;color:#e8e8e2;font-size:14px;font-weight:500}
+.pu-brand-option small{display:block;margin-top:3px;color:#8a8a84;font-size:12px}
+.pu-kit-summary{display:grid;gap:12px;padding:16px;border:1px solid #ffffff10;border-radius:16px;background:#121212}
+.pu-kit-summary p{margin:0;color:#a0a098;font-size:13px;line-height:1.6}
+.pu-kit-swatches{display:flex;flex-wrap:wrap;gap:6px}
+.pu-kit-swatches span{width:26px;height:26px;border:1px solid #ffffff26;border-radius:8px}
+#pu-brand-kit:focus{outline:none}
