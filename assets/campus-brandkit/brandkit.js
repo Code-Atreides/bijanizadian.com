@@ -16,11 +16,11 @@
       for (const format of ['grid', 'story']) {
         const file = `/assets/campus-brandkit/downloads/campus-${format}-${key}`;
         const preview = document.getElementById(`${format}-preview`);
-        preview.src = `${file}.png?v=5`;
+        preview.src = `${file}.png?v=6`;
         preview.alt = `${theme.name} ${format === 'grid' ? 'grid post' : 'story'} with the campus logo and your campus your people headline`;
         for (const extension of ['svg', 'png']) {
           const link = document.getElementById(`${format}-${extension}`);
-          link.href = `${file}.${extension}?v=5`;
+          link.href = `${file}.${extension}?v=6`;
           link.setAttribute('aria-label', `Download ${theme.name.toLowerCase()} ${format} ${extension.toUpperCase()}`);
         }
       }
@@ -49,15 +49,15 @@
         const recipe = card.dataset.campaignRecipe;
         const name = card.dataset.campaignName;
         const preview = card.querySelector('[data-campaign-preview]');
-        preview.src = `/assets/campus-brandkit/previews/campaign-${format}-${recipe}-${colorway}.webp?v=5`;
+        preview.src = `/assets/campus-brandkit/previews/campaign-${format}-${recipe}-${colorway}.webp?v=6`;
         preview.height = format === 'story' ? 960 : 675;
         preview.alt = `${name} ${formatName} template, ${colorwayName.toLowerCase()} colorway, with editable placeholders`;
         const open = card.querySelector('[data-campaign-open]');
-        open.href = `/assets/campus-brandkit/downloads/campus-${format}-${recipe}-${colorway}.png?v=5`;
+        open.href = `/assets/campus-brandkit/downloads/campus-${format}-${recipe}-${colorway}.png?v=6`;
         open.setAttribute('aria-label', `Open ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${formatName} artwork`);
         card.querySelectorAll('[data-campaign-file]').forEach(link => {
           const [fileFormat, extension] = link.dataset.campaignFile.split('-');
-          link.href = `/assets/campus-brandkit/downloads/campus-${fileFormat}-${recipe}-${colorway}.${extension}?v=5`;
+          link.href = `/assets/campus-brandkit/downloads/campus-${fileFormat}-${recipe}-${colorway}.${extension}?v=6`;
           link.setAttribute('aria-label', `Download ${colorwayName.toLowerCase()} ${name.toLowerCase()} ${fileFormat} ${extension.toUpperCase()}`);
         });
       });
