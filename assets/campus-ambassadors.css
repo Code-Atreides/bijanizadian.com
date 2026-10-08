@@ -234,11 +234,6 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
 .form-success p { font-size: 16px; line-height: 1.65; color: var(--muted); margin-top: 17px; }
 .form-success .button, .form-success .text-link { margin-top: 24px; }
 
-/* Side-by-side sections: the heading travels with the taller column instead of leaving it empty. */
-@media (min-width: 901px) {
-  .resume-copy, .faq > div:first-child { position: sticky; top: calc(var(--header-height) + 32px); align-self: start; }
-}
-
 @media (max-width: 1050px) {
   :root { --column-gap: 40px; }
   .nav nav { gap: 22px; }
