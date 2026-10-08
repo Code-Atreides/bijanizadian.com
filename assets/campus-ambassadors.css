@@ -53,6 +53,8 @@ h1, h2, h3, p { margin: 0; }
 strong { font-weight: 500; }
 svg, img { max-width: 100%; }
 [hidden] { display: none !important; }
+p, li { text-wrap: pretty; }
+.nowrap { white-space: nowrap; }
 ::selection { background: #dfe4ff; color: var(--ink); }
 a:focus-visible, button:focus-visible, summary:focus-visible,
 input:focus-visible, select:focus-visible, textarea:focus-visible {
@@ -234,6 +236,11 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
 .form-success p { font-size: 16px; line-height: 1.65; color: var(--muted); margin-top: 17px; }
 .form-success .button, .form-success .text-link { margin-top: 24px; }
 
+/* Side-by-side sections: the heading travels with the taller column instead of leaving it empty. */
+@media (min-width: 901px) {
+  .resume-copy, .faq > div:first-child { position: sticky; top: calc(var(--header-height) + 32px); align-self: start; }
+}
+
 @media (max-width: 1050px) {
   :root { --column-gap: 40px; }
   .nav nav { gap: 22px; }
@@ -327,6 +334,7 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .role-tasks li + li { margin-top: 6px; }
   .role-apply { min-height: 44px; padding-top: 12px; }
   .role-path { margin-top: 14px; padding-inline: 2px; }
+  .resume-example { gap: 24px; }
   .resume-copy p { margin-top: 12px; font-size: 16px; }
   .resume-stage { padding: 12px; border-radius: 23px; }
   .resume-card { padding: 18px 16px; }
@@ -340,7 +348,7 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .resume-logo svg { width: 28px; height: 28px; }
   .resume-positions { --indent: 52px; --rail: 20px; margin-top: 16px; }
   .resume-positions ul li { font-size: 13px; }
-  .faq { gap: 20px; }
+  .faq { gap: 24px; }
   .faq summary { min-height: 52px; padding-block: 12px; }
   .faq details:first-child summary { min-height: 44px; }
   .faq details p { padding-right: 24px; }

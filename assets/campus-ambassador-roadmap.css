@@ -192,10 +192,8 @@
   .roadmap-progress span { width: 16px; }
 }
 @media (max-width: 600px) {
-  .ambassador-roadmap { padding-top: 16px; }
-  .roadmap-heading { margin-bottom: 14px; }
-  .roadmap-heading h2 { font-size: clamp(28px, 7.4vw, 32px); }
-  .roadmap-view-tabs { width: 256px; padding: 3px; margin-top: 10px; }
+  .roadmap-heading { margin-bottom: 24px; }
+  .roadmap-view-tabs { width: 256px; padding: 3px; margin-top: 16px; }
   .roadmap-view-tabs::before { left: 3px; top: 3px; bottom: 3px; width: calc((100% - 6px) / 2); }
   .roadmap-view-tabs button { min-height: 44px; padding: 8px 14px; font-size: 13px; }
   .roadmap-overview { grid-template-rows: repeat(4, auto); }
