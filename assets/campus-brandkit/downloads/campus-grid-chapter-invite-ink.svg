@@ -42,7 +42,6 @@
       <text x="968" y="1092" font-size="32" fill="#FFFFFF" font-weight="400" text-anchor="end">chapter goal</text>
     </g>
   <g id="editable-call-to-action">
-    <path d="M72 1168 H1008" fill="none" stroke="#FFFFFF" stroke-opacity=".25" stroke-width="1.5"/>
     <text x="1008" y="1230" font-size="36" fill="#FFFFFF" font-weight="500" text-anchor="end">dm “fomo” to get the link</text>
     <path id="cta-arrow" d="M157 0C142.5 34.5 97.5 72 0 87M26 65L0 87L30 104" transform="translate(422 1178)" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
