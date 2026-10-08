@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campus Tasks · Your campus. Your call.</title>
+<meta name="description" content="Campus Tasks puts company capital and real opportunities behind one selected student on each campus. Choose your tasks, build your team, and make something happen.">
+<meta property="og:title" content="Campus Tasks">
+<meta property="og:description" content="Their capital. Your campus. Your call.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#fafafa">
+<link rel="icon" href="/tasks/assets/favicon.svg">
+<link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/campus/fonts/Aeonik-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/tasks/landing.css">
+<script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.campusTasksReady)document.documentElement.classList.remove('js')},3000);</script>
+<script src="/tasks/landing.js" defer></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v16M4 12h16"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4M3 21l5-1L21 7a2.8 2.8 0 0 0-4-4L4 16l-1 5Z"/></symbol>
+<symbol id="i-dinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+<symbol id="i-plane" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2Z"/></symbol>
+<symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4.5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><path d="m20.5 20.5-4-4"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</defs>
+</svg>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-head" data-head>
+  <div class="wrap head-row">
+    <a class="brand" href="/tasks" aria-label="Campus Tasks home">campus<span>tasks</span><i>.</i></a>
+    <nav class="head-nav" aria-label="On this page">
+      <a href="#how">How it works</a>
+      <a href="#tasks">Tasks</a>
+      <a href="#rewards">Rewards</a>
+    </nav>
+    <a class="pill-ghost" href="https://milomessina.com/tasks" data-workspace>Sign in</a>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-grid-bg" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow reveal">ONE CAMPUS. YOUR LEAD.</p>
+      <h1 id="hero-title" class="hero-title">
+        <span class="line"><span class="word" style="--i:0">Their</span> <span class="word" style="--i:1">capital.</span></span>
+        <span class="line"><span class="word" style="--i:2">Your</span> <span class="word" style="--i:3">campus.</span></span>
+        <span class="line"><span class="word" style="--i:4">Your</span> <span class="word" style="--i:5">call<b class="dot">.</b></span></span>
+      </h1>
+      <p class="lead reveal" style="--d:.55s">Choose your tasks. Build your team. Put company capital to work on your campus.</p>
+      <p class="authority reveal" style="--d:.65s">You’re the one person on your campus in charge.</p>
+      <div class="hero-actions reveal" style="--d:.75s">
+        <a class="btn" href="https://milomessina.com/tasks" data-workspace>Enter your workspace <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="link-arrow" href="#how">See how it works <svg aria-hidden="true"><use href="#i-down"/></svg></a>
+      </div>
+      <div class="school-try reveal" style="--d:.85s">
+        <label for="school-input">See it in your school’s colors</label>
+        <div class="combo" data-combo>
+          <span class="combo-swatch" aria-hidden="true"></span>
+          <input id="school-input" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="school-list" autocomplete="off" spellcheck="false" placeholder="Search your school, e.g. SDSU">
+          <button class="combo-clear" type="button" aria-label="Clear school" hidden><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+          <ul id="school-list" role="listbox" aria-label="Schools" hidden></ul>
+        </div>
+        <p class="combo-status" id="school-status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="stage" data-stage aria-hidden="true">
+        <div class="stage-glow"></div>
+        <div class="window" data-window>
+          <div class="win-bar">
+            <span class="win-brand">campus<span>tasks</span><i>.</i></span>
+            <span class="win-out">Sign out</span>
+          </div>
+          <div class="win-body">
+            <div class="win-id">
+              <span class="tile" data-tile><span data-mono>CT</span></span>
+              <span class="win-who"><strong data-school-name>Your campus</strong><small>Campus lead · Personally selected</small></span>
+              <span class="win-tag">Preview</span>
+            </div>
+            <p class="win-h">Your campus. Your call.</p>
+            <div class="win-company">
+              <img src="/tasks/assets/fomo-wordmark.svg" alt="" width="75" height="24">
+              <span class="win-co-text"><b>Build the campus culture.</b><small>5 opportunities</small></span>
+              <span class="live-chip"><i></i>Active company</span>
+            </div>
+            <div class="win-filters">
+              <span class="on">All <i>5</i></span>
+              <span>In progress <i data-count="active">0</i></span>
+              <span>In review <i data-count="review">0</i></span>
+              <span class="hide-sm">Approved <i data-count="approved">0</i></span>
+            </div>
+            <ul class="win-tasks">
+              <li data-mtask="dinner" data-state="available">
+                <span class="mt-icon"><svg><use href="#i-dinner"/></svg></span>
+                <span class="mt-text"><b>Host the creator dinner</b><small>A DINNER ON fomo</small></span>
+                <span class="status">Available</span>
+              </li>
+              <li data-mtask="filmer" data-state="available">
+                <span class="mt-icon"><svg><use href="#i-video"/></svg></span>
+                <span class="mt-text"><b>Find your chapter filmer</b><small>FINAL CUT + PARTY FUNDING</small></span>
+                <span class="status">Available</span>
+              </li>
+              <li data-mtask="host" data-state="available">
+                <span class="mt-icon"><svg><use href="#i-mic"/></svg></span>
+                <span class="mt-text"><b>Recruit your campus media host</b><small>A PAID ROLE TO OFFER</small></span>
+                <span class="status">Available</span>
+              </li>
+            </ul>
+            <div class="win-bonus">
+              <span class="wb-label">OPTIONAL BONUS<em data-bonus-text>0 of 5 approved</em></span>
+              <b>$100</b>
+              <span class="wb-bar"><i data-bonus-bar></i></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="team-card" data-team>
+          <span class="tc-label">YOUR TEAM</span>
+          <div class="tc-row">
+            <span class="tc-member is-in"><span class="tc-avatar"><svg><use href="#i-user"/></svg></span><small>You</small></span>
+            <span class="tc-member" data-member="filmer"><span class="tc-avatar"><svg class="tc-plus"><use href="#i-plus"/></svg><svg class="tc-icon"><use href="#i-video"/></svg></span><small>Filmer</small></span>
+            <span class="tc-member" data-member="host"><span class="tc-avatar"><svg class="tc-plus"><use href="#i-plus"/></svg><svg class="tc-icon"><use href="#i-mic"/></svg></span><small>Host</small></span>
+          </div>
+        </div>
+
+        <div class="toast" data-toast><span class="toast-icon"><svg><use href="#i-check"/></svg></span><span data-toast-text>Step sent for review</span></div>
+      </div>
+      <p class="visually-hidden">An example workspace: tasks move from available to in progress, in review, and approved, and the workspace takes on the colors of the school it belongs to.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow reveal">HOW IT WORKS</p>
+      <h2 id="how-title" class="reveal" style="--d:.08s">Pick a task. Do it your way. Get it approved.</h2>
+      <p class="lede reveal" style="--d:.16s">Every task is optional. Pick any, skip any, work in any order.</p>
+    </header>
+
+    <ol class="flow reveal" data-flow>
+      <li class="flow-step" style="--d:0s">
+        <div class="flow-art art-in" aria-hidden="true">
+          <span class="ai-halo"></span><span class="ai-ring"></span><span class="ai-ring two"></span>
+          <span class="ai-kicker">WELCOME TO CAMPUS TASKS</span>
+          <span class="ai-title">You’re in.</span>
+          <span class="ai-chip"><span class="tile"><span data-mono>CT</span></span><span data-school-name>Your campus</span></span>
+        </div>
+        <span class="flow-num">01</span>
+        <h3>You’re selected.</h3>
+        <p>One point person on each selected campus. Create your account and the workspace takes on your school’s colors.</p>
+      </li>
+      <li class="flow-step" style="--d:.7s">
+        <div class="flow-art art-pick" aria-hidden="true">
+          <span class="ap-row"><span>Host the creator dinner</span><i class="ap-check"><svg><use href="#i-check"/></svg></i></span>
+          <span class="ap-row ap-skip"><span>Upload your social calendar</span><i class="ap-pass">Pass</i></span>
+          <span class="ap-row"><span>Find your chapter filmer</span><i class="ap-check"><svg><use href="#i-check"/></svg></i></span>
+        </div>
+        <span class="flow-num">02</span>
+        <h3>Choose your tasks.</h3>
+        <p>Companies post opportunities with real budgets behind them. Take the ones you want. Pass on anything you don’t.</p>
+      </li>
+      <li class="flow-step" style="--d:1.4s">
+        <div class="flow-art art-send" aria-hidden="true">
+          <span class="as-card">
+            <span class="as-top"><span>STEP 1</span><span class="as-status"><b class="as-not">Not submitted</b><b class="as-rev">In review</b></span></span>
+            <span class="as-file"><svg><use href="#i-file"/></svg>guest-list.pdf<i class="as-prog"><i></i></i></span>
+            <span class="as-btn">Send step for review</span>
+          </span>
+        </div>
+        <span class="flow-num">03</span>
+        <h3>Send each step for review.</h3>
+        <p>Add notes, links, or up to five files to each step and send it when it’s ready. Drafts save as you go.</p>
+      </li>
+      <li class="flow-step" style="--d:2.1s">
+        <div class="flow-art art-grow" aria-hidden="true">
+          <span class="ag-pill"><svg><use href="#i-check"/></svg>Approved</span>
+          <span class="ag-bars">
+            <span class="ag-bar" style="--h:58%"><i></i><small>Tasks</small></span>
+            <span class="ag-bar" style="--h:76%"><i></i><small>Budget</small></span>
+            <span class="ag-bar" style="--h:96%"><i></i><small>Freedom</small></span>
+          </span>
+        </div>
+        <span class="flow-num">04</span>
+        <h3>Get approved. Grow.</h3>
+        <p>Approved work counts. Strong work unlocks bigger tasks, larger budgets, and more freedom.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section-tasks" id="tasks" aria-labelledby="tasks-title">
+  <div class="wrap">
+    <header class="section-head split">
+      <div>
+        <p class="eyebrow reveal">STARTING WITH fomo</p>
+        <h2 id="tasks-title" class="reveal" style="--d:.08s">Five ways to move your campus.</h2>
+      </div>
+      <p class="lede reveal" style="--d:.16s">fomo is the first company in the workspace. Every task comes with the budget, the pitch, and the steps. You decide which ones are worth your time.</p>
+    </header>
+
+    <div class="taskx reveal" data-taskx>
+      <div class="taskx-list" role="tablist" aria-label="fomo tasks" aria-orientation="vertical">
+        <button type="button" role="tab" id="tab-dinner" aria-controls="panel-dinner" aria-selected="true" tabindex="0">
+          <span class="tx-num">01</span><span class="tx-text"><b>Host the creator dinner</b><small>A DINNER ON fomo</small></span><span class="tx-timer"><i></i></span>
+        </button>
+        <button type="button" role="tab" id="tab-filmer" aria-controls="panel-filmer" aria-selected="false" tabindex="-1">
+          <span class="tx-num">02</span><span class="tx-text"><b>Find your chapter filmer</b><small>FINAL CUT + PARTY FUNDING</small></span><span class="tx-timer"><i></i></span>
+        </button>
+        <button type="button" role="tab" id="tab-host" aria-controls="panel-host" aria-selected="false" tabindex="-1">
+          <span class="tx-num">03</span><span class="tx-text"><b>Recruit your campus media host</b><small>A PAID ROLE TO OFFER</small></span><span class="tx-timer"><i></i></span>
+        </button>
+        <button type="button" role="tab" id="tab-travel" aria-controls="panel-travel" aria-selected="false" tabindex="-1">
+          <span class="tx-num">04</span><span class="tx-text"><b>Take fomo to another campus</b><small>A FLIGHT ON fomo</small></span><span class="tx-timer"><i></i></span>
+        </button>
+        <button type="button" role="tab" id="tab-calendar" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">
+          <span class="tx-num">05</span><span class="tx-text"><b>Upload your social calendar</b><small>YOUR SOCIAL CALENDAR</small></span><span class="tx-timer"><i></i></span>
+        </button>
+      </div>
+
+      <div class="taskx-panels">
+        <article class="tp is-active" role="tabpanel" id="panel-dinner" aria-labelledby="tab-dinner" tabindex="0">
+          <div class="tp-top a"><span>Host the creator dinner</span><span class="tp-status">Available</span></div>
+          <div class="tp-reward">
+            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-dinner"/></svg></span>
+            <div>
+              <p class="tp-kicker a">A DINNER ON fomo</p>
+              <h3 class="a">You pick the girls. Dinner’s on us.</h3>
+              <p class="tp-desc a">Curate 10 popular sorority creators with real campus reach and content people want to share. You pick the people, plan the night, and invite them to a free dinner. fomo covers the bill. Collect menu Stories or “GRWM for a crypto dinner” TikToks.</p>
+              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Your guest list</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Your restaurant pick</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Dinner paid for</li></ul>
+            </div>
+          </div>
+          <div class="tp-pitch a"><span>WHAT YOU GET TO TELL THEM</span><blockquote>“I’m putting together a dinner for 10 sorority creators who talk to the camera. I’d love to invite you—fomo is paying for dinner. We’re asking creators to post an Instagram Story of the menu or a ‘GRWM for a crypto dinner’ TikTok.”</blockquote></div>
+          <div class="tp-steps">
+            <h4 class="a">What to do</h4>
+            <ol>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Find 10 sorority creators</span><small>STEP 1</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Choose a restaurant</span><small>STEP 2</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Create a fixed custom menu with fomo branding</span><small>STEP 3</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Host the dinner</span><small>STEP 4</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Get Instagram Stories or TikToks</span><small>STEP 5</small></li>
+            </ol>
+          </div>
+        </article>
+
+        <article class="tp" role="tabpanel" id="panel-filmer" aria-labelledby="tab-filmer" tabindex="0" hidden>
+          <div class="tp-top a"><span>Find your chapter filmer</span><span class="tp-status">Available</span></div>
+          <div class="tp-reward">
+            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-video"/></svg></span>
+            <div>
+              <p class="tp-kicker a">FINAL CUT + PARTY FUNDING</p>
+              <h3 class="a">Your parties. Your final cut.</h3>
+              <p class="tp-desc a">Build your camera team. Recruit a paid camera operator from your chapter to film your parties, with a fomo content monitor alongside them. You get final cut and decide how fomo capital is spent on parties. They join your campus team and get internship experience too.</p>
+              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Your camera operator, your team</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>You direct the party funding</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Paid work + internship experience</li></ul>
+            </div>
+          </div>
+          <div class="tp-pitch a"><span>WHAT YOU GET TO TELL THEM</span><blockquote>“Want to get paid to film our chapter’s parties? We’re finding an on-campus filmer from our chapter. You’d work alongside a person fomo sends to monitor the content.”</blockquote></div>
+          <div class="tp-steps">
+            <h4 class="a">What to do</h4>
+            <ol>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Choose an in-chapter filmer</span><small>STEP 1</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Coordinate with the fomo monitor</span><small>STEP 2</small></li>
+            </ol>
+          </div>
+        </article>
+
+        <article class="tp" role="tabpanel" id="panel-host" aria-labelledby="tab-host" tabindex="0" hidden>
+          <div class="tp-top a"><span>Recruit your campus media host</span><span class="tp-status">Available</span></div>
+          <div class="tp-reward">
+            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-mic"/></svg></span>
+            <div>
+              <p class="tp-kicker a">A PAID ROLE TO OFFER</p>
+              <h3 class="a">Put someone on as your campus host.</h3>
+              <p class="tp-desc a">Recruit the content lead for your campus team: a magnetic creator who turns campus moments into content people share. They get a mic, payment for views, and rewards-link earnings. You lead the campus; they get internship experience alongside you.</p>
+              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Build your content team</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Paid for views + internship experience</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>25% of referred fees for life</li></ul>
+            </div>
+          </div>
+          <div class="tp-pitch a"><span>WHAT YOU GET TO TELL THEM</span><blockquote>“Want to be the fomo media host for our campus? fomo sends you a mic and pays you for views. You can also put a fomo rewards link in your bio and keep 25% of the fees it generates, for life.”</blockquote></div>
+          <div class="tp-steps">
+            <h4 class="a">What to do</h4>
+            <ol>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Find your campus host</span><small>STEP 1</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Confirm they’re in</span><small>STEP 2</small></li>
+            </ol>
+          </div>
+        </article>
+
+        <article class="tp" role="tabpanel" id="panel-travel" aria-labelledby="tab-travel" tabindex="0" hidden>
+          <div class="tp-top a"><span>Take fomo to another campus</span><span class="tp-status">Available</span></div>
+          <div class="tp-reward">
+            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-plane"/></svg></span>
+            <div>
+              <p class="tp-kicker a">A FLIGHT ON fomo</p>
+              <h3 class="a">Send a creator to see their friends.</h3>
+              <p class="tp-desc a">Offer a popular talking-to-camera creator a trip to visit friends at another school. Pick someone with on-camera personality, an engaged audience, and strong viral potential—preferably a sorority member. You help plan the content. fomo pays for their flight.</p>
+              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Their friends’ campus</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Content from a new school</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Their flight paid for</li></ul>
+            </div>
+          </div>
+          <div class="tp-pitch a"><span>WHAT YOU GET TO TELL THEM</span><blockquote>“Have friends at another school? We’re looking for a creator to visit them and make talking-to-camera content. fomo will cover your flight.”</blockquote></div>
+          <div class="tp-steps">
+            <h4 class="a">What to do</h4>
+            <ol>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Find a talking-to-camera creator</span><small>STEP 1</small></li>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Plan the campus visit</span><small>STEP 2</small></li>
+            </ol>
+          </div>
+        </article>
+
+        <article class="tp" role="tabpanel" id="panel-calendar" aria-labelledby="tab-calendar" tabindex="0" hidden>
+          <div class="tp-top a"><span>Upload your social calendar</span><span class="tp-status">Available</span></div>
+          <div class="tp-reward">
+            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-calendar"/></svg></span>
+            <div>
+              <p class="tp-kicker a">YOUR SOCIAL CALENDAR</p>
+              <h3 class="a">Put your events on fomo’s radar.</h3>
+              <p class="tp-desc a">Upload your chapter’s social calendar or add event dates manually. Keep your upcoming parties and events together in one place.</p>
+              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Drop a calendar file</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Or enter dates manually</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Saved with your profile</li></ul>
+            </div>
+          </div>
+          <div class="tp-pitch a"><span>WHAT YOU GET TO TELL THEM</span><blockquote>“Here’s our chapter’s upcoming social calendar so fomo can see what we have planned.”</blockquote></div>
+          <div class="tp-steps">
+            <h4 class="a">What to do</h4>
+            <ol>
+              <li class="a"><span class="tp-tick"><svg aria-hidden="true"><use href="#i-check"/></svg></span><span>Add your calendar</span><small>STEP 1</small></li>
+            </ol>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="circle reveal">
+      <div class="circle-active">
+        <img src="/tasks/assets/fomo-wordmark.svg" alt="fomo" width="75" height="24">
+        <span class="circle-text"><b>Build the campus culture. Bring your people in.</b><small>5 opportunities</small></span>
+        <span class="live-chip"><i></i>Active company</span>
+      </div>
+      <div class="circle-future">
+        <span class="slots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="circle-text"><b>More companies, same circle.</b><small>New partners will appear here when they launch.</small></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="rewards" aria-labelledby="rewards-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="eyebrow reveal">WHAT YOU WALK AWAY WITH</p>
+      <h2 id="rewards-title" class="reveal" style="--d:.08s">Experience with your name on it.</h2>
+      <p class="lede reveal" style="--d:.16s">Get five tasks approved and the role is yours to put on LinkedIn. The money is extra.</p>
+    </header>
+
+    <div class="rewards reveal" data-unlock>
+      <div class="rw-experience">
+        <div class="li-card">
+          <div class="li-head"><h3>Experience</h3><span class="li-icons" aria-hidden="true"><svg><use href="#i-plus"/></svg><svg><use href="#i-pencil"/></svg></span></div>
+          <div class="li-role">
+            <img src="/tasks/assets/fomo-linkedin.svg" alt="fomo" width="56" height="56">
+            <div>
+              <h4>Campus Lead Intern</h4>
+              <p class="li-co">fomo · Internship</p>
+              <p class="li-meta">Start date – Present</p>
+              <p class="li-meta" data-school-name>Your campus</p>
+              <ul class="li-bullets">
+                <li>Led fomo’s campus presence and recruited a team of camera operators and content leads.</li>
+                <li>Coordinated company-funded creator dinners, party content, campus media, and creator travel plans.</li>
+                <li>Managed campus relationships, social calendars, and deliverables for review.</li>
+              </ul>
+            </div>
+          </div>
+          <span class="li-lock"><svg aria-hidden="true"><use href="#i-lock"/></svg>Unlocks after 5 approved tasks</span>
+        </div>
+        <div class="unlock">
+          <span class="unlock-bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+          <p class="unlock-text"><span data-unlock-text>Complete 5 approved tasks to add this to LinkedIn.</span></p>
+        </div>
+      </div>
+
+      <div class="rw-list">
+        <div class="rw-item">
+          <span class="rw-icon" aria-hidden="true"><svg><use href="#i-user"/></svg></span>
+          <h3>Build your team.</h3>
+          <p>Hire camera operators and content leads. They get paid work and internship experience alongside you.</p>
+        </div>
+        <div class="rw-item">
+          <span class="rw-amount">$100</span>
+          <h3>Want to do all five?</h3>
+          <p>Get all five tasks approved by fomo to earn an extra $100. Or just choose the tasks you want. The rest are always optional.</p>
+        </div>
+        <div class="rw-item">
+          <span class="rw-amount">$50–$100</span>
+          <h3>Bring another chapter.</h3>
+          <p>Know someone in another chapter? Refer their chapter to fomo. Once they finish onboarding, you earn $50–$100, depending on the chapter’s size.</p>
+          <ol class="relay" aria-label="How the referral bonus works">
+            <li>Refer another chapter</li>
+            <li>They finish onboarding</li>
+            <li>You earn the bonus</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="why" aria-labelledby="why-title">
+  <div class="wrap why-grid">
+    <div>
+      <p class="eyebrow reveal">WHY YOU’RE HERE</p>
+      <h2 id="why-title" class="why-title"><span class="line reveal-line"><span>The title didn’t get you here.</span></span><span class="line reveal-line" style="--d:.12s"><span>The way you move did.</span></span></h2>
+    </div>
+    <p class="why-copy reveal" style="--d:.2s">One point person on each selected campus, with company capital and opportunities to put behind their people. Work with the companies you like. Take the tasks you want. Pass on anything you don’t. We’re starting with fomo; more companies can join this same workspace later.</p>
+  </div>
+</section>
+
+<section class="arrival" aria-labelledby="arrival-title" data-arrival>
+  <div class="arr-grid" aria-hidden="true"></div>
+  <div class="arr-halo" aria-hidden="true"></div>
+  <div class="wrap arr-content">
+    <p class="arr-kicker">WELCOME TO CAMPUS TASKS</p>
+    <h2 id="arrival-title">The access is yours.</h2>
+    <p class="arr-desc">What you do with it is up to you.</p>
+    <p class="arr-campus"><span class="tile"><span data-mono>CT</span></span><span data-school-name>Your campus</span><span class="arr-verified" aria-hidden="true"><svg><use href="#i-check"/></svg></span></p>
+    <a class="btn btn-light" href="https://milomessina.com/tasks" data-workspace>Enter my campus <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+    <p class="arr-note">Selected for your campus? Create your account, or sign in to pick up where you left off.</p>
+  </div>
+  <span class="arr-progress" aria-hidden="true"></span>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-row">
+    <span class="brand brand-light">campus<span>tasks</span><i>.</i></span>
+    <span class="foot-tag">ONE CAMPUS. YOUR LEAD.</span>
+    <a href="https://milomessina.com/tasks" data-workspace>Sign in</a>
+  </div>
+</footer>
+</body>
+</html>
