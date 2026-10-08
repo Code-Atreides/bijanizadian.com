@@ -126,8 +126,9 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .cta-note { font-size: 12px; line-height: 1.6; color: var(--muted); margin-top: 12px; }
 
 .role-finder { background: var(--tint); border: 1px solid #e5e8ff; border-radius: 28px; padding: 28px; min-width: 0; }
-.role-finder-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.role-finder-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 .role-finder-top h2 { font-size: 18px; line-height: 1.3; letter-spacing: -.5px; font-weight: 500; }
+.role-finder-note { padding: 5px 11px; border: 1px solid #dfe3f5; border-radius: 50px; background: #fff; color: var(--muted); font-size: 12px; line-height: 1.5; white-space: nowrap; }
 .role-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; max-width: 440px; }
 .role-option { min-height: 42px; padding: 11px 14px; font-size: 13px; line-height: 1.3; color: #565c77; border: 1px solid #dfe3f5; border-radius: 50px; background: transparent; transition: border-color .15s, background .15s, color .15s; }
 .role-option:hover { background: #e9edff; border-color: #c4cdfc; }
@@ -142,6 +143,37 @@ input:focus-visible, select:focus-visible, textarea:focus-visible {
 .role-apply { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--line); color: var(--purple); font-weight: 500; font-size: 13px; line-height: 1.5; }
 .role-apply span { font-size: 20px; }
 .role-apply:hover { color: var(--purple-dark); }
+.role-path { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; padding-inline: 4px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.role-path > span:first-child { flex: none; color: var(--purple); font-size: 16px; line-height: 1.25; }
+.role-path strong { color: var(--ink); }
+
+.resume-example { margin-top: var(--section-space); border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--column-gap); align-items: start; padding-top: var(--section-inset); }
+.resume-copy p { max-width: 40ch; margin-top: 16px; color: var(--muted); font-size: 18px; line-height: 1.6; }
+.resume-stage { padding: 28px; border: 1px solid #e5e8ff; border-radius: 28px; background: var(--tint); }
+.resume-card { position: relative; margin: 0; padding: 24px; border: 1px solid #e3e5ee; border-radius: 16px; background: #fff; box-shadow: 0 14px 32px #4356a20b; }
+.resume-tag { position: absolute; top: 20px; right: 20px; padding: 4px 10px; border: 1px solid #dfe3f5; border-radius: 50px; background: var(--tint); color: var(--purple-dark); font-size: 11px; font-weight: 500; line-height: 1.5; letter-spacing: .06em; text-transform: uppercase; }
+.resume-profile { display: flex; align-items: center; gap: 14px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.resume-profile strong { margin-right: 84px; }
+.resume-avatar { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 50%; background: #eaedff; color: var(--purple); font-size: 16px; font-weight: 500; }
+.resume-profile strong, .resume-company strong { display: block; font-size: 17px; font-weight: 700; line-height: 1.3; letter-spacing: -.3px; }
+.resume-profile div span, .resume-company div span { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.resume-heading { margin-top: 20px; font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -.3px; }
+.resume-company { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.resume-logo { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border-radius: 8px; background: var(--purple); }
+.resume-logo svg { width: 34px; height: 34px; fill: #fff; }
+/* Two titles under one company, joined by a timeline under the logo: the promotion is the point. */
+.resume-positions { --indent: 60px; --rail: 24px; list-style: none; margin: 18px 0 0; padding: 0 0 0 var(--indent); }
+.resume-positions > li { position: relative; }
+.resume-positions > li + li { margin-top: 20px; }
+.resume-positions > li::before { content: ''; position: absolute; top: 6px; left: calc(var(--rail) - var(--indent) - 4.5px); width: 9px; height: 9px; border-radius: 50%; background: #c9ccd8; }
+.resume-positions > li:first-child::before { background: var(--purple); }
+.resume-positions > li:not(:last-child)::after { content: ''; position: absolute; top: 21px; bottom: -20px; left: calc(var(--rail) - var(--indent) - 1px); width: 2px; border-radius: 2px; background: #e3e5ee; }
+.resume-positions h3 { font-size: 16px; font-weight: 700; line-height: 1.35; letter-spacing: -.3px; }
+.resume-dates { margin-top: 2px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.resume-positions ul { margin: 10px 0 0; padding: 0; list-style: none; }
+.resume-positions ul li { position: relative; padding-left: 14px; color: #3d3d4a; font-size: 14px; line-height: 1.5; }
+.resume-positions ul li + li { margin-top: 6px; }
+.resume-positions ul li::before { content: ''; position: absolute; top: 9px; left: 0; width: 4px; height: 4px; border-radius: 50%; background: #8a8a98; }
 
 h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 500; }
 .text-link { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; color: var(--purple); margin-left: auto; white-space: nowrap; }
@@ -225,6 +257,7 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .role-options { gap: 8px; }
   .role-option { padding-inline: 16px; }
   h2 { font-size: 37px; }
+  .resume-example { grid-template-columns: 1fr; gap: 28px; }
   .faq { grid-template-columns: 1fr; gap: 32px; }
   .faq summary { font-size: 17px; min-height: 72px; }
   .closing { padding-block: var(--section-space); }
@@ -293,6 +326,20 @@ h2 { font-size: 44px; letter-spacing: -.055em; line-height: 1.08; font-weight: 5
   .role-tasks { margin: 12px 0 16px; }
   .role-tasks li + li { margin-top: 6px; }
   .role-apply { min-height: 44px; padding-top: 12px; }
+  .role-path { margin-top: 14px; padding-inline: 2px; }
+  .resume-copy p { margin-top: 12px; font-size: 16px; }
+  .resume-stage { padding: 12px; border-radius: 23px; }
+  .resume-card { padding: 18px 16px; }
+  .resume-tag { top: 16px; right: 16px; }
+  .resume-profile { gap: 12px; padding-bottom: 16px; }
+  .resume-profile strong { margin-right: 76px; }
+  .resume-avatar { width: 44px; height: 44px; font-size: 14px; }
+  .resume-profile strong, .resume-company strong { font-size: 16px; }
+  .resume-heading { margin-top: 16px; font-size: 17px; }
+  .resume-logo { width: 40px; height: 40px; }
+  .resume-logo svg { width: 28px; height: 28px; }
+  .resume-positions { --indent: 52px; --rail: 20px; margin-top: 16px; }
+  .resume-positions ul li { font-size: 13px; }
   .faq { gap: 20px; }
   .faq summary { min-height: 52px; padding-block: 12px; }
   .faq details:first-child summary { min-height: 44px; }

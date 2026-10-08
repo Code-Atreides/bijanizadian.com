@@ -13,7 +13,7 @@
   var complete = false;
   var connectionTimer = null;
   var database = null;
-  var roles = ['president', 'growth', 'partnerships', 'content', 'culture', 'any'];
+  var roles = ['growth', 'content', 'culture', 'partnerships', 'any'];
   var emailPattern = /^[a-z0-9_%+-]+(\.[a-z0-9_%+-]+)*@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,24}$/i;
   var emailTypos = {
     'gmail.con': 'gmail.com', 'gmail.co': 'gmail.com', 'gmai.com': 'gmail.com',
@@ -49,7 +49,7 @@
   function validationMessage(field) {
     var value = field.value.trim();
     if (!value && !field.required) return '';
-    if (!value) return field.tagName === 'SELECT' ? 'Choose a role, or select “Wherever I’m needed”.' : 'Please fill in this field.';
+    if (!value) return field.tagName === 'SELECT' ? 'Choose a role, or select “Not sure yet”.' : 'Please fill in this field.';
     if (field.name === 'tiktok' && value.length > 200) return 'Keep your TikTok handle or profile link to 200 characters or fewer.';
     if (field.name === 'email') {
       if (value.length >= 200 || !emailPattern.test(value)) return 'Enter a complete email address, like you@school.edu (under 200 characters).';

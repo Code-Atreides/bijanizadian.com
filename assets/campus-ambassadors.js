@@ -1,11 +1,12 @@
 (() => {
   'use strict';
+  // Roles an ambassador unlocks after the three starter steps. Campus President
+  // is reached by building a team, so it is not a tab.
   const roles = {
-    president: { title: 'campus president.', name: 'Campus President', description: 'Lead fomo at your school. Bring the team together, set priorities, and turn campus ideas into finished work.', tasks: ['Coordinate the campus team', 'Keep tasks and deadlines on track', 'Share progress with the fomo team'] },
-    partnerships: { title: 'partnerships.', name: 'Partnerships', description: 'Build relationships with campus clubs and creators. Turn those connections into shared events, content, or campaigns with fomo.', tasks: ['Find the right campus partners', 'Plan a shared event or campaign', 'Coordinate details and follow through'] },
-    culture: { title: 'culture.', name: 'Culture', description: 'Plan gatherings that fit your campus. Bring people together around fomo and handle the details that make an event work.', tasks: ['Plan a campus gathering', 'Coordinate invitations and RSVPs', 'Host and share an event recap'] },
-    content: { title: 'content.', name: 'Content', description: 'Get paid to create original videos and posts about fomo in your own voice. Bring campus life into the content you make.', tasks: ['Film and edit original content', 'Clearly label paid posts', 'Submit the post link for review'] },
-    growth: { title: 'growth.', name: 'Growth', description: 'Help interested students get started on fomo. Explain the app, walk them through sign-up, and follow up with people who want to join.', tasks: ['Reach students through your network', 'Help interested students get started', 'Track verified signups'] }
+    growth: { title: 'growth.', description: 'Get students at your school signed up and using fomo.', tasks: ['Refer friends and classmates', 'Table and do outreach on campus', 'Help new students get started'] },
+    content: { title: 'content.', description: 'Tell fomo’s story at your school, in your own voice.', tasks: ['Film campus videos and posts', 'Cover fomo events', 'Clearly label paid posts'] },
+    culture: { title: 'culture & events.', description: 'Plan and run fomo events at your school.', tasks: ['Plan trading nights and sponsored dinners', 'Help run larger campus events', 'Handle invites, RSVPs, and recaps'] },
+    partnerships: { title: 'partnerships.', description: 'Bring clubs, Greek chapters, and student groups on board with fomo.', tasks: ['Reach out to org leaders and exec boards', 'Set up joint events or campaigns', 'Handle the details and follow through'] }
   };
   const buttons = Array.from(document.querySelectorAll('[data-role]'));
   const preview = document.getElementById('role-preview');
@@ -32,13 +33,6 @@
       item.textContent = task;
       return item;
     }));
-    const link = target.querySelector('.role-apply');
-    link.href = '/campus/ambassadors/apply?role=' + key;
-    link.textContent = 'Apply for ' + role.name + ' ';
-    const arrow = document.createElement('span');
-    arrow.setAttribute('aria-hidden', 'true');
-    arrow.textContent = '↗';
-    link.append(arrow);
   }
 
   // Reserve the tallest role at this exact width so changing roles never moves

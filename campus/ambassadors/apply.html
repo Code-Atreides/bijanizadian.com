@@ -15,10 +15,10 @@
   <link rel="icon" type="image/svg+xml" href="/assets/campus-favicon.svg">
   <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
   <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=11">
+  <link rel="stylesheet" href="/assets/campus-ambassadors.css?v=12">
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
-  <script defer src="/assets/campus-ambassador-apply.js?v=3"></script>
+  <script defer src="/assets/campus-ambassador-apply.js?v=4"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to application</a>
@@ -36,8 +36,8 @@
     <div class="application-copy">
       <p class="eyebrow"><span class="brand-dot" aria-hidden="true"></span> CAMPUS AMBASSADORS</p>
       <h1>let’s get<br>to work.</h1>
-      <p>Apply to be a paid campus ambassador with fomo. Payment details are specific to your role and will be discussed separately with the team.</p>
-      <p>Tell us what you’re good at, which communities you know, and one idea you’d like to bring to your school. We’re looking for people who take initiative and follow through.</p>
+      <p>Apply to be a paid fomo campus ambassador. Pay is based on results, and the team walks you through how it works.</p>
+      <p>Tell us what you’re good at and which communities you know. We want people who take initiative and follow through.</p>
       <p>For currently enrolled students, 18 or older.</p>
       <p class="application-note">Your application is reviewed by the fomo campus team. We’ll use these details to consider your application and contact you about the program. <a href="https://fomo.family/privacy-policy" target="_blank" rel="noopener">Privacy policy <span aria-hidden="true">↗</span></a></p>
     </div>
@@ -89,16 +89,16 @@
           <p id="school-error" class="field-error" hidden></p>
         </div>
         <div class="field field-wide">
-          <label for="role">Where do you see yourself?</label>
-          <select id="role" name="role" aria-describedby="role-error" required>
-            <option value="" disabled selected>Choose a role</option>
-            <option value="president">Campus President — coordinate the campus team</option>
-            <option value="partnerships">Partnerships — collaborate with campus organizations</option>
-            <option value="culture">Culture — help plan and run events</option>
-            <option value="content">Content — create campus videos and posts</option>
-            <option value="growth">Growth — recruit and onboard students</option>
-            <option value="any">Wherever I’m needed</option>
+          <label for="role">Which role interests you most?</label>
+          <select id="role" name="role" aria-describedby="role-help role-error" required>
+            <option value="" disabled selected>Choose one</option>
+            <option value="growth">Growth — bring in students</option>
+            <option value="content">Content — tell the story</option>
+            <option value="culture">Culture &amp; Events — plan and run events</option>
+            <option value="partnerships">Partnerships — bring in campus groups</option>
+            <option value="any">Not sure yet</option>
           </select>
+          <p id="role-help" class="help">Everyone starts as an ambassador. You unlock a role after your first three steps.</p>
           <p id="role-error" class="field-error" hidden></p>
         </div>
         <div class="field field-wide">
@@ -116,16 +116,15 @@
       <div id="application-success" class="form-success" role="status" aria-labelledby="success-title" tabindex="-1" hidden>
         <p class="eyebrow">APPLICATION RECEIVED</p>
         <h2 id="success-title">thanks for applying.</h2>
-        <p>The fomo campus team has received your application and will review what you’ve shared.</p>
-        <p>The team can contact you by email or phone about next steps.</p>
-        <a class="button" href="/campus/ambassadors">Back to the program <span aria-hidden="true">↗</span></a>
+        <p>We’ve got your application. The fomo campus team will review it and may reach out by email or phone.</p>
+        <a class="button" href="/campus/ambassadors">Back to ambassadors <span aria-hidden="true">↗</span></a>
       </div>
     </section>
   </main>
 
   <footer class="footer wrap">
     <p>© 2026 fomo · campus ambassadors</p>
-    <a href="/campus/ambassadors">Back to the program <span aria-hidden="true">↗</span></a>
+    <a href="/campus/ambassadors">Back to ambassadors <span aria-hidden="true">↗</span></a>
   </footer>
 </body>
 </html>
