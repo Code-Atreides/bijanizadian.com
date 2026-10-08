@@ -368,8 +368,27 @@
         if (step[3]) showToast(step[3]);
       }, step[0]));
     });
-    timers.push(setTimeout(function () { runCycle(true); }, CYCLE));
+    // The company slot moves through the circle three times a cycle.
+    [3400, 6800].forEach(function (t) { timers.push(setTimeout(nextHeroCompany, t)); });
+    timers.push(setTimeout(function () { nextHeroCompany(); runCycle(true); }, CYCLE));
   }
+
+  // Shows the next logo in a stack of images marked .is-on / .is-out.
+  function rotator(stack) {
+    var items = $$('img', stack);
+    var index = 0;
+    return function () {
+      var out = items[index];
+      index = (index + 1) % items.length;
+      out.classList.remove('is-on');
+      out.classList.add('is-out');
+      items[index].classList.remove('is-out');
+      items[index].classList.add('is-on');
+      setTimeout(function () { out.classList.remove('is-out'); }, 800);
+      return index;
+    };
+  }
+  var nextHeroCompany = rotator($('[data-co-cycle]'));
 
   function syncCycle() {
     var shouldRun = heroVisible && !document.hidden && !reduced;
@@ -524,7 +543,7 @@
   var taskx = $('[data-taskx]');
   var tabs = $$('[role=tab]', taskx);
   var panels = tabs.map(function (t) { return document.getElementById(t.getAttribute('aria-controls')); });
-  var panelWrap = $('.taskx-panels', taskx);
+  var tabList = $('.taskx-list', taskx);
   var selected = 0;
   var taskxSeen = false;
   var taskxVisible = false;
@@ -542,10 +561,34 @@
     panel.classList.add('is-entering');
   }
 
+  // Each company has its own five tabs; the switcher shows one company's at a time.
+  var coButtons = $$('.co-switch [data-co]', taskx);
+  var activeCo = 'fomo';
+  function showCompany(co) {
+    if (co === activeCo) return;
+    activeCo = co;
+    coButtons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-co') === co)); });
+    tabs.forEach(function (t) { t.hidden = t.getAttribute('data-co') !== co; });
+    if (reduced || !Element.prototype.animate) return;
+    visibleTabs().forEach(function (t, k) {
+      t.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: k * 55, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
+    });
+  }
+  function visibleTabs() { return tabs.filter(function (t) { return !t.hidden; }); }
+  coButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var co = b.getAttribute('data-co');
+      stopAuto();
+      if (co === activeCo) return;
+      selectTab(tabs.findIndex(function (t) { return t.getAttribute('data-co') === co; }));
+    });
+  });
+
   function selectTab(i, opts) {
     opts = opts || {};
     if (i === selected && !opts.force) return;
-    var from = panelWrap.offsetHeight;
+    showCompany(tabs[i].getAttribute('data-co'));
+    // Panels share one grid cell, so the section keeps its height as tasks change.
     tabs.forEach(function (t, idx) {
       var on = idx === i;
       t.setAttribute('aria-selected', String(on));
@@ -555,14 +598,11 @@
     });
     selected = i;
     enter(panels[i]);
-    var to = panelWrap.offsetHeight;
-    if (!reduced && panelWrap.animate && from && from !== to) {
-      panelWrap.style.overflow = 'clip';
-      panelWrap.animate([{ height: from + 'px' }, { height: to + 'px' }], { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' })
-        .onfinish = function () { panelWrap.style.overflow = ''; };
-    }
     if (opts.focus) tabs[i].focus();
-    if (opts.scroll) tabs[i].scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+    // On phones the tabs are a sideways strip: scroll the strip itself, never the page.
+    if (tabList.scrollWidth > tabList.clientWidth) {
+      tabList.scrollTo({ left: Math.max(0, tabs[i].offsetLeft - tabList.offsetLeft - 16), behavior: reduced ? 'auto' : 'smooth' });
+    }
   }
 
   function stopAuto() { taskx.classList.remove('is-auto'); }
@@ -570,22 +610,23 @@
   tabs.forEach(function (tab, i) {
     tab.addEventListener('click', function () { stopAuto(); selectTab(i); });
     tab.addEventListener('keydown', function (e) {
+      var shown = visibleTabs();
+      var pos = shown.indexOf(tab);
       var next = null;
-      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = (i + 1) % tabs.length;
-      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
-      else if (e.key === 'Home') next = 0;
-      else if (e.key === 'End') next = tabs.length - 1;
-      if (next === null) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') next = shown[(pos + 1) % shown.length];
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') next = shown[(pos - 1 + shown.length) % shown.length];
+      else if (e.key === 'Home') next = shown[0];
+      else if (e.key === 'End') next = shown[shown.length - 1];
+      if (!next) return;
       e.preventDefault();
       stopAuto();
-      selectTab(next, { focus: true });
+      selectTab(tabs.indexOf(next), { focus: true });
     });
   });
 
   taskx.addEventListener('animationend', function (e) {
     if (e.animationName !== 'timer' || !taskx.classList.contains('is-auto')) return;
-    var listIsScroller = taskx.querySelector('.taskx-list').scrollWidth > taskx.querySelector('.taskx-list').clientWidth;
-    selectTab((selected + 1) % tabs.length, { scroll: listIsScroller });
+    selectTab((selected + 1) % tabs.length);
   });
 
   function syncPause() { taskx.classList.toggle('is-paused', hovering || !taskxVisible || document.hidden); }
@@ -612,10 +653,19 @@
   var rewards = $('[data-unlock]');
   var unlockText = $('[data-unlock-text]');
   var segments = $$('.unlock-bar i', rewards);
+  // Once unlocked, the experience rotates through every company in the circle.
+  var EXPERIENCE_COMPANIES = ['fomo', 'IcyBox', 'Rho'];
+  var nextExperienceLogo = rotator($('[data-li-logo]', rewards));
+  function nextExperience() {
+    if (document.hidden || !isOnScreen(rewards)) return;
+    var name = EXPERIENCE_COMPANIES[nextExperienceLogo()];
+    $$('[data-li-co]', rewards).forEach(function (el) { swapText(el, name); });
+  }
   function unlock(instant) {
     function done() {
       rewards.classList.add('is-unlocked');
       unlockText.textContent = 'All five approved. Add it to LinkedIn with your actual dates.';
+      if (!reduced) setInterval(nextExperience, 3400);
     }
     if (instant) { segments.forEach(function (s) { s.classList.add('on'); }); done(); return; }
     segments.forEach(function (s, i) {
