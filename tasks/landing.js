@@ -352,33 +352,11 @@
     panel.classList.add('is-entering');
   }
 
-  // Each company has its own five tabs; the switcher shows one company's at a time.
-  var coButtons = $$('.co-switch [data-co]', taskx);
-  var activeCo = 'fomo';
-  function showCompany(co) {
-    if (co === activeCo) return;
-    activeCo = co;
-    coButtons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-co') === co)); });
-    tabs.forEach(function (t) { t.hidden = t.getAttribute('data-co') !== co; });
-    if (reduced || !Element.prototype.animate) return;
-    visibleTabs().forEach(function (t, k) {
-      t.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 500, delay: k * 55, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'backwards' });
-    });
-  }
   function visibleTabs() { return tabs.filter(function (t) { return !t.hidden; }); }
-  coButtons.forEach(function (b) {
-    b.addEventListener('click', function () {
-      var co = b.getAttribute('data-co');
-      stopAuto();
-      if (co === activeCo) return;
-      selectTab(tabs.findIndex(function (t) { return t.getAttribute('data-co') === co; }));
-    });
-  });
 
   function selectTab(i, opts) {
     opts = opts || {};
     if (i === selected && !opts.force) return;
-    showCompany(tabs[i].getAttribute('data-co'));
     // Panels share one grid cell, so the section keeps its height as tasks change.
     tabs.forEach(function (t, idx) {
       var on = idx === i;
