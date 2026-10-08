@@ -120,7 +120,7 @@
   $$('[data-mtask]').forEach(function (li) { tasks[li.getAttribute('data-mtask')] = li; });
   var LABELS = { available: 'Available', active: 'In progress', review: 'In review', approved: 'Approved' };
   // Each cycle features one client's real tasks; the brand flips in with the school.
-  // Rho has no tasks yet, so it appears where only a logo applies.
+  // Rho's rows are placeholders until Rho's real tasks are in; they promise nothing on Rho's behalf.
   var BRANDS = [
     { logo: '/tasks/assets/fomo-wordmark.svg', wide: false, tagline: 'Build the campus culture.',
       rows: { a: ['dinner', 'Host the creator dinner', 'A DINNER ON fomo'], b: ['video', 'Find your chapter filmer', 'FINAL CUT + PARTY FUNDING'], c: ['mic', 'Recruit your campus media host', 'A PAID ROLE TO OFFER'] },
@@ -129,7 +129,11 @@
     { logo: '/tasks/assets/icybox-wordmark.svg', wide: true, tagline: 'Get your house spinning together.',
       rows: { a: ['users', 'Host a chapter spin night', 'SPINS ON ICYBOX'], b: ['video', 'Hire your chapter filmer', 'A PAID CAMERA ROLE'], c: ['trophy', 'Call out another house', 'HOUSE VS HOUSE'] },
       joins: { b: 'filmer' },
-      toasts: { a: 'Approved by IcyBox', b: 'Your filmer joined the team' } }
+      toasts: { a: 'Approved by IcyBox', b: 'Your filmer joined the team' } },
+    { logo: '/tasks/assets/rho-wordmark.svg', wide: false, tagline: 'Back the builders on your campus.',
+      rows: { a: ['dinner', 'Host a founder night', 'A NIGHT FOR BUILDERS'], b: ['video', 'Find your chapter filmer', 'A CAMERA ROLE'], c: ['users', 'Find your campus founders', 'STUDENT STARTUPS'] },
+      joins: { b: 'filmer' },
+      toasts: { a: 'Approved by Rho', b: 'Your filmer joined the team' } }
   ];
   var brandIndex = 0;
   var brand = BRANDS[0];
@@ -280,7 +284,7 @@
   }
 
   // Warm the cache so a flipped logo never shows up blank.
-  ['/tasks/assets/icybox-wordmark.svg', '/tasks/assets/icybox-app-icon.svg', '/tasks/assets/rho-icon.svg'].forEach(function (src) { new Image().src = src; });
+  ['/tasks/assets/icybox-wordmark.svg', '/tasks/assets/icybox-app-icon.svg', '/tasks/assets/rho-wordmark.svg', '/tasks/assets/rho-icon.svg'].forEach(function (src) { new Image().src = src; });
 
   function syncCycle() {
     var shouldRun = heroVisible && !document.hidden && !reduced;
