@@ -148,13 +148,11 @@ p{margin:0}
 .win-tag{margin-left:auto;font-size:.66em;color:var(--accent);background:var(--soft);border-radius:999px;padding:.35em .8em}
 .win-h{font-size:1.75em;line-height:1.1;letter-spacing:-.045em;font-weight:500;margin:.6em 0 .65em}
 .win-company{display:flex;align-items:center;gap:1em;background:var(--paper);border:1px solid var(--line);border-radius:.85em;padding:.7em 1em}
-/* The company slot rotates through every company in the circle. */
-.co-cycle{position:relative;display:block;width:4.4em;height:1.6em;flex-shrink:0;overflow:hidden}
-.co-cycle img{position:absolute;left:0;top:50%;width:auto;max-width:100%;height:1.15em;opacity:0;transform:translateY(-50%) translateY(110%);transition:transform .7s var(--ease),opacity .45s}
-.co-cycle img.is-on{opacity:1;transform:translateY(-50%)}
-.co-cycle img.is-out{opacity:0;transform:translateY(-50%) translateY(-110%)}
-.co-cycle .co-icy{height:.66em}
-.co-cycle .co-rho{height:1.3em}
+/* One logo per slot; a new brand flips in the same way the school tile does. */
+.co-logo{display:flex;align-items:center;width:4.6em;height:1.6em;flex-shrink:0}
+.co-logo img{display:block;width:auto;max-width:100%;height:1.15em}
+.co-logo img.is-wide{height:.68em}
+.co-logo.is-flipping,.li-logo.is-flipping{animation:tile-flip .7s var(--ease-io)}
 .win-co-text{display:flex;flex-direction:column;min-width:0}
 .win-co-text b{font-weight:500;font-size:.78em}
 .win-co-text small{font-size:.68em;color:var(--muted)}
@@ -173,9 +171,7 @@ p{margin:0}
 .mt-icon svg{width:1em;height:1em}
 .mt-text{display:flex;flex-direction:column;min-width:0}
 .mt-text b{font-size:.82em;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mt-text small{display:block;font-size:.62em;margin-top:.3em}
-.mt-text small img{width:auto;height:1.15em}
-.mt-text small .mt-icy{height:.72em;margin:.2em 0}
+.mt-text small{font-size:.62em;letter-spacing:.06em;color:var(--accent);margin-top:.15em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .status{margin-left:auto;display:inline-flex;align-items:center;gap:.45em;font-size:.68em;padding:.42em .85em;border-radius:999px;background:#f1f1f4;color:var(--muted);white-space:nowrap;transition:background .4s,color .4s}
 .status::before{content:'';display:none;flex-shrink:0}
 [data-state=active] .status,[data-state=review] .status{background:var(--soft);color:var(--accent)}
@@ -350,9 +346,8 @@ p{margin:0}
 .li-icons{display:flex;gap:20px;color:#404040}
 .li-icons svg{width:20px;height:20px}
 .li-role{display:flex;gap:14px;align-items:flex-start}
-.li-logo{position:relative;width:48px;height:48px;flex-shrink:0}
-.li-logo img{position:absolute;inset:0;width:100%;height:100%;border-radius:8px;opacity:0;transform:scale(.88);transition:opacity .5s var(--ease),transform .6s var(--ease)}
-.li-logo img.is-on{opacity:1;transform:none}
+.li-logo{display:block;width:48px;height:48px;flex-shrink:0}
+.li-logo img{width:100%;height:100%;border-radius:8px}
 [data-li-co]{display:inline-block}
 .li-role h4{font-family:inherit;font-size:16px;font-weight:600;color:#191919;line-height:1.3}
 .li-co{font-size:14.5px;color:#191919;margin-top:1px}

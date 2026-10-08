@@ -269,16 +269,30 @@
   var tasks = {};
   $$('[data-mtask]').forEach(function (li) { tasks[li.getAttribute('data-mtask')] = li; });
   var LABELS = { available: 'Available', active: 'In progress', review: 'In review', approved: 'Approved' };
+  // Each cycle features one client's real tasks; the brand flips in with the school.
+  // Rho has no tasks yet, so it appears where only a logo applies.
+  var BRANDS = [
+    { logo: '/tasks/assets/fomo-wordmark.svg', wide: false, tagline: 'Build the campus culture.',
+      rows: { a: ['dinner', 'Host the creator dinner', 'A DINNER ON fomo'], b: ['video', 'Find your chapter filmer', 'FINAL CUT + PARTY FUNDING'], c: ['mic', 'Recruit your campus media host', 'A PAID ROLE TO OFFER'] },
+      joins: { b: 'filmer', c: 'host' },
+      toasts: { a: 'Approved by fomo', c: 'Your media host joined the team' } },
+    { logo: '/tasks/assets/icybox-wordmark.svg', wide: true, tagline: 'Get your house spinning together.',
+      rows: { a: ['users', 'Host a chapter spin night', 'SPINS ON ICYBOX'], b: ['video', 'Hire your chapter filmer', 'A PAID CAMERA ROLE'], c: ['trophy', 'Call out another house', 'HOUSE VS HOUSE'] },
+      joins: { b: 'filmer' },
+      toasts: { a: 'Approved by IcyBox', b: 'Your filmer joined the team' } }
+  ];
+  var brandIndex = 0;
+  var brand = BRANDS[0];
   var TIMELINE = [
-    [700, 'dinner', 'active'],
-    [1600, 'dinner', 'review', 'Step 1 sent for review'],
-    [2500, 'filmer', 'active'],
-    [3400, 'dinner', 'approved', 'Approved by fomo'],
-    [4200, 'host', 'active'],
-    [5000, 'filmer', 'review'],
-    [5900, 'filmer', 'approved'],
-    [6800, 'host', 'review'],
-    [7800, 'host', 'approved', 'Your media host joined the team']
+    [700, 'a', 'active'],
+    [1600, 'a', 'review', 'Step 1 sent for review'],
+    [2500, 'b', 'active'],
+    [3400, 'a', 'approved'],
+    [4200, 'c', 'active'],
+    [5000, 'b', 'review'],
+    [5900, 'b', 'approved'],
+    [6800, 'c', 'review'],
+    [7800, 'c', 'approved']
   ];
   var CYCLE = 10200;
   var toast = $('[data-toast]');
@@ -319,11 +333,12 @@
     bump(pill);
     paintCounts();
     if (state === 'approved') {
-      var member = $('[data-member="' + id + '"]');
+      var member = brand.joins[id] ? $('[data-member="' + brand.joins[id] + '"]') : null;
       if (member) {
         member.classList.add('is-in', 'is-joining');
         setTimeout(function () { member.classList.remove('is-joining'); }, 800);
       }
+      if (brand.toasts[id] && !reduced) showToast(brand.toasts[id]);
     }
   }
 
@@ -361,6 +376,10 @@
     clearCycle();
     running = true;
     applySchool(nextSchool(advance), true);
+    if (advance) {
+      brandIndex = (brandIndex + 1) % BRANDS.length;
+      applyBrand(BRANDS[brandIndex]);
+    }
     resetMock();
     TIMELINE.forEach(function (step) {
       timers.push(setTimeout(function () {
@@ -368,27 +387,37 @@
         if (step[3]) showToast(step[3]);
       }, step[0]));
     });
-    // The company slot moves through the circle three times a cycle.
-    [3400, 6800].forEach(function (t) { timers.push(setTimeout(nextHeroCompany, t)); });
-    timers.push(setTimeout(function () { nextHeroCompany(); runCycle(true); }, CYCLE));
+    timers.push(setTimeout(function () { runCycle(true); }, CYCLE));
   }
 
-  // Shows the next logo in a stack of images marked .is-on / .is-out.
-  function rotator(stack) {
-    var items = $$('img', stack);
-    var index = 0;
-    return function () {
-      var out = items[index];
-      index = (index + 1) % items.length;
-      out.classList.remove('is-on');
-      out.classList.add('is-out');
-      items[index].classList.remove('is-out');
-      items[index].classList.add('is-on');
-      setTimeout(function () { out.classList.remove('is-out'); }, 800);
-      return index;
-    };
+  // Flip a logo slot like the school tile, swapping its content at the halfway point.
+  function flip(el, swap) {
+    if (reduced || !isOnScreen(el)) { swap(); return; }
+    el.classList.remove('is-flipping');
+    void el.offsetWidth;
+    el.classList.add('is-flipping');
+    setTimeout(swap, 340);
   }
-  var nextHeroCompany = rotator($('[data-co-cycle]'));
+
+  function applyBrand(next) {
+    brand = next;
+    var slot = $('[data-co-logo]');
+    flip(slot, function () {
+      var img = slot.querySelector('img');
+      img.src = next.logo;
+      img.classList.toggle('is-wide', next.wide);
+    });
+    swapText($('[data-co-tagline]'), next.tagline);
+    Object.keys(next.rows).forEach(function (id) {
+      var row = next.rows[id];
+      tasks[id].querySelector('.mt-icon use').setAttribute('href', '#i-' + row[0]);
+      swapText(tasks[id].querySelector('.mt-text b'), row[1]);
+      swapText(tasks[id].querySelector('.mt-text small'), row[2]);
+    });
+  }
+
+  // Warm the cache so a flipped logo never shows up blank.
+  ['/tasks/assets/icybox-wordmark.svg', '/tasks/assets/icybox-app-icon.svg', '/tasks/assets/rho-icon.svg'].forEach(function (src) { new Image().src = src; });
 
   function syncCycle() {
     var shouldRun = heroVisible && !document.hidden && !reduced;
@@ -399,9 +428,9 @@
   // A calm, finished frame for reduced motion.
   function staticMock() {
     applySchool(pinned || featured[0] || null, false);
-    setState('dinner', 'approved');
-    setState('filmer', 'review');
-    setState('host', 'active');
+    setState('a', 'approved');
+    setState('b', 'review');
+    setState('c', 'active');
   }
 
   if ('IntersectionObserver' in window) {
@@ -653,13 +682,16 @@
   var rewards = $('[data-unlock]');
   var unlockText = $('[data-unlock-text]');
   var segments = $$('.unlock-bar i', rewards);
-  // Once unlocked, the experience rotates through every company in the circle.
-  var EXPERIENCE_COMPANIES = ['fomo', 'IcyBox', 'Rho'];
-  var nextExperienceLogo = rotator($('[data-li-logo]', rewards));
+  // Once unlocked, the experience flips through every company in the circle.
+  var EXPERIENCES = [['fomo', '/tasks/assets/fomo-linkedin.svg'], ['IcyBox', '/tasks/assets/icybox-app-icon.svg'], ['Rho', '/tasks/assets/rho-icon.svg']];
+  var experienceIndex = 0;
   function nextExperience() {
     if (document.hidden || !isOnScreen(rewards)) return;
-    var name = EXPERIENCE_COMPANIES[nextExperienceLogo()];
-    $$('[data-li-co]', rewards).forEach(function (el) { swapText(el, name); });
+    experienceIndex = (experienceIndex + 1) % EXPERIENCES.length;
+    var next = EXPERIENCES[experienceIndex];
+    var logo = $('[data-li-logo]', rewards);
+    flip(logo, function () { logo.querySelector('img').src = next[1]; });
+    $$('[data-li-co]', rewards).forEach(function (el) { swapText(el, next[0]); });
   }
   function unlock(instant) {
     function done() {
