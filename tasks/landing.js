@@ -372,10 +372,12 @@
     return featured[cycleIndex];
   }
 
+  // The brand drives the task loop; the school re-themes half a cycle later, so the
+  // two flip at different moments and every brand gets seen in more than one school.
   function runCycle(advance) {
     clearCycle();
     running = true;
-    applySchool(nextSchool(advance), true);
+    applySchool(nextSchool(false), true);
     if (advance) {
       brandIndex = (brandIndex + 1) % BRANDS.length;
       applyBrand(BRANDS[brandIndex]);
@@ -387,6 +389,7 @@
         if (step[3]) showToast(step[3]);
       }, step[0]));
     });
+    timers.push(setTimeout(function () { applySchool(nextSchool(true), true); }, CYCLE / 2));
     timers.push(setTimeout(function () { runCycle(true); }, CYCLE));
   }
 
