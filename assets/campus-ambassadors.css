@@ -53,7 +53,7 @@ h1, h2, h3, p { margin: 0; }
 strong { font-weight: 500; }
 svg, img { max-width: 100%; }
 [hidden] { display: none !important; }
-p, li { text-wrap: pretty; }
+p, li, dd { text-wrap: pretty; }
 .nowrap { white-space: nowrap; }
 ::selection { background: #dfe4ff; color: var(--ink); }
 a:focus-visible, button:focus-visible, summary:focus-visible,

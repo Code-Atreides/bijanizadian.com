@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  // Roles an ambassador unlocks after the three starter steps. Campus President
+  // Roles an ambassador unlocks after the five starter tasks. Campus President
   // is reached by building a team, so it is not a tab.
   const roles = {
     growth: { title: 'growth.', description: 'Get students at your school signed up and using fomo.', tasks: ['Refer friends and classmates', 'Table and do outreach on campus', 'Help new students get started'] },
