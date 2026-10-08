@@ -180,10 +180,6 @@ p{margin:0}
 .tc-member.is-in .tc-icon{opacity:1;transform:none}
 .tc-member.is-joining .tc-avatar{animation:join .7s var(--ease)}
 
-.toast{position:absolute;right:0;top:0;display:flex;align-items:center;gap:.6em;padding:.5em 1.1em .5em .5em;background:var(--paper);border:1px solid var(--line);border-radius:999px;font-size:.78em;box-shadow:0 20px 40px -20px #00000040;opacity:0;transform:translateY(-.6em) scale(.95);transition:opacity .45s var(--ease),transform .6s var(--ease)}
-.toast.show{opacity:1;transform:translate(var(--px,0),var(--py,0))}
-.toast-icon{display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--accent);color:#fff}
-.toast-icon svg{width:1em;height:1em}
 
 @container (max-width:470px){
   .mt-text small,.win-co-text small,.hide-sm{display:none}

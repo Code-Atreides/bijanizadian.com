@@ -124,22 +124,19 @@
   var BRANDS = [
     { logo: '/tasks/assets/fomo-wordmark.svg', wide: false, tagline: 'Build the campus culture.',
       rows: { a: ['dinner', 'Host the creator dinner', 'A DINNER ON fomo'], b: ['video', 'Find your chapter filmer', 'FINAL CUT + PARTY FUNDING'], c: ['mic', 'Recruit your campus media host', 'A PAID ROLE TO OFFER'] },
-      joins: { b: 'filmer', c: 'host' },
-      toasts: { a: 'Approved by fomo', c: 'Your media host joined the team' } },
+      joins: { b: 'filmer', c: 'host' } },
     { logo: '/tasks/assets/icybox-wordmark.svg', wide: true, tagline: 'Get your house spinning together.',
       rows: { a: ['users', 'Host a chapter spin night', 'SPINS ON ICYBOX'], b: ['video', 'Hire your chapter filmer', 'A PAID CAMERA ROLE'], c: ['trophy', 'Call out another house', 'HOUSE VS HOUSE'] },
-      joins: { b: 'filmer' },
-      toasts: { a: 'Approved by IcyBox', b: 'Your filmer joined the team' } },
+      joins: { b: 'filmer' } },
     { logo: '/tasks/assets/rho-wordmark.svg', wide: false, tagline: 'Back the builders on your campus.',
       rows: { a: ['dinner', 'Host a founder night', 'A NIGHT FOR BUILDERS'], b: ['video', 'Find your chapter filmer', 'A CAMERA ROLE'], c: ['users', 'Find your campus founders', 'STUDENT STARTUPS'] },
-      joins: { b: 'filmer' },
-      toasts: { a: 'Approved by Rho', b: 'Your filmer joined the team' } }
+      joins: { b: 'filmer' } }
   ];
   var brandIndex = 0;
   var brand = BRANDS[0];
   var TIMELINE = [
     [700, 'a', 'active'],
-    [1600, 'a', 'review', 'Step 1 sent for review'],
+    [1600, 'a', 'review'],
     [2500, 'b', 'active'],
     [3400, 'a', 'approved'],
     [4200, 'c', 'active'],
@@ -149,9 +146,6 @@
     [7800, 'c', 'approved']
   ];
   var CYCLE = 10200;
-  var toast = $('[data-toast]');
-  var toastText = $('[data-toast-text]');
-  var toastTimer = null;
   var timers = [];
   var cycleIndex = -1;
   var heroVisible = true;
@@ -192,15 +186,7 @@
         member.classList.add('is-in', 'is-joining');
         setTimeout(function () { member.classList.remove('is-joining'); }, 800);
       }
-      if (brand.toasts[id] && !reduced) showToast(brand.toasts[id]);
     }
-  }
-
-  function showToast(text) {
-    toastText.textContent = text;
-    toast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2300);
   }
 
   function resetMock() {
@@ -209,7 +195,6 @@
       tasks[k].querySelector('.status').textContent = LABELS.available;
     });
     $$('[data-member]').forEach(function (m) { m.classList.remove('is-in', 'is-joining'); });
-    toast.classList.remove('show');
     paintCounts();
   }
 
@@ -226,9 +211,9 @@
   }
 
   // Three clocks share one 10.2s loop: task statuses run the full loop, the brand
-  // flips every 3.4s, and the school every 5.1s, offset so no two flips land together.
+  // flips every 3.4s, and the school once a loop, between brand flips.
   var BRAND_FLIPS = [3400, 6800];
-  var SCHOOL_FLIPS = [2550, 7650];
+  var SCHOOL_FLIPS = [5100];
   function nextBrand() {
     brandIndex = (brandIndex + 1) % BRANDS.length;
     applyBrand(BRANDS[brandIndex]);
@@ -242,7 +227,6 @@
     TIMELINE.forEach(function (step) {
       timers.push(setTimeout(function () {
         setState(step[1], step[2]);
-        if (step[3]) showToast(step[3]);
       }, step[0]));
     });
     BRAND_FLIPS.forEach(function (t) { timers.push(setTimeout(nextBrand, t)); });
