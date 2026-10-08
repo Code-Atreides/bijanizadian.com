@@ -103,29 +103,7 @@ p{margin:0}
 .hero-title .word{display:inline-block}
 .hero-title .dot{color:var(--accent);font-weight:inherit}
 .lead{font-size:clamp(16px,calc(2.4 * var(--vh)),18px);line-height:1.6;color:var(--muted);max-width:470px}
-.authority{margin-top:clamp(12px,calc(2.2 * var(--vh)),20px);padding-left:14px;border-left:2px solid var(--accent);color:var(--accent);font-weight:500}
 .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin-top:clamp(20px,calc(3.8 * var(--vh)),34px)}
-
-.school-try{margin-top:clamp(18px,calc(4 * var(--vh)),40px);max-width:400px}
-.school-try label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
-.combo{position:relative}
-.combo input{width:100%;height:48px;padding:0 44px 0 46px;border:1px solid var(--line-2);border-radius:14px;background:var(--paper);font-size:15px;transition:border-color .2s,box-shadow .2s}
-.combo input::placeholder{color:var(--faint)}
-.combo input:hover{border-color:#bdbdc6}
-.combo input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px var(--soft-2)}
-.combo-swatch{position:absolute;left:16px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--line-2);pointer-events:none}
-.combo-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:38px;height:38px;border:0;border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
-.combo-clear[hidden]{display:none}
-.combo-clear:hover{background:var(--soft);color:var(--ink)}
-.combo-clear svg{width:16px;height:16px}
-.combo ul{position:absolute;z-index:30;left:0;right:0;top:calc(100% + 8px);margin:0;padding:6px;list-style:none;max-height:min(300px,calc(40 * var(--vh)));overflow:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 50px -20px #0000003d;animation:pop-in .25s var(--ease)}
-.combo li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;font-size:14px;cursor:pointer}
-.combo li[aria-selected=true]{background:var(--soft)}
-.combo li .sw{width:14px;height:14px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px #00000014}
-.combo li small{margin-left:auto;color:var(--faint);font-size:12px}
-.combo li.empty{color:var(--muted);cursor:default}
-.combo-status{font-size:13px;color:var(--muted);margin-top:8px}
-.combo-status:empty{display:none}
 
 /* Hero workspace preview. Sized in em, so one font-size scales it as a piece:
    by the column width, and by the screen height so the hero never overflows. */
@@ -494,7 +472,6 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .hero-copy{display:contents}
   .hero-visual{order:2;margin-top:clamp(24px,calc(4 * var(--vh)),36px)}
   .stage{margin:0 auto;font-size:clamp(10.5px,2.6cqw,15.5px)}
-  .school-try{order:3;margin-top:8px}
   .section-head.split{grid-template-columns:minmax(0,1fr)}
   .section-head.split .lede{padding-bottom:0}
   /* How it works becomes a swipeable row, so the section stays one screen tall. */
