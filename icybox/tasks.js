@@ -1,23 +1,19 @@
 // Campus Tasks, IcyBox client preview. No accounts and no network calls:
 // everything a visitor types stays in this browser.
-const KEY = 'icybox-campus-tasks-preview-v1';
+const KEY = 'icybox-campus-tasks-preview-v2';
 const $ = selector => document.querySelector(selector);
 const cards = [...document.querySelectorAll('[data-task]')];
 const saveStatus = $('#save-status');
-const calendarCard = cards.find(card => card.dataset.task === 'calendar');
-const FILE_TYPES = '.pdf,.csv,.xlsx,.xls,.ics,.doc,.docx,.png,.jpg,.jpeg,.webp,.mp4,.mov';
+const FILE_TYPES = '.pdf,.csv,.xlsx,.xls,.doc,.docx,.png,.jpg,.jpeg,.webp,.mp4,.mov';
 
 let storage = null;
 try { storage = window.localStorage; storage.getItem(KEY); } catch { storage = null; }
 
-const blank = () => ({ version: 1, tasks: {}, steps: {}, calendar: { fileName: '', events: [] }, referral: '' });
+const blank = () => ({ version: 2, tasks: {}, steps: {}, referral: '' });
 function load() {
   try {
     const data = JSON.parse(storage?.getItem(KEY) || 'null');
-    if (data?.version === 1 && typeof data.tasks === 'object' && typeof data.steps === 'object') {
-      const events = Array.isArray(data.calendar?.events) ? data.calendar.events.filter(e => e && typeof e === 'object') : [];
-      return { ...blank(), ...data, calendar: { fileName: String(data.calendar?.fileName || ''), events } };
-    }
+    if (data?.version === 2 && data.tasks && typeof data.tasks === 'object' && data.steps && typeof data.steps === 'object') return { ...blank(), ...data };
   } catch { /* Fall back to an empty workspace. */ }
   return blank();
 }
@@ -41,12 +37,10 @@ function el(tag, props = {}, children = []) {
 
 // Status ------------------------------------------------------------------
 const stepsFor = id => Object.entries(state.steps).filter(([key]) => key.startsWith(id + ':')).map(([, value]) => value);
-const hasCalendar = () => Boolean(state.calendar.fileName) || state.calendar.events.some(e => String(e.title || '').trim() && e.date);
 function taskStatus(id) {
   const task = state.tasks[id] || {}, steps = stepsFor(id);
   if (steps.some(step => step.sent)) return 'review';
   if (task.checks?.some(Boolean) || task.notes?.trim() || steps.some(step => step.notes?.trim())) return 'active';
-  if (id === 'calendar' && (state.calendar.fileName || state.calendar.events.length)) return 'active';
   return 'available';
 }
 const isComplete = card => {
@@ -99,7 +93,7 @@ function collect(card) {
   paint();
 }
 for (const card of cards) {
-  const onEdit = event => { if (!event.target.closest('.step-editor, .calendar-panel')) collect(card); };
+  const onEdit = event => { if (!event.target.closest('.step-editor')) collect(card); };
   card.addEventListener('input', onEdit);
   card.addEventListener('change', onEdit);
   card.querySelector('.update-form').addEventListener('submit', event => event.preventDefault());
@@ -154,59 +148,6 @@ for (const card of cards) {
   }
 }
 
-// Calendar ------------------------------------------------------------------
-const calendarCheck = calendarCard.querySelector('[data-check]');
-const eventsList = $('#calendar-events'), calendarStatus = $('#calendar-status');
-function syncCalendar() {
-  calendarCheck.checked = hasCalendar();
-  collect(calendarCard);
-}
-function paintAttachment() {
-  $('#calendar-attachment').hidden = !state.calendar.fileName;
-  $('#calendar-file-name').textContent = state.calendar.fileName;
-}
-function renderEvents() {
-  eventsList.replaceChildren(...state.calendar.events.map((event, index) => {
-    const field = (label, type, name) => {
-      const input = el('input', { type, value: String(event[name] || '') });
-      if (type === 'text') input.maxLength = 120;
-      input.addEventListener('input', () => { state.calendar.events[index][name] = input.value; syncCalendar(); });
-      return el('label', {}, [label, input]);
-    };
-    const remove = el('button', { type: 'button', className: 'quiet-button', textContent: 'Remove' });
-    remove.setAttribute('aria-label', `Remove event ${index + 1}`);
-    remove.addEventListener('click', () => {
-      state.calendar.events.splice(index, 1);
-      renderEvents(); syncCalendar();
-      calendarStatus.textContent = 'Event removed.';
-      $('#add-event').focus();
-    });
-    return el('div', { className: 'calendar-event' }, [field('Event name', 'text', 'title'), field('Date', 'date', 'date'), field('Time (optional)', 'time', 'time'), remove]);
-  }));
-}
-function acceptFile(file) {
-  if (!file) return;
-  if (file.size > 10 * 1024 * 1024) { calendarStatus.textContent = 'That file is over 10 MB. Try a smaller export.'; return; }
-  state.calendar.fileName = file.name;
-  paintAttachment(); syncCalendar();
-  calendarStatus.textContent = `${file.name} added.`;
-}
-$('#calendar-file').addEventListener('change', event => { acceptFile(event.target.files[0]); event.target.value = ''; });
-const drop = $('#calendar-drop');
-for (const type of ['dragenter', 'dragover']) drop.addEventListener(type, event => { event.preventDefault(); drop.classList.add('drag-over'); });
-for (const type of ['dragleave', 'drop']) drop.addEventListener(type, () => drop.classList.remove('drag-over'));
-drop.addEventListener('drop', event => { event.preventDefault(); acceptFile(event.dataTransfer.files[0]); });
-$('#remove-calendar').addEventListener('click', () => {
-  state.calendar.fileName = '';
-  paintAttachment(); syncCalendar();
-  calendarStatus.textContent = 'File removed.';
-});
-$('#add-event').addEventListener('click', () => {
-  state.calendar.events.push({ title: '', date: '', time: '' });
-  renderEvents(); save(); paint();
-  eventsList.lastElementChild?.querySelector('input')?.focus();
-});
-
 // Referral, experience dates, reset ------------------------------------------
 const referralNotes = $('#referral-notes');
 referralNotes.addEventListener('input', () => { state.referral = referralNotes.value; save(); });
@@ -227,11 +168,7 @@ function restore() {
     card.querySelector('[data-chapter]').value = typeof saved.chapter === 'string' ? saved.chapter.slice(0, 160) : '';
     card.querySelector('[data-notes]').value = typeof saved.notes === 'string' ? saved.notes.slice(0, 6000) : '';
   }
-  calendarCheck.checked = hasCalendar();
   stepEditors.forEach(fn => fn());
-  paintAttachment();
-  renderEvents();
-  calendarStatus.textContent = '';
   referralNotes.value = state.referral || '';
   $('#referral-status').textContent = '';
   paint();

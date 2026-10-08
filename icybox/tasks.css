@@ -43,7 +43,9 @@ button:disabled:hover{background:var(--ink)}
 .network-brand{font-family:var(--display);font-size:25px;line-height:1;letter-spacing:-1.1px;font-weight:800;text-decoration:none;white-space:nowrap}
 .network-brand>span{font-weight:500;margin-left:4px}
 .brand-period,.network-brand .brand-period{margin-left:0;color:var(--blue);font-weight:800}
-.preview-tag{font-size:12px;font-weight:500;letter-spacing:.2px;color:var(--blue);background:var(--ice);border-radius:999px;padding:5px 11px;white-space:nowrap}
+.client-mark{display:flex;align-items:center;border-left:1px solid var(--line);padding-left:22px;height:26px}
+.client-mark img{display:block;width:93px;height:auto}
+.preview-tag{font-size:12px;font-weight:500;letter-spacing:.2px;color:var(--blue);background:var(--ice);border-radius:999px;padding:4px 10px;white-space:nowrap}
 .topbar nav{display:flex;gap:24px;margin-left:auto;font-size:14px}
 .topbar nav a{text-decoration:none}
 .topbar nav a:hover{color:var(--blue)}
@@ -54,7 +56,7 @@ main{max-width:1236px;margin:auto;padding:46px 28px 20px}
 /* Hero */
 .welcome-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:64px;align-items:center;margin-bottom:46px}
 .campus-identity{display:flex;align-items:center;gap:16px;margin:0 0 28px}
-.campus-mark{display:grid;place-items:center;width:72px;height:72px;border-radius:20px;background:var(--paper);border:1px solid var(--line)}
+.campus-mark{display:block;width:64px;height:64px;flex-shrink:0;box-shadow:0 10px 24px #012FFF2E;border-radius:16px}
 #member-greeting{font-size:16px;font-weight:500;margin:0}
 #pass-school{margin:2px 0 0;color:var(--muted);font-size:14px}
 .heading h1{font-size:clamp(34px,3.6vw,50px);letter-spacing:-2px;font-weight:800;line-height:1.05;max-width:640px;margin-bottom:18px}
@@ -85,8 +87,7 @@ main{max-width:1236px;margin:auto;padding:46px 28px 20px}
 
 .company-strip{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--paper)}
 .active-company{display:flex;align-items:center;gap:20px;padding:18px 22px;min-width:0}
-.icy-wordmark{display:flex;align-items:center;gap:9px;font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.8px;flex-shrink:0}
-.icy-wordmark img{border-radius:8px}
+.icy-wordmark{display:block;width:120px;height:auto;flex-shrink:0}
 .active-company>div{display:flex;flex-direction:column;gap:3px;min-width:0}
 .active-company strong{font-size:14px;font-weight:500}
 .active-company>div>span{font-size:13px;color:var(--muted)}
@@ -125,7 +126,7 @@ main{max-width:1236px;margin:auto;padding:46px 28px 20px}
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:22px 24px 0;font-size:14px;color:var(--muted)}
 .task-context{display:flex;gap:10px;align-items:center;line-height:1.4}
 .company-tag{display:grid;place-items:center}
-.company-tag img{border-radius:6px}
+.company-tag img{display:block}
 .status{flex-shrink:0;background:var(--ice);color:var(--blue);border-radius:999px;padding:4px 11px;font-size:13px}
 .task-card.is-complete .status{background:var(--blue);color:#fff}
 .reward{display:flex;gap:18px;padding:20px 24px 22px}
@@ -154,7 +155,6 @@ details[open] .card-toggle svg{transform:rotate(180deg)}
 .task-step{border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:10px}
 .check-item{display:flex;gap:13px;padding:14px 0 6px;cursor:pointer}
 .check-item input{width:20px;height:20px;margin:2px 0 0;flex-shrink:0;accent-color:var(--blue)}
-.check-item input:disabled{cursor:default}
 .check-item>span{display:flex;flex-direction:column;gap:4px}
 .check-item strong{font-size:16px;font-weight:600}
 .check-item>span>span{font-size:14px;color:var(--muted)}
@@ -182,27 +182,6 @@ details[open] .card-toggle svg{transform:rotate(180deg)}
 .update-form input{margin-bottom:18px}
 .update-form textarea{resize:vertical;min-height:100px}
 .task-bottom{border-top:1px solid var(--line);padding-top:18px;margin-top:18px;font-size:13px;color:var(--muted);font-family:var(--price)}
-
-/* Calendar */
-.calendar-panel{margin:12px 0 0 33px;padding-bottom:6px}
-.calendar-panel h3{font-size:16px}
-.file-drop{position:relative;margin-top:14px;border:1px dashed var(--line-strong);border-radius:15px;padding:22px;text-align:center;background:var(--paper)}
-.file-drop.drag-over{border-color:var(--blue);background:var(--ice)}
-.file-drop:focus-within{outline:3px solid var(--blue);outline-offset:3px}
-.file-drop>label{font-size:16px;font-weight:500;display:block}
-.file-drop>label>span{color:var(--blue);text-decoration:underline}
-.file-drop input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.file-drop p,.calendar-help{font-size:13px;color:var(--muted);margin:10px 0 0}
-#calendar-attachment{padding:14px;border:1px solid var(--line);border-radius:12px;margin-top:12px;overflow-wrap:anywhere;background:var(--paper)}
-#calendar-attachment>div{display:flex;gap:8px;margin-top:10px}
-.calendar-divider{font-size:14px;font-weight:500;margin:22px 0 10px}
-.calendar-event{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;padding:12px 0;border-top:1px solid var(--line);align-items:end}
-.calendar-event label{font-size:13px}
-.calendar-event input{width:100%;min-width:0;font-size:16px;border:1px solid var(--line-strong);border-radius:10px;padding:9px 10px;margin-top:6px;background:var(--paper);color:var(--ink)}
-.calendar-event button{min-height:42px;font-size:13px}
-#add-event{margin-top:6px}
-#calendar-status{font-size:14px;color:var(--blue);margin:10px 0 0}
-#calendar-status:empty{display:none}
 
 .empty-opportunities{padding:55px 25px;text-align:center;border:1px dashed var(--line-strong);border-radius:18px;background:var(--paper)}
 .empty-opportunities h3{font-size:24px;letter-spacing:-.6px}
@@ -257,8 +236,6 @@ footer p{font-size:13px;color:var(--muted);margin:0;text-align:right}
   .welcome-grid{gap:34px}
   .tasks-grid{grid-template-columns:minmax(0,1fr) 250px;gap:22px}
   .company-live{display:none}
-  .calendar-event{grid-template-columns:1fr 1fr}
-  .calendar-event label:first-child{grid-column:1/-1}
 }
 @media (max-width:820px){
   .welcome-grid{grid-template-columns:1fr}
@@ -274,8 +251,9 @@ footer p{font-size:13px;color:var(--muted);margin:0;text-align:right}
   .network-brand{font-size:22px}
   .topbar nav{gap:16px;font-size:13px}
   main{padding:30px 16px 16px}
-  .campus-mark{width:60px;height:60px;border-radius:17px}
-  .campus-mark img{width:36px;height:36px}
+  .campus-mark{width:56px;height:56px;border-radius:14px}
+  .client-mark{padding-left:12px;height:22px}
+  .client-mark img{width:80px}
   .active-company{flex-wrap:wrap;gap:12px}
   .workspace-toolbar{flex-direction:column;gap:4px}
   .shared-controls{left:0;right:auto}
@@ -287,14 +265,12 @@ footer p{font-size:13px;color:var(--muted);margin:0;text-align:right}
   .task-body{padding:18px}
   .pitch{padding:18px}
   .pitch blockquote{font-size:16px}
-  .step-editor,.calendar-panel{margin-left:0}
+  .step-editor{margin-left:0}
   .step-editor{padding:14px}
   footer{flex-direction:column;align-items:flex-start}
   footer p{text-align:left}
 }
 @media (max-width:450px){
   .topbar nav{margin-left:0;width:100%}
-  .calendar-event{grid-template-columns:1fr}
-  .calendar-event label:first-child{grid-column:auto}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
