@@ -372,16 +372,19 @@
     return featured[cycleIndex];
   }
 
-  // The brand drives the task loop; the school re-themes half a cycle later, so the
-  // two flip at different moments and every brand gets seen in more than one school.
-  function runCycle(advance) {
+  // Three clocks share one 10.2s loop: task statuses run the full loop, the brand
+  // flips every 3.4s, and the school every 5.1s, offset so no two flips land together.
+  var BRAND_FLIPS = [3400, 6800];
+  var SCHOOL_FLIPS = [2550, 7650];
+  function nextBrand() {
+    brandIndex = (brandIndex + 1) % BRANDS.length;
+    applyBrand(BRANDS[brandIndex]);
+  }
+
+  function runCycle() {
     clearCycle();
     running = true;
     applySchool(nextSchool(false), true);
-    if (advance) {
-      brandIndex = (brandIndex + 1) % BRANDS.length;
-      applyBrand(BRANDS[brandIndex]);
-    }
     resetMock();
     TIMELINE.forEach(function (step) {
       timers.push(setTimeout(function () {
@@ -389,8 +392,9 @@
         if (step[3]) showToast(step[3]);
       }, step[0]));
     });
-    timers.push(setTimeout(function () { applySchool(nextSchool(true), true); }, CYCLE / 2));
-    timers.push(setTimeout(function () { runCycle(true); }, CYCLE));
+    BRAND_FLIPS.forEach(function (t) { timers.push(setTimeout(nextBrand, t)); });
+    SCHOOL_FLIPS.forEach(function (t) { timers.push(setTimeout(function () { applySchool(nextSchool(true), true); }, t)); });
+    timers.push(setTimeout(function () { nextBrand(); runCycle(); }, CYCLE));
   }
 
   // Flip a logo slot like the school tile, swapping its content at the halfway point.
@@ -410,13 +414,20 @@
       img.src = next.logo;
       img.classList.toggle('is-wide', next.wide);
     });
-    swapText($('[data-co-tagline]'), next.tagline);
-    Object.keys(next.rows).forEach(function (id) {
-      var row = next.rows[id];
-      tasks[id].querySelector('.mt-icon use').setAttribute('href', '#i-' + row[0]);
-      swapText(tasks[id].querySelector('.mt-text b'), row[1]);
-      swapText(tasks[id].querySelector('.mt-text small'), row[2]);
-    });
+    // Text fades out over 220ms, so starting it 120ms in lands the swap with the logo's.
+    setTimeout(function () {
+      swapText($('[data-co-tagline]'), next.tagline);
+      Object.keys(next.rows).forEach(function (id) {
+        var row = next.rows[id];
+        swapText(tasks[id].querySelector('.mt-text b'), row[1]);
+        swapText(tasks[id].querySelector('.mt-text small'), row[2]);
+      });
+    }, reduced ? 0 : 120);
+    setTimeout(function () {
+      Object.keys(next.rows).forEach(function (id) {
+        tasks[id].querySelector('.mt-icon use').setAttribute('href', '#i-' + next.rows[id][0]);
+      });
+    }, reduced ? 0 : 340);
   }
 
   // Warm the cache so a flipped logo never shows up blank.
@@ -424,7 +435,7 @@
 
   function syncCycle() {
     var shouldRun = heroVisible && !document.hidden && !reduced;
-    if (shouldRun && !running) runCycle(false);
+    if (shouldRun && !running) runCycle();
     if (!shouldRun && running) clearCycle();
   }
 
