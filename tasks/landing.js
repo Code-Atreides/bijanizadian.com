@@ -8,15 +8,15 @@
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var BRAND_ACCENT = '#4A36FF';
 
-  // [id, name, primary colour] for the schools the preview cycles through, from the
+  // [id, name, primary colour, logo] for the schools the preview cycles through, from the
   // product's public school list (/api/task-schools).
   var SCHOOL_ROWS = [
-    ["university-of-oregon","University of Oregon","#00934B"],
-    ["university-of-michigan-ann-arbor","University of Michigan - Ann Arbor","#00274C"],
-    ["the-university-of-texas-at-austin","The University of Texas at Austin","#BF5700"],
-    ["university-of-southern-california","University of Southern California","#9D2235"],
-    ["university-of-washington","University of Washington","#33006F"],
-    ["university-of-florida","University of Florida","#0021A5"]
+    ["university-of-oregon","University of Oregon","#00934B","/tasks/assets/schools/university-of-oregon.png"],
+    ["university-of-michigan-ann-arbor","University of Michigan - Ann Arbor","#00274C","/tasks/assets/schools/university-of-michigan-ann-arbor.png"],
+    ["the-university-of-texas-at-austin","The University of Texas at Austin","#BF5700","/tasks/assets/schools/the-university-of-texas-at-austin.png"],
+    ["university-of-southern-california","University of Southern California","#9D2235","/tasks/assets/schools/university-of-southern-california.png"],
+    ["university-of-washington","University of Washington","#33006F","/tasks/assets/schools/university-of-washington.png"],
+    ["university-of-florida","University of Florida","#0021A5","/tasks/assets/schools/university-of-florida.png"]
   ];
   var FEATURED = ['university-of-oregon', 'university-of-michigan-ann-arbor', 'the-university-of-texas-at-austin', 'university-of-southern-california', 'university-of-washington', 'university-of-florida'];
   var MONO_OVERRIDES = { 'the-university-of-texas-at-austin': 'UT' };
@@ -46,7 +46,7 @@
   }
 
   var SCHOOLS = SCHOOL_ROWS.map(function (r) {
-    return { id: r[0], name: r[1], accent: readable(r[2]), mono: monogram(r[0], r[1]) };
+    return { id: r[0], name: r[1], accent: readable(r[2]), mono: monogram(r[0], r[1]), logo: r[3] };
   });
   var BY_ID = {};
   SCHOOLS.forEach(function (s) { BY_ID[s.id] = s; });
@@ -70,9 +70,14 @@
     return r.bottom > 0 && r.top < window.innerHeight;
   }
 
-  function setMono(el, text) {
-    el.style.setProperty('--mono-size', text.length <= 2 ? '.95em' : text.length === 3 ? '.78em' : '.64em');
-    el.textContent = text;
+  function setTile(tile, school) {
+    var mono = school ? school.mono : 'CT';
+    var monoEl = tile.querySelector('[data-mono]');
+    var logo = tile.querySelector('[data-school-logo]');
+    monoEl.style.setProperty('--mono-size', mono.length <= 2 ? '.95em' : mono.length === 3 ? '.78em' : '.64em');
+    monoEl.textContent = mono;
+    if (logo && school && school.logo) logo.src = school.logo;
+    tile.classList.toggle('has-logo', Boolean(logo && school && school.logo));
   }
 
   function applySchool(school, animate) {
@@ -80,15 +85,14 @@
     current = school;
     root.style.setProperty('--accent', school ? school.accent : BRAND_ACCENT);
     var name = school ? school.name : 'Your campus';
-    var mono = school ? school.mono : 'CT';
     $$('[data-school-name]').forEach(function (el) { swapText(el, name); });
     $$('[data-mono]').forEach(function (el) {
       var tile = el.parentElement;
-      if (!animate || reduced || !isOnScreen(tile)) { setMono(el, mono); return; }
+      if (!animate || reduced || !isOnScreen(tile)) { setTile(tile, school); return; }
       tile.classList.remove('is-flipping');
       void tile.offsetWidth;
       tile.classList.add('is-flipping');
-      setTimeout(function () { setMono(el, mono); }, 340);
+      setTimeout(function () { setTile(tile, school); }, 340);
     });
   }
 
@@ -212,8 +216,11 @@
 
   // Three clocks share one 10.2s loop: task statuses run the full loop, the brand
   // flips every 3.4s, and the school once a loop, between brand flips.
-  var BRAND_FLIPS = [3400, 6800];
-  var SCHOOL_FLIPS = [5100];
+  var BRAND_EVERY = 3400;
+  var BRAND_FLIPS = [BRAND_EVERY, BRAND_EVERY * 2];
+  var SCHOOL_EVERY = 8000;
+  var cycleStart = 0;
+  var schoolTimer = null;
   function nextBrand() {
     brandIndex = (brandIndex + 1) % BRANDS.length;
     applyBrand(BRANDS[brandIndex]);
@@ -222,7 +229,7 @@
   function runCycle() {
     clearCycle();
     running = true;
-    applySchool(nextSchool(false), true);
+    cycleStart = performance.now();
     resetMock();
     TIMELINE.forEach(function (step) {
       timers.push(setTimeout(function () {
@@ -230,7 +237,6 @@
       }, step[0]));
     });
     BRAND_FLIPS.forEach(function (t) { timers.push(setTimeout(nextBrand, t)); });
-    SCHOOL_FLIPS.forEach(function (t) { timers.push(setTimeout(function () { applySchool(nextSchool(true), true); }, t)); });
     timers.push(setTimeout(function () { nextBrand(); runCycle(); }, CYCLE));
   }
 
@@ -268,12 +274,34 @@
   }
 
   // Warm the cache so a flipped logo never shows up blank.
-  ['/tasks/assets/icybox-wordmark.svg', '/tasks/assets/icybox-app-icon.svg', '/tasks/assets/rho-wordmark.svg', '/tasks/assets/rho-icon.svg'].forEach(function (src) { new Image().src = src; });
+  ['/tasks/assets/icybox-wordmark.svg', '/tasks/assets/icybox-app-icon.svg', '/tasks/assets/rho-wordmark.svg', '/tasks/assets/rho-icon.svg'].concat(featured.map(function (s) { return s.logo; })).forEach(function (src) { new Image().src = src; });
 
   function syncCycle() {
     var shouldRun = heroVisible && !document.hidden && !reduced;
     if (shouldRun && !running) runCycle();
     if (!shouldRun && running) clearCycle();
+  }
+
+  // The school changes every 8s across the whole page, so its colour carries into every
+  // section. While the brand clock runs, a school flip waits for a gap between brand flips.
+  function scheduleSchool(delay) {
+    clearTimeout(schoolTimer);
+    schoolTimer = setTimeout(schoolTick, delay);
+  }
+  function schoolTick() {
+    if (running) {
+      var phase = (performance.now() - cycleStart) % BRAND_EVERY;
+      if (phase < 800 || phase > BRAND_EVERY - 800) {
+        scheduleSchool((BRAND_EVERY / 2 - phase + BRAND_EVERY) % BRAND_EVERY);
+        return;
+      }
+    }
+    applySchool(nextSchool(true), true);
+    scheduleSchool(SCHOOL_EVERY);
+  }
+  function syncSchool() {
+    if (document.hidden || reduced) clearTimeout(schoolTimer);
+    else scheduleSchool(SCHOOL_EVERY);
   }
 
   // A calm, finished frame for reduced motion.
@@ -290,7 +318,7 @@
       if (root.classList.contains('is-ready')) syncCycle();
     }, { threshold: 0.15 }).observe($('.hero'));
   }
-  document.addEventListener('visibilitychange', function () { if (root.classList.contains('is-ready')) syncCycle(); });
+  document.addEventListener('visibilitychange', function () { if (root.classList.contains('is-ready')) { syncCycle(); syncSchool(); } });
 
   // Pointer depth on the preview, for fine pointers only.
   if (!reduced && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
@@ -453,7 +481,11 @@
     root.classList.add('is-ready');
     if (reduced) { staticMock(); return; }
     // Let the default workspace land first, then hand it to a school.
-    setTimeout(syncCycle, 1500);
+    setTimeout(function () {
+      applySchool(nextSchool(false), true);
+      syncCycle();
+      syncSchool();
+    }, 1500);
   }
   var fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
   Promise.race([fontsReady, new Promise(function (r) { setTimeout(r, 900); })]).then(function () { requestAnimationFrame(start); });
