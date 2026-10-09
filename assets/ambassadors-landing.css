@@ -270,6 +270,7 @@ html.js .live-card.reveal{transition:opacity 1s var(--ease),transform 1s var(--e
 .lc-meta div{display:grid;grid-template-columns:54px minmax(0,1fr);gap:8px;align-items:baseline}
 .lc-meta dt{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 .lc-meta dd{font-size:13px;line-height:1.45;color:var(--ink)}
+.lc-visual{display:none}
 .live-unlock{background:var(--lavender);border-color:#d3daff}
 .live-unlock .lc-icon{background:var(--accent);border-color:var(--accent);color:#fff}
 .live-unlock .lc-kicker{color:var(--ink)}
@@ -486,9 +487,8 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   /* Rewards become swipeable cards too: the experience, then each reward. */
   .rewards{display:flex;gap:10px;background:none;border:0;border-radius:0;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 calc(var(--gutter) * -1);padding:0 var(--gutter) 6px;scrollbar-width:none}
   .rewards::-webkit-scrollbar{display:none}
-  .rw-list{display:contents}
-  .rw-experience,.rw-item,.rw-item:first-child{flex:0 0 min(86%,340px);scroll-snap-align:center;border:1px solid var(--line);border-radius:18px}
-  .rw-item{align-content:start;background:var(--paper)}
+  .rw-experience,.rw-list{flex:0 0 min(86%,340px);scroll-snap-align:center;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .rw-list{background:var(--paper)}
   .rw-experience{padding:20px 16px}
   .li-card{padding:16px 14px}
   .li-positions{--indent:52px;--rail:22px}
@@ -513,6 +513,49 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .hero-grid{flex:1;min-height:0}
   .hero-visual{flex:1 1 0;min-height:0;overflow:hidden;-webkit-mask-image:linear-gradient(#000 62%,transparent);mask-image:linear-gradient(#000 62%,transparent)}
   .lane-card{display:none}
+  /* Content fills the screen instead of floating in it: the head sits at the top and the
+     carousel takes the rest, so each card is as tall as the space it has. */
+  .section.screen{justify-content:flex-start}
+  .section.screen>.wrap{flex:1;display:flex;flex-direction:column;min-height:0}
+  .section-head{flex:none}
+  .flow,.live-grid,.rewards{flex:1;min-height:0}
+  .flow-step,.flow-step:nth-child(n){display:flex;flex-direction:column}
+  .flow-art{flex:1;height:auto;min-height:120px}
+  /* Task cards: a preview of what you submit grows into the spare height. */
+  .lc-visual{flex:1;min-height:92px;display:grid;place-content:center;justify-items:center;gap:8px;padding:14px;border-radius:14px;background:var(--bg);border:1px solid var(--line);text-align:center}
+  .lv-handle{display:inline-flex;align-items:center;gap:7px;padding:7px 14px 7px 9px;border-radius:999px;background:var(--paper);border:1px solid var(--line);font-size:14px;font-weight:500}
+  .lv-handle svg{width:18px;height:18px;color:var(--accent)}
+  .lv-bubble{max-width:250px;padding:12px 16px;border-radius:16px 16px 16px 4px;background:var(--accent);color:#fff;font-size:15px;line-height:1.4;text-align:left}
+  .lv-dots{display:flex;gap:6px}
+  .lv-dots i{width:38px;height:38px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--paper),0 0 0 4px var(--soft-2)}
+  .lv-dots i:nth-child(even){background:#8b9bf9}
+  .lv-signups b{font-size:17px;font-weight:500}
+  .lv-signups small,.lv-list small{font-size:12px;color:var(--muted)}
+  .lv-post{grid-template-columns:auto minmax(0,150px);align-items:center;gap:12px}
+  .lv-photo{display:grid;place-items:center;width:84px;height:104px;border-radius:10px;background:linear-gradient(160deg,#acb8f9,var(--accent));color:#fff}
+  .lv-photo svg{width:22px;height:22px}
+  .lv-lines{display:grid;gap:7px;justify-items:start}
+  .lv-lines>i{display:block;height:7px;width:100%;border-radius:4px;background:var(--line)}
+  .lv-lines>i+i{width:70%}
+  .lv-link{display:inline-flex;align-items:center;gap:5px;margin-top:2px;padding:4px 9px;border-radius:999px;background:var(--soft);color:var(--accent-ink);font-size:11.5px}
+  .lv-link svg{width:13px;height:13px}
+  .lv-list{justify-items:stretch;width:100%}
+  .lv-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;background:var(--paper);border:1px solid var(--line);font-size:13.5px;text-align:left}
+  .lv-row b{font-weight:500}
+  .lv-row i{height:6px;border-radius:3px;background:var(--line)}
+  .lv-row em{font-style:normal;color:var(--accent-ink)}
+  .lv-cal .lv-date{color:var(--accent-ink)}
+  .lv-list small{margin-top:2px}
+  /* The four lanes stack as rows that fill the unlock card. */
+  .live-unlock .lc-lanes{flex:1;flex-direction:column;flex-wrap:nowrap;justify-content:flex-end;gap:8px;padding-top:12px}
+  .live-unlock .lc-lanes span{padding:12px 14px;border-radius:12px;font-size:15px;font-weight:500}
+  /* The three rewards share one slide and split its height between them. */
+  .rw-item{padding:14px 16px}
+  .rw-item p{font-size:14px}
+  /* Why is a short statement: it keeps its own height, and the closing section rises in under it. */
+  .why.screen{min-height:0}
+  .why .why-title{font-size:clamp(38px,11vw,50px)}
+  .why-grid{gap:22px}
 }
 /* Shorter phones: tighter rhythm and a shorter experience card, so every section still fits one screen. */
 @media (max-width:640px) and (min-height:560px) and (max-height:800px){
@@ -522,6 +565,20 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .li-card{padding:12px}
   .li-head{margin-bottom:8px}
   .li-positions>li:last-child .li-bullets{display:none}
+  /* Previews trim to their essentials, and the cards tighten, so the tallest task still fits. */
+  .live-card{gap:6px;padding:14px 14px 12px}
+  .live-card p{font-size:13.5px;line-height:1.45}
+  .lc-visual{min-height:72px;padding:10px;gap:6px}
+  .lc-visual small,.lv-row:nth-child(3){display:none}
+  .lv-dots i{width:24px;height:24px}
+  .lv-handle{font-size:13px}
+  .lv-signups b{font-size:15px}
+  .lv-row{padding:7px 10px;font-size:12px}
+  .lv-bubble{padding:8px 12px;font-size:12.5px}
+  .lv-photo{width:52px;height:62px}
+  .rw-item{padding:10px 14px}
+  .rw-item p{font-size:13.5px;line-height:1.45}
+  .rw-item .relay{margin-top:2px}
 }
 
 @media (prefers-reduced-motion:reduce){
