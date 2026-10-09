@@ -320,13 +320,18 @@ html.js .live-card.reveal{transition:opacity 1s var(--ease),transform 1s var(--e
 .rw-item p{font-size:14.5px;line-height:1.55;color:var(--muted);max-width:520px}
 .rw-icon{display:grid;place-items:center;width:clamp(30px,calc(4.6 * var(--vh)),38px);height:clamp(30px,calc(4.6 * var(--vh)),38px);border-radius:50%;background:var(--soft);color:var(--accent)}
 .rw-icon svg{width:17px;height:17px}
-.relay{position:relative;list-style:none;margin:clamp(4px,calc(.8 * var(--vh)),8px) 0 0;padding:0;display:flex;justify-content:space-between;gap:10px;max-width:420px;counter-reset:relay}
-.relay::before{content:'';position:absolute;left:10px;right:10px;top:10px;height:1px;background:var(--line-2)}
-.relay::after{content:'';position:absolute;top:7px;left:10px;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--soft-2);animation:relay 4.5s var(--ease-io) infinite}
-.relay li{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);counter-increment:relay;flex:1}
-.relay li:nth-child(2){align-items:center;text-align:center}
-.relay li:last-child{align-items:flex-end;text-align:right}
-.relay li::before{content:counter(relay);display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--paper);border:1px solid var(--line-2);font-size:11px;color:var(--ink)}
+/* The path: a fill runs step to step, each step lights as it lands, and the last one pulses. */
+.relay{--loop:5.4s;position:relative;list-style:none;margin:clamp(6px,calc(1 * var(--vh)),10px) 0 0;padding:0;display:flex;justify-content:space-between;gap:10px;max-width:420px;counter-reset:relay}
+.relay::before,.relay::after{content:'';position:absolute;left:13px;right:13px;top:12px;height:3px;border-radius:3px;background:var(--line)}
+.relay::after{background:linear-gradient(90deg,var(--accent),#8b9bf9);transform-origin:left;transform:scaleX(0);animation:relay-fill var(--loop) var(--ease-io) infinite}
+.relay li{position:relative;z-index:1;display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--muted);counter-increment:relay;flex:1;animation:relay-label-1 var(--loop) ease infinite}
+.relay li:nth-child(2){align-items:center;text-align:center;animation-name:relay-label-2}
+.relay li:last-child{align-items:flex-end;text-align:right;animation-name:relay-label-3}
+.relay li::before{content:counter(relay);display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--paper);border:1.5px solid var(--line-2);font-size:12px;font-weight:500;color:var(--ink);animation:relay-step-1 var(--loop) var(--ease) infinite}
+.relay li:nth-child(2)::before{animation-name:relay-step-2}
+.relay li:last-child::before{animation-name:relay-step-3}
+.relay li:last-child::after{content:'';position:absolute;right:0;top:0;width:27px;height:27px;border-radius:50%;pointer-events:none;animation:relay-pulse var(--loop) ease-out infinite}
+html.js .rewards:not(.is-in) .relay::after,html.js .rewards:not(.is-in) .relay li,html.js .rewards:not(.is-in) .relay li::before,html.js .rewards:not(.is-in) .relay li::after{animation-play-state:paused}
 
 /* ── Why you're here: a full-screen statement. */
 .why{border-top:1px solid var(--line)}
@@ -409,7 +414,14 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
 @keyframes fill{0%{transform:scaleX(0)}22%,92%{transform:scaleX(1)}100%{transform:scaleX(0)}}
 @keyframes press{0%,16%{transform:none;filter:none}20%{transform:scale(.94);filter:brightness(1.2)}26%,100%{transform:none;filter:none}}
 @keyframes grow{0%,6%{transform:scaleY(.08)}30%,90%{transform:scaleY(1)}100%{transform:scaleY(.08)}}
-@keyframes relay{0%{left:10px}45%,55%{left:50%}90%,100%{left:calc(100% - 17px)}}
+@keyframes relay-fill{0%,8%{transform:scaleX(0);opacity:1}40%,48%{transform:scaleX(.5)}78%,92%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes relay-step-1{0%,4%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}8%{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.2)}13%,92%{background:var(--accent);border-color:var(--accent);color:#fff;transform:none}100%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}}
+@keyframes relay-step-2{0%,36%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}40%{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.2)}45%,92%{background:var(--accent);border-color:var(--accent);color:#fff;transform:none}100%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}}
+@keyframes relay-step-3{0%,74%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}78%{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.28)}84%,92%{background:var(--accent);border-color:var(--accent);color:#fff;transform:none}100%{background:var(--paper);border-color:var(--line-2);color:var(--ink);transform:none}}
+@keyframes relay-pulse{0%,77%{box-shadow:0 0 0 0 #516af699}92%,100%{box-shadow:0 0 0 14px #516af600}}
+@keyframes relay-label-1{0%,4%,100%{color:var(--muted)}10%,92%{color:var(--ink)}}
+@keyframes relay-label-2{0%,36%,100%{color:var(--muted)}42%,92%{color:var(--ink)}}
+@keyframes relay-label-3{0%,74%,100%{color:var(--muted)}80%,92%{color:var(--ink)}}
 
 /* Laptops and up: let each scroll settle on a section. Only where every section fits. */
 @media (min-width:901px) and (min-height:600px) and (hover:hover){
@@ -485,4 +497,7 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .flow::before{transform:scaleX(1)}
   .arr-progress{display:none}
   .ai-ring{opacity:0}
+  .relay::after{transform:none}
+  .relay li{color:var(--ink)}
+  .relay li::before{background:var(--accent);border-color:var(--accent);color:#fff}
 }
