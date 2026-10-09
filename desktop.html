@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1e6fd6">
 <title>Bijan Izadian</title>
-<style>html,body{margin:0;height:100%}#desk{height:100vh}</style>
+<style>
+  /* The page runs under the phone's status bar and home indicator; the safe-area
+     padding shows the html background there: sky blue on top, taskbar blue below. */
+  html{background:linear-gradient(#1e6fd6 50%,#245edb 50%)}
+  html,body{margin:0;height:100%}
+  #desk{box-sizing:border-box;height:100vh;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+</style>
 </head>
 <body>
 <div id="desk"></div>
