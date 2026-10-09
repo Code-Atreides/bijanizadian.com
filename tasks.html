@@ -12,9 +12,9 @@
 <link rel="icon" href="/tasks/assets/favicon.svg">
 <link rel="preload" href="/campus/fonts/Aeonik-Medium.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/campus/fonts/Aeonik-Regular.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/tasks/landing.css?v=20261009h">
+<link rel="stylesheet" href="/tasks/landing.css?v=20261009j">
 <script>document.documentElement.classList.add('js');setTimeout(function(){if(!window.campusTasksReady)document.documentElement.classList.remove('js')},3000);</script>
-<script src="/tasks/landing.js?v=20261009c" defer></script>
+<script src="/tasks/landing.js?v=20261009i" defer></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -202,142 +202,45 @@
 
 <section class="section screen" id="tasks" aria-labelledby="tasks-title">
   <div class="wrap">
-    <div class="taskx reveal" data-taskx>
-      <div class="taskx-side">
-        <header class="section-head">
-          <p class="eyebrow">WHAT YOU’LL DO</p>
-          <h2 id="tasks-title">Five kinds of tasks. Every company’s own take.</h2>
-        </header>
-        <div class="taskx-list" role="tablist" aria-label="Kinds of tasks" aria-orientation="vertical">
-          <button type="button" role="tab" id="tab-events" aria-controls="panel-events" aria-selected="true" tabindex="0">
-            <span class="tx-num">01</span><span class="tx-text"><b>Host the night</b></span><span class="tx-timer"><i></i></span>
-          </button>
-          <button type="button" role="tab" id="tab-camera" aria-controls="panel-camera" aria-selected="false" tabindex="-1">
-            <span class="tx-num">02</span><span class="tx-text"><b>Build your camera team</b></span><span class="tx-timer"><i></i></span>
-          </button>
-          <button type="button" role="tab" id="tab-creators" aria-controls="panel-creators" aria-selected="false" tabindex="-1">
-            <span class="tx-num">03</span><span class="tx-text"><b>Put a creator on</b></span><span class="tx-timer"><i></i></span>
-          </button>
-          <button type="button" role="tab" id="tab-challenges" aria-controls="panel-challenges" aria-selected="false" tabindex="-1">
-            <span class="tx-num">04</span><span class="tx-text"><b>Start a rivalry</b></span><span class="tx-timer"><i></i></span>
-          </button>
-          <button type="button" role="tab" id="tab-calendar" aria-controls="panel-calendar" aria-selected="false" tabindex="-1">
-            <span class="tx-num">05</span><span class="tx-text"><b>Share what’s coming</b></span><span class="tx-timer"><i></i></span>
-          </button>
-        </div>
-        <div class="circle">
-          <span class="circle-logos"><img src="/tasks/assets/fomo-wordmark.svg" alt="fomo" width="75" height="24"><img class="is-wide" src="/tasks/assets/icybox-wordmark.svg" alt="IcyBox" width="133" height="20"><img src="/tasks/assets/rho-wordmark.svg" alt="Rho" width="63" height="29"><span class="slots" aria-hidden="true"><i></i><i></i></span></span>
-          <span class="circle-future">More companies, same circle.</span>
-        </div>
+    <header class="section-head split">
+      <div>
+        <p class="eyebrow reveal">LIVE NOW</p>
+        <h2 id="tasks-title" class="reveal" style="--d:.08s">Real tasks, running with <span class="live-fomo"><img src="/tasks/assets/fomo-wordmark.svg" alt="fomo" width="75" height="24"></span></h2>
       </div>
-
-      <div class="taskx-panels">
-        <article class="tp is-active" role="tabpanel" id="panel-events" aria-labelledby="tab-events" tabindex="0">
-          <div class="tp-reward">
-            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-dinner"/></svg></span>
-            <div>
-              <p class="tp-kicker a">EVENTS</p>
-              <h3 class="a">Host the night. They cover the bill.</h3>
-              <p class="tp-desc a">Dinners, spin nights, founder nights. You choose the guest list and the place; the company pays for it and gets the content.</p>
-              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>You pick who’s there</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>The cost is covered</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Content from the night</li></ul>
-            </div>
-          </div>
-          <div class="tp-steps">
-            <h4 class="a">WHAT TO DO</h4>
-            <ol>
-              <li class="a"><span class="tp-tick">1</span>Pick your people</li>
-              <li class="a"><span class="tp-tick">2</span>Plan the night</li>
-              <li class="a"><span class="tp-tick">3</span>Host it</li>
-              <li class="a"><span class="tp-tick">4</span>Post it</li>
-            </ol>
-          </div>
-        </article>
-
-        <article class="tp" role="tabpanel" id="panel-camera" aria-labelledby="tab-camera" tabindex="0" hidden>
-          <div class="tp-reward">
-            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-video"/></svg></span>
-            <div>
-              <p class="tp-kicker a">PAID ROLES</p>
-              <h3 class="a">Your footage. Your final cut.</h3>
-              <p class="tp-desc a">Hire a paid filmer from your chapter to shoot what you run. You choose who gets the role and sign off on every edit before it goes to the company.</p>
-              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>A paid role for your pick</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>You get final cut</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>They join your team</li></ul>
-            </div>
-          </div>
-          <div class="tp-steps">
-            <h4 class="a">WHAT TO DO</h4>
-            <ol>
-              <li class="a"><span class="tp-tick">1</span>Choose your filmer</li>
-              <li class="a"><span class="tp-tick">2</span>Plan the first shoot</li>
-              <li class="a"><span class="tp-tick">3</span>Film it</li>
-              <li class="a"><span class="tp-tick">4</span>Approve the edit</li>
-            </ol>
-          </div>
-        </article>
-
-        <article class="tp" role="tabpanel" id="panel-creators" aria-labelledby="tab-creators" tabindex="0" hidden>
-          <div class="tp-reward">
-            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-mic"/></svg></span>
-            <div>
-              <p class="tp-kicker a">CREATORS</p>
-              <h3 class="a">Put someone on camera.</h3>
-              <p class="tp-desc a">Recruit the people your campus already watches. Companies back them with gear, pay, or a trip to make content somewhere new. You decide who gets the call.</p>
-              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>You choose who</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>They get backed</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Your campus, on camera</li></ul>
-            </div>
-          </div>
-          <div class="tp-steps">
-            <h4 class="a">WHAT TO DO</h4>
-            <ol>
-              <li class="a"><span class="tp-tick">1</span>Find your creator</li>
-              <li class="a"><span class="tp-tick">2</span>Make the pitch</li>
-              <li class="a"><span class="tp-tick">3</span>Confirm they’re in</li>
-              <li class="a"><span class="tp-tick">4</span>Get the first post up</li>
-            </ol>
-          </div>
-        </article>
-
-        <article class="tp" role="tabpanel" id="panel-challenges" aria-labelledby="tab-challenges" tabindex="0" hidden>
-          <div class="tp-reward">
-            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-trophy"/></svg></span>
-            <div>
-              <p class="tp-kicker a">CHALLENGES</p>
-              <h3 class="a">Your house vs theirs.</h3>
-              <p class="tp-desc a">Chapter vs chapter, campus vs campus. Pick the matchup, set the stakes, run it on camera, and let the result travel. The company covers what it takes.</p>
-              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>You choose the matchup</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>The company covers it</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Bragging rights</li></ul>
-            </div>
-          </div>
-          <div class="tp-steps">
-            <h4 class="a">WHAT TO DO</h4>
-            <ol>
-              <li class="a"><span class="tp-tick">1</span>Call someone out</li>
-              <li class="a"><span class="tp-tick">2</span>Set the stakes</li>
-              <li class="a"><span class="tp-tick">3</span>Run it on camera</li>
-              <li class="a"><span class="tp-tick">4</span>Post the result</li>
-            </ol>
-          </div>
-        </article>
-
-        <article class="tp" role="tabpanel" id="panel-calendar" aria-labelledby="tab-calendar" tabindex="0" hidden>
-          <div class="tp-reward">
-            <span class="tp-icon a"><svg aria-hidden="true"><use href="#i-calendar"/></svg></span>
-            <div>
-              <p class="tp-kicker a">YOUR CALENDAR</p>
-              <h3 class="a">Put your events on their radar.</h3>
-              <p class="tp-desc a">Upload your chapter’s social calendar so companies can plan around what you already have going on, and bring tasks to the nights that matter.</p>
-              <ul class="tp-perks a"><li><svg aria-hidden="true"><use href="#i-check"/></svg>Drop a file</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Or add dates by hand</li><li><svg aria-hidden="true"><use href="#i-check"/></svg>Saved with your profile</li></ul>
-            </div>
-          </div>
-          <div class="tp-steps">
-            <h4 class="a">WHAT TO DO</h4>
-            <ol>
-              <li class="a"><span class="tp-tick">1</span>Add your calendar</li>
-              <li class="a"><span class="tp-tick">2</span>Mark the big nights</li>
-              <li class="a"><span class="tp-tick">3</span>Send it for review</li>
-              <li class="a"><span class="tp-tick">4</span>Keep it up to date</li>
-            </ol>
-          </div>
-        </article>
-      </div>
-    </div>
+      <p class="lede reveal" style="--d:.16s">fomo is our first client. Here’s what campus leads are running for them right now.</p>
+    </header>
+    <ul class="live-grid">
+      <li class="live-card reveal" style="--d:0.00s">
+        <span class="lc-top"><span class="lc-icon"><svg aria-hidden="true"><use href="#i-dinner"/></svg></span><span class="lc-kicker">A DINNER ON fomo</span></span>
+        <h3>You pick the girls. Dinner’s on us.</h3>
+        <p>Host the creator dinner</p>
+      </li>
+      <li class="live-card reveal" style="--d:0.06s">
+        <span class="lc-top"><span class="lc-icon"><svg aria-hidden="true"><use href="#i-video"/></svg></span><span class="lc-kicker">FINAL CUT + PARTY FUNDING</span></span>
+        <h3>Your parties. Your final cut.</h3>
+        <p>Find your chapter filmer</p>
+      </li>
+      <li class="live-card reveal" style="--d:0.12s">
+        <span class="lc-top"><span class="lc-icon"><svg aria-hidden="true"><use href="#i-mic"/></svg></span><span class="lc-kicker">A PAID ROLE TO OFFER</span></span>
+        <h3>Put someone on as your campus host.</h3>
+        <p>Recruit your campus media host</p>
+      </li>
+      <li class="live-card reveal" style="--d:0.18s">
+        <span class="lc-top"><span class="lc-icon"><svg aria-hidden="true"><use href="#i-plane"/></svg></span><span class="lc-kicker">A FLIGHT ON fomo</span></span>
+        <h3>Send a creator to see their friends.</h3>
+        <p>Take fomo to another campus</p>
+      </li>
+      <li class="live-card reveal" style="--d:0.24s">
+        <span class="lc-top"><span class="lc-icon"><svg aria-hidden="true"><use href="#i-calendar"/></svg></span><span class="lc-kicker">YOUR SOCIAL CALENDAR</span></span>
+        <h3>Put your events on fomo’s radar.</h3>
+        <p>Upload your social calendar</p>
+      </li>
+      <li class="live-card live-more reveal" style="--d:.30s">
+        <span class="lc-logos"><img class="is-wide" src="/tasks/assets/icybox-wordmark.svg" alt="IcyBox" width="133" height="20"><img src="/tasks/assets/rho-wordmark.svg" alt="Rho" width="63" height="29"><span class="slots" aria-hidden="true"><i></i><i></i></span></span>
+        <h3>More companies, same circle.</h3>
+        <p>New partners show up here when they launch.</p>
+      </li>
+    </ul>
   </div>
 </section>
 
