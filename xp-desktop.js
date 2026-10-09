@@ -77,6 +77,10 @@
 .xpd-win__text h2{margin:0 0 6px;font:700 14px/1.2 var(--xpd-display)}\
 .xpd-win__text h2 small{font:400 11px Tahoma,Verdana,sans-serif;color:#5f5f5f;margin-left:6px}\
 .xpd-win__text p{margin:0 0 9px}\
+.xpd-paths{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2px 16px;margin:2px 0 0}\
+.xpd-paths h3{margin:0 0 2px;font:700 11px/1.4 Tahoma,Verdana,sans-serif;color:#5f5f5f}\
+.xpd-paths ul{list-style:none;margin:0 0 8px;padding:0}\
+.xpd-paths li{font-size:11.5px;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\
 .xpd-win__actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid #d6d2c4}\
 .xpd-btn{display:inline-flex;align-items:center;justify-content:center;min-width:76px;height:23px;padding:0 12px;font-size:11px;color:#000;text-decoration:none;cursor:pointer;background:linear-gradient(#fff,#f3f2ec 45%,#e2e0d7);border:1px solid #003c74;border-radius:3px;box-shadow:inset 0 0 0 1px #fff}\
 .xpd-btn:hover{box-shadow:inset 0 0 0 1px #fff,inset 0 0 0 2px #f9c46b}\

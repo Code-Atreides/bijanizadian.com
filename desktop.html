@@ -11,6 +11,18 @@
 
 <script src="xp-desktop.js"></script>
 <script>
+  // Groups of [heading, [[path, page name], ...]] as a two-column list of slash paths.
+  function fomoPaths(groups) {
+    var cols = [groups.slice(0, 2), groups.slice(2)];
+    return '<div class="xpd-paths">' + cols.map(function (col) {
+      return '<div>' + col.map(function (g) {
+        return '<h3>' + g[0] + '</h3><ul>' + g[1].map(function (p) {
+          return '<li><a href="' + p[0] + '" title="' + p[1] + '" target="_blank" rel="noopener">' + p[0] + '</a></li>';
+        }).join('') + '</ul>';
+      }).join('') + '</div>';
+    }).join('') + '</div>';
+  }
+
   XPDesktop.mount('#desk', {
     name: 'Bijan Izadian',
     subtitle: 'New York City',
@@ -20,8 +32,12 @@
         body: '' },
       { id: 'fomo',    label: 'fomo',          icon: 'bell',    title: 'fomo',
         link: 'https://fomo.family', linkLabel: 'Open fomo',
-        extra: [{ label: 'fomo/campus', href: '/campus' }, { label: 'Dinner Series', href: '/dinners' }, { label: 'Game Day', href: '/gameday' }, { label: 'Crew sheet', href: '/crewsheet' }],
-        body: '' },
+        body: fomoPaths([
+          ['campus', [['/campus', 'Campus hub'], ['/campus/landing', 'Campus landing page'], ['/campus/directory', 'Page directory'], ['/campus/manual', 'Campus manual'], ['/campus/visit', 'Visit a friend'], ['/campus/ambassadors', 'Campus ambassadors'], ['/campus/ambassadors/apply', 'Apply to be an ambassador']]],
+          ['team & earlier designs', [['/irrigation', 'Irrigation, the team workspace'], ['/campus-wars', 'Campus Wars'], ['/campus-connected', 'Earlier campus design']]],
+          ['greek wars', [['/greekwars', 'Greek Wars'], ['/greekwars/onboard', 'Chapter onboarding'], ['/greekwars/claim', 'Onboard your chapter'], ['/greekwars/refer', 'Refer a fraternity'], ['/greekwars/invite', 'Greek Wars invite']]],
+          ['dinners & events', [['/dinners', 'Dinner Series'], ['/dinners/apply', 'Apply to host a dinner'], ['/crewsheet', 'Dinner crew sheet'], ['/gameday', 'Game Day'], ['/hqvisitform', 'Come by fomo HQ']]]
+        ]) },
       { id: 'build',   label: 'Build request', icon: 'form',    title: 'Build request',
         link: '/build', linkLabel: 'Open the form',
         body: '<p>Have a web app idea you want built? Send it through the intake form and I\'ll come back with scope, timing, and cost.</p>' },
