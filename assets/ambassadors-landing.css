@@ -466,6 +466,10 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .rw-experience{padding:20px 16px}
   .li-card{padding:16px 14px}
   .li-positions{--indent:52px;--rail:22px}
+  /* Phones keep one line per title so the card stays short. */
+  .li-bullets li:nth-child(n+2){display:none}
+  .li-lock{top:auto;bottom:-6px;transform:translateX(-50%)}
+  [data-unlock].is-unlocked .li-lock{transform:translate(-50%,10px) scale(.9)}
   .rw-item{padding:20px 18px}
   .arr-campus{font-size:15px}
   .foot-row{flex-wrap:wrap;padding-top:20px;padding-bottom:20px}
