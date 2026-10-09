@@ -289,7 +289,7 @@ p{margin:0}
 
 /* Panels share one grid cell, so switching tasks never changes the section height. */
 .taskx-panels{display:grid}
-.tp{grid-area:1/1;position:relative;display:flex;flex-direction:column;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.tp{grid-area:1/1;position:relative;display:flex;flex-direction:column;justify-content:center;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
 .tp[hidden]{display:flex;visibility:hidden;pointer-events:none}
 .tp-status{position:absolute;top:clamp(16px,calc(2.6 * var(--vh)),24px);right:24px;background:var(--soft);color:var(--accent);border-radius:999px;padding:4px 12px;font-size:13px}
 .tp-reward{display:flex;gap:18px;padding:clamp(22px,calc(4.4 * var(--vh)),40px) clamp(28px,3vw,40px) clamp(14px,calc(2.4 * var(--vh)),22px)}
@@ -304,7 +304,7 @@ p{margin:0}
 .tp-pitch{margin:0 28px;padding:clamp(12px,calc(2 * var(--vh)),18px) 20px;border-radius:14px;background:color-mix(in srgb,var(--accent) 4%,white);border:1px solid color-mix(in srgb,var(--accent) 11%,white)}
 .tp-pitch>span{font-size:11px;letter-spacing:.12em;color:var(--muted)}
 .tp-pitch blockquote{margin:6px 0 0;font-size:clamp(14.5px,calc(2.1 * var(--vh)),16px);line-height:1.55}
-.tp-steps{margin-top:auto;padding:clamp(10px,calc(2 * var(--vh)),20px) clamp(28px,3vw,40px) clamp(16px,calc(3.4 * var(--vh)),32px) calc(clamp(28px,3vw,40px) + 64px)}
+.tp-steps{padding:clamp(14px,calc(3 * var(--vh)),30px) clamp(28px,3vw,40px) clamp(16px,calc(3.4 * var(--vh)),32px) calc(clamp(28px,3vw,40px) + 64px)}
 .tp-steps h4{font-size:12px;letter-spacing:.12em;font-weight:500;color:var(--muted);margin-bottom:4px}
 .tp-steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .tp-steps li{display:flex;align-items:center;gap:12px;padding:clamp(7px,calc(1.4 * var(--vh)),11px) 0;font-size:clamp(14.5px,calc(2.2 * var(--vh)),16px)}
