@@ -53,6 +53,7 @@ h1,h2,h3,h4{margin:0;font-weight:500;text-wrap:balance}
 p,dd{margin:0;text-wrap:pretty}
 dl{margin:0}
 :is(a,button,input,[tabindex]):focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.nowrap{white-space:nowrap}
 .visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .wrap{width:100%;max-width:calc(1180px + var(--gutter) * 2);margin:0 auto;padding:0 var(--gutter)}
 .skip-link{position:absolute;left:16px;top:-80px;z-index:100;padding:12px 18px;background:var(--paper);border-radius:10px;box-shadow:0 8px 24px #0000001f}
@@ -460,7 +461,7 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .arrival{min-height:0}
 }
 @media (max-width:640px){
-  :root{--gutter:16px;--radius:18px;--header:60px}
+  :root{--gutter:16px;--radius:18px;--header:60px;--sy:44px;--head-gap:22px;--lede:16px}
   .head-row{gap:14px}
   .head-nav{display:none}
   .pill-ghost{margin-left:auto}
@@ -468,13 +469,20 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .brand-divider,.brand-campus{display:none}
   .hero-title{font-size:clamp(40px,11.5vw,52px)}
   .lead{font-size:16px}
-  .stage{padding:2.2em 0 3.4em .4em}
+  /* One full-width action, the secondary link centred under it. */
+  .hero-actions{flex-direction:column;align-items:stretch;gap:6px}
+  .hero-actions .btn{justify-content:center}
+  .hero-actions .link-arrow{justify-content:center}
+  .stage{padding:1.6em 0 5.4em .4em}
   .lane-card{left:.4em}
   .flow-step,.flow-step:nth-child(n){padding:18px 18px 22px}
   .flow-step p{font-size:14.5px}
-  .live-grid{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 calc(var(--gutter) * -1);padding:0 var(--gutter) 6px;scrollbar-width:none}
-  .live-grid::-webkit-scrollbar{display:none}
-  .live-card{flex:0 0 min(80%,320px);scroll-snap-align:center}
+  /* The five tasks are the core content, so phones stack them instead of hiding four off-screen. */
+  .live-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+  .live-card{gap:8px;padding:16px 16px 14px;border-radius:16px}
+  .live-card h3{font-size:20px}
+  .lc-meta{margin-top:4px;padding-top:10px}
+  .lc-lanes{margin-top:4px}
   .rw-experience{padding:20px 16px}
   .li-card{padding:16px 14px}
   .li-positions{--indent:52px;--rail:22px}
@@ -483,6 +491,7 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
   .li-lock{top:auto;bottom:-6px;transform:translateX(-50%)}
   [data-unlock].is-unlocked .li-lock{transform:translate(-50%,10px) scale(.9)}
   .rw-item{padding:20px 18px}
+  .why-copy{font-size:16px;line-height:1.65}
   .arr-campus{font-size:15px}
   .foot-row{flex-wrap:wrap;padding-top:20px;padding-bottom:20px}
   .foot-tag{display:none}
