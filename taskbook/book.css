@@ -237,6 +237,25 @@ input:disabled{opacity:.6}
 #experience-copy-fallback{margin-top:6px;font-size:11px}
 .board-caption{display:flex;justify-content:space-between;gap:12px;margin-top:16px;font-size:11px;color:#8f897f}
 .board-caption strong{font-weight:500;color:var(--body)}
+/* The signed-in contents page fills its page exactly: spacing and type follow the page height, the rows share what is
+   left (capped so they stay a list), and the caption sits on the bottom margin, or steps aside on short pages.
+   An opened row takes the room it needs; only then can the page scroll. */
+@media (min-width:821px){
+ .contents-post .page-inner{display:flex;flex-direction:column;container-type:size;padding:min(72px,calc(var(--ph) * .1)) 9% min(54px,calc(var(--ph) * .075))}
+ .contents-post .campus-identity{margin-bottom:min(14px,calc(var(--ph) * .016))}
+ .contents-post #member-greeting{font-size:clamp(12px,calc(var(--ph) * .019),16px)}
+ .contents-post #pass-school{font-size:clamp(11px,calc(var(--ph) * .017),14px)}
+ .contents-post .title{flex:none;font-size:clamp(24px,min(calc(var(--pw) * .1),calc(var(--ph) * .068)),64px);margin-bottom:min(18px,calc(var(--ph) * .022))}
+ .contents-post .lede{font-size:clamp(12px,calc(var(--ph) * .019),17px);margin-bottom:min(18px,calc(var(--ph) * .02))}
+ .contents-post .toc{flex:1 1 auto;display:flex;flex-direction:column}
+ .contents-post .toc-item{flex:1 1 0;display:flex;flex-direction:column;justify-content:center;max-height:calc(var(--ph) * .078)}
+ .contents-post .toc-item:has(.toc-row[aria-expanded=true]){flex:none;max-height:none}
+ .contents-post .toc-row{padding:min(8px,calc(var(--ph) * .007)) 2px;font-size:clamp(12px,min(calc(var(--pw) * .036),calc(var(--ph) * .025)),22px)}
+ .contents-post .toc-p{font-size:.7em}
+ .contents-post .board-caption{flex:none;margin-top:auto;padding-top:min(16px,calc(var(--ph) * .02));font-size:clamp(10px,calc(var(--ph) * .015),13px)}
+ @container (max-height:420px){.contents-post .board-caption{display:none}}
+}
+
 
 /* Task pages */
 .task-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
