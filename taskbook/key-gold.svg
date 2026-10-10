@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 40">
+<!-- Brass key, lit from the desk lamp (up and to the right). The bow's hole is cut out so the key ring shows through it. -->
+<defs>
+<radialGradient id="bow" cx=".58" cy=".3" r=".8"><stop offset="0" stop-color="#fff8dc"/><stop offset=".28" stop-color="#f6d57b"/><stop offset=".6" stop-color="#dda940"/><stop offset=".86" stop-color="#a7731a"/><stop offset="1" stop-color="#7a520e"/></radialGradient>
+<linearGradient id="rod" x1="0" y1="17" x2="0" y2="23" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff5d2"/><stop offset=".22" stop-color="#f5d474"/><stop offset=".55" stop-color="#dba83e"/><stop offset=".84" stop-color="#a5721b"/><stop offset="1" stop-color="#78510f"/></linearGradient>
+<linearGradient id="collar" x1="0" y1="14" x2="0" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff3c9"/><stop offset=".25" stop-color="#f2cf6c"/><stop offset=".6" stop-color="#d29d35"/><stop offset="1" stop-color="#7d5510"/></linearGradient>
+<linearGradient id="bit" x1="0" y1="22" x2="0" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e9bc50"/><stop offset=".5" stop-color="#c38c27"/><stop offset="1" stop-color="#8a5e13"/></linearGradient>
+<mask id="hole"><rect width="156" height="40" fill="#fff"/><circle cx="34.4" cy="20" r="8" fill="#000"/></mask>
+</defs>
+<g stroke="#5c3d09" stroke-opacity=".55" stroke-width=".7">
+<path d="M124 22H146V31H141V27H137V36H131V29H127V33H124Z" fill="url(#bit)"/>
+<rect x="70" y="17" width="80" height="6" rx="3" fill="url(#rod)"/>
+<path d="M50 15.2L61 16.8V23.2L50 24.8Z" fill="url(#collar)"/>
+<rect x="60" y="14" width="6" height="12" rx="1.6" fill="url(#collar)"/>
+<rect x="67.5" y="15.4" width="4" height="9.2" rx="1.2" fill="url(#collar)"/>
+<circle cx="34.4" cy="20" r="18" fill="url(#bow)" mask="url(#hole)"/>
+</g>
+<!-- Engraving, bevels and glints -->
+<circle cx="34.4" cy="20" r="13.2" fill="none" stroke="#7a520e" stroke-opacity=".5" stroke-width="1.1"/>
+<circle cx="34.4" cy="20.6" r="13.2" fill="none" stroke="#fff6d6" stroke-opacity=".45" stroke-width=".6"/>
+<circle cx="34.4" cy="20" r="8.4" fill="none" stroke="#6a460c" stroke-opacity=".7" stroke-width="1"/>
+<path d="M28.6 15.4A8.4 8.4 0 0 1 40.6 14.6" fill="none" stroke="#fff4cc" stroke-opacity=".5" stroke-width=".6" transform="rotate(180 34.4 20)"/>
+<ellipse cx="41" cy="9.5" rx="4.6" ry="2" fill="#fffbea" opacity=".75" transform="rotate(28 41 9.5)"/>
+<rect x="73" y="17.9" width="74" height=".9" rx=".45" fill="#fffbe8" opacity=".6"/>
+<rect x="61" y="15" width="4" height=".8" rx=".4" fill="#fffbe8" opacity=".6"/>
+</svg>
