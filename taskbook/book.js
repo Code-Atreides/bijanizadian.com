@@ -67,7 +67,8 @@ function apply(turn,t){
 // A tab is glued to the leaf whose back is its task's first page, so it swings over the spine with that leaf,
 // a hair above it, and shows its back once it passes upright. Jumps of several leaves carry all their tabs together.
 function flipTabs(turn,t){
- if(single()||turn.from<0||turn.to<0)return;
+ // Opening never carries a tab (it lands on the contents). Closing carries every tab on the left back over with the cover.
+ if(single()||turn.from<0)return;
  const lo=Math.min(turn.from,turn.to),hi=Math.max(turn.from,turn.to),swing=turn.dir>0?t:1-t;
  for(const tab of tabs){
   const page=Number(tab.dataset.goto);if(page<=lo||page>hi)continue;
@@ -105,7 +106,7 @@ async function openBook(){
 }
 async function closeBook(){
  if(!isOpen||busy)return;busy=true;
- if(!single()&&cur!==0){const back=setup(cur,0);start(back);await tween(back,0,1,800);cur=0;}
+ // Like shutting a real book: the left side, cover and all, swings straight over onto the right from wherever it is open.
  body.classList.remove('is-spread');
  const turn=setup(cur,-1);start(turn);await tween(turn,0,1,single()?800:1050);
  isOpen=false;cur=0;busy=false;paint();body.classList.remove('is-open');
@@ -137,6 +138,18 @@ function pageTurnClick(event){
  if(target<0||target>=pages.length)return false;
  go(target);return true;
 }
+
+// Chrome's fast scrolling can't find a page's scroll area inside the 3D book, so wheel and trackpad scrolling stall
+// (touch is fine). Scroll here instead: the nearest scrollable thing under the cursor that can still move that way.
+const scrollable=el=>/(auto|scroll)/.test(getComputedStyle(el).overflowY)&&el.scrollHeight>el.clientHeight;
+document.addEventListener('wheel',event=>{
+ const page=event.target.closest?.('.page.is-shown');if(!page||event.ctrlKey)return;
+ const dy=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?page.clientHeight:1);if(!dy)return;
+ for(let el=event.target;el&&el!==page;el=el.parentElement){
+  if(!scrollable(el))continue;
+  if(dy<0?el.scrollTop>0:el.scrollTop<el.scrollHeight-el.clientHeight-1){el.scrollTop+=dy;event.preventDefault();return;}
+ }
+},{passive:false});
 
 // Chapter links: tabs, contents and in-page buttons.
 document.addEventListener('click',event=>{
