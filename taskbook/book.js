@@ -199,7 +199,7 @@ async function writeStartHere(){
  if(!text)return;
  wrote=true;
  const rest=$('.pencil-rest'),fly=$('#pencil'),tip=rest.querySelector('.tip').getBoundingClientRect(),box=text.getBoundingClientRect();
- if(reduced.matches||tip.left>innerWidth||tip.top>innerHeight){text.classList.add('is-written');return;}
+ if(reduced.matches){text.classList.add('is-written');return;}
  const from={x:tip.left,y:tip.top},a={x:box.left+4,y:box.bottom-8},b={x:box.left+Math.min(box.width,150)-2,y:box.bottom-10};
  rest.style.visibility='hidden';fly.classList.add('is-flying');
  const pose=(p,rot)=>`translate(${p.x}px,${p.y}px) rotate(${rot}deg)`;
@@ -212,6 +212,52 @@ async function writeStartHere(){
  await fly.animate([{transform:pose(b,14)},{transform:pose({x:back.left,y:back.top},62)}],{duration:700,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'}).finished;
  fly.classList.remove('is-flying');rest.style.visibility='';
 }
+
+// First-visit intro. The room is dark; the desk lamp flickers on and the view drifts in; the title blurs in word by word;
+// the book opens itself; the view pushes in on "start here" while the pencil writes it; then it eases back out.
+// Any click, key or scroll skips to the open book. Plays once per browser (?intro replays it), never with reduced motion.
+const INTRO_KEY='tasks2-intro-v1',scene=$('.scene'),introTitle=$('#intro'),root=document.documentElement;
+async function playIntro(){
+ let skipped=false;
+ const pause=ms=>new Promise(r=>setTimeout(r,ms)),settle=a=>a.finished.catch(()=>{});
+ const end=()=>{for(const a of scene.getAnimations())a.cancel();scene.style.transformOrigin='';root.style.removeProperty('--cam');
+  body.classList.remove('is-intro','intro-dark','intro-lamp','intro-chrome');introTitle.classList.remove('is-in','is-out');root.classList.remove('intro-pending');
+  remember(INTRO_KEY,1);for(const t of ['pointerdown','keydown','wheel'])removeEventListener(t,skip,true);};
+ const skip=event=>{if(skipped)return;skipped=true;if(event?.type==='keydown')event.preventDefault();end();if(!isOpen&&!busy)openBook();};
+ for(const t of ['pointerdown','keydown','wheel'])addEventListener(t,skip,true);
+ body.classList.add('is-intro','intro-dark');root.classList.remove('intro-pending');
+ // Starts pushed in and offset (the desk still fills the frame), so the title has the left side; then pulls back to rest.
+ const pan=single()?'translateY(-8vh) scale(1.3)':'translateX(15vw) scale(1.36)',hold=single()?'translateY(-7vh) scale(1.28)':'translateX(14vw) scale(1.32)';
+ const drift=scene.animate([{transform:pan},{transform:hold,offset:.7},{transform:'none'}],{duration:3900,easing:'cubic-bezier(.45,0,.25,1)',fill:'forwards'});
+ await pause(250);if(skipped)return;
+ body.classList.replace('intro-dark','intro-lamp');
+ await pause(600);if(skipped)return;
+ introTitle.classList.add('is-in');body.classList.add('intro-chrome');
+ await pause(2550);if(skipped)return;
+ introTitle.classList.add('is-out');
+ await pause(150);if(skipped)return;
+ await settle(drift);drift.cancel();
+ wrote=true;await openBook();
+ const text=shown(cur).find(el=>el?.querySelector('.start-here'))?.querySelector('.start-here');
+ if(skipped){if(text&&!text.classList.contains('is-written'))writeStartHere();return;}
+ if(text&&!single()){
+  await pause(200);if(skipped){writeStartHere();return;}
+  const r=text.getBoundingClientRect(),p={x:r.left+Math.min(r.width,160)/2,y:r.top+r.height/2+30},zoom=1.34;
+  const to=`translate(${(innerWidth/2-p.x)*.55}px,${(innerHeight/2-p.y)*.55}px) scale(${zoom})`;
+  scene.style.transformOrigin=`${p.x}px ${p.y}px`;
+  await settle(scene.animate([{transform:'none',filter:'blur(0)'},{filter:'blur(1.8px)',offset:.45},{transform:to,filter:'blur(0)'}],{duration:1150,easing:'cubic-bezier(.65,0,.2,1)',fill:'forwards'}));
+  if(skipped){writeStartHere();return;}
+  root.style.setProperty('--cam',zoom);await writeStartHere();root.style.removeProperty('--cam');if(skipped)return;
+  for(const a of scene.getAnimations())a.cancel();
+  await settle(scene.animate([{transform:to,filter:'blur(0)'},{filter:'blur(1.2px)',offset:.5},{transform:'none',filter:'blur(0)'}],{duration:1050,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'}));
+ }else if(text)await writeStartHere();
+ if(!skipped){skipped=true;end();}
+}
+if(root.classList.contains('intro-pending'))(async()=>{
+ if(document.readyState!=='complete')await new Promise(r=>addEventListener('load',r,{once:true}));
+ await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,1500))]);
+ playIntro();
+})();
 
 // Sign-in swaps in the workspace pages; a saved session opens the book by itself. A guest (sign-in off) starts at the closed cover.
 let autoOpen=0;
