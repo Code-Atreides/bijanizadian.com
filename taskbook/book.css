@@ -354,7 +354,21 @@ input:disabled{opacity:.6}
 #bonus-next{margin:4px 0 0;font-size:11px;line-height:1.4;color:#a19ca7}
 .completion-bonus.earned{box-shadow:0 0 0 2px #fff,0 18px 30px -16px #1d0d7a90}
 .end-page .career-preview{margin-top:10px}
+/* What comes after the five: one quiet line, outlined like a locked slot, so the bonus page stays light. */
+.tier-next{display:flex;align-items:center;gap:9px;margin:10px 0 0;padding:8px 12px;border:1px dashed #ffffff4d;border-radius:12px;font-size:11.5px;line-height:1.4;color:#ffffffc2}
+.tier-next strong{font-weight:600;color:#fff}
+.tier-lock{flex:none;width:10px;height:12px;color:#ffffffb3}
 .end-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:18px}
+/* The bonus page fits its page too: spacing follows the page height, and on short pages the "Start task 1" link
+   (the tabs do the same job) and the optional-extra note (the headline says it) step aside. */
+@media (min-width:821px){
+ .end-page .page-inner{container-type:size}
+ .end-page .title{font-size:clamp(24px,min(calc(var(--pw) * .1),calc(var(--ph) * .068)),46px);margin-bottom:min(18px,calc(var(--ph) * .024))}
+ .end-page .plan{padding:min(16px,calc(var(--ph) * .022)) 16px}
+ .end-page .career-preview,.end-page .tier-next{margin-top:min(10px,calc(var(--ph) * .014))}
+ .end-page .end-links{margin-top:min(18px,calc(var(--ph) * .022))}
+ @container (max-height:400px){.end-page .end-links,.end-page #bonus-next{display:none}.end-page .tier-next{padding:6px 10px;margin-top:6px}.end-page .title{margin-bottom:8px}}
+}
 .end-links button{border:0;background:none;padding:4px 0;font-size:12px;color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#ffffff60}
 .end-page #shared-message{color:#ffffffc0}
 
