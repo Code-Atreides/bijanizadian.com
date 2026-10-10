@@ -1,26 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 156 40">
-<!-- Brass key, lit from the desk lamp (up and to the right). The bow's hole is cut out so the key ring shows through it. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 42">
+<!-- A brass Schlage-style SC4 key blank lying flat, head to the left: stepped head with a rounded triangular hole
+     (cut out, so the key ring shows through), "SC4 USA" stamped across it, and a milled, uncut blade with an angled tip.
+     Lit from the desk lamp (up and to the right). -->
 <defs>
-<radialGradient id="bow" cx=".58" cy=".3" r=".8"><stop offset="0" stop-color="#fff8dc"/><stop offset=".28" stop-color="#f6d57b"/><stop offset=".6" stop-color="#dda940"/><stop offset=".86" stop-color="#a7731a"/><stop offset="1" stop-color="#7a520e"/></radialGradient>
-<linearGradient id="rod" x1="0" y1="17" x2="0" y2="23" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff5d2"/><stop offset=".22" stop-color="#f5d474"/><stop offset=".55" stop-color="#dba83e"/><stop offset=".84" stop-color="#a5721b"/><stop offset="1" stop-color="#78510f"/></linearGradient>
-<linearGradient id="collar" x1="0" y1="14" x2="0" y2="26" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff3c9"/><stop offset=".25" stop-color="#f2cf6c"/><stop offset=".6" stop-color="#d29d35"/><stop offset="1" stop-color="#7d5510"/></linearGradient>
-<linearGradient id="bit" x1="0" y1="22" x2="0" y2="36" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#e9bc50"/><stop offset=".5" stop-color="#c38c27"/><stop offset="1" stop-color="#8a5e13"/></linearGradient>
-<mask id="hole"><rect width="156" height="40" fill="#fff"/><circle cx="34.4" cy="20" r="8" fill="#000"/></mask>
+<linearGradient id="brass" x1="0" y1="0" x2="0" y2="42" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ead08a"/><stop offset=".3" stop-color="#d9b65f"/><stop offset=".62" stop-color="#c49c45"/><stop offset="1" stop-color="#9c7a2e"/></linearGradient>
+<linearGradient id="sheen" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".45" stop-color="#fff" stop-opacity=".16"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset=".85" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+<filter id="brush" x="0" y="0" width="1" height="1"><feTurbulence type="fractalNoise" baseFrequency=".9 .02" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .35 0 0 0 0 .26 0 0 0 0 .08 0 0 0 .28 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+<mask id="hole"><rect width="100" height="42" fill="#fff"/><path d="M6.6 21L18.6 13.4V28.6Z" fill="#000" stroke="#000" stroke-width="3.2" stroke-linejoin="round"/></mask>
+<path id="key" d="M1.6 21C1.6 19.5 2.4 18.2 3.6 17.4L15.6 9.8V6.6H18.2V3.4H20.6V.8H30V3.4H32.6V6.6H35V10H37.2V13.5H93.4L99.4 15.4C100 15.6 100 16.4 99.6 16.9L93.6 28.5H37.2V32H35V35.4H32.6V38.6H30V41.2H20.6V38.6H18.2V35.4H15.6V32.2L3.6 24.6C2.4 23.8 1.6 22.5 1.6 21Z"/>
 </defs>
-<g stroke="#5c3d09" stroke-opacity=".55" stroke-width=".7">
-<path d="M124 22H146V31H141V27H137V36H131V29H127V33H124Z" fill="url(#bit)"/>
-<rect x="70" y="17" width="80" height="6" rx="3" fill="url(#rod)"/>
-<path d="M50 15.2L61 16.8V23.2L50 24.8Z" fill="url(#collar)"/>
-<rect x="60" y="14" width="6" height="12" rx="1.6" fill="url(#collar)"/>
-<rect x="67.5" y="15.4" width="4" height="9.2" rx="1.2" fill="url(#collar)"/>
-<circle cx="34.4" cy="20" r="18" fill="url(#bow)" mask="url(#hole)"/>
+<g mask="url(#hole)">
+<use href="#key" fill="url(#brass)" stroke="#6f5419" stroke-opacity=".7" stroke-width=".6"/>
+<use href="#key" fill="#000" filter="url(#brush)"/>
+<use href="#key" fill="url(#sheen)"/>
+<!-- milled keyway grooves along the blade -->
+<path d="M38.6 16.6H92.4" stroke="#7a5d1f" stroke-opacity=".75" stroke-width="1.1"/><path d="M38.6 17.6H92" stroke="#f3dc9c" stroke-opacity=".7" stroke-width=".5"/>
+<path d="M38.6 21.6H95" stroke="#7a5d1f" stroke-opacity=".7" stroke-width="1.4"/><path d="M38.6 22.9H94.4" stroke="#f3dc9c" stroke-opacity=".6" stroke-width=".5"/>
+<path d="M38.6 25.8H93.6" stroke="#7a5d1f" stroke-opacity=".55" stroke-width=".8"/>
+<path d="M37.2 14.1H93.2" stroke="#fff2c6" stroke-opacity=".75" stroke-width=".6"/>
+<!-- stepped head: engraved lines following the steps, and the stamp -->
+<path d="M21.2 1.8V40.2M29.4 1.8V40.2M18.8 4.4V37.6M33.2 7.6V34.4" stroke="#7a5d1f" stroke-opacity=".35" stroke-width=".45"/>
+<path d="M21.7 1.8V40.2M29.9 1.8V40.2" stroke="#fff2c6" stroke-opacity=".4" stroke-width=".35"/>
+<g font-family="Arial,Helvetica,sans-serif" font-size="4.6" font-weight="700" fill="#8a6a25" fill-opacity=".8" text-anchor="middle" letter-spacing=".3">
+<text transform="translate(26.9 31) rotate(-90)">SC4</text>
+<text transform="translate(26.9 11) rotate(-90)">USA</text>
 </g>
-<!-- Engraving, bevels and glints -->
-<circle cx="34.4" cy="20" r="13.2" fill="none" stroke="#7a520e" stroke-opacity=".5" stroke-width="1.1"/>
-<circle cx="34.4" cy="20.6" r="13.2" fill="none" stroke="#fff6d6" stroke-opacity=".45" stroke-width=".6"/>
-<circle cx="34.4" cy="20" r="8.4" fill="none" stroke="#6a460c" stroke-opacity=".7" stroke-width="1"/>
-<path d="M28.6 15.4A8.4 8.4 0 0 1 40.6 14.6" fill="none" stroke="#fff4cc" stroke-opacity=".5" stroke-width=".6" transform="rotate(180 34.4 20)"/>
-<ellipse cx="41" cy="9.5" rx="4.6" ry="2" fill="#fffbea" opacity=".75" transform="rotate(28 41 9.5)"/>
-<rect x="73" y="17.9" width="74" height=".9" rx=".45" fill="#fffbe8" opacity=".6"/>
-<rect x="61" y="15" width="4" height=".8" rx=".4" fill="#fffbe8" opacity=".6"/>
+<!-- rim of the triangular hole -->
+<path d="M6.6 21L18.6 13.4V28.6Z" fill="none" stroke="#6f5419" stroke-opacity=".6" stroke-width="4.4" stroke-linejoin="round"/>
+<path d="M6.6 21L18.6 13.4V28.6Z" fill="none" stroke="#f5e1a6" stroke-opacity=".55" stroke-width="3.6" stroke-linejoin="round" transform="translate(.4 .4)"/>
+</g>
 </svg>
