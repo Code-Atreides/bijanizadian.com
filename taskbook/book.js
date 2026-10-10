@@ -215,14 +215,14 @@ async function writeStartHere(){
 
 // First-visit intro. The room is dark; the desk lamp flickers on and the view drifts in; the title blurs in word by word;
 // the book opens itself; the view pushes in on "start here" while the pencil writes it; then it eases back out.
-// Any click, key or scroll skips to the open book. Plays once per browser (?intro replays it), never with reduced motion.
-const INTRO_KEY='tasks2-intro-v1',scene=$('.scene'),introTitle=$('#intro'),root=document.documentElement;
+// Plays on every visit; any click, key or scroll skips to the open book. Never plays with reduced motion.
+const scene=$('.scene'),introTitle=$('#intro'),root=document.documentElement;
 async function playIntro(){
  let skipped=false;
  const pause=ms=>new Promise(r=>setTimeout(r,ms)),settle=a=>a.finished.catch(()=>{});
  const end=()=>{for(const a of scene.getAnimations())a.cancel();scene.style.transformOrigin='';root.style.removeProperty('--cam');
   body.classList.remove('is-intro','intro-dark','intro-lamp','intro-chrome');introTitle.classList.remove('is-in','is-out');root.classList.remove('intro-pending');
-  remember(INTRO_KEY,1);for(const t of ['pointerdown','keydown','wheel'])removeEventListener(t,skip,true);};
+  for(const t of ['pointerdown','keydown','wheel'])removeEventListener(t,skip,true);};
  const skip=event=>{if(skipped)return;skipped=true;if(event?.type==='keydown')event.preventDefault();end();if(!isOpen&&!busy)openBook();};
  for(const t of ['pointerdown','keydown','wheel'])addEventListener(t,skip,true);
  body.classList.add('is-intro','intro-dark');root.classList.remove('intro-pending');
