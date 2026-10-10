@@ -61,6 +61,10 @@
         "destination": "/hqvisitform/index.html"
       },
       {
+        "source": "/taskbook",
+        "destination": "/taskbook/index.html"
+      },
+      {
         "source": "/greekwars/clan/**",
         "destination": "/greekwars/clan.html"
       },
