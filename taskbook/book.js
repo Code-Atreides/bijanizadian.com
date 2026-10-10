@@ -214,14 +214,14 @@ async function writeStartHere(){
 }
 
 // First-visit intro. The room is dark; the desk lamp flickers on and the view drifts in; the title blurs in word by word;
-// the book opens itself; the view pushes in on "start here" while the pencil writes it; then it eases back out.
+// the book opens itself; the camera pushes in and racks focus onto the headline; then it eases back out.
 // Plays on every visit; any click, key or scroll skips to the open book. Never plays with reduced motion.
 const scene=$('.scene'),introTitle=$('#intro'),root=document.documentElement;
 async function playIntro(){
  let skipped=false;
  const pause=ms=>new Promise(r=>setTimeout(r,ms)),settle=a=>a.finished.catch(()=>{});
  const end=()=>{for(const a of scene.getAnimations())a.cancel();scene.style.transformOrigin='';root.style.removeProperty('--cam');
-  body.classList.remove('is-intro','intro-dark','intro-lamp','intro-chrome');introTitle.classList.remove('is-in','is-out');root.classList.remove('intro-pending');
+  body.classList.remove('is-intro','intro-dark','intro-lamp','intro-chrome','rack-soft','rack-focus');introTitle.classList.remove('is-in','is-out');root.classList.remove('intro-pending');
   for(const t of ['pointerdown','keydown','wheel'])removeEventListener(t,skip,true);};
  const skip=event=>{if(skipped)return;skipped=true;if(event?.type==='keydown')event.preventDefault();end();if(!isOpen&&!busy)openBook();};
  for(const t of ['pointerdown','keydown','wheel'])addEventListener(t,skip,true);
@@ -237,20 +237,25 @@ async function playIntro(){
  introTitle.classList.add('is-out');
  await pause(150);if(skipped)return;
  await settle(drift);drift.cancel();
- wrote=true;await openBook();
- const text=shown(cur).find(el=>el?.querySelector('.start-here'))?.querySelector('.start-here');
- if(skipped){if(text&&!text.classList.contains('is-written'))writeStartHere();return;}
- if(text&&!single()){
-  await pause(200);if(skipped){writeStartHere();return;}
-  const r=text.getBoundingClientRect(),p={x:r.left+Math.min(r.width,160)/2,y:r.top+r.height/2+30},zoom=1.34;
-  const to=`translate(${(innerWidth/2-p.x)*.55}px,${(innerHeight/2-p.y)*.55}px) scale(${zoom})`;
+ wrote=true;await openBook();if(skipped)return;
+ // Rack focus: the camera pushes in on the foreword's headline while the focus is soft everywhere, then pulls onto the
+ // headline (the desk and the rest of the spread stay soft), holds, and eases back out as the whole page comes into focus.
+ const head=$('#foreword-title');
+ if(head&&head.closest('.page.is-shown')){
+  const r=head.getBoundingClientRect(),p={x:r.left+r.width*.45,y:r.top+r.height/2},zoom=single()?1.12:1.22;
+  // Frame toward the headline, but never so far that the scene's edge comes into view.
+  const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v)),W=innerWidth,H=innerHeight;
+  const tx=clamp((W/2-p.x)*.5,(W-p.x)*(1-zoom),p.x*(zoom-1)),ty=clamp((H/2-p.y)*.5,(H-p.y)*(1-zoom),p.y*(zoom-1));
+  const to=`translate(${tx}px,${ty}px) scale(${zoom})`;
   scene.style.transformOrigin=`${p.x}px ${p.y}px`;
-  await settle(scene.animate([{transform:'none',filter:'blur(0)'},{filter:'blur(1.8px)',offset:.45},{transform:to,filter:'blur(0)'}],{duration:1150,easing:'cubic-bezier(.65,0,.2,1)',fill:'forwards'}));
-  if(skipped){writeStartHere();return;}
-  root.style.setProperty('--cam',zoom);await writeStartHere();root.style.removeProperty('--cam');if(skipped)return;
-  for(const a of scene.getAnimations())a.cancel();
-  await settle(scene.animate([{transform:to,filter:'blur(0)'},{filter:'blur(1.2px)',offset:.5},{transform:'none',filter:'blur(0)'}],{duration:1050,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'}));
- }else if(text)await writeStartHere();
+  body.classList.add('rack-soft');
+  const push=scene.animate([{transform:'none'},{transform:to}],{duration:1500,easing:'cubic-bezier(.55,0,.15,1)',fill:'forwards'});
+  await pause(650);if(skipped)return;
+  body.classList.add('rack-focus');
+  await settle(push);await pause(1100);if(skipped)return;
+  body.classList.remove('rack-soft','rack-focus');
+  await settle(scene.animate([{transform:to},{transform:'none'}],{duration:1300,easing:'cubic-bezier(.5,0,.2,1)',fill:'forwards'}));
+ }
  if(!skipped){skipped=true;end();}
 }
 if(root.classList.contains('intro-pending'))(async()=>{

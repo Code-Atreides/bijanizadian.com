@@ -366,7 +366,13 @@ input:disabled{opacity:.6}
 .tier-next strong{font-weight:600;color:#fff}
 .tier-lock{flex:none;width:10px;height:12px;color:#ffffffb3}
 .end-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:18px}
-.foreword-projects .start-here{margin:-4px 0 0 -2px}
+/* Rack focus (intro): soft everywhere, then the foreword headline pulls sharp while the desk and the rest stay soft. */
+body.is-intro .desk,body.is-intro .props{transition:transform 1.5s var(--ease),filter 1s var(--ease)}
+body.is-intro .page-inner>*{transition:filter 1s var(--ease)}
+body.rack-soft .desk,body.rack-soft .props{filter:blur(7px)}
+body.rack-soft .page.is-shown .page-inner>*{filter:blur(3.5px)}
+body.rack-focus .page.is-shown .page-inner>#foreword-title{filter:blur(0);transition-duration:1.1s}
+body.rack-focus .foreword-projects .page-inner>*{filter:blur(5px)}
 
 /* First-visit intro (book.js plays it): the room starts dark, the desk lamp flickers on, the title blurs in word by word,
    the book opens itself, the view pushes in while the pencil writes, then eases back. */
