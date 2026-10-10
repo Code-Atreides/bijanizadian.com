@@ -29,10 +29,9 @@
       BAGS.forEach(function (b) {
         var li = el('li', 'bag-card');
         if (copy) li.setAttribute('aria-hidden', 'true');
-        var img = el('img'); img.src = src(b); img.alt = ''; img.width = 220; img.height = 220; img.loading = 'lazy';
-        var p = el('p'); p.textContent = b.brand + ' ' + b.name;
+        var img = el('img'); img.src = src(b); img.alt = copy ? '' : b.brand + ' ' + b.name; img.width = 220; img.height = 220; img.loading = 'lazy';
         var price = el('b'); price.textContent = short(b.price);
-        li.append(img, p, price);
+        li.append(img, price);
         track.appendChild(li);
       });
     }
@@ -48,8 +47,7 @@
       tier: spinner.querySelector('[data-pull-tier]'),
       brand: spinner.querySelector('[data-pull-brand]'),
       name: spinner.querySelector('[data-pull-name]'),
-      price: spinner.querySelector('[data-pull-price]'),
-      offer: spinner.querySelector('[data-pull-offer]')
+      price: spinner.querySelector('[data-pull-price]')
     };
     var COUNT = 44, LAND_MIN = 32, spinning = false, current = BAGS[0];
 
@@ -75,7 +73,6 @@
       out.brand.textContent = b.brand;
       out.name.textContent = b.name;
       out.price.textContent = full(b.price);
-      out.offer.textContent = full(b.price * 0.9);
     };
     var spin = function () {
       if (spinning) return;
@@ -173,7 +170,6 @@
     else if (input.required && !v) ok = false;
     else if (input.type === 'email' && v) ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     else if (input.type === 'tel' && v) ok = digits(v).length >= 10;
-    else if (input.type === 'url' && v) ok = /^https?:\/\/\S+\.\S+/.test(v);
     if (input.type === 'checkbox') input.closest('.age').classList.toggle('is-invalid', !ok);
     else input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     return ok;
@@ -202,7 +198,6 @@
       chapter: form.chapter.value.trim(),
       instagram: handle(form.instagram.value),
       tiktok: handle(form.tiktok.value),
-      video_link: form.video_link.value.trim(),
       age_ok: true,
       submitted_at: new Date().toISOString(),
       page: location.pathname
