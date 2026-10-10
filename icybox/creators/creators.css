@@ -218,24 +218,31 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,mi
 @media (max-width:860px){
   .nav-links{display:none}
   .nav{padding-left:0.875rem}
-  .screen{min-height:auto;padding-top:calc(var(--nav-space) + 0.5rem);padding-bottom:3.5rem}
+  .screen{min-height:auto;padding-top:3rem;padding-bottom:3rem;scroll-margin-top:4.5rem}
   .hero{--strip:10.75rem;height:auto;min-height:0;display:flex;flex-direction:column;padding:calc(var(--nav-space) + 0.5rem) 0 0}
   .hero-copy{position:static;width:auto;padding:0 var(--gutter)}
-  .hero-phone{position:relative;right:auto;align-self:center;height:auto;width:min(80vw,23.75rem);margin-top:1.75rem}
-  .marquee{position:relative;flex:none;margin-top:-7.5rem;padding-bottom:1.25rem;height:auto}
-  .spin,.content,.apply{grid-template-columns:minmax(0,1fr);row-gap:2rem}
+  .hero-phone{position:relative;right:auto;align-self:center;height:auto;width:min(72vw,21rem);margin-top:2rem}
+  .marquee{position:relative;flex:none;margin-top:-6.5rem;padding-bottom:1.5rem;height:auto}
+  .spin,.content,.apply{grid-template-columns:minmax(0,1fr);row-gap:1.75rem}
   .spin-stage{min-height:0}
   .reward-card{grid-template-columns:minmax(0,1fr)}
   .reward-col+.reward-col{border-left:0;border-top:1px solid var(--hairline)}
   .ladder{height:9.375rem}
-  .boxes{margin-top:1.25rem}
+  .boxes{margin-top:1rem}
+  .footer{flex-direction:column;align-items:flex-start;gap:0.75rem}
+  .footer nav{margin-left:0}
   .clips{order:2;max-width:none;width:100%}
   .formats{grid-template-columns:1fr}
 }
 @media (max-width:520px){
   .nav-brand span{display:none}
-  .form-grid{grid-template-columns:1fr}
-  .hero h1{font-size:clamp(3.25rem,16.5vw,5rem)}
+  .form-grid label:nth-child(n+3):nth-child(-n+6){grid-column:1 / -1}
+  .apply-form{padding:1.25rem}
+  .hero h1{font-size:clamp(2.75rem,14.6vw,5rem)}
+  .hero-actions .btn{flex:1 1 auto}
+  .ladder-top figcaption{white-space:nowrap}
+  .steps li{grid-template-columns:2rem 1fr}
+  .reel{height:8.25rem}
   .spinner-top{flex-wrap:wrap}
   .spinner-note{order:3;width:100%;margin:0;text-align:left;font-size:0.625rem}
   .spinner-note+.spin-btn{margin-left:auto}
