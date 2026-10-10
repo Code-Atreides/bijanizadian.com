@@ -18,11 +18,12 @@ button{cursor:pointer}
 .desk{position:absolute;inset:-6%;background:url("/taskbook/desk-wood.svg") center/cover,var(--desk)}
 /* A desk lamp in a dim room. The lamp sits just off the top-right corner (where every shadow falls away from) and throws
    a warm tungsten pool; past it the room drops to deep brown-black. The layer covers the desk, props and book but not the
-   top bar. Closed, the pool is tight on the book; open, the lamp is turned to light the whole spread so the pages read. */
+   top bar. Closed, the pool is tight on the book; open, the lamp is turned to light the whole spread so the pages read:
+   an oval pool sized to the spread (--pw/--ph), nudged toward the lamp, that falls off smoothly into the room. */
 .lamp{position:absolute;inset:0;z-index:4;pointer-events:none}
 .lamp:before,.lamp:after{content:'';position:absolute;inset:0;transition:opacity 1.5s var(--ease)}
 .lamp:before{background:radial-gradient(circle at 92% -8%,#ffd69a42,#ffd69a00 30%),radial-gradient(ellipse 36% 42% at 58% 42%,#ffc27a26,#ffc27a00 72%),radial-gradient(ellipse 64% 70% at 57% 43%,#0b050200 0 22%,#0b050285 55%,#0b0502d2 80%,#0b0502ee 100%)}
-.lamp:after{opacity:0;--bx:calc(var(--pw) + 46px);--by:calc(var(--ph) / 2 + 30px);background:radial-gradient(circle at 92% -8%,#ffd69a33,#ffd69a00 30%),linear-gradient(90deg,#0b0502e0 0,#0b0502e0 calc(50% - var(--bx) - 70px),#0b050200 calc(50% - var(--bx) + 6px),#0b050200 calc(50% + var(--bx) - 6px),#0b0502c8 calc(50% + var(--bx) + 70px),#0b0502c8 100%),linear-gradient(180deg,#0b0502c8 0,#0b0502c8 calc(50% - var(--by) - 50px),#0b050200 calc(50% - var(--by) + 6px),#0b050200 calc(50% + var(--by) - 6px),#0b0502e6 calc(50% + var(--by) + 60px),#0b0502e6 100%),radial-gradient(ellipse 120% 120% at 78% 8%,#0b050200 0 40%,#0b050233 72%,#0b050266 100%)}
+.lamp:after{opacity:0;--cx:calc(50% + var(--pw) * .1);--cy:calc(50% - var(--ph) * .04);background:radial-gradient(circle at 92% -8%,#ffd69a33,#ffd69a00 30%),radial-gradient(ellipse calc(var(--pw) * 1.3) calc(var(--ph) * .8) at var(--cx) var(--cy),#ffc27a14,#ffc27a00 80%),radial-gradient(ellipse calc(var(--pw) * 1.42) calc(var(--ph) * .8) at var(--cx) var(--cy),#0b050200 0 58%,#0b050240 78%,#0b050299 100%,#0b0502d9 125%,#0b0502ee 160%),radial-gradient(ellipse 120% 120% at 78% 8%,#0b050200 0 45%,#0b050226 75%,#0b05024d 100%)}
 body.is-open .lamp:before{opacity:0}body.is-open .lamp:after{opacity:1}
 .desk:after{content:'';position:absolute;inset:0;opacity:.35;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .18 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
 body.is-open .desk,body.is-open .props{transform:scale(1.13)}
