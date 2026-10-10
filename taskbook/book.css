@@ -237,12 +237,23 @@ input:disabled{opacity:.6}
 #experience-copy-fallback{margin-top:6px;font-size:11px}
 .board-caption{display:flex;justify-content:space-between;gap:12px;margin-top:16px;font-size:11px;color:#8f897f}
 .board-caption strong{font-weight:500;color:var(--body)}
+/* Running heads: each page's first line sits high in the top margin across the full measure, over a hairline, like a
+   book's running head. Pages without a status on the right carry the book's title there instead. */
+@media (min-width:821px){
+ .page-inner{padding-top:clamp(22px,calc(var(--ph) * .045),40px)}
+ .page-inner>:is(.task-head,.kicker,.campus-identity):first-child{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:22px;margin:0 0 clamp(16px,calc(var(--ph) * .04),30px);padding-bottom:clamp(8px,calc(var(--ph) * .013),12px);border-bottom:1px solid var(--rule)}
+ .page-inner>.task-head:first-child .kicker{margin:0}
+ .page-inner>.kicker:first-child:after,.page-inner>.campus-identity:first-child:after{content:'campus tasks';margin-left:auto;font-size:10.5px;font-weight:500;letter-spacing:.01em;color:#a39d93}
+ .page-inner>.campus-identity:first-child:after{content:'Contents'}
+ .dark .page-inner>:first-child{border-color:#ffffff1f}.accent .page-inner>:first-child{border-color:#ffffff38}
+ .dark .page-inner>.kicker:first-child:after{color:#ffffff59}.accent .page-inner>.kicker:first-child:after{color:#ffffffa6}
+}
 /* The signed-in contents page fills its page exactly: spacing and type follow the page height, the rows share what is
    left (capped so they stay a list), and the caption sits on the bottom margin, or steps aside on short pages.
    An opened row takes the room it needs; only then can the page scroll. */
 @media (min-width:821px){
- .contents-post .page-inner{display:flex;flex-direction:column;container-type:size;padding:min(72px,calc(var(--ph) * .1)) 9% min(54px,calc(var(--ph) * .075))}
- .contents-post .campus-identity{margin-bottom:min(14px,calc(var(--ph) * .016))}
+ .contents-post .page-inner{display:flex;flex-direction:column;container-type:size;padding:clamp(22px,calc(var(--ph) * .045),40px) 9% min(54px,calc(var(--ph) * .075))}
+ .contents-post .campus-identity{margin-bottom:clamp(12px,calc(var(--ph) * .03),26px)}
  .contents-post #member-greeting{font-size:clamp(12px,calc(var(--ph) * .019),16px)}
  .contents-post #pass-school{font-size:clamp(11px,calc(var(--ph) * .017),14px)}
  .contents-post .title{flex:none;font-size:clamp(24px,min(calc(var(--pw) * .1),calc(var(--ph) * .068)),64px);margin-bottom:min(18px,calc(var(--ph) * .022))}
