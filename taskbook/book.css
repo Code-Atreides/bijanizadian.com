@@ -15,7 +15,15 @@ button{cursor:pointer}
 /* Desk, light and props */
 .scene{position:fixed;inset:0;overflow:hidden;overflow:clip}
 .desk,.props{transition:transform 1.5s var(--ease)}
-.desk{position:absolute;inset:-6%;background:radial-gradient(ellipse 70% 60% at 68% 28%,#fff3df45,#0000 70%),radial-gradient(ellipse 90% 85% at 50% 48%,#0000 55%,#24120633 80%,#1a0c0466 100%),url("/taskbook/desk-wood.svg") center/cover,var(--desk)}
+.desk{position:absolute;inset:-6%;background:url("/taskbook/desk-wood.svg") center/cover,var(--desk)}
+/* A desk lamp in a dim room. The lamp sits just off the top-right corner (where every shadow falls away from) and throws
+   a warm tungsten pool; past it the room drops to deep brown-black. The layer covers the desk, props and book but not the
+   top bar. Closed, the pool is tight on the book; open, the lamp is turned to light the whole spread so the pages read. */
+.lamp{position:absolute;inset:0;z-index:4;pointer-events:none}
+.lamp:before,.lamp:after{content:'';position:absolute;inset:0;transition:opacity 1.5s var(--ease)}
+.lamp:before{background:radial-gradient(circle at 92% -8%,#ffd69a42,#ffd69a00 30%),radial-gradient(ellipse 36% 42% at 58% 42%,#ffc27a26,#ffc27a00 72%),radial-gradient(ellipse 64% 70% at 57% 43%,#0b050200 0 22%,#0b050285 55%,#0b0502d2 80%,#0b0502ee 100%)}
+.lamp:after{opacity:0;--bx:calc(var(--pw) + 46px);--by:calc(var(--ph) / 2 + 30px);background:radial-gradient(circle at 92% -8%,#ffd69a33,#ffd69a00 30%),linear-gradient(90deg,#0b0502e0 0,#0b0502e0 calc(50% - var(--bx) - 70px),#0b050200 calc(50% - var(--bx) + 6px),#0b050200 calc(50% + var(--bx) - 6px),#0b0502c8 calc(50% + var(--bx) + 70px),#0b0502c8 100%),linear-gradient(180deg,#0b0502c8 0,#0b0502c8 calc(50% - var(--by) - 50px),#0b050200 calc(50% - var(--by) + 6px),#0b050200 calc(50% + var(--by) - 6px),#0b0502e6 calc(50% + var(--by) + 60px),#0b0502e6 100%),radial-gradient(ellipse 120% 120% at 78% 8%,#0b050200 0 40%,#0b050233 72%,#0b050266 100%)}
+body.is-open .lamp:before{opacity:0}body.is-open .lamp:after{opacity:1}
 .desk:after{content:'';position:absolute;inset:0;opacity:.35;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .18 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
 body.is-open .desk,body.is-open .props{transform:scale(1.13)}
 .props{position:absolute;inset:0;pointer-events:none}
@@ -44,23 +52,23 @@ body.is-open .pad{opacity:0;transform:rotate(-8deg) scale(1.2)}
 .pencil-fly{filter:drop-shadow(-8px 14px 10px #2a160a40)}
 
 /* Closed-book corners */
-.corner{position:absolute;bottom:26px;z-index:2;font-size:13px;color:#3f2c1c;transition:opacity .6s}
-.corner small{display:block;font-size:9px;letter-spacing:.06em;color:#6e4f33}
+.corner{position:absolute;bottom:26px;z-index:5;font-size:13px;color:#e9d9c1;transition:opacity .6s}
+.corner small{display:block;font-size:9px;letter-spacing:.06em;color:#b39f84}
 .corner-l{left:3.2vw}.corner-r{right:3.2vw;text-align:right}
 body.is-open .corner{opacity:0}
 
 /* Header and hint */
 .deskbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:22px 3.2vw;pointer-events:none}
 .deskbar>*{pointer-events:auto}
-.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);font-size:17px;font-weight:500;letter-spacing:-.02em}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f3e6d2;font-size:17px;font-weight:500;letter-spacing:-.02em}
 .mark{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;background:var(--accent);flex:none}
 .mark i{width:13px;height:8px;background:#fff;mask:url('/taskbook/assets/fomo-eyes.svg') center/contain no-repeat;-webkit-mask:url('/taskbook/assets/fomo-eyes.svg') center/contain no-repeat}
-.bound{position:absolute;left:50%;transform:translateX(-50%);font-size:11px;color:#3f2c1c;pointer-events:none}
+.bound{position:absolute;left:50%;transform:translateX(-50%);font-size:11px;color:#d9c7ad;pointer-events:none}
 .deskbar-actions{display:flex;gap:8px}
 .pill{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:20px;padding:9px 15px;font-size:12px;color:#2b2925;background:#ffffff8c;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 0 #ffffff80 inset,0 2px 10px #5a412812;transition:background .2s}
 .pill:hover{background:#ffffffd0}
 .pill svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6}
-.hint{position:fixed;left:0;right:0;bottom:18px;z-index:5;margin:0;text-align:center;font-size:11px;color:#3f2c1c;opacity:0;transition:opacity .6s .9s;pointer-events:none}
+.hint{position:fixed;left:0;right:0;bottom:18px;z-index:5;margin:0;text-align:center;font-size:11px;color:#d9c7ad;opacity:0;transition:opacity .6s .9s;pointer-events:none}
 body.is-open .hint{opacity:1}
 
 /* The book */
