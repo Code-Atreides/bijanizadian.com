@@ -67,7 +67,7 @@ function apply(turn,t){
 // A tab is glued to the leaf whose back is its task's first page, so it swings over the spine with that leaf,
 // a hair above it, and shows its back once it passes upright. Jumps of several leaves carry all their tabs together.
 function flipTabs(turn,t){
- // Opening never carries a tab (it lands on the contents). Closing carries every tab on the left back over with the cover.
+ // Opening never carries a tab (it lands on the foreword). Closing carries every tab on the left back over with the cover.
  if(single()||turn.from<0)return;
  const lo=Math.min(turn.from,turn.to),hi=Math.max(turn.from,turn.to),swing=turn.dir>0?t:1-t;
  for(const tab of tabs){

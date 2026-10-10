@@ -364,6 +364,23 @@ input:disabled{opacity:.6}
 .tier-next strong{font-weight:600;color:#fff}
 .tier-lock{flex:none;width:10px;height:12px;color:#ffffffb3}
 .end-links{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:18px}
+/* Foreword spread: the pitch on the left, the projects and what they pay on the right. Both fill their page:
+   type follows the page height, the go-to-market line and the pay scale sit on the bottom margin. */
+.foreword .page-inner,.foreword-projects .page-inner{display:flex;flex-direction:column}
+.foreword .title{flex:none;font-size:clamp(24px,min(calc(var(--pw) * .085),calc(var(--ph) * .06)),44px);margin-bottom:min(22px,calc(var(--ph) * .03))}
+.foreword-lead{margin:0;max-width:30em;font-size:clamp(14px,calc(var(--ph) * .027),20px);line-height:1.55;letter-spacing:-.01em;color:var(--ink)}
+.foreword-gtm{margin:auto 0 0;padding:4px 0 4px 14px;border-left:2px solid var(--accent);max-width:24em;font-size:clamp(13px,calc(var(--ph) * .023),17px);line-height:1.45;color:var(--body)}
+.projects{flex:1 1 auto;display:flex;flex-direction:column;margin:0;padding:0;list-style:none}
+.projects li{flex:1 1 0;display:flex;align-items:center;max-height:calc(var(--ph) * .16);border-bottom:1px solid #0000000d}
+.project-row{display:flex;align-items:baseline;gap:10px;width:100%;padding:min(10px,calc(var(--ph) * .012)) 2px;border:0;border-radius:8px;background:none;text-align:left;font-size:clamp(13px,min(calc(var(--pw) * .036),calc(var(--ph) * .025)),20px);color:var(--ink);transition:background .2s}
+.project-row:hover{background:#0000000a}
+.project-label{min-width:0}
+.earn{flex:none;margin-top:min(20px,calc(var(--ph) * .026));padding-top:min(16px,calc(var(--ph) * .02));border-top:1px solid var(--rule)}
+.earn-lead{margin:0 0 min(12px,calc(var(--ph) * .015));font-size:clamp(13px,calc(var(--ph) * .023),17px);font-weight:600;letter-spacing:-.015em;color:var(--ink)}
+.earn-scale{display:grid;gap:min(10px,calc(var(--ph) * .013));margin:0;padding:0;list-style:none;font-size:clamp(11.5px,calc(var(--ph) * .019),14px);color:var(--body)}
+.earn-scale i{display:block;width:100%;height:4px;margin-bottom:5px;border-radius:2px;background:var(--accent)}
+.earn-scale li:last-child i{width:42%;opacity:.45}
+.foreword-projects .end-links{flex:none;margin-top:min(14px,calc(var(--ph) * .018))}
 /* The bonus page fits its page too: spacing follows the page height, and on short pages the "Start task 1" link
    (the tabs do the same job) and the optional-extra note (the headline says it) step aside. */
 @media (min-width:821px){
