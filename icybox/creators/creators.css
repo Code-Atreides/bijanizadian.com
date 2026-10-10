@@ -27,6 +27,8 @@
   --soft-card:linear-gradient(90deg,#fff 0%,#FAFCFF 28%,#EEF4FC 55%,#DCE8FA 78%,#D6E8FF 100%);
   --gutter:clamp(16px,4vw,56px);
   --nav-space:clamp(76px,12svh,92px);
+  --wrap:clamp(1280px,93vw,1560px);
+  --hero-wrap:clamp(1280px,75vw,1560px);
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
@@ -75,17 +77,17 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(32px,mi
 .nav-cta:hover{background:var(--brand)}
 
 /* Each section is one screen tall with its content centred */
-.screen{position:relative;min-height:100svh;padding:var(--nav-space) var(--gutter) clamp(24px,5svh,48px);display:grid;align-content:center;scroll-margin-top:0}
-.screen>*{width:100%;max-width:1280px;margin-inline:auto}
+.screen{position:relative;min-height:100svh;padding:var(--nav-space) max(var(--gutter),calc((100% - var(--wrap)) / 2)) clamp(24px,5svh,48px);display:grid;align-content:center;scroll-margin-top:0}
+.screen>*{min-width:0}
 
 /* 1. Hero: copy above a catalog strip, the real app screen on the right */
 .hero{--strip:clamp(150px,26svh,196px);display:block;height:100svh;min-height:560px;padding:0;background:var(--hero-fade);color:#fff;overflow:hidden}
 .hero>*{width:auto;max-width:none;margin:0}
-.hero-copy{position:absolute;z-index:2;top:var(--nav-space);bottom:var(--strip);left:max(var(--gutter),calc((100% - 1280px) / 2));width:min(680px,54%);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
-.hero h1{font-size:clamp(56px,min(7.6vw,15.5svh),128px);margin:clamp(12px,2.4svh,22px) 0 clamp(12px,2.2svh,20px);text-shadow:0 6px 40px #001a9940}
+.hero-copy{position:absolute;z-index:2;top:var(--nav-space);bottom:var(--strip);left:max(var(--gutter),calc((100% - var(--hero-wrap)) / 2));width:min(760px,54%);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.hero h1{font-size:clamp(56px,min(7.6vw,15.5svh),120px);margin:clamp(12px,2.4svh,22px) 0 clamp(12px,2.2svh,20px);text-shadow:0 6px 40px #001a9940}
 .hero-lede{font-size:clamp(15px,2.5svh,19px);line-height:1.45;max-width:44ch;color:#ffffffeb;font-weight:500}
 .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:clamp(16px,3svh,28px)}
-.hero-phone{position:absolute;z-index:3;bottom:0;right:max(var(--gutter),calc((100% - 1280px) / 2 + 20px));height:calc(100% - var(--nav-space) + 4px);aspect-ratio:820/984;-webkit-mask-image:linear-gradient(180deg,#000 70%,#0000 94%);mask-image:linear-gradient(180deg,#000 70%,#0000 94%)}
+.hero-phone{position:absolute;z-index:3;bottom:0;right:max(var(--gutter),calc((100% - var(--hero-wrap)) / 2 + 20px));height:min(calc(100% - var(--nav-space) + 4px),700px,44vw);aspect-ratio:820/984;-webkit-mask-image:linear-gradient(180deg,#000 70%,#0000 94%);mask-image:linear-gradient(180deg,#000 70%,#0000 94%)}
 .hero-phone img{width:100%;height:100%;object-fit:contain;object-position:bottom}
 .marquee{position:absolute;z-index:1;left:0;right:0;bottom:0;height:var(--strip);padding:12px 0 0;overflow:hidden;background:linear-gradient(180deg,#fff0,#ffffff8c 40%);-webkit-mask-image:linear-gradient(90deg,#0000,#000 6%,#000 94%,#0000);mask-image:linear-gradient(90deg,#0000,#000 6%,#000 94%,#0000)}
 .marquee-track{display:flex;gap:12px;width:max-content;animation:drift 70s linear infinite}
@@ -175,7 +177,7 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(32px,mi
 
 /* 4. What to film */
 .content{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:clamp(28px,5vw,80px);align-items:center;background:var(--card-alt)}
-.clips{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:calc((100svh - var(--nav-space) - 80px) * 1.1);justify-self:center}
+.clips{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:min(calc((100svh - var(--nav-space) - 80px) * 1.1),620px);justify-self:center}
 .clip video{width:100%;aspect-ratio:616/1096;object-fit:cover;border-radius:20px;background:#ddd;box-shadow:0 24px 48px -20px #0006}
 .clip figcaption{margin-top:8px;font-size:12px;color:var(--muted);line-height:1.35}
 .content-copy h2{margin:12px 0 clamp(10px,1.8svh,16px)}
@@ -220,6 +222,18 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(32px,mi
 .footer nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-left:auto}
 .footer a{text-decoration:none}
 .footer a:hover{color:#fff}
+
+/* Big monitors and zoomed-out browsers: scale the hero up instead of leaving it small */
+@media (min-width:1800px) and (min-height:950px){
+  :root{--hero-wrap:clamp(1560px,80vw,1840px)}
+  .hero{--strip:224px}
+  .hero-copy{width:min(1000px,54%)}
+  .hero h1{font-size:clamp(120px,min(6.4vw,13svh),168px)}
+  .hero-lede{font-size:22px}
+  .hero .btn{min-height:56px;padding:0 28px;font-size:17px}
+  .hero .chip{font-size:14px;padding:9px 14px}
+  .hero-phone{height:min(calc(100% - var(--nav-space) + 4px),900px,36vw)}
+}
 
 /* Narrower laptops */
 @media (max-width:1100px){
