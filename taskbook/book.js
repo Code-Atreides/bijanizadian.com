@@ -112,6 +112,8 @@ async function closeBook(){
 }
 toggle.addEventListener('click',()=>isOpen?closeBook():openBook());
 cover.addEventListener('click',()=>openBook());
+// The closed book opens from anywhere on it, its board and page edges included, not just the cover face.
+book.addEventListener('click',event=>{if(!isOpen&&!event.target.closest('.tab,.resize-handle'))openBook();});
 for(const button of document.querySelectorAll('[data-turn]'))button.addEventListener('click',()=>go(cur+Number(button.dataset.turn)*step()));
 
 // Contents rows open one at a time to show the task, with a button to its page.
