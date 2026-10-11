@@ -316,13 +316,31 @@ html.js .live-card.reveal{transition:opacity 1s var(--ease),transform 1s var(--e
 .rw-amount{display:block;font-size:clamp(26px,calc(4.2 * var(--vh)),34px);line-height:1;letter-spacing:-.04em;color:var(--accent);white-space:nowrap}
 .rw-icon{display:grid;place-items:center;width:clamp(30px,calc(4.6 * var(--vh)),38px);height:clamp(30px,calc(4.6 * var(--vh)),38px);border-radius:50%;background:var(--soft);color:var(--accent)}
 .rw-icon svg{width:17px;height:17px}
-.relay{position:relative;list-style:none;margin:clamp(4px,calc(.8 * var(--vh)),8px) 0 0;padding:0;display:flex;justify-content:space-between;gap:10px;max-width:420px;counter-reset:relay}
-.relay::before{content:'';position:absolute;left:10px;right:10px;top:10px;height:1px;background:var(--line-2)}
-.relay::after{content:'';position:absolute;top:7px;left:10px;width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--soft-2);animation:relay 4.5s var(--ease-io) infinite}
-.relay li{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted);counter-increment:relay;flex:1}
+/* Bonus relay: a 6s loop that starts once the rewards card is in view. */
+.relay{position:relative;list-style:none;margin:clamp(6px,calc(1.2 * var(--vh)),12px) 0 0;padding:0;display:flex;justify-content:space-between;gap:10px;max-width:420px;counter-reset:relay}
+.relay::before,.relay::after{content:'';position:absolute;left:11px;right:11px;top:10px;height:2px;border-radius:2px}
+.relay::before{background:var(--line)}
+.relay::after{background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,white),var(--accent));transform-origin:left;transform:scaleX(1);animation:relay-fill 6s var(--ease-io) infinite}
+.relay li{position:relative;z-index:1;display:flex;flex-direction:column;gap:7px;font-size:12px;color:var(--ink);font-weight:500;counter-increment:relay;flex:1}
 .relay li:nth-child(2){align-items:center;text-align:center}
 .relay li:last-child{align-items:flex-end;text-align:right}
-.relay li::before{content:counter(relay);display:grid;place-items:center;width:21px;height:21px;border-radius:50%;background:var(--paper);border:1px solid var(--line-2);font-size:11px;color:var(--ink)}
+.relay li::before{content:counter(relay);display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-size:11px;background:var(--accent);border:1px solid var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2)}
+.relay li:nth-child(1),.relay li:nth-child(1)::before{animation:relay-on-1 6s var(--ease) infinite}
+.relay li:nth-child(2),.relay li:nth-child(2)::before{animation:relay-on-2 6s var(--ease) infinite}
+.relay li:nth-child(3),.relay li:nth-child(3)::before{animation:relay-on-3 6s var(--ease) infinite}
+.relay li:nth-child(1){animation-name:relay-label-1}
+.relay li:nth-child(2){animation-name:relay-label-2}
+.relay li:nth-child(3){animation-name:relay-label-3}
+.relay li:last-child::after{content:'';position:absolute;right:0;top:0;width:22px;height:22px;border-radius:50%;border:2px solid var(--accent);opacity:0;pointer-events:none;animation:relay-burst 6s var(--ease) infinite}
+.rewards:not(.is-in) .relay::after,.rewards:not(.is-in) .relay li,.rewards:not(.is-in) .relay li::before,.rewards:not(.is-in) .relay li::after{animation-play-state:paused}
+@keyframes relay-fill{0%,8%{transform:scaleX(0);opacity:1}40%{transform:scaleX(.5)}72%,92%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes relay-on-1{0%,6%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}10%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2);transform:scale(1.22)}15%,92%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2);transform:scale(1)}100%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}}
+@keyframes relay-on-2{0%,38%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}42%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2);transform:scale(1.22)}47%,92%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2);transform:scale(1)}100%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}}
+@keyframes relay-on-3{0%,70%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}74%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 6px var(--soft-2);transform:scale(1.32)}80%,92%{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--soft-2);transform:scale(1)}100%{background:var(--paper);border-color:var(--line-2);color:var(--muted);box-shadow:0 0 0 0 transparent;transform:scale(1)}}
+@keyframes relay-label-1{0%,6%{color:var(--faint);font-weight:400}12%,92%{color:var(--ink);font-weight:500}100%{color:var(--faint);font-weight:400}}
+@keyframes relay-label-2{0%,38%{color:var(--faint);font-weight:400}44%,92%{color:var(--ink);font-weight:500}100%{color:var(--faint);font-weight:400}}
+@keyframes relay-label-3{0%,70%{color:var(--faint);font-weight:400}76%,92%{color:var(--accent);font-weight:500}100%{color:var(--faint);font-weight:400}}
+@keyframes relay-burst{0%,72%{opacity:0;transform:scale(1)}74%{opacity:.9;transform:scale(1)}88%,100%{opacity:0;transform:scale(2.6)}}
 
 /* ── Why you're here: a full-screen statement. */
 .why{border-top:1px solid var(--line)}
@@ -408,7 +426,6 @@ html.js .arrival:not(.is-in) .arr-halo{transform:translate(-50%,-50%) scale(.6);
 @keyframes panel-in{from{opacity:0;transform:translateY(14px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
 @keyframes tick{0%{background:transparent;border-color:var(--line-2);color:var(--muted);transform:scale(1)}40%{transform:scale(.8)}70%{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.1)}100%{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1)}}
 @keyframes shimmer{0%{transform:translateX(-110%)}60%,100%{transform:translateX(110%)}}
-@keyframes relay{0%{left:10px}45%,55%{left:50%}90%,100%{left:calc(100% - 17px)}}
 
 /* Laptops and up: let each scroll settle on a section. Only where every section fits. */
 @media (min-width:901px) and (min-height:600px) and (hover:hover){
