@@ -170,10 +170,15 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,mi
 .clips{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;width:100%;max-width:min(calc((100svh - var(--nav-space) - 5rem) * 1.1),38.75rem);justify-self:center}
 .clip video{width:100%;aspect-ratio:616/1096;object-fit:cover;border-radius:1.25rem;background:#ddd;box-shadow:0 1.5rem 3rem -1.25rem #0006}
 .content-copy h2{margin:0.75rem 0 clamp(0.625rem,1.8svh,1rem)}
-.formats{display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;margin-top:clamp(1rem,3svh,1.625rem)}
-.formats li{padding:clamp(0.75rem,2.2svh,1.125rem);border-radius:1rem;background:#fff;border:1px solid var(--hairline)}
-.formats strong{display:block;font-size:1rem;font-weight:700;letter-spacing:-.01em}
-.formats span{display:block;margin-top:0.25rem;color:var(--muted);font-size:0.875rem;line-height:1.4}
+/* four-step progression: spin, post, it takes off, unbox */
+.progress{margin-top:clamp(1rem,3svh,1.75rem)}
+.progress li{position:relative;display:grid;grid-template-columns:2.5rem 1fr;gap:1rem;align-items:start;padding-bottom:clamp(0.875rem,2.6svh,1.5rem)}
+.progress li:not(:last-child)::before{content:"";position:absolute;left:1.1875rem;top:2.5rem;bottom:0;width:2px;background:linear-gradient(180deg,var(--hairline-strong),var(--brand))}
+.progress li:last-child{padding-bottom:0}
+.progress-n{display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;background:#fff;border:2px solid var(--brand);color:var(--brand);font:500 1rem/1 var(--label)}
+.progress-win .progress-n{background:var(--brand);color:#fff;box-shadow:0 0.5rem 1.25rem #0532FF55}
+.progress strong{display:block;font-size:clamp(1rem,2.6svh,1.1875rem);font-weight:700;letter-spacing:-.01em;line-height:1.2;padding-top:0.125rem}
+.progress span:not(.progress-n){display:block;margin-top:0.25rem;color:var(--muted);font-size:clamp(0.875rem,2.2svh,1rem);line-height:1.4}
 .rules{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:clamp(0.875rem,2.6svh,1.375rem)}
 .rules li{padding:0.4375rem 0.75rem;border-radius:62.4375rem;background:var(--brand);color:#fff;font:500 0.75rem/1.2 var(--label);letter-spacing:.02em}
 
@@ -239,8 +244,7 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,mi
   .reward-foot{padding:0.875rem 1.125rem;font-size:0.75rem}
   .footer{flex-direction:column;align-items:flex-start;gap:0.75rem}
   .footer nav{margin-left:0}
-  .clips{order:2;max-width:none;width:100%}
-  .formats{grid-template-columns:1fr}
+  .clips{order:2;max-width:17.5rem;width:100%;justify-self:center}
 }
 @media (max-width:520px){
   .nav-brand span{display:none}
