@@ -201,6 +201,7 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,mi
 .age.is-invalid span{color:#F62451}
 .form-error{margin-top:0.625rem;color:#F62451;font-size:0.875rem;font-weight:600}
 .btn-block{width:100%;margin-top:clamp(0.75rem,2.2svh,1rem);min-height:3.25rem;font-size:1rem}
+.form-privacy{margin-top:0.625rem;text-align:center;font-size:0.75rem;color:var(--muted)}
 .apply-done{text-align:center}
 .apply-done img{margin:0 auto 0.5rem;width:8.75rem;height:auto}
 .apply-done h3{font-size:1.75rem;font-weight:700;letter-spacing:-.02em}
