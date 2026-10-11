@@ -162,10 +162,10 @@ h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,mi
 .boxes{display:flex;justify-content:center;align-items:flex-end;margin-top:auto;padding-top:clamp(0.75rem,2.4svh,1.25rem)}
 .boxes img{height:clamp(4rem,15svh,6.875rem);width:auto;max-width:36%;object-fit:contain;filter:drop-shadow(0 1rem 1.125rem #0002)}
 .boxes img:nth-child(2){margin:0 -5% 4%;z-index:1;height:clamp(4.5rem,17svh,7.75rem)}
-.reward-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.625rem 1.5rem;padding:0.875rem clamp(1.25rem,3vw,2.5rem);background:var(--shade);color:#ffffffb3;font-size:0.8125rem}
-.reward-foot a{display:inline-flex;align-items:center;gap:0.375rem;color:#fff;font-weight:700;text-decoration:none}
+.reward-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.625rem 1.5rem;padding:0.875rem clamp(1.25rem,3vw,2.5rem);background:#ffffffb3;border-top:1px solid var(--hairline);color:var(--muted);font-size:0.8125rem}
+.reward-foot a{display:inline-flex;align-items:center;gap:0.375rem;color:var(--brand);font-weight:700;text-decoration:none}
 .reward-foot a svg{width:1rem;height:1rem}
-.reward-foot a:hover{color:#ACC6FF}
+.reward-foot a:hover{color:var(--ink)}
 
 /* 4. What to film */
 .content{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:clamp(1.75rem,5vw,5rem);align-items:center;background:var(--card-alt)}
