@@ -18,6 +18,17 @@
 
 <script src="xp-desktop.js"></script>
 <script>
+  // The fomo window's path list is encrypted with the unlock password
+  // (scripts/encrypt-fomo-paths.mjs writes this line); it decrypts in the browser.
+  var FOMO_LOCKED = { salt: 'whp8tZzySODhl5l69Fbx8w==', iv: '7pjSd398zRA+4hq8', data: 'yX4q4LwfTUKuuKZDrVPEva0c4ah+T1PW0q24EROVe/f84n6naaSEKOCMPObDWWXnfW5y3HekVCY/qg1zcGLb29++zK7SifTH/KGWkp/3TEqnOioHp33oVWEvth9syXIrdIlS7KeZ7eSMsxn2eY8csOilXa6F4PEWLBUJlQv1UgnKzcep8gzWy3SlEzYGBWUV2nrUKXuv+NIb6EjJNy3np/lEeSgNQGizvwDG7gfQpT5Y3EbofkpydMDZKEpzkZt2kkv43sq6yFUyDSSwnnq3xOw4NYPBhwNa+csw4AOdedaDE2+r4Rh2Bv4cCeCC4KKECsIxyBpztoH9/KOdfLKkL8BzaTe9fMyoBX6cstlNpRImnRdEEBDCU04lyj7nYh5EB5ibbRJIrjmu3MLdGqvdFNmXCuK91kuF29Y6bi8hsMg1EdgK+EUa0UeDltSGygfti1e2S/Tyt5/8wSHh2Y4JW0mGoQseLMNcA28wHSs3a2oIuRAnwprgEIRy/eehht/PGkHprxg9xtgNn1Qp4muCupCazQ8muSZq3ejBWDHPZxL/wJJKJ+WHVlX7L8Iwq8mzhJgGfvaqrcplyn3q2qwEjGOfdA4Ogj7C6CBUWywDzk7oghaVrTZGjeDvAPP7PRejez77kFdAEsickrO9H8r1aA11uUa26SfVJ2exuriZT24YnRafgbCHupywppFnHjVLns49seCuDr2qc99FUJLEGyJ4G4jAhqKJCfiGYgisv5v1wjxQuxdq5RdeAT18QdJQkp9SA4tPg1dyJQR58ZVktEVpRwq3krZfCiRfKEGkH1qcSGCxVe47zEKzyerOYbyXn1l2eH6EeA3QwgYfTHD/PRjmWKGksCyVjrqtLBA92PQt2EEKEvbsM1GQ1+L6J/NtMKwsUiKIEOErGluNvnpI9TIsQENFdaFpLygjtN24uhCBQ3ULiBMiK/opSI0HNYOKq2pLK6YHRUyGUQl2OTPQaAij5ByIYPb2tIKP6FEhl6AABbmdrSk8++57xSe8nhtXZfsBNuP7jC+7Mxgb5ZFhtPsbaKf05az+7ZL0AEV03rmMJSkrrgnNoJqhP8XSE+FHZf/AP4F1dNozUZVHo6HopmefI5DBRjDmXa6dHcMKMlFr01ePt0/CULwaTH2I+0QsvT1LOjxM14AWU8f/FXSMPq6V8/6dVSDfSb7lqEZnMa7+NThL/ycQlamUUd6NirsJzzDR+SMbGgLUwa9084pqrFNY8chmqCRyn7CBa+W3XtvHQ9g7tPIpbZ1nmC34eBv/Ssk3r+5ZL1Y2T1+fSsHp6vQO8Wkn1byTQthE1tp24CjB7IGAOY12urWE7u4MkXgV0CDK4mJO6u7yn5JznXXUjLrHOFsLSXtxTtBnqcRUuO4k2XlcpfJaEEEQGtGAcK3pRgH1' };
+  var FOMO_LOCK_FORM =
+    '<form class="xpd-lock" data-fomo-lock>' +
+      '<p>Type the password to see the fomo links.</p>' +
+      '<div class="xpd-lock__row"><input class="xpd-input" type="password" name="pw" aria-label="Password" autocomplete="off" required>' +
+      '<button class="xpd-btn" type="submit">Unlock</button></div>' +
+      '<p class="xpd-lock__err" role="alert" hidden></p>' +
+    '</form>';
+
   // Groups of [heading, [[path, page name], ...]] as a two-column list of slash paths.
   function fomoPaths(groups) {
     var cols = [groups.slice(0, 2), groups.slice(2)];
@@ -30,6 +41,37 @@
     }).join('') + '</div>';
   }
 
+  function unlockFomo(password) {
+    var bytes = function (b64) { return Uint8Array.from(atob(b64), function (c) { return c.charCodeAt(0); }); };
+    var subtle = window.crypto && window.crypto.subtle;
+    if (!subtle) return Promise.reject(new Error('unsupported'));
+    return subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey'])
+      .then(function (base) {
+        return subtle.deriveKey({ name: 'PBKDF2', salt: bytes(FOMO_LOCKED.salt), iterations: 250000, hash: 'SHA-256' },
+          base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+      })
+      .then(function (key) { return subtle.decrypt({ name: 'AES-GCM', iv: bytes(FOMO_LOCKED.iv) }, key, bytes(FOMO_LOCKED.data)); })
+      .then(function (plain) { return fomoPaths(JSON.parse(new TextDecoder().decode(plain))); });
+  }
+
+  var fomoItem = { id: 'fomo', label: 'fomo', icon: 'bell', title: 'fomo',
+    link: 'https://fomo.family', linkLabel: 'Open fomo', body: FOMO_LOCK_FORM };
+
+  document.addEventListener('submit', function (e) {
+    var form = e.target.closest && e.target.closest('[data-fomo-lock]');
+    if (!form) return;
+    e.preventDefault();
+    var input = form.elements.pw, err = form.querySelector('.xpd-lock__err'), btn = form.querySelector('button');
+    btn.disabled = true; err.hidden = true;
+    unlockFomo(input.value).then(function (html) {
+      fomoItem.body = html; // stays unlocked if the window is closed and reopened
+      form.outerHTML = html;
+    }, function (x) {
+      err.textContent = x && x.message === 'unsupported' ? 'This browser can\'t unlock the links.' : 'Wrong password.';
+      err.hidden = false; btn.disabled = false; input.value = ''; input.focus();
+    });
+  });
+
   XPDesktop.mount('#desk', {
     name: 'Bijan Izadian',
     subtitle: 'New York City',
@@ -37,15 +79,7 @@
     items: [
       { id: 'about',   label: 'About Bijan',   icon: 'notepad', title: 'About Bijan', menuDesc: 'Who I am', openOnLoad: true,
         body: '' },
-      { id: 'fomo',    label: 'fomo',          icon: 'bell',    title: 'fomo',
-        link: 'https://fomo.family', linkLabel: 'Open fomo',
-        body: fomoPaths([
-          ['campus', [['/campus', 'Campus hub'], ['/campus/landing', 'Campus landing page'], ['/campus/directory', 'Page directory'], ['/campus/manual', 'Campus manual'], ['/campus/visit', 'Visit a friend'], ['/campus/ambassadors', 'Campus ambassadors'], ['/campus/ambassadors/apply', 'Apply to be an ambassador'], ['/campus/brandkit', 'Campus brand kit'], ['/taskbook', 'Campus task book']]],
-          ['team & earlier designs', [['/irrigation', 'Irrigation, the team workspace'], ['/campus-wars', 'Campus Wars'], ['/campus-connected', 'Earlier campus design']]],
-          ['greek wars', [['/greekwars', 'Greek Wars'], ['/greekwars/onboard', 'Chapter onboarding'], ['/greekwars/claim', 'Onboard your chapter'], ['/greekwars/refer', 'Refer a fraternity'], ['/greekwars/invite', 'Greek Wars invite'], ['/claimlinks', 'Claim links']]],
-          ['dinners & events', [['/dinners', 'Dinner Series'], ['/dinners/apply', 'Apply to host a dinner'], ['/crewsheet', 'Dinner crew sheet'], ['/gameday', 'Game Day'], ['/hqvisitform', 'Come by fomo HQ']]],
-          ['houses', [['/LAhousepitch', 'Los Angeles house'], ['/NYhousepitch', 'New York loft']]]
-        ]) },
+      fomoItem,
       { id: 'build',   label: 'Build request', icon: 'form',    title: 'Build request',
         link: '/build', linkLabel: 'Open the form',
         body: '<p>Have a web app idea you want built? Send it through the intake form and I\'ll come back with scope, timing, and cost.</p>' },

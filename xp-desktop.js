@@ -81,6 +81,11 @@
 .xpd-paths h3{margin:0 0 2px;font:700 11px/1.4 Tahoma,Verdana,sans-serif;color:#5f5f5f}\
 .xpd-paths ul{list-style:none;margin:0 0 8px;padding:0}\
 .xpd-paths li{font-size:11.5px;line-height:1.6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\
+.xpd-lock p{margin:0 0 8px}\
+.xpd-lock__row{display:flex;gap:6px}\
+.xpd-input{flex:1;min-width:0;height:23px;padding:0 6px;font:12px Tahoma,Verdana,sans-serif;color:#000;background:#fff;border:1px solid #7f9db9;border-radius:0}\
+.xpd-input:focus{outline:1px solid #316ac5;outline-offset:0}\
+.xpd-lock .xpd-lock__err{margin:6px 0 0;color:#c00}\
 .xpd-win__actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid #d6d2c4}\
 .xpd-btn{display:inline-flex;align-items:center;justify-content:center;min-width:76px;height:23px;padding:0 12px;font-size:11px;color:#000;text-decoration:none;cursor:pointer;background:linear-gradient(#fff,#f3f2ec 45%,#e2e0d7);border:1px solid #003c74;border-radius:3px;box-shadow:inset 0 0 0 1px #fff}\
 .xpd-btn:hover{box-shadow:inset 0 0 0 1px #fff,inset 0 0 0 2px #f9c46b}\
@@ -124,6 +129,8 @@
 .xpd--narrow .xpd-icon{width:72px}\
 .xpd--narrow .xpd-win{left:8px!important;top:8px!important;width:calc(100% - 16px);max-height:calc(100% - 16px);overflow:auto}\
 .xpd--narrow .xpd-win__body{flex-direction:column;gap:10px;font-size:13.5px}\
+.xpd--narrow .xpd-input{height:30px;font-size:16px}\
+.xpd--narrow .xpd-btn[type=submit]{height:30px}\
 .xpd--narrow .xpd-win__bigicon{width:40px;height:40px}\
 .xpd--narrow .xpd-task{min-width:34px;max-width:40px;padding:0 8px;justify-content:center}\
 .xpd--narrow .xpd-task span{display:none}\
