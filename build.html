@@ -23,8 +23,10 @@
 <div id="root"></div>
 
 <script>
-  // idea-intake.jsx expects a window.storage.{set,get,list} API — back it with the same
-  // Firebase project the crew sheet uses, storing each submission under intake/<key>.
+  // idea-intake.jsx saves through window.storage.set — back it with the same Firebase
+  // project the crew sheet uses, storing each submission under intake/<key>. The
+  // database rules make intake write-once and unreadable from the browser, so this
+  // page can send a request but never list or read past ones.
   var db = firebase.initializeApp({
     apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
     authDomain: 'bijanizadian-84e48.firebaseapp.com',
@@ -37,19 +39,6 @@
       return db.ref('intake/' + key).set(value)
         .then(function () { return true; })
         .catch(function (e) { console.error(e); return false; });
-    },
-    list: function (prefix) {
-      return db.ref('intake').get()
-        .then(function (snap) {
-          var val = snap.exists() ? snap.val() : {};
-          return { keys: Object.keys(val).filter(function (k) { return k.indexOf(prefix) === 0; }) };
-        })
-        .catch(function (e) { console.error(e); return { keys: [] }; });
-    },
-    get: function (key) {
-      return db.ref('intake/' + key).get()
-        .then(function (snap) { return snap.exists() ? { value: snap.val() } : null; })
-        .catch(function (e) { console.error(e); return null; });
     }
   };
 </script>

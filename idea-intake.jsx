@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 
 const STEP_TITLES = ["About you", "The idea", "The details", "Scope", "Anything else"];
@@ -65,22 +65,12 @@ function ReviewRow({ label, value }) {
   );
 }
 
-function formatDate(iso) {
-  try {
-    return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
-  } catch {
-    return "";
-  }
-}
-
 export default function IdeaIntake() {
   const [screen, setScreen] = useState("intro");
   const [stepIndex, setStepIndex] = useState(0);
   const [data, setData] = useState(EMPTY_DATA);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
-  const [submissions, setSubmissions] = useState([]);
-  const [loadingSubs, setLoadingSubs] = useState(false);
 
   function update(field, value) {
     setData((d) => ({ ...d, [field]: value }));
@@ -149,33 +139,6 @@ export default function IdeaIntake() {
       setSubmitting(false);
     }
   }
-
-  async function loadSubmissions() {
-    setLoadingSubs(true);
-    try {
-      const listResult = await window.storage.list("submissions:", true);
-      const keys = listResult?.keys || [];
-      const items = [];
-      for (const key of keys) {
-        try {
-          const r = await window.storage.get(key, true);
-          if (r?.value) items.push(JSON.parse(r.value));
-        } catch (innerErr) {
-          console.error("Failed to load", key, innerErr);
-        }
-      }
-      items.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
-      setSubmissions(items);
-    } catch (err) {
-      console.error("Failed to list submissions:", err);
-    } finally {
-      setLoadingSubs(false);
-    }
-  }
-
-  useEffect(() => {
-    if (screen === "dashboard") loadSubmissions();
-  }, [screen]);
 
   const firstName = data.name.trim().split(/\s+/)[0] || "there";
 
@@ -288,14 +251,6 @@ export default function IdeaIntake() {
           display: flex; align-items: center; justify-content: center;
         }
 
-        .meta-pill {
-          font-size: 0.72rem;
-          padding: 0.2rem 0.55rem;
-          border-radius: 6px;
-          background: var(--accent-soft);
-          color: var(--accent-dark);
-        }
-
         button:focus-visible, input:focus-visible, textarea:focus-visible {
           outline: 2px solid var(--accent);
           outline-offset: 2px;
@@ -335,9 +290,6 @@ export default function IdeaIntake() {
                   About 3 minutes
                 </span>
               </div>
-              <button type="button" className="btn-link self-start" onClick={() => setScreen("dashboard")}>
-                View past submissions
-              </button>
             </div>
           )}
 
@@ -583,57 +535,6 @@ export default function IdeaIntake() {
               <button type="button" className="btn-secondary mt-2" onClick={resetAll}>
                 Submit another idea
               </button>
-            </div>
-          )}
-
-          {screen === "dashboard" && (
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center justify-between">
-                <h2 className="font-display text-2xl" style={{ color: "var(--ink)" }}>
-                  Submissions
-                </h2>
-                <button type="button" className="btn-link" onClick={() => setScreen("intro")}>
-                  Back
-                </button>
-              </div>
-              <p className="text-xs" style={{ color: "var(--ink)", opacity: 0.5 }}>
-                Anyone with this link can open this page — treat it like a shared inbox, not a
-                private one.
-              </p>
-              {loadingSubs && (
-                <p className="text-sm" style={{ color: "var(--ink)", opacity: 0.6 }}>
-                  Loading…
-                </p>
-              )}
-              {!loadingSubs && submissions.length === 0 && (
-                <p className="text-sm" style={{ color: "var(--ink)", opacity: 0.6 }}>
-                  Nothing yet — submissions will show up here once someone fills out the form.
-                </p>
-              )}
-              <div className="flex flex-col gap-4 max-h-96 overflow-y-auto pr-1">
-                {submissions.map((s) => (
-                  <div key={s.id} className="pb-4" style={{ borderBottom: "1px solid var(--line)" }}>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium" style={{ color: "var(--ink)" }}>
-                        {s.name}
-                      </span>
-                      <span className="text-xs" style={{ color: "var(--ink)", opacity: 0.45 }}>
-                        {formatDate(s.submittedAt)}
-                      </span>
-                    </div>
-                    <span className="text-xs" style={{ color: "var(--ink)", opacity: 0.55 }}>
-                      {s.email}
-                    </span>
-                    <p className="text-sm mt-1.5 leading-relaxed" style={{ color: "var(--ink)" }}>
-                      {s.pitch}
-                    </p>
-                    <div className="flex gap-2 mt-2">
-                      {s.timeline && <span className="meta-pill">{s.timeline}</span>}
-                      {s.budget && <span className="meta-pill">{s.budget}</span>}
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
         </div>
