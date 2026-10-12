@@ -35,6 +35,9 @@
    display (by width, or height on unusually short screens) so it fills the same way. */
 html{font-size:max(16px,min(1vw,2.3svh));scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+/* IcyBox's pixel arrow from icybox.io, hotspot on the tip; plain url() first as the fallback */
+html,a,button,label,.btn,summary,input[type=checkbox]{cursor:url(/icybox/creators/app/cursor-32.png) 3 1,auto;cursor:image-set(url(/icybox/creators/app/cursor-32.png) 1x,url(/icybox/creators/app/cursor-64.png) 2x) 3 1,auto}
+input:not([type=checkbox]){cursor:text}
 body{margin:0;background:var(--surface);color:var(--ink);font:1rem/1.5 var(--text);-webkit-font-smoothing:antialiased;overflow-x:clip}
 img,video{display:block;max-width:100%;height:auto}
 a{color:inherit}
@@ -54,7 +57,7 @@ button,input{font:inherit;color:inherit}
 h2{font-weight:600;letter-spacing:-.02em;line-height:.99;font-size:clamp(2rem,min(4vw,7.6svh),3.5rem)}
 .display,h1{font-family:var(--display);font-stretch:75%;font-weight:700;text-transform:uppercase;letter-spacing:-.01em;line-height:.82}
 .lede{color:var(--muted);font-size:clamp(0.9375rem,2.4svh,1.125rem);line-height:1.45;max-width:46ch}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.625rem;min-height:3rem;padding:0 1.375rem;border-radius:62.4375rem;border:0;font-weight:600;font-size:0.9375rem;text-decoration:none;cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:0.625rem;min-height:3rem;padding:0 1.375rem;border-radius:62.4375rem;border:0;font-weight:600;font-size:0.9375rem;text-decoration:none;transition:transform .15s,background .15s,box-shadow .15s}
 .btn svg{width:1.125rem;height:1.125rem}
 .btn:hover{transform:translateY(-1px)}
 .btn-ink{background:var(--ink);color:#fff;box-shadow:0 0.625rem 1.875rem #0000002e}
