@@ -1,5 +1,5 @@
-import {hash,letters,ROAD} from './world-model.js?v=8';
-import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=8';
+import {hash,letters,ROAD} from './world-model.js?v=9';
+import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=9';
 export {BRAND};
 
 // Deliberate value steps: cool ink, warm stone, jewel roofs and sunlit foliage.

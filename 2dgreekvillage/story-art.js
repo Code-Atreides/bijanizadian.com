@@ -1,4 +1,4 @@
-import {rect,poly,line,text} from './pixel-art.js?v=8';
+import {rect,poly,line,text} from './pixel-art.js?v=9';
 
 // Brand kit: campus purple is fomo blue #516AF6, lit with light blue #ACB8F9
 // and lavender #EAEDFF, shaded toward ink #0B091F.

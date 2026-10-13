@@ -1,8 +1,8 @@
-import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=8';
-import {VillageRenderer} from './renderer.js?v=8';
-import {StoryDirector} from './story-ui.js?v=8';
-import {LANDING} from './story-model.js?v=8';
-import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=8';
+import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=9';
+import {VillageRenderer} from './renderer.js?v=9';
+import {StoryDirector} from './story-ui.js?v=9';
+import {LANDING} from './story-model.js?v=9';
+import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=9';
 import {startChapterFeed} from './shared/chapter-feed.js?v=183';
 import {searchChapters} from './shared/village-chapter-search.js?v=183';
 const $=id=>document.getElementById(id),canvas=$('world'),mini=$('mini'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -15,7 +15,7 @@ const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',ma
 const dirty=()=>{state.dirty=true;};
 const VENUES={
  court:{icon:'◎',copy:'Court Kings: ten balls, one power meter. Hit the blue zone for a swish. Makes move you back to the arc.'},
- stadium:{icon:'▤',copy:'The Final Drive: down three with twelve seconds left. Four plays to go 65 yards. Juke to slip tackles.'},
+ stadium:{icon:'▤',copy:'The Final Drive: down three, 1:30 left, ball on your 25. Play quarterback: drag back and release to throw, or hand it off. Move the chains and score.'},
  helipad:{icon:'H',copy:'Flight to New York: Orangie and Rasmr need a pilot. Hold to climb, grab fomo fuel and land softly downtown.'},
 };
 function clearMotion(){state.keys.clear();state.joystick={x:0,y:0};$('joystick-knob').style.transform='';renderer.player.moving=false;}

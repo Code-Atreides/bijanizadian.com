@@ -1,10 +1,10 @@
-import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=8';
-import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=8';
+import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=9';
+import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=9';
 import {helipadState} from './shared/village-helipad.js?v=183';
 import {footballState,footballPlayer,footballBall} from './shared/village-football.js?v=183';
-import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=8';
+import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=9';
 import {helipadFanPose} from './shared/village-helipad-fans.js?v=183';
-import {heroSprite,drawLanding} from './story-art.js?v=8';
+import {heroSprite,drawLanding} from './story-art.js?v=9';
 
 // Traffic drives on the right. Each loop is a closed lane circuit around a
 // block; cars queue behind each other, yield at merges and stop for the player.
@@ -148,7 +148,7 @@ export class VillageRenderer{
  }
  stadiumLife(c,t,seen){const l=this.landmark('stadium');if(!seen(l.x-30,l.y-45,l.w+60,l.h+60))return;
    const s=footballState(t),cx=l.x+l.w/2,cy=l.y+l.h/2;
-   for(let i=0;i<22;i++){const p=footballPlayer(i,t),x=cx+p.z*3.3,y=cy+p.x*3.1;rect(c,x-2,y-3,5,5,p.team?'#e8ddc6':BRAND.blue);rect(c,x-2,y-6,5,3,p.team?'#c9505f':BRAND.light);rect(c,x-3,y+2,2,3,'#f2e5c5');rect(c,x+2,y+2,2,3,'#f2e5c5');}
+   for(let i=0;i<22;i++){const p=footballPlayer(i,t),x=cx+p.z*3.3,y=cy+p.x*3.1;rect(c,x-3,y-3,7,2,p.team?'#c43f4c':BRAND.blue);rect(c,x-2,y-1,5,3,p.team?'#c43f4c':BRAND.blue);rect(c,x-2,y-7,5,4,p.team?'#c43f4c':'#f2f4fa');rect(c,x-1,y-7,3,1,p.team?'#f4ead2':BRAND.blue);rect(c,x+2,y-5,1,2,'#a3a9b8');rect(c,x-2,y+2,2,3,'#f2f4fa');rect(c,x+1,y+2,2,3,'#f2f4fa');}
    const b=footballBall(t);rect(c,cx+b.z*3.3,cy+b.x*3.1-b.y*2,3,2,'#734b46');
    rect(c,l.x+l.w/2-75,l.y+l.h-9,150,15,BRAND.ink);text(c,`fomo ${s.home} - ${s.away} AWAY`,cx,l.y+l.h-5,BRAND.pale,1,'center');
    if(s.phase==='TOUCHDOWN'){rect(c,cx-44,cy-7,88,17,BRAND.ink);rect(c,cx-43,cy-6,86,15,BRAND.blue);text(c,'TOUCHDOWN!',cx,cy-2,BRAND.white,1,'center');}

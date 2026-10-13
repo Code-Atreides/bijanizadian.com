@@ -1,6 +1,6 @@
-import {introPose,INTRO_END,STORY_KEY,LEGACY_STORY_KEY,LANDING,STAGES,STAGE_GAME,STAGE_VENUE,restoredProgress,visitQuest,gameQuest,questCopy,topHouses} from './story-model.js?v=8';
-import {renderIntroScene,aryaPortrait} from './story-art.js?v=8';
-import {StoryAudio} from './story-audio.js?v=8';
+import {introPose,INTRO_END,STORY_KEY,LEGACY_STORY_KEY,LANDING,STAGES,STAGE_GAME,STAGE_VENUE,restoredProgress,visitQuest,gameQuest,questCopy,topHouses} from './story-model.js?v=9';
+import {renderIntroScene,aryaPortrait} from './story-art.js?v=9';
+import {StoryAudio} from './story-audio.js?v=9';
 
 const $=id=>document.getElementById(id);
 const gameSurfaces='#world,.topbar,.location-chip,.modes,.destinations,.world-tools,.minimap,#chapter-panel,#venue-panel,#move-help,#walk-prompt,#joystick,#mobile-interact,#quest-hud';
@@ -82,7 +82,7 @@ export class StoryDirector{
   this.speak([{text:`Wait — you already beat ${GAME_NAMES[game]}? Then we’re skipping ahead.`},...this.storyAfter(from)],()=>this.catchUp());
  }
  storyAfter(stage){
-  if(stage==='court')return [{text:'Five buckets. Coach saw the whole thing — you’re in.'},{text:'Fourth quarter. Twelve seconds left. We’re down three. Get back to fomo field and score the game-winner.'}];
+  if(stage==='court')return [{text:'Five buckets. Coach saw the whole thing — you’re in.'},{text:'Fourth quarter, 1:30 left, we’re down three. Coach is putting you in at quarterback. Get back to fomo field and lead the game-winning drive.'}];
   if(stage==='game-winner')return [{text:'TOUCHDOWN! The whole village is losing it.'},{text:'Uh-oh. Orangie and Rasmr just landed at the helipad, and their pilot is stuck in traffic on the turnpike. They’re due on a stream in New York tonight.'},{text:'You fell out of a pipe this morning. A helicopter can’t be harder. Fly them to the Downtown heliport — safely, please.'}];
   if(stage==='vip-flight')return [{text:'They made it! Orangie says thanks for the smooth landing. Mostly smooth.'},{text:'Top house, fomo field, the team, the game-winner and a VIP run to New York. That’s Greek Village legend status.'},{text:'Party night is on me. Bring your chapter — every member who joins makes the neighborhood bigger.',complete:()=>this.onFinale?.()}];
   return [];

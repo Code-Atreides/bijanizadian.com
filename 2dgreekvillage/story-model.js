@@ -1,4 +1,4 @@
-import {houseStandings} from './world-model.js?v=8';
+import {houseStandings} from './world-model.js?v=9';
 
 export const STORY_KEY='fomo-village-story-v5';
 export const LEGACY_STORY_KEY='fomo-village-story-v4';
@@ -43,7 +43,7 @@ export function questCopy(progress){
  const s=progress.stage;
  if(s==='campus-field')return {number:'02',title:'Find fomo field',detail:'Catch the action at the stadium.',hint:'Head west of Greek Row. In Walk mode, press E in the middle of the field, or pick Stadium on the map.'};
  if(s==='court')return {number:'03',title:'Make the team',detail:'Hit 5 of 10 shots at the courts.',hint:'The courts are right below fomo field. Walk onto the court and press E, or pick Courts on the map. Stop the meter in the blue zone.'};
- if(s==='game-winner')return {number:'04',title:'Win the game',detail:'Score the game-winning touchdown.',hint:'Back to fomo field. Four plays, 65 yards. Juke when a defender closes in. Your blockers only hold for a moment.'};
+ if(s==='game-winner')return {number:'04',title:'Win the game',detail:'Score the game-winning touchdown.',hint:'Back to fomo field. You’re the quarterback with 1:30 left. Snap, then drag back and release to throw to the open man, or tap the running back to run it. Move the chains and get in the end zone.'};
  if(s==='vip-flight')return {number:'05',title:'VIP to New York',detail:'Fly Orangie & Rasmr to NYC.',hint:'The helipad is just south of the courts. Hold to climb, let go to descend, grab fomo fuel and ease off for a soft landing.'};
  if(s==='complete')return {number:'✓',title:'Greek Village legend',detail:'All five quests done. Chase high scores.',hint:'You did it all. Replay Court Kings, the Final Drive and the NYC flight for a new best, or bring your chapter to the village.'};
  return {number:'01',title:'Find the top house',detail:'Look for the house ranked #1.',hint:'Check Standings for the current leader by member signups. Click its house in Map mode, or walk to its door and press E. Tied #1 houses both count.'};
