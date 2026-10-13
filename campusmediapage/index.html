@@ -39,7 +39,7 @@
 body { margin: 0; }
 [hidden] { display: none !important; }
 img { max-width: 100%; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 76px; }
 body { background: var(--bg); color: var(--body-ink); font-family: var(--sans); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 .wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
 h1, h2, h3 { margin: 0; color: var(--ink); text-wrap: balance; font-weight: 600; letter-spacing: -.025em; }
@@ -157,7 +157,17 @@ blockquote cite { display: block; margin-top: 10px; font: 500 14px/1.4 var(--san
 @media (max-width: 480px) { .facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 14px; } .deliver li { flex-direction: column; gap: 2px; padding: 13px 0; } }
 
 /* work: bento showcase. First project is featured; the last row fills itself. */
-.work { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); grid-auto-rows: clamp(170px, 18vw, 230px); gap: 16px; }
+.work { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px;
+  /* three rows sized to fit the screen with the heading, under the sticky nav */
+  grid-auto-rows: clamp(128px, min(15vw, calc((100vh - 300px) / 3)), 210px);
+  grid-auto-rows: clamp(128px, min(15vw, calc((100svh - 300px) / 3)), 210px); }
+#work { padding-top: clamp(48px, 5vw, 64px); }
+#work .head-row { margin-bottom: 24px; }
+.work .item:not(.big) .media .ico { display: none; }
+.work .item:not(.big) .cap span { display: none; }
+.work .item:not(.big) .cap { padding: 8px 12px; border-radius: 10px; }
+.work .item:not(.big) .cap b { font-size: 14.5px; }
+#work .h2 { font-size: clamp(30px, 3.6vw, 42px); }
 .work .item { grid-column: span 2; position: relative; display: block; border-radius: var(--r); overflow: hidden; text-decoration: none; color: inherit; isolation: isolate; }
 .work .item.big { grid-column: span 4; grid-row: span 2; }
 .work .item.half { grid-column: span 3; }
@@ -194,6 +204,8 @@ blockquote cite { display: block; margin-top: 10px; font: 500 14px/1.4 var(--san
   .work .item:not(.big) .playbtn { width: 44px; height: 44px; }
   .work .item:not(.big) .playbtn svg { width: 18px !important; height: 18px !important; }
   .work .item.big .cap { left: 12px; bottom: 12px; padding: 11px 14px; }
+  .work .item.big .media .ico { padding-bottom: 56px; }
+  .work .item.big .playbtn { width: 60px; height: 60px; }
   .work .item.big .cap b { font-size: 16.5px; }
   .work .media .ico svg { width: 30px; height: 30px; }
 }
@@ -647,6 +659,11 @@ function renderBar() {
 }
 
 applyBrand(); render(); renderBar();
+// Content renders after load, so re-apply a #section link once it exists.
+if (location.hash.length > 1) {
+  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: "instant", block: "start" }));
+}
 
 document.addEventListener("click", (e) => {
   const sw = e.target.closest("[data-sw]");
