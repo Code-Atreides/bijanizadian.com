@@ -73,6 +73,10 @@
         "destination": "/2dgreekvillage/index.html"
       },
       {
+        "source": "/campusmediapage",
+        "destination": "/campusmediapage/index.html"
+      },
+      {
         "source": "/",
         "destination": "/desktop.html"
       }
