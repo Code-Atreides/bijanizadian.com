@@ -1,0 +1,283 @@
+import {yieldVillageBuild} from './village-build-scheduler.js?v=183';
+import {batchCampusGeometrySteps} from './village-campus-kit.js?v=183';
+import {createPedestrianSpacing} from './village-pedestrian-spacing.js?v=183';
+import {createCampusHill,isCampusHill,CAMPUS_HILL_HEIGHT} from './village-campus-hill.js?v=183';
+import {BLOCK,districtSpecs,districtAt,districtKind,greekColumn,mod,hash,pick} from './village-district-layout.js?v=183';
+import {createCampusKit} from './village-campus-kit.js?v=183';
+import {buildSkylineBuilding} from './village-skyline.js?v=183';
+import {createCampusPeople,createCampusTraffic} from './village-campus-life.js?v=183';
+import {dressNeighborhood} from './village-places.js?v=183';
+import {createStadium,STADIUM_SITE} from './village-stadium.js?v=183';
+import {HELIPAD_SITE} from './village-helipad.js?v=183';
+import {campusDistrictExists} from './village-campus-bounds.js?v=183';
+
+export function createDistricts(T,extension=0,streets=1,options={}){
+  const steps=buildDistrictSteps(T,extension,streets,options);let result;
+  do{result=steps.next();}while(!result.done);return result.value;
+}
+export async function createDistrictsAsync(T,extension=0,streets=1,options={}){
+  const steps=buildDistrictSteps(T,extension,streets,options);let result;
+  do{const start=performance.now();do{result=steps.next();}while(!result.done&&performance.now()-start<4);if(!result.done)await yieldVillageBuild();}while(!result.done);
+  return result.value;
+}
+function* buildDistrictSteps(T,extension,streets,{incremental=false,budgeted=false}={}){
+  const root=new T.Group(),chunks=new Map(),kit=createCampusKit(T);let night=false;
+  const stadium=createStadium(T,extension);root.add(stadium.root);yield;
+  const {box,mesh,cylinder,bar,tree:plantTree,bench,lamp,table,path,sign}=kit;
+  // The court straddles two district blocks. Keep landscaping from either
+  // block outside its footprint, including when those blocks stream again.
+  function overlapsCourt(p,x,z,halfX=0,halfZ=halfX){
+    for(let parent=p;parent;parent=parent.parent){x+=parent.position.x;z+=parent.position.z;}
+    const column=Math.round((x+51)/BLOCK);
+    return greekColumn(column,streets)&&Math.abs(x-(column*BLOCK-51))<10+halfX&&Math.abs(z-10)<15+halfZ;
+  }
+  function hedge(p,x,z,length=5,turn=0){
+    if(!overlapsCourt(p,x,z,Math.abs(Math.cos(turn))*length/2+.8,Math.abs(Math.sin(turn))*length/2+.8))kit.hedge(p,x,z,length,turn);
+  }
+  function tree(p,x,z,seed,size){
+    if(overlapsCourt(p,x,z,3*(size||1)))return;
+    const blocked=(p.userData.specs||[]).some(s=>{const dx=x-(s.x-p.position.x),dz=z-(s.z-p.position.z),a=s.rotation;return Math.abs(dx*Math.cos(a)-dz*Math.sin(a))<s.width/2+2&&Math.abs(dx*Math.sin(a)+dz*Math.cos(a))<s.depth/2+3;});
+    if(!blocked)plantTree(p,x,z,seed,size);
+  }
+  const plantingKit=Object.assign(Object.create(kit),{hedge,tree(p,x,z,seed,size){if(!overlapsCourt(p,x,z,3*(size||1)))plantTree(p,x,z,seed,size);}});
+  const traffic=createCampusTraffic(T,kit,extension);root.add(traffic.root);yield;
+  function bikeRack(p,x,z){
+    for(let i=0;i<5;i++){
+      const a=x+i*.75;bar(p,[a,.1,z],[a,.9,z],.035,0x7a898b);bar(p,[a,.9,z],[a,.9,z+1],.035,0x7a898b);bar(p,[a,.9,z+1],[a,.1,z+1],.035,0x7a898b);
+      if(i%2===0){for(const offset of [-.1,1.2]){const w=mesh(p,'wheel',a+.16,.4,z+offset,1,1,1,0x384649);w.rotation.y=Math.PI/2;}
+        bar(p,[a+.16,.4,z-.1],[a+.16,.9,z+.35],.033,0xa78059);bar(p,[a+.16,.9,z+.35],[a+.16,.4,z+1.2],.033,0xa78059);bar(p,[a+.16,.4,z-.1],[a+.16,.4,z+1.2],.033,0xa78059);
+      }
+    }
+  }
+  function corePlaces(parent){
+    // Reserve x=25.6..37 on both sides for the chapter backyards. Amenities
+    // share the gap between streets; café and court occupy different z ranges.
+    const p=new T.Group();p.name='greek-row-amenities';parent.add(p);
+    const cafe=new T.Group();cafe.position.x=9;cafe.name='campus-coffee';p.add(cafe);
+    box(cafe,41,.07,-18,16,.08,18,0xc4bcaa);box(cafe,41,1.95,-20,8,3.6,5.5,0xc5b599,'stone');box(cafe,41,3.92,-20,9,.22,6.2,0x626961);box(cafe,41,2,-17.17,6.8,1.8,.08,0x49616b);
+    for(let i=0;i<8;i++)box(cafe,37.5+i,3.2,-16.5,1,.12,2.2,i%2?0xb4805d:0xe9dfc7);
+    sign(cafe,'CAMPUS COFFEE',41,3.6,-17.12,7,.6);
+    for(const x of [37,43,46])table(cafe,x,-11,x!==43);
+    bikeRack(cafe,34,-25);
+    const fountain=new T.Group();fountain.position.set(8,0,18+extension);fountain.name='social-fountain';p.add(fountain);
+    cylinder(fountain,42,.3,14,3.2,.45,0xc9c2b1);cylinder(fountain,42,.56,14,2.85,.07,0x729ca1);cylinder(fountain,42,.8,14,.35,.7,0xd6cdb6);
+    for(let i=0;i<5;i++){const a=i*Math.PI*2/5;const water=bar(fountain,[42,.9,14],[42+Math.cos(a)*1.1,.68,14+Math.sin(a)*1.1],.025,0xb6cfca);water.castShadow=false;}
+    bench(fountain,36,14,Math.PI/2);bench(fountain,48,14,-Math.PI/2);bench(fountain,42,20);bench(fountain,36,8,.4);
+    const court=new T.Group();court.position.x=-9;court.name='basketball-court';p.add(court);
+    box(court,-42,.2,10,18,.24,28,0x718888);
+    for(const x of [-50,-34])box(court,x,.335,10,.09,.025,25,0xe8e0cd);
+    for(const z of [-2.5,10,22.5])box(court,-42,.335,z,16,.025,.09,0xe8e0cd);
+    for(const z of [-1.5,21.5]){cylinder(court,-42,1.8,z,.07,3.2,0x8a9590);box(court,-42,3.35,z,1.55,1,.1,0xe4dfcb);const hoop=mesh(court,'wheel',-42,3.05,z+(z<0?.5:-.5),1.15,1.15,1.15,0xb37350);hoop.rotation.x=Math.PI/2;
+      const net=new T.Group();net.name='basketball-hoop-net';net.position.copy(hoop.position);court.add(net);
+      const knots=12,rows=5,point=(row,k)=>{const angle=(k+(row%2)*.5)/knots*Math.PI*2,radius=.39-row*.042;return [Math.cos(angle)*radius,-row*.16,Math.sin(angle)*radius];};
+      for(let row=0;row<rows-1;row++)for(let k=0;k<knots;k++){
+        const a=point(row,k);for(const next of [k,k+(row%2?1:-1)])bar(net,a,point(row+1,next),.012,0xf2eee2);
+      }
+      for(let k=0;k<knots;k++)bar(net,point(rows-1,k),point(rows-1,k+1),.012,0xf2eee2);
+    }
+    bench(p,-41.4,7,Math.PI/2);bench(p,-41.4,14,Math.PI/2);
+    for(const side of [-1,1]){
+      // The whole path is authored at its final length, so an extended row
+      // cannot leave a disconnected middle section or move it into a yard.
+      path(p,[side*39.5,-39],[side*39.5,39+extension],2.6);
+      path(p,[side*7,38+extension],[side*39.5,38+extension],2.2);
+      path(p,[side*7,-39],[side*39.5,-39],2.2);
+      for(const [x,z] of [[43,-34],[55,-33],[55,37+extension]])tree(p,side*x,z,mod(x+z,9),.9);
+    }
+    // Small student hangouts along the extended lawn, clear of both footpaths.
+    if(extension>=76){
+      const accents=new T.Group();accents.name='campus-lawn-accents';p.add(accents);
+      for(const [x,z] of [[47,48],[53,54],[47,111]]){table(accents,x,z,true);box(accents,x,.9,z,.4,.06,.3,0x7062a8);cylinder(accents,x+.3,.98,z,.07,.2,0xd6b576);}
+      for(const z of [68,120]){
+        for(const x of [45,55])tree(accents,x,z+5,Math.round(x+z),.7);
+        bench(accents,46,z,Math.PI/2);bench(accents,54,z,-Math.PI/2);
+      }
+      // Sagging striped hammocks on low timber posts.
+      for(const [x,z,color] of [[47,88,0x7665b5],[54,94,0xc59b65]]){
+        for(const dz of [-3,3])bar(accents,[x,0,z+dz],[x,2.3,z+dz],.1,0x98734c);
+        for(let i=0;i<12;i++){const t=(i+.5)/12,zz=z-2.6+t*5.2,y=1.1+Math.pow(t-.5,2)*3.4;box(accents,x,y,zz,1.3,.055,.47,i%3?color:0xe6ddcb);}
+        bar(accents,[x,2.1,z-3],[x,1.95,z-2.6],.025,0xd7c8a7);bar(accents,[x,1.95,z+2.6],[x,2.1,z+3],.025,0xd7c8a7);
+      }
+      // Two pairs of cornhole boards and colorful beanbags on the lawn.
+      for(const x of [47,53])for(const z of [132,139]){
+        const board=box(accents,x,.3,z,1,.1,1.65,0xc29d66);board.rotation.x=z===132?-.16:.16;
+        cylinder(accents,x,.47,z+(z===132?.45:-.45),.13,.012,0x343443);
+        box(accents,x+.26,.4,z-.24,.19,.06,.19,x===47?0x7862b3:0x7c9b74);
+      }
+      bikeRack(accents,46,151);
+      for(const z of [59,107,147]){lamp(accents,57,z);kit.bins(accents,57,z+2);}
+    }
+    path(p,[39.5,-15],[44,-15],2.2);
+  }
+  function landscape(p,kind,cx,cz){
+    const spine=['library','athletics','commons'].includes(kind),seed=mod(cx*17+cz*41,27);
+    // Staggered groves and varied setbacks replace the repeated fence of trees.
+    if(kind==='greek'){corePlaces(p);return;}
+    if(['town','green','residential'].includes(kind))return;
+    if(spine){
+      path(p,[0,kind==='athletics'?-41:-10.5],[0,42],5);
+      if(kind==='athletics'){
+        path(p,[0,5],[-23,5],2.6);path(p,[0,9],[26,9],2.6);path(p,[0,-10],[-12,-10],2.2);
+      }else{
+        path(p,[0,5],[-16.5,5],2.6);path(p,[0,-7],[19.5,-7],2.6);
+      }
+      for(const side of [-1,1]){bench(p,side*12,36);for(const z of [8,24,39])tree(p,side*(22+(z%3)*3),z,seed+mod(z,8),1.15);}
+      for(let i=0;i<4;i++){box(p,(kind==='athletics'?13:-20)+i*2.1,.16,(kind==='athletics'?-21:15)+(i%2)*2,1.8,.025,1.3,[0xad8769,0x78899a,0xd0c4a5,0x8f9586][i]);}
+      if(kind==='athletics'){
+        for(const x of [-22,-2])for(const z of [-33,-14]){cylinder(p,x,1.1,z,.065,2.1,0xe2deca);}
+        for(const z of [-33,-14])bar(p,[-22,2.1,z],[-2,2.1,z],.025,0xd8d5c7);
+        sign(p,'INTRAMURAL FIELD',-12,1.5,-10,12,.55);
+      }
+    }else{
+      for(const side of [-1,1]){
+        bench(p,side*29,38);
+        for(const z of [-39,5,39])tree(p,side*(40+(z%3)),z,seed+mod(z,8),.95+seed%3*.1);
+        bikeRack(p,side>0?11:-16,30);
+      }
+      if(kind==='town'){
+        for(let i=0;i<3;i++){table(p,18+i*4.2,5,i!==1);}
+      }
+    }
+    for(const side of [-1,1])for(const z of [-35,17])lamp(p,side*8,z);
+    // Bus shelters and campus noticeboards make the curb useful.
+    if(kind==='science'||kind==='arts'){
+      const x=kind==='science'?8.8:-8.8;for(const z of [-30,-24])cylinder(p,x,1.4,z,.045,2.8,0x657774);
+      box(p,x,2.86,-27,2.5,.14,7.2,0x748984);box(p,x+(x>0?1:-1),1.5,-27,.08,2.4,6,0x90aaa5);bench(p,x,-27,Math.PI/2);
+      sign(p,'CAMPUS SHUTTLE',x,2.7,-23.35,2,.35);
+    }
+    for(let i=0;i<4;i++){
+      const x=(i%2?1:-1)*(45+(seed%3)),z=-32+i*19;
+      tree(p,x,z,seed+i,.8+(i%3)*.17);
+    }
+  }
+  function fillDetails(p,kind,cx,cz){
+    const core=kind==='greek',spine=['library','athletics','commons'].includes(kind);
+    for(const side of [-1,1]){
+      if(core){
+        const x=side*23;
+        hedge(p,x,-42,12);hedge(p,side*34,-35,10,Math.PI/2);
+        box(p,x,.25,-36,12,.35,6,0xbcb7a7);for(const dx of [-3,3]){table(p,x+dx,-36);bench(p,x+dx,-34.3);}
+        kit.streetFurniture(p,side*14,-39,side);
+        cylinder(p,side*32,3.3,-32,.06,6.6,0x687575);box(p,side*32+.44,5.3,-32,.78,1.7,.045,0x7b83ac);box(p,side*32+.44,5.3,-31.97,.035,1.4,.015,0xd9d4bd);
+        for(const dx of [-5,5])tree(p,x+dx,-38,Math.floor(hash(x,dx)*10000),.8);
+        kit.parkedCar(p,side*43,-37,0,side,false);kit.parkedCar(p,side*47,-37,0,side+8,true);
+        kit.bins(p,side*31,30);hedge(p,side*26,40,11);
+      }else{
+        hedge(p,side*35,42,15);hedge(p,side*46,20,11,Math.PI/2);
+        kit.streetFurniture(p,side*15,37,cx*71+cz);
+        for(const x of [side*22,side*36]){box(p,x,.34,41,5,.5,.45,0xb1ae9d);for(let i=0;i<3;i++)mesh(p,'leaf',x-1.4+i*1.4,.8,41,.65,.48,.6,pick([0x748363,0x7b8059,0x88785d],cx,cz,x,i));}
+        if(!spine)for(let i=0;i<6;i++)kit.parkedCar(p,side*(18+i*4.8),-40,side>0?Math.PI/2:-Math.PI/2,Math.floor(hash(cx,cz,side,i)*10000),i%2===1);
+        if(spine){for(const x of [side*16,side*30]){table(p,x,39);kit.bins(p,x+1.8,40.5);}}
+      }
+      // Lamps and access bollards punctuate long pavements without blocking the road.
+      for(const z of [-40,34])for(let i=0;i<3;i++)cylinder(p,side*(core?31:18)+i*.9,.55,z,.09,.9,0x687575);
+    }
+  }
+  function* distantCampus(){
+    const p=new T.Group();p.name='permanent-campus-horizon';
+    for(let i=0;i<65;i++){
+      const a=hash(i,'sky-angle')*Math.PI*2,r=225+hash(i,'sky-radius')*130,x=Math.sin(a)*r,z=Math.cos(a)*r,w=7+hash(i,'sky-width')*17,h=6+hash(i,'sky-height')*19;
+      if(Math.abs(x-STADIUM_SITE.x)<STADIUM_SITE.width*STADIUM_SITE.scale/2+w&&Math.abs(z-STADIUM_SITE.z)<STADIUM_SITE.depth*STADIUM_SITE.scale/2+18)continue;
+      if(Math.abs(x-HELIPAD_SITE.x)<36+w&&Math.abs(z-HELIPAD_SITE.z)<55)continue;
+      buildSkylineBuilding(T,kit,p,{x,z,width:w,depth:8+hash(i,'sky-depth')*9,height:h,seed:i});yield;
+    }
+    for(let i=0;i<80;i++){const a=hash(i,'distant-tree')*Math.PI*2,r=205+hash(i,'tree-radius')*130,x=Math.sin(a)*r,z=Math.cos(a)*r;if(Math.abs(x)<50&&Math.abs(z-STADIUM_SITE.z)<50)continue;if(Math.abs(x-HELIPAD_SITE.x)<38&&Math.abs(z-HELIPAD_SITE.z)<56)continue;mesh(p,'leaf',x,3.5,z,5+hash(i)*6,5+hash(i,1)*5,4+hash(i,2)*6,pick([0x7d907b,0x718978,0x8c9b82],i));}
+    // Water tower, bell tower and stadium floodlights break the dormitory skyline.
+    for(const x of [233,241])for(const z of [181,189])bar(p,[x,0,z],[x,24,z],.20,0x8c9f9d);
+    cylinder(p,237,26,185,6,6,0xaebdb5);mesh(p,'dome',237,29,185,6,2,6,0xaebdb5);
+    box(p,-248,16,55,8,32,8,0x9b9e8e);for(const x of [-251,-245])for(const z of [52,58])box(p,x,35,z,.6,6,.6,0xaeb3a3);mesh(p,'cone',-248,40,55,6,6,6,0x829790);
+    for(const z of [-155,-115]){cylinder(p,247,20,z,.35,40,0x9cacab);box(p,247,40,z,13,1.5,.6,0x859794);for(let i=0;i<6;i++)box(p,242+i*2,40,z+.4,1.5,1.1,.3,0xc6d0bd);}
+    if(extension)for(const child of p.children)if(child.position.z>30)child.position.z+=extension;
+    yield* batchCampusGeometrySteps(T,p);p.updateMatrixWorld(true);p.traverse(o=>o.matrixAutoUpdate=false);return p;
+  }
+  const horizon=yield* distantCampus();root.add(horizon);
+  function* makeChunk(cx,cz){
+    const p=new T.Group();p.position.set(cx*BLOCK,0,cz*BLOCK);
+    let completed=false;
+    try{
+    const kind=districtKind(cx,cz,streets),specs=districtSpecs(cx,cz,streets);p.userData.specs=specs;
+    for(const spec of specs){const building=kit.building(p,spec,cx*BLOCK,cz*BLOCK);if(isCampusHill(cx,cz))building.position.y=CAMPUS_HILL_HEIGHT;yield;}
+    if(isCampusHill(cx,cz))createCampusHill(T,kit,p);
+    else {landscape(p,kind,cx,cz);yield;fillDetails(p,kind,cx,cz);yield;dressNeighborhood(T,plantingKit,p,kind,cx,cz);yield;}
+    const activity=createCampusPeople(T,kit,kind,cx,cz,streets,extension);p.add(activity.root);
+    if(extension){
+      if(cz>0)p.position.z+=extension;
+      else if(cz===0)for(const child of p.children)if(child!==activity.root && child.position.z>=30)child.position.z+=extension;
+    }
+    yield* batchCampusGeometrySteps(T,p);
+    const lights=new Set();p.traverse(o=>{if(o.material?.userData.placeLight)lights.add(o.material);});
+    const setNight=enabled=>{for(const m of lights)m.emissiveIntensity=enabled?(m.userData.placeLight==='homeLight'?.65:m.userData.placeLight==='shopLight'?1.6:2.3):.04;activity.setNight(enabled);animatedAt=NaN;};
+    p.updateMatrixWorld(true);p.traverse(o=>o.matrixAutoUpdate=false);
+    // Use the same conservative bounds as the crowd's instance batches. These
+    // include every route and prop, so skipping a whole invisible batch cannot
+    // leave an old pose visible. Absolute-time poses catch up before drawing.
+    const activityBounds=activity.root.children.find(o=>o.isInstancedMesh).boundingSphere.clone().applyMatrix4(activity.root.matrixWorld);
+    let animatedAt=0;setNight(night);
+    completed=true;
+    return {group:p,kind,specs,activityBounds,people:activity.people,pedestrian:activity.pedestrian,setNight,animate(time,animatePeople=true,camera=null,poses=null){
+      if(animatePeople){activity.animate(time,camera,poses);animatedAt=time;}
+    },dispose(){p.userData.nationalPrize?.dispose();activity.dispose();kit.disposeChunk(p);}};
+    }
+    finally{if(!completed)kit.disposeChunk(p);}
+  }
+  let lastKey='',pending=[],building=null;
+  function update(x,z){
+    const center=districtAt(x,z>30?Math.max(30,z-extension):z),key=`${center.x},${center.z}`;
+    let changed=false;
+    if(key!==lastKey){
+      lastKey=key;
+      const wanted=new Set(),missing=[];
+      for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++){
+        const a=center.x+dx,b=center.z+dz,id=`${a},${b}`;
+        if(!campusDistrictExists(a,b,streets))continue;
+        wanted.add(id);if(!chunks.has(id)&&building?.id!==id)missing.push({a,b,id,distance:dx*dx+dz*dz});
+      }
+      pending=missing.sort((a,b)=>a.distance-b.distance);
+      // Keep nearby blocks resident when crossing an intersection. The small
+      // campus fits in this cache, avoiding buildings popping out and rebuilding.
+      const evict=[...chunks].filter(([id,c])=>!wanted.has(id)&&c.kind!=='stadium').sort((a,b)=>{
+        const distance=([,c])=>Math.hypot(c.group.position.x-x,c.group.position.z-z);
+        return distance(b)-distance(a);
+      });
+      let detailed=[...chunks.values()].filter(c=>c.kind!=='stadium').length+missing.filter(c=>!(c.a===0&&c.b===2)).length;
+      while(detailed>11&&evict.length){const [id,chunk]=evict.shift();chunk.group.removeFromParent();chunk.dispose();chunks.delete(id);detailed--;changed=true;}
+    }
+    const start=performance.now();
+    do{
+      if(!building){const next=pending.shift();if(!next)break;building={...next,steps:makeChunk(next.a,next.b)};}
+      let result;
+      do{result=building.steps.next();}while(!result.done&&(!budgeted||performance.now()-start<4));
+      if(!result.done)break;
+      root.add(result.value.group);chunks.set(building.id,result.value);building=null;changed=true;
+      if(incremental)break;
+    }while(pending.length);
+    if(changed)root.updateMatrixWorld(true);return changed;
+  }
+  const frustum=new T.Frustum(),projection=new T.Matrix4();
+  let trafficTime,trafficX,trafficZ;const spacing=createPedestrianSpacing();
+  const pedestrians=()=>[...chunks.values()].map(c=>c.pedestrian).filter(Boolean);
+  function animate(time,x=0,z=0,camera=null,sharedPoses=null){
+    const poses=sharedPoses||spacing.update(time,pedestrians());
+    if(camera)frustum.setFromProjectionMatrix(projection.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
+    stadium.root.visible=!camera||frustum.intersectsSphere(stadium.bounds);
+    if(stadium.root.visible)stadium.animate(time);
+    for(const chunk of chunks.values()){
+      const inView=camera?frustum.intersectsSphere(chunk.activityBounds):Math.hypot(chunk.group.position.x-x,chunk.group.position.z-z)<165;
+      chunk.animate(time,inView,camera,poses);
+    }
+    if(time!==trafficTime||x!==trafficX||z!==trafficZ){traffic.animate(time,x,z);trafficTime=time;trafficX=x;trafficZ=z;}
+  }
+  update(0,0);
+  // Finish the first block before exposing the campus; later blocks stream.
+  while(building){yield;update(0,0);}
+  function dispose(){
+    if(building){building.steps.return();building=null;}
+    stadium.dispose();
+    for(const chunk of chunks.values())chunk.dispose();
+    const resources=new Set();root.traverse(o=>{if(o.geometry)resources.add(o.geometry);if(o.isInstancedMesh)resources.add(o);for(const m of (Array.isArray(o.material)?o.material:[o.material]))if(m){resources.add(m);for(const v of Object.values(m))if(v?.isTexture)resources.add(v);}});
+    Object.values(kit.geometries).forEach(g=>resources.add(g));
+    kit.vehicles.resources.forEach(r=>resources.add(r));
+    for(const r of resources)if(!r.userData?.sharedResource)r.dispose();chunks.clear();
+  }
+  return {root,update,animate,chunks,get pedestrians(){return pedestrians();},get building(){return Boolean(building)||pending.length>0;},traffic,horizon,stadium,dispose,setNight(enabled){night=Boolean(enabled);stadium.setNight(night);for(const chunk of chunks.values())chunk.setNight(night);}};
+}

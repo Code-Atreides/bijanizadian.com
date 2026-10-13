@@ -69,6 +69,10 @@
         "destination": "/greekwars/clan.html"
       },
       {
+        "source": "/2dgreekvillage",
+        "destination": "/2dgreekvillage/index.html"
+      },
+      {
         "source": "/",
         "destination": "/desktop.html"
       }

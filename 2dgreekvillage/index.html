@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><base href="/2dgreekvillage/"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0B091F"><title>Greek Village · fomo</title><meta name="description" content="One pipe. A whole campus to discover. A pixel adventure in fomo Greek Village."><link rel="icon" href="./assets/favicon.svg"><link rel="stylesheet" href="./style.css?v=8"><link rel="stylesheet" href="./story.css?v=8"></head>
+<body>
+<canvas id="world" tabindex="0" role="application" aria-label="Interactive Greek Village. Drag to explore. Use Map or Walk mode. Chapter details are also available through the Chapters button."></canvas>
+<header class="topbar">
+ <a class="brand" href="https://fomocampus.com/" target="_blank" rel="noopener"><img src="./assets/fomo-lockup-pale.svg" alt="fomo"><span class="brand-divider"></span><span class="brand-name">greek village<span>GREEK WARS · FALL 2026</span></span></a>
+ <div class="top-actions"><button id="chapters-open" class="glass search-trigger"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span>Find your chapter</span><kbd>/</kbd></button><a class="join" href="https://fomocampus.com/onboard/" target="_blank" rel="noopener">Join Greek Wars <span>↗</span></a></div>
+</header>
+<div class="location-chip glass"><span class="pixel-pin">◆</span><div><strong id="location-name">Greek Row</strong><span id="location-sub">YOUR CHAPTER. YOUR CORNER OF CAMPUS.</span></div></div>
+<div class="modes glass" role="group" aria-label="Navigation mode"><button id="map-mode" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Z M9 3v16 M15 5v16"/></svg>Map <kbd>M</kbd></button><button id="walk-mode" aria-pressed="false"><svg viewBox="0 0 24 24"><circle cx="13" cy="4" r="2"/><path d="m10 8 5 2 3 4 M12 8l-3 7 5 3 2 4 M9 15l-5 6 M10 8l-4 4H3"/></svg>Walk <kbd>W</kbd></button></div>
+<nav class="destinations glass" aria-label="Campus destinations">
+ <button data-go="home" title="Greek Row"><span class="nav-pixel">⌂</span><span>Greek Row</span></button>
+ <button data-go="stadium" title="Visit fomo field"><span class="nav-pixel">▤</span><span>Stadium</span></button>
+ <button data-go="court" title="Visit the courts"><span class="nav-pixel">◎</span><span>Courts</span></button>
+ <button data-go="helipad" title="Visit the helipad"><span class="nav-pixel">H</span><span>Helipad</span></button>
+ <button data-go="trophy" title="Visit the trophy"><span class="nav-pixel">♜</span><span>The prize</span></button>
+ <button id="leaderboard-open" title="Leaderboard"><span class="nav-pixel">▥</span><span>Standings</span></button>
+</nav>
+<div class="world-tools glass" role="group" aria-label="World controls"><button id="night" aria-label="Turn on party night" aria-pressed="false" title="Party night">☾</button><button id="pause" aria-label="Pause campus activity" aria-pressed="false" title="Pause activity">Ⅱ</button><button id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out" title="Zoom out">−</button><button id="overview" aria-label="Overview of campus" title="Campus overview">⌖</button><button id="fullscreen" aria-label="Full screen" title="Full screen">⛶</button><button id="help" aria-label="About Greek Wars and controls" title="About and controls">?</button></div>
+<aside class="minimap glass"><div><span class="tiny-square"></span> CAMPUS MAP <button id="minimap-toggle" aria-label="Collapse minimap">−</button></div><canvas id="mini" width="165" height="146" aria-label="Campus minimap. Click to move the camera."></canvas><footer><span id="feed-dot" class="status-dot"></span><span id="feed-status">Saved registrations</span></footer></aside>
+<section id="chapter-panel" class="chapter-panel glass" aria-label="Selected chapter" aria-live="polite">
+ <div class="chapter-top"><button id="chapter-crest" class="chapter-crest" aria-label="Open chapter profile">ΣΧ</button><div class="chapter-title"><div id="chapter-school">SAN DIEGO STATE UNIVERSITY</div><h1 id="chapter-name">Sigma Chi</h1></div><span id="chapter-rank" class="rank">#2</span><button id="close-panel" aria-label="Hide chapter details" class="quiet">×</button></div>
+ <div class="chapter-metrics"><strong><span id="chapter-count">85</span><small>members onboarded</small></strong><span id="chapter-unlock">Pool unlocked <span class="check">✓</span></span></div>
+ <div class="progress-track"><div id="chapter-progress"></div><span class="progress-marker"></span></div>
+ <div class="chapter-bottom"><span id="chapter-target">85 / 80 pool target</span><div><button id="view-pool">Visit pool <span>↗</span></button><button id="share">Share <span>↗</span></button></div></div>
+</section>
+<section id="venue-panel" class="chapter-panel venue-panel glass" aria-label="Campus venue" aria-live="polite" hidden>
+ <div class="chapter-top"><span id="venue-icon" class="chapter-crest" aria-hidden="true">◎</span><div class="chapter-title"><div id="venue-sub">PICKUP HOOPS, ALL DAY</div><h1 id="venue-name">The Courts</h1></div><span id="venue-quest" class="rank" hidden>QUEST</span><button id="close-venue" aria-label="Hide venue details" class="quiet">×</button></div>
+ <p id="venue-copy" class="venue-copy"></p>
+ <div class="chapter-bottom"><span id="venue-best">BEST —</span><button id="venue-play" class="primary">Play <span aria-hidden="true">▶</span></button></div>
+</section>
+<div class="move-help glass" id="move-help"><span class="mouse-icon">↔</span> Drag to explore <span>·</span> Scroll to zoom <span>·</span> Click a house</div>
+<div id="walk-prompt" class="walk-prompt glass" hidden><kbd>E</kbd><span></span><button id="interact">Open</button></div>
+<div id="joystick" class="joystick" aria-label="Touch joystick" hidden><span id="joystick-knob"></span></div>
+<button id="mobile-interact" class="mobile-interact" hidden aria-label="Interact with what is nearby">E</button>
+<div id="toast" role="status" hidden></div>
+<div id="loading" class="loading"><img src="./assets/fomo-campus-white.svg" alt=""><strong>Welcome to the neighborhood.</strong><span>Planting trees. Opening doors.</span><div><i></i></div></div>
+
+<dialog id="chapters-dialog" class="chapters-dialog">
+ <header><div><span class="eyebrow">THE WHOLE NEIGHBORHOOD</span><h2>Find your people.</h2></div><button data-close aria-label="Close chapters">×</button></header>
+ <div class="dialog-search"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input id="chapter-search" type="search" placeholder="Chapter, nickname, or school…" aria-label="Search chapters" autocomplete="off"></div>
+ <div class="list-meta"><span id="chapter-results"></span><span>MEMBERS</span></div><div id="chapter-list" class="chapter-list"></div>
+ <a class="claim-link" href="https://fomocampus.com/onboard/" target="_blank" rel="noopener"><span>+</span><div><strong>Your lot is waiting.</strong><small>Bring your chapter to the village.</small></div><span>↗</span></a>
+ <p class="fineprint">Houses appear at 31 members. Scenery and campus visitors are separate from registrations.</p>
+</dialog>
+<dialog id="profile-dialog" class="profile-dialog"><button class="dialog-x" data-close aria-label="Close profile">×</button><div id="profile-content"></div></dialog>
+<dialog id="leaderboard-dialog" class="leaderboard-dialog"><header><div><span class="eyebrow">GREEK WARS · LIVE ONBOARDING</span><h2>The neighborhood standings.</h2></div><button data-close aria-label="Close standings">×</button></header><p class="dialog-description">More people. Bigger house. This board ranks member signups; trading P&amp;L is a separate competition.</p><div id="leaderboard-list" class="chapter-list"></div><footer id="leaderboard-total"></footer></dialog>
+<dialog id="about-dialog" class="about-dialog"><header><div><span class="eyebrow">fomo / CAMPUS</span><h2>Your chapter. Your team.</h2></div><button data-close aria-label="Close about">×</button></header><p>Build your house, rally your people, and compete on fomo. fomo has committed $500,000 to fomo / campus.</p><div class="controls-guide"><div><kbd>M</kbd><strong>Map mode</strong><span>Drag to pan. Scroll or pinch to zoom.</span></div><div><kbd>W</kbd><strong>Walk mode</strong><span>WASD / arrows to move. E to interact.</span></div><div><kbd>/</kbd><strong>Find a chapter</strong><span>Search names, nicknames, or schools.</span></div><div><kbd>ESC</kbd><strong>Back to campus</strong><span>Close a panel or return to Map mode.</span></div></div>
+ <details open><summary>What can I play?</summary><p>Three campus games, each part of Arya’s quests. <b>Court Kings</b> at the courts: hit 5 of 10 shots. <b>The Final Drive</b> at fomo field: score the game-winning touchdown in four plays. <b>Flight to New York</b> at the helipad: fly Orangie and Rasmr to the Downtown heliport. High scores save on this device. Game scores are just for fun and never change chapter standings.</p></details>
+ <details><summary>How does my house grow?</summary><p>The connected village displays chapters with more than 30 members. House size grows with your own joined count. Reach 80% of your active roster to unlock a backyard pool, terrace, loungers, and landscaping. All registered chapters remain searchable.</p></details>
+ <details><summary>How do I join my chapter?</summary><p>Ask your chapter lead for your chapter’s invite link. Joining through it counts toward your roster target. Your house and standings update as registrations arrive.</p></details>
+ <details><summary>Who gets the $500—and the extra $250?</summary><p>Every chapter that onboards at least 80% of its active members qualifies for $500, paid to the chapter. The first chapter at each school to reach 80% earns an extra $250. Fraternities and sororities compete for the same first-chapter bonus. Registering alone does not qualify your chapter.</p></details>
+ <details><summary>How does Greek Wars work?</summary><p>Greek Wars is a semester-long trading competition. Your chapter is your team. Chapters compete at their school and nationally on raw profit and loss in dollars. The national trading prize amount will be announced later.</p></details>
+ <details><summary>Who can participate?</summary><p>Recognized Greek chapters, including fraternities and sororities, can enter. Members competing must be 18 or older. The listed Fall 2026 season runs August 24–December 11.</p></details>
+ <div class="about-actions"><button id="replay" class="primary">Replay the intro</button><a href="https://fomocampus.com/onboard/" class="join" target="_blank" rel="noopener">Join Greek Wars ↗</a></div><p class="fineprint">18+ to compete. Trading involves risk, including loss of principal. Competition prizes are not guaranteed trading returns. Orangie, Rasmr and the helicopter trip are fictional scenery, not an endorsement.</p>
+</dialog>
+<button id="quest-hud" class="quest-hud" hidden aria-label="Open your current quest and ask Arya for a hint"><span id="quest-number" class="quest-number">01</span><span class="quest-copy"><small>ARYA’S QUEST <span>· HINT ↗</span></small><strong id="quest-title">Find the top house</strong><span id="quest-detail">Look for the house ranked #1.</span></span></button>
+<button id="sound" class="sound-toggle glass" aria-pressed="true" aria-label="Mute game audio">♪ On</button>
+<section id="arya" class="arya" role="dialog" aria-modal="true" aria-label="Arya" aria-describedby="arya-full-text" hidden>
+ <div class="arya-character"><canvas id="arya-portrait" width="64" height="64" aria-hidden="true"></canvas></div>
+ <button id="arya-next" class="arya-bubble" type="button" aria-labelledby="arya-full-text" aria-description="Activate to reveal or continue Arya’s dialogue. Escape closes the conversation."><span class="arya-tail" aria-hidden="true"></span><span id="arya-text" class="arya-copy" aria-hidden="true"></span><span id="arya-full-text" class="sr-only"></span></button>
+</section>
+<section id="arcade" class="arcade" role="dialog" aria-modal="true" aria-labelledby="arcade-title" hidden>
+ <h2 id="arcade-title" class="sr-only">Campus game</h2>
+ <canvas id="arcade-canvas" tabindex="0" aria-describedby="arcade-live"></canvas>
+ <p id="arcade-live" class="sr-only" aria-live="polite"></p>
+ <div class="arcade-bar"><img src="./assets/fomo-lockup-pale.svg" alt="fomo"><span>CAMPUS ARCADE</span><div><button id="arcade-pause" aria-pressed="false">Pause</button><button id="arcade-exit">Back to campus ✕</button></div></div>
+ <div id="arcade-touch" class="arcade-touch" hidden><div id="arcade-stick" class="arcade-stick" aria-label="Movement stick"><span></span></div><button id="arcade-action" class="arcade-action" aria-label="Action">GO</button></div>
+</section>
+<section id="intro" class="intro story-intro" role="dialog" aria-modal="true" aria-label="fomo Greek Village opening adventure" tabindex="-1" hidden>
+ <canvas id="intro-canvas" aria-hidden="true"></canvas>
+ <div class="intro-brand"><img src="./assets/fomo-lockup-blue.svg" alt="fomo"><span>A CAMPUS ADVENTURE</span></div>
+ <div id="intro-start-panel" class="intro-start-panel"><span class="intro-world-label">WORLD 01 / GREEK VILLAGE</span><h2>Wrong turn.<br><span>Right universe.</span></h2><p>Every good story starts a little lost.</p><button id="intro-start">Begin adventure →</button><small>PRESS ENTER TO START</small></div>
+ <div class="intro-footer"><span id="intro-caption">SOMEWHERE, JUST OFF CAMPUS.</span><div><button id="intro-sound" aria-pressed="true">♪ On</button><button id="intro-pause" hidden>Pause</button><button id="intro-skip">Skip to campus ↗</button></div></div>
+ <p class="sr-only">A fomo mascot looks around a white void, walks right, discovers a pipe and jumps inside. It transforms into a fomo frat kid, falls from the sky and lands on a campus street. Arya welcomes you and offers a quest.</p>
+</section>
+<noscript><div class="noscript">Greek Village needs JavaScript. <a href="https://fomocampus.com/onboard/">Join Greek Wars ↗</a></div></noscript>
+<script type="module" src="./game.js?v=8"></script>
+</body></html>
