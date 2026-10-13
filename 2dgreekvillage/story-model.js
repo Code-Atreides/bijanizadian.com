@@ -1,4 +1,4 @@
-import {houseStandings} from './world-model.js?v=9';
+import {houseStandings} from './world-model.js?v=10';
 
 export const STORY_KEY='fomo-village-story-v5';
 export const LEGACY_STORY_KEY='fomo-village-story-v4';

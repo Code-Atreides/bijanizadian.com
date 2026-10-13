@@ -1,5 +1,5 @@
-import {hash,letters,ROAD} from './world-model.js?v=9';
-import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=9';
+import {hash,letters,ROAD} from './world-model.js?v=10';
+import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=10';
 export {BRAND};
 
 // Deliberate value steps: cool ink, warm stone, jewel roofs and sunlit foliage.
@@ -439,7 +439,6 @@ export class PixelArt{
  helipad(g,l){const {x,y,w,h}=l;rect(g,x,y,w,h,'#d4b58d');rect(g,x+7,y+7,w-14,h-14,'#626f7b');rect(g,x+65,y+29,217,182,'#82969a');
    for(let i=0;i<200;i++)rect(g,x+8+hash(i,'hp')*(w-16),y+8+hash(i,'hp2')*(h-16),1,1,'#56626e');
    for(let r=66;r<=69;r++)ring(g,x+174,y+118,r,'#e7ddbc');text(g,'H',x+174,y+97,'#eee4c6',6,'center');
-   rect(g,x-5,y+153,160,17,'#a73564');for(let i=0;i<16;i++)rect(g,x+3+i*8,y+155,1,13,'#d9607b');
    for(let a=0;a<12;a++){const v=a/12*Math.PI*2;rect(g,x+174+Math.cos(v)*73,y+118+Math.sin(v)*73,3,3,'#ffda7b');}
    rect(g,x+88,y+9,171,16,BRAND.ink);rect(g,x+89,y+10,169,14,BRAND.navy);text(g,'fomo HELIPORT',x+174,y+14,BRAND.pale,1,'center');text(g,'RASMR × ORANGIE',x+174,y+h-20,'#4b4c5e',1,'center');
    for(let i=0;i<5;i++){rect(g,x+10+i*65,y+228,25,10,'#899183');rect(g,x+12+i*65,y+223,21,9,'#5d8868');}

@@ -1,4 +1,4 @@
-import {rect,text,line,disc,poly,BRAND,fomo,textWidth} from '../pixel-art.js?v=9';
+import {rect,text,line,disc,poly,BRAND,fomo,textWidth} from '../pixel-art.js?v=10';
 
 // Flight to New York: carry Orangie and Rasmr from campus to the Downtown
 // heliport. Hold to climb, release to descend. Weather, wildlife and the

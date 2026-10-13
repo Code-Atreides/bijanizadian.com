@@ -1,8 +1,8 @@
-import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=9';
-import {VillageRenderer} from './renderer.js?v=9';
-import {StoryDirector} from './story-ui.js?v=9';
-import {LANDING} from './story-model.js?v=9';
-import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=9';
+import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=10';
+import {VillageRenderer} from './renderer.js?v=10';
+import {StoryDirector} from './story-ui.js?v=10';
+import {LANDING} from './story-model.js?v=10';
+import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=10';
 import {startChapterFeed} from './shared/chapter-feed.js?v=183';
 import {searchChapters} from './shared/village-chapter-search.js?v=183';
 const $=id=>document.getElementById(id),canvas=$('world'),mini=$('mini'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;

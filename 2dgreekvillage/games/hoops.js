@@ -1,5 +1,5 @@
-import {rect,text,line,disc,ring,BRAND,fomo,eyesSprite} from '../pixel-art.js?v=9';
-import {heroSprite} from '../story-art.js?v=9';
+import {rect,text,line,disc,ring,BRAND,fomo,eyesSprite} from '../pixel-art.js?v=10';
+import {heroSprite} from '../story-art.js?v=10';
 
 // Court Kings: ten balls, a timing meter and real projectile physics. The
 // meter only sets launch speed; the rim, backboard and floor decide the rest.
@@ -86,7 +86,7 @@ export class HoopsGame{
   // Shooter: the frat kid from the opening, now in tryout mode.
   const s=this.spotInfo,jump=this.phase==='windup'?Math.sin(Math.min(1,this.wind/.16)*Math.PI/2)*8:this.phase==='flight'&&this.flight<.3?8*(1-this.flight/.3):0;
   rect(c,s.x-8,FLOOR+11,18,3,'#00000033');
-  c.drawImage(heroSprite(this.art,'frat',0,1,jump>2),s.x-16,FLOOR-44+12-Math.round(jump));
+  c.drawImage(heroSprite(this.art,'frat',0,1,jump>2),s.x-20,FLOOR+12-58-Math.round(jump),40,58);
   if(this.phase==='ready'||this.phase==='windup'){const dy=this.phase==='ready'?Math.abs(Math.sin(this.clock*7))*16:0,bx=this.phase==='ready'?s.x+12:s.x+8,by=this.phase==='ready'?FLOOR+6-dy:FLOOR-54-jump;this.drawBall(c,bx,by);}
   if(this.ball){const b=this.ball;if(this.streak>=2){for(let i=1;i<5;i++)rect(c,b.x-b.vx*i*.012-1,b.y-b.vy*i*.012-1,3-i*.5,3-i*.5,i%2?BRAND.light:BRAND.pale);}this.drawBall(c,b.x,b.y);
    if(b.x>RIM_FRONT&&b.x<RIM_BACK&&b.y>RIM_Y&&b.y<RIM_Y+16)rect(c,RIM_FRONT-1,RIM_Y-1,RIM_BACK-RIM_FRONT+3,2,'#c43c2a');}

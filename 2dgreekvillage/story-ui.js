@@ -1,6 +1,6 @@
-import {introPose,INTRO_END,STORY_KEY,LEGACY_STORY_KEY,LANDING,STAGES,STAGE_GAME,STAGE_VENUE,restoredProgress,visitQuest,gameQuest,questCopy,topHouses} from './story-model.js?v=9';
-import {renderIntroScene,aryaPortrait} from './story-art.js?v=9';
-import {StoryAudio} from './story-audio.js?v=9';
+import {introPose,INTRO_END,STORY_KEY,LEGACY_STORY_KEY,LANDING,STAGES,STAGE_GAME,STAGE_VENUE,restoredProgress,visitQuest,gameQuest,questCopy,topHouses} from './story-model.js?v=10';
+import {renderIntroScene,aryaPortrait} from './story-art.js?v=10';
+import {StoryAudio} from './story-audio.js?v=10';
 
 const $=id=>document.getElementById(id);
 const gameSurfaces='#world,.topbar,.location-chip,.modes,.destinations,.world-tools,.minimap,#chapter-panel,#venue-panel,#move-help,#walk-prompt,#joystick,#mobile-interact,#quest-hud';

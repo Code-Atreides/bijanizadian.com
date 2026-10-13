@@ -1,10 +1,10 @@
-import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=9';
-import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=9';
+import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=10';
+import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=10';
 import {helipadState} from './shared/village-helipad.js?v=183';
 import {footballState,footballPlayer,footballBall} from './shared/village-football.js?v=183';
-import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=9';
+import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=10';
 import {helipadFanPose} from './shared/village-helipad-fans.js?v=183';
-import {heroSprite,drawLanding} from './story-art.js?v=9';
+import {heroSprite,drawLanding} from './story-art.js?v=10';
 
 // Traffic drives on the right. Each loop is a closed lane circuit around a
 // block; cars queue behind each other, yield at merges and stop for the player.
@@ -102,9 +102,9 @@ export class VillageRenderer{
      const sprite=this.art.person(p,pose.frame,pose.dir),scale=p.lot?.67:.72;nodes.push({x:pose.x-9*scale,y:pose.y-22*scale,depth:pose.y,sprite,person:p,pose,scale});drawn++;
    }
    for(const car of this.cars){const p=loopPoint(this.loops[car.loop],car.s);if(seen(p.x-20,p.y-20,40,40))nodes.push({x:p.x-20,y:p.y-20,depth:p.y+8,sprite:this.art.car(car.kind,p.dir)});}
-   if(this.walk&&!this.storyFrame?.airborne)nodes.push({x:this.player.x-10,y:this.player.y-27,depth:this.player.y,sprite:heroSprite(this.art,'frat',this.player.moving?Math.floor(t*8)%4:0,this.player.dir),scale:.65,avatar:true});
+   if(this.walk&&!this.storyFrame?.airborne)nodes.push({x:Math.round(this.player.x)-10,y:Math.round(this.player.y)-28,depth:this.player.y,sprite:heroSprite(this.art,'frat',this.player.moving?Math.floor(t*8)%4:0,this.player.dir),avatar:true});
    nodes.sort((a,b)=>a.depth-b.depth);
-   for(const n of nodes){if(n.avatar){rect(c,n.x+3,n.y+27,15,3,'#0b091f44');}
+   for(const n of nodes){if(n.avatar){rect(c,n.x+3,n.y+27,14,2,'#0b091f55');}
      if(n.type==='house'&&this.walk&&this.player.y<n.lot.house.y&&this.player.y>n.lot.y+75&&Math.abs(this.player.x-n.lot.house.x)<n.lot.house.w*.5){c.globalAlpha=.35;c.drawImage(n.sprite,Math.round(n.x),Math.round(n.y));c.globalAlpha=1;}else c.drawImage(n.sprite,Math.round(n.x),Math.round(n.y),Math.round(n.sprite.width*(n.scale||1)),Math.round(n.sprite.height*(n.scale||1)));
      if(n.type==='house'&&view.step>1&&view.step<=3){
        // Re-letter the cloth at the display grid rather than shrinking glyphs.
@@ -136,7 +136,7 @@ export class VillageRenderer{
      rect(c,sx-Math.floor(width/2)-1,sy-2,width+2,9,BRAND.ink);rect(c,sx-Math.floor(width/2),sy-3,width,8,selected?BRAND.blue:'#2a2f52');rect(c,sx-Math.floor(width/2),sy-3,width,1,selected?BRAND.light:'#5a6390');
      tinyText(c,label,sx,sy-1,BRAND.pale);
    }
-   if(this.walk&&!this.storyFrame)tinyText(c,'YOU',Math.round((this.player.x-vx)/view.step),Math.round((this.player.y-vy-32)/view.step)-5,BRAND.pale);
+   if(this.walk&&!this.storyFrame)tinyText(c,'YOU',Math.round((this.player.x-vx)/view.step),Math.round((this.player.y-vy-31)/view.step)-6,BRAND.pale);
    this.output.imageSmoothingEnabled=false;
    this.output.drawImage(this.frame,0,0,this.viewport.width,this.viewport.height);
    this.renderStats={visiblePeople:drawn,worldPeople:this.world.people.length,visibleNodes:nodes.length,pixelSize:this.viewport.pixel/this.viewport.dpr,worldGrid:view.step,cars:this.cars.length};
@@ -162,7 +162,10 @@ export class VillageRenderer{
  }
  helipadLife(c,t,seen,view){const l=this.landmark('helipad');if(!seen(l.x-150,l.y-500,l.w+300,l.h+800))return;
    const s=helipadState(t*1.15),cx=l.x+174,cy=l.y+118;
-   rect(c,l.x-40,cy+1,205*s.carpetProgress,12,'#b13864');if(s.carpetProgress>0)rect(c,l.x-40,cy+2,205*s.carpetProgress,1,'#f9879a');
+   // One red carpet: the chauffeur rolls it out from the car and packs it away again.
+   const cw=Math.round(205*s.carpetProgress),cx0=l.x-40,cy0=cy+1;
+   if(cw>0){rect(c,cx0,cy0+12,cw,2,'#0b091f33');rect(c,cx0,cy0,cw,12,'#b13864');rect(c,cx0,cy0+2,cw,1,'#d9607b');rect(c,cx0,cy0,cw,1,'#e2b45a');rect(c,cx0,cy0+11,cw,1,'#e2b45a');
+     if(s.carpetProgress<1){rect(c,cx0+cw-2,cy0-2,5,16,'#8c2449');rect(c,cx0+cw-1,cy0-2,2,16,'#c94a72');rect(c,cx0+cw-2,cy0-2,5,1,'#e2b45a');rect(c,cx0+cw-2,cy0+13,5,1,'#e2b45a');}}
    // The Maybach arrives up the west drive from the south and leaves north.
    const carx=cx+s.carX*5.5,cary=cy+(s.carZ>0?s.carZ*8.1:s.carZ*16.9);
    if(cary>290&&cary<1410){c.drawImage(this.art.maybach(3),Math.round(carx)-28,Math.round(cary)-28);if(s.doors>.4){rect(c,carx+9,cary-8,8,2,'#c4c7cf');rect(c,carx+9,cary+4,8,2,'#c4c7cf');}}

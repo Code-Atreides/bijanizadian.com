@@ -1,4 +1,4 @@
-import {rect,text,ring,BRAND} from '../pixel-art.js?v=9';
+import {rect,text,ring,BRAND} from '../pixel-art.js?v=10';
 
 // The Final Drive, played the Retro Bowl way: a sideline camera, you are the
 // quarterback. Snap, read the routes, drag back and release to throw (the

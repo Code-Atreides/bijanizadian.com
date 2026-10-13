@@ -1,4 +1,5 @@
-import {rect,poly,line,text} from './pixel-art.js?v=9';
+import {rect,poly,line,text} from './pixel-art.js?v=10';
+import {paintHero,HERO_W,HERO_H} from './hero-art.js?v=10';
 
 // Brand kit: campus purple is fomo blue #516AF6, lit with light blue #ACB8F9
 // and lavender #EAEDFF, shaded toward ink #0B091F.
@@ -7,6 +8,8 @@ const P={ink:'#0B091F',deep:'#3346c2',purple:'#516AF6',light:'#ACB8F9',shine:'#E
 // Original, editable 32 × 44 sprites. The mascot and campus avatar share a cap,
 // violet silhouette and cream sneakers so the transformation reads instantly.
 export function heroSprite(art,kind='mascot',frame=0,dir=2,air=false){
+ // The campus avatar is hand-placed pixel art drawn 1:1 (see hero-art.js).
+ if(kind==='frat')return art.cached(`hero2:${frame%4}:${dir}:${air}`,HERO_W,HERO_H,c=>paintHero(c,dir,frame,air));
  return art.cached(`hero:${kind}:${frame}:${dir}:${air}`,32,44,c=>{
   const frat=kind==='frat',side=dir===1||dir===3,back=dir===0,step=frame===1?2:frame===3?-2:0;
   c.save();if(dir===3){c.translate(32,0);c.scale(-1,1);}
@@ -122,7 +125,7 @@ export function drawLanding(c,art,player,pose,t,view){
   rect(c,x-3-s*9,y-2,6+s*18,4,'#0b091f55');
   if(pose.altitude<235)for(let i=0;i<5;i++){const xx=x+(i-2)*7,yy=y-altitude-26-(i%3)*9;rect(c,xx,yy-12,1,8+(i%2)*8,P.shine);}
   const sprite=heroSprite(art,'frat',0,2,true);
-  c.drawImage(sprite,Math.round(x-10),Math.round(y-27-altitude),21,29);
+  c.drawImage(sprite,Math.round(x-10),Math.round(y-28-altitude));
   if(pose.altitude>230){text(c,'!',x,y-altitude-38,P.shine,1,'center');}
   // A second pipe hangs from the top of the campus view: the transformed kid
   // comes out of its mouth before it retreats, making the portal connection clear.
