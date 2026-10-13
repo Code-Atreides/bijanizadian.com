@@ -156,58 +156,50 @@ blockquote cite { display: block; margin-top: 10px; font: 500 14px/1.4 var(--san
 @media (max-width: 900px) { .feature { grid-template-columns: minmax(0, 1fr); gap: 32px; } .deliver { padding: 22px; } }
 @media (max-width: 480px) { .facts { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); row-gap: 14px; } .deliver li { flex-direction: column; gap: 2px; padding: 13px 0; } }
 
-/* work: bento showcase. First project is featured; the last row fills itself. */
-.work { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px;
-  /* three rows sized to fit the screen with the heading, under the sticky nav */
-  grid-auto-rows: clamp(128px, min(15vw, calc((100vh - 300px) / 3)), 210px);
-  grid-auto-rows: clamp(128px, min(15vw, calc((100svh - 300px) / 3)), 210px); }
+/* work: rows of one 16:9 landscape project + three 9:16 vertical reels, all the same height.
+   Flex-grow equals each tile's width/height ratio, so heights match without fixed sizes. */
 #work { padding-top: clamp(48px, 5vw, 64px); }
 #work .head-row { margin-bottom: 24px; }
-.work .item:not(.big) .media .ico { display: none; }
-.work .item:not(.big) .cap span { display: none; }
-.work .item:not(.big) .cap { padding: 8px 12px; border-radius: 10px; }
-.work .item:not(.big) .cap b { font-size: 14.5px; }
 #work .h2 { font-size: clamp(30px, 3.6vw, 42px); }
-.work .item { grid-column: span 2; position: relative; display: block; border-radius: var(--r); overflow: hidden; text-decoration: none; color: inherit; isolation: isolate; }
-.work .item.big { grid-column: span 4; grid-row: span 2; }
-.work .item.half { grid-column: span 3; }
-.work .item.wide { grid-column: span 6; }
+.work { display: grid; gap: 14px; }
+.work-row { display: flex; gap: 14px; align-items: flex-start; }
+.work-row.flip { flex-direction: row-reverse; }
+.reels { display: flex; gap: 14px; flex: 1.6875 1 28px; min-width: 0; }
+.work .item { position: relative; display: block; border-radius: var(--r); overflow: hidden; text-decoration: none; color: inherit; isolation: isolate; min-width: 0; }
+.work .item.land { flex: 1.7778 1 0; aspect-ratio: 16 / 9; }
+.reels .item { flex: 1 1 0; aspect-ratio: 9 / 16; }
+.reels .ghost { visibility: hidden; }
 .work .media { position: absolute; inset: 0; border-radius: inherit; transition: transform .5s cubic-bezier(.2, .7, .2, 1); }
 .work a.item:hover .media { transform: scale(1.03); }
-.work .media .ico svg { width: 36px; height: 36px; }
-.work .item.big .media .ico svg { width: 52px; height: 52px; }
-.playbtn { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.94); color: var(--accent); display: grid; place-items: center; box-shadow: 0 8px 24px -8px rgba(16,24,40,.35); }
-.playbtn svg { width: 22px !important; height: 22px !important; opacity: 1 !important; color: var(--accent) !important; margin-left: 3px; }
-.work .item.big .playbtn { width: 72px; height: 72px; }
-.work .item.big .playbtn svg { width: 28px !important; height: 28px !important; }
-.work .top { position: absolute; top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+.work .media .ico svg { width: 30px; height: 30px; }
+.work .item.land .media .ico svg { width: 46px; height: 46px; }
+.reels .media .ico { padding-bottom: 30px; }
+.playbtn { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.94); color: var(--accent); display: grid; place-items: center; box-shadow: 0 8px 24px -8px rgba(16,24,40,.35); }
+.playbtn svg { width: 18px !important; height: 18px !important; opacity: 1 !important; color: var(--accent) !important; margin-left: 3px; }
+.work .item.land .playbtn { width: 68px; height: 68px; }
+.work .item.land .playbtn svg { width: 26px !important; height: 26px !important; }
+.work .top { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
 .work .top span { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: var(--ink); white-space: nowrap; }
 .work .top span + span { font-weight: 500; color: var(--muted); }
-.work .cap { position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px); background: rgba(255,255,255,.95); border-radius: 12px; padding: 10px 14px; box-shadow: 0 4px 14px -6px rgba(16,24,40,.2); display: grid; gap: 1px; }
-.work .cap b { color: var(--ink); font-weight: 600; font-size: 15.5px; line-height: 1.3; }
-.work .cap span { font-size: 13.5px; color: var(--muted); }
-.work .item.big .cap { left: 16px; bottom: 16px; padding: 14px 18px; }
-.work .item.big .cap b { font-size: 19px; }
+.work .cap { position: absolute; left: 10px; right: 10px; bottom: 10px; background: rgba(255,255,255,.95); border-radius: 10px; padding: 9px 12px; box-shadow: 0 4px 14px -6px rgba(16,24,40,.2); display: grid; gap: 1px; }
+.work .cap b { color: var(--ink); font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+.work .cap span { font-size: 13px; color: var(--muted); }
+.work .item.land .cap { right: auto; max-width: calc(100% - 32px); left: 16px; bottom: 16px; padding: 13px 18px; border-radius: 12px; }
+.work .item.land .cap b { font-size: 18px; }
+.work .item.land .cap span { font-size: 14px; }
 .work-more { display: inline-flex; align-items: center; gap: 8px; }
 .work-more svg { width: 16px; height: 16px; }
 @media (max-width: 760px) {
-  .work { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: auto; gap: 12px; }
-  .work .item, .work .item.half, .work .item.wide { grid-column: span 1; grid-row: auto; aspect-ratio: 1 / 1; }
-  .work .item.big { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
-  .work .item:not(.big):last-child:nth-child(even) { grid-column: 1 / -1; aspect-ratio: 2 / 1; }
-  .work .item:not(.big) .top span + span { display: none; }
-  .work .item:not(.big) .cap { left: 8px; bottom: 8px; max-width: calc(100% - 16px); padding: 7px 10px; border-radius: 10px; }
-  .work .item:not(.big) .cap b { font-size: 13.5px; }
-  .work .item:not(.big) .cap span { display: none; }
-  .work .item:not(.big) .top { top: 8px; left: 8px; right: 8px; }
-  .work .item:not(.big) .top span { font-size: 11px; padding: 4px 8px; }
-  .work .item:not(.big) .playbtn { width: 44px; height: 44px; }
-  .work .item:not(.big) .playbtn svg { width: 18px !important; height: 18px !important; }
-  .work .item.big .cap { left: 12px; bottom: 12px; padding: 11px 14px; }
-  .work .item.big .media .ico { padding-bottom: 56px; }
-  .work .item.big .playbtn { width: 60px; height: 60px; }
-  .work .item.big .cap b { font-size: 16.5px; }
-  .work .media .ico svg { width: 30px; height: 30px; }
+  .work-row, .work-row.flip { display: grid; gap: 12px; }
+  .work .item.land { aspect-ratio: 16 / 9; }
+  .work .item.land .playbtn { width: 54px; height: 54px; }
+  .work .item.land .media .ico { padding-bottom: 44px; }
+  .work .item.land .cap { left: 10px; bottom: 10px; padding: 9px 13px; }
+  .work .item.land .cap b { font-size: 15.5px; }
+  .reels { gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); scroll-padding-inline: var(--gutter); scrollbar-width: none; }
+  .reels::-webkit-scrollbar { display: none; }
+  .reels .item { flex: 0 0 44%; scroll-snap-align: start; }
+  .reels .ghost { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .work .media { transition: none; } }
 
@@ -494,13 +486,13 @@ const SITE = {
   },
   // Projects. Add an image URL to "img" when you have one; empty tiles show a soft placeholder.
   work: [
-    // The first project is shown large. "detail" is a short note: a runtime, photo count, format.
-    { title: "Homecoming Weekend", client: "FOMO Campus", type: "Video", detail: "0:28 reel", img: "", link: "" },
-    { title: "Spring Formal", client: "FOMO Campus", type: "Photo", detail: "64 photos", img: "", link: "" },
-    { title: "Friday Night Guide", client: "FOMO Campus", type: "Social", detail: "8-slide carousel", img: "", link: "" },
-    { title: "Game Day", client: "FOMO Campus", type: "Photo", detail: "40 photos", img: "", link: "" },
-    { title: "Opening Night Recap", client: "FOMO Campus", type: "Video", detail: "0:41 reel", img: "", link: "" },
-    { title: "Where to Be This Weekend", client: "FOMO Campus", type: "Social", detail: "Weekly series", img: "", link: "" }
+    // Shown in groups of four: the 1st is a 16:9 landscape piece, the next three are 9:16 vertical reels.
+    // Use horizontal images for the 1st of each group and vertical images for the rest.
+    // "detail" is a short note: a runtime, photo count or format.
+    { title: "Homecoming Weekend", client: "FOMO Campus", type: "Video", detail: "1:12 recap film", img: "", link: "" },
+    { title: "Opening Night", client: "FOMO Campus", type: "Video", detail: "0:28 reel", img: "", link: "" },
+    { title: "Friday Night Guide", client: "FOMO Campus", type: "Social", detail: "Story set", img: "", link: "" },
+    { title: "Spring Formal", client: "FOMO Campus", type: "Photo", detail: "64 photos", img: "", link: "" }
   ],
   process: [
     ["Discovery", "A short call to understand your goals, audience and timeline. We follow up with a plan and quote."],
@@ -605,22 +597,21 @@ function render() {
   q.hidden = !cs.quote;
   q.innerHTML = cs.quote ? "“" + esc(cs.quote) + "”<cite>" + esc(cs.quoteBy) + "</cite>" : "";
 
-  const n = w.length, rest = (n - 3) % 3;
-  const size = (i) => {
-    if (n < 3) return n === 1 ? "wide" : "half";
-    if (i === 0) return "big";
-    if (i < 3) return "";
-    if (rest === 1 && i === n - 1) return "wide";
-    if (rest === 2 && i >= n - 2) return "half";
-    return "";
-  };
-  $("#workGrid").innerHTML = w.map((x, i) => {
+  const tile = (x, i, land) => {
     const tag = x.link ? "a" : "div";
     const href = x.link ? ' href="' + esc(x.link) + '" target="_blank" rel="noopener"' : "";
-    return "<" + tag + ' class="item ' + size(i) + '"' + href + ">" + media(x, i) +
-      '<div class="top"><span>' + esc(x.type) + "</span>" + (x.detail ? "<span>" + esc(x.detail) + "</span>" : "") + "</div>" +
-      '<div class="cap"><b>' + esc(x.title) + "</b><span>" + esc(x.client) + "</span></div></" + tag + ">";
-  }).join("");
+    const top = '<div class="top"><span>' + esc(x.type) + "</span>" + (land && x.detail ? "<span>" + esc(x.detail) + "</span>" : "") + "</div>";
+    const sub = land ? x.client : (x.detail || x.client);
+    return "<" + tag + ' class="item' + (land ? " land" : "") + '"' + href + ">" + media(x, i) + top +
+      '<div class="cap"><b>' + esc(x.title) + "</b><span>" + esc(sub) + "</span></div></" + tag + ">";
+  };
+  const rows = [];
+  for (let i = 0; i < w.length; i += 4) {
+    const reels = w.slice(i + 1, i + 4).map((x, k) => tile(x, i + 1 + k, false));
+    while (reels.length < 3) reels.push('<div class="item ghost" aria-hidden="true"></div>');
+    rows.push('<div class="work-row' + ((i / 4) % 2 ? " flip" : "") + '">' + tile(w[i], i, true) + '<div class="reels">' + reels.join("") + "</div></div>");
+  }
+  $("#workGrid").innerHTML = rows.join("");
   const more = $("#workMore"), ig = (SITE.contact.instagram || "").replace(/^@/, "");
   more.hidden = !ig;
   if (ig) { more.href = "https://instagram.com/" + encodeURIComponent(ig); more.innerHTML = "See more on Instagram " + ICONS.arrow; }
