@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/fomo-favicon.svg" type="image/svg+xml">
+<style>
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>fomo campus U.S. coverage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sticky brand header; KPI strip; region ranking bars; US tile-grid map; gaps panel.
+   Palette: fomo "clanwars" periwinkle/indigo on a cool-white ground; single-hue blue
+   sequential ramp for the map; red reserved for "stalled" status only. */
+:root{
+  --bg:#eef1ff; --panel:#ffffff; --soft:#f6f8ff; --line:#e2e7f7; --line-2:#cfd7f1;
+  --ink:#0b091f; --body:#3f4568; --muted:#7e85a6;
+  --accent:#4350f5; --accent-strong:#3a2be6; --accent-tint:#dfe3fd;
+  --good:#15924a; --warn:#d92d20; --warn-tint:#fdeae8;
+  /* sequential members ramp: light -> dark (single blue hue) */
+  --m1:#e2e7fe; --m2:#bcc7fb; --m3:#8e9bf7; --m4:#5a72f4; --m5:#3733d8;
+  --m1-ink:#2a2f66; --m2-ink:#20265e; --m3-ink:#ffffff; --m4-ink:#ffffff; --m5-ink:#ffffff;
+  --absent:#e7e9f2; --absent-ink:#9aa0bd; --absent-line:#c9cee2;
+  --shadow:0 1px 2px rgba(11,9,31,.05), 0 12px 34px rgba(11,9,31,.07);
+  --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Archivo",var(--sans);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#09081d; --panel:#141333; --soft:#1a1940; --line:#282754; --line-2:#363673;
+  --ink:#eef0ff; --body:#b9bee3; --muted:#878dba;
+  --accent:#8e9bf7; --accent-strong:#aeb8ff; --accent-tint:#23235a;
+  --good:#38c979; --warn:#ff6f61; --warn-tint:#3a1c1d;
+  --m1:#232353; --m2:#33398a; --m3:#4a5ad3; --m4:#7584ff; --m5:#a3b1ff;
+  --m1-ink:#c7ccf5; --m2-ink:#dde1ff; --m3-ink:#ffffff; --m4-ink:#0b091f; --m5-ink:#0b091f;
+  --absent:#191836; --absent-ink:#6b7098; --absent-line:#2d2c58;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 38px rgba(0,0,0,.45);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#09081d; --panel:#141333; --soft:#1a1940; --line:#282754; --line-2:#363673;
+  --ink:#eef0ff; --body:#b9bee3; --muted:#878dba;
+  --accent:#8e9bf7; --accent-strong:#aeb8ff; --accent-tint:#23235a;
+  --good:#38c979; --warn:#ff6f61; --warn-tint:#3a1c1d;
+  --m1:#232353; --m2:#33398a; --m3:#4a5ad3; --m4:#7584ff; --m5:#a3b1ff;
+  --m1-ink:#c7ccf5; --m2-ink:#dde1ff; --m3-ink:#ffffff; --m4-ink:#0b091f; --m5-ink:#0b091f;
+  --absent:#191836; --absent-ink:#6b7098; --absent-line:#2d2c58;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 38px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--body);font-family:var(--sans);line-height:1.5;
+  -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:0 56px}
+
+/* header */
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line)}
+.site-in{max-width:1100px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{font-family:var(--display);font-weight:900;letter-spacing:-.02em;color:var(--ink);font-size:17px}
+.brand .dot{color:var(--accent)}
+.brand .sub{font-family:var(--sans);font-weight:600;color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-left:10px}
+.hspace{flex:1}
+.asof{font-size:12px;color:var(--muted);font-weight:500}
+.tgl{appearance:none;border:1px solid var(--line-2);background:var(--panel);color:var(--body);
+  font:inherit;font-size:12px;font-weight:600;border-radius:999px;padding:6px 12px;cursor:pointer}
+.tgl:hover{border-color:var(--accent)}
+
+/* hero */
+.hero{padding:30px 0 10px}
+h1{font-family:var(--display);font-weight:900;letter-spacing:-.03em;color:var(--ink);
+  font-size:clamp(28px,5.2vw,46px);line-height:1.02;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+.lede{margin:14px 0 0;max-width:62ch;color:var(--body);font-size:15.5px}
+.src{margin-top:10px;font-size:12.5px;color:var(--muted)}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 16px;box-shadow:var(--shadow)}
+.kpi .v{font-family:var(--display);font-weight:800;color:var(--ink);font-size:clamp(22px,2.6vw,30px);letter-spacing:-.02em;line-height:1}
+.kpi .v small{font-size:.5em;font-weight:700;color:var(--muted)}
+.kpi .l{margin-top:7px;font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.02em;text-transform:uppercase}
+.kpi.warn .v{color:var(--warn)}
+
+/* section */
+section{margin-top:34px}
+.sec-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.sec-h h2{font-family:var(--display);font-weight:800;color:var(--ink);font-size:20px;letter-spacing:-.01em;margin:0}
+.sec-h p{margin:0;font-size:13px;color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--shadow)}
+
+/* region ranking bars */
+.rbar{display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:center;margin:0 0 16px}
+.rbar:last-child{margin-bottom:0}
+.rbar .name{font-family:var(--display);font-weight:800;color:var(--ink);font-size:15px;text-align:right}
+.rbar .name .tag{display:block;font-family:var(--sans);font-weight:700;font-size:10px;letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.tag.top{color:var(--accent)} .tag.low{color:var(--warn)}
+.track{position:relative;background:var(--soft);border-radius:9px;height:34px;overflow:hidden}
+.fill{height:100%;border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--accent-strong));
+  display:flex;align-items:center;min-width:2px;transition:width .2s}
+.fill .num{color:#fff;font-weight:800;font-size:14px;padding:0 11px;white-space:nowrap}
+.rmeta{font-size:12.5px;color:var(--muted);margin-top:4px}
+.rmeta b{color:var(--body);font-weight:700}
+
+/* map */
+.maplayout{display:grid;grid-template-columns:1fr 210px;gap:22px;align-items:start}
+.tilewrap{overflow-x:auto}
+.tiles{display:grid;grid-template-columns:repeat(11,minmax(34px,1fr));gap:5px;min-width:430px}
+.tile{position:relative;aspect-ratio:1;border-radius:7px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;border:1px solid transparent;cursor:default;
+  font-weight:700;line-height:1;transition:transform .08s,box-shadow .08s}
+.tile .ab{font-size:12px;letter-spacing:.01em}
+.tile .mv{font-size:9.5px;font-weight:600;margin-top:2px;opacity:.9}
+.tile:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(11,9,31,.22);z-index:5}
+.tile.absent{background:var(--absent);color:var(--absent-ink);border-color:var(--absent-line);border-style:dashed}
+.tile.stalled{outline:2px solid var(--warn);outline-offset:-2px}
+.tile.stalled::after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--warn)}
+
+/* legend */
+.legend{display:flex;flex-direction:column;gap:9px}
+.legend .lt{font-family:var(--display);font-weight:800;color:var(--ink);font-size:13px;margin-bottom:2px}
+.lg{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--body)}
+.sw{width:17px;height:17px;border-radius:5px;flex:none;border:1px solid rgba(0,0,0,.06)}
+.sw.absent{background:var(--absent);border:1px dashed var(--absent-line)}
+.sw.stalled{background:var(--m1);outline:2px solid var(--warn);outline-offset:-2px;position:relative}
+
+/* two-col */
+.grid2{display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:start}
+.sbar{display:grid;grid-template-columns:118px 1fr 48px;gap:10px;align-items:center;margin-bottom:9px;font-size:13px}
+.sbar:last-child{margin-bottom:0}
+.sbar .sn{color:var(--ink);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbar .sn .rg{color:var(--muted);font-weight:500;font-size:11px}
+.sbar .st{background:var(--soft);border-radius:7px;height:20px;overflow:hidden}
+.sbar .sf{height:100%;background:var(--accent);border-radius:7px;min-width:2px}
+.sbar .sv{text-align:right;font-weight:700;color:var(--ink)}
+.sbar .sv small{color:var(--muted);font-weight:600}
+
+.gaps h3{font-family:var(--display);font-size:13px;font-weight:800;color:var(--ink);margin:0 0 9px;display:flex;align-items:center;gap:7px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--warn-tint);color:var(--warn);
+  border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;margin:0 6px 6px 0}
+.pill .c{font-weight:600;opacity:.8;font-size:11px}
+.pill.ab{background:var(--soft);color:var(--body)}
+.gaps .note{font-size:12px;color:var(--muted);margin:2px 0 16px}
+.gaps hr{border:none;border-top:1px solid var(--line);margin:4px 0 16px}
+
+.foot{margin-top:34px;font-size:12px;color:var(--muted);line-height:1.6}
+.foot b{color:var(--body)}
+
+/* tooltip */
+#tt{position:fixed;z-index:100;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--ink);color:var(--bg);border-radius:10px;padding:9px 11px;font-size:12px;
+  line-height:1.4;max-width:220px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+#tt .tn{font-family:var(--display);font-weight:800;font-size:13px;margin-bottom:2px}
+#tt .tr{color:var(--bg);opacity:.72;font-size:11px}
+
+@media (max-width:860px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .maplayout{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:420px){ .rbar{grid-template-columns:74px 1fr} }
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="site-in">
+    <span class="brand">fomo<span class="dot">.</span>campus<span class="sub">Greek Wars admin</span></span>
+    <span class="hspace"></span>
+    <span class="asof">Registrations pulled Oct 14, 2026</span>
+    <button class="tgl" id="themeBtn" type="button">Dark</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h1>Where fomo campus <em>is</em> &mdash; and isn&rsquo;t &mdash; across America</h1>
+    <p class="lede">Every registered chapter is tied to a U.S. school. Rolled up to the four Census
+      regions and all 50 states + D.C., here is where members are actually joining, where chapters
+      are signed up but stalled, and where there is no presence at all.</p>
+    <p class="src">Source: fomocampus.com/admin &middot; 343 chapters, 3,755 members across 146 U.S. schools.
+      Two Canadian chapters (45 members) are excluded from the U.S. view.</p>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <section>
+    <div class="sec-h">
+      <h2>Regions, ranked</h2>
+      <p>Members joined (bar) &middot; chapters registered (below)</p>
+    </div>
+    <div class="card" id="regions"></div>
+  </section>
+
+  <section>
+    <div class="sec-h">
+      <h2>State coverage map</h2>
+      <p>Shaded by members joined &middot; hover a tile for detail</p>
+    </div>
+    <div class="card">
+      <div class="maplayout">
+        <div class="tilewrap"><div class="tiles" id="tiles"></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="grid2">
+      <div class="card">
+        <div class="sec-h" style="margin-bottom:16px"><h2>Top states</h2><p>by members joined</p></div>
+        <div id="topstates"></div>
+      </div>
+      <div class="card gaps">
+        <div class="sec-h" style="margin-bottom:16px"><h2>Coverage gaps</h2><p>the bottom of the map</p></div>
+        <h3><span style="width:8px;height:8px;border-radius:50%;background:var(--warn);display:inline-block"></span> Signed up, 0 joins</h3>
+        <p class="note">Chapters registered but no member has joined yet &mdash; the fastest wins.</p>
+        <div id="stalled"></div>
+        <hr>
+        <h3><span style="width:14px;height:10px;border:1px dashed var(--absent-line);background:var(--absent);display:inline-block;border-radius:3px"></span> No presence (12 states)</h3>
+        <p class="note">No chapter registered anywhere in the state.</p>
+        <div id="absent"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p><b>How to read this.</b> <b>Members joined</b> = individual students onboarded through a chapter&rsquo;s
+      join link. <b>Chapters</b> = chapter registrations (the pipeline). A state can have many chapters but
+      few joins &mdash; that gap is the opportunity. Regions are U.S. Census regions.</p>
+    <p>Alabama&rsquo;s 100 members come from a single chapter; California and New York have the widest
+      school spread (18 and 14 schools) but middling joins. Louisiana leads the &ldquo;signed up, 0 joins&rdquo;
+      list with 5 chapters and nobody onboarded.</p>
+  </div>
+</div>
+
+<div id="tt" role="tooltip" aria-hidden="true"></div>
+
+<script>
+const DATA={
+ totals:{members:3755,chapters:343,schools:146,present:39,missing:12},
+ regions:[
+  {region:"South",members:1440,chapters:126,schools:51,tag:"top"},
+  {region:"Midwest",members:913,chapters:71,schools:29},
+  {region:"Northeast",members:716,chapters:76,schools:35},
+  {region:"West",members:686,chapters:70,schools:31,tag:"low"}
+ ],
+ states:[
+  {a:"FL",n:"Florida",r:"South",m:658,c:31},{a:"IN",n:"Indiana",r:"Midwest",m:429,c:18},
+  {a:"NJ",n:"New Jersey",r:"Northeast",m:401,c:22},{a:"CA",n:"California",r:"West",m:383,c:32},
+  {a:"SC",n:"South Carolina",r:"South",m:324,c:16},{a:"OH",n:"Ohio",r:"Midwest",m:287,c:18},
+  {a:"AZ",n:"Arizona",r:"West",m:207,c:17},{a:"TX",n:"Texas",r:"South",m:178,c:27},
+  {a:"MI",n:"Michigan",r:"Midwest",m:115,c:11},{a:"PA",n:"Pennsylvania",r:"Northeast",m:104,c:14},
+  {a:"MA",n:"Massachusetts",r:"Northeast",m:101,c:11},{a:"VA",n:"Virginia",r:"South",m:100,c:14},
+  {a:"AL",n:"Alabama",r:"South",m:100,c:3},{a:"NY",n:"New York",r:"Northeast",m:86,c:25},
+  {a:"CO",n:"Colorado",r:"West",m:74,c:9},{a:"NC",n:"North Carolina",r:"South",m:60,c:16},
+  {a:"WI",n:"Wisconsin",r:"Midwest",m:44,c:4},{a:"IL",n:"Illinois",r:"Midwest",m:32,c:12},
+  {a:"RI",n:"Rhode Island",r:"Northeast",m:18,c:1},{a:"OR",n:"Oregon",r:"West",m:14,c:3},
+  {a:"WA",n:"Washington",r:"West",m:8,c:6},{a:"GA",n:"Georgia",r:"South",m:7,c:2},
+  {a:"MD",n:"Maryland",r:"South",m:6,c:3},{a:"MN",n:"Minnesota",r:"Midwest",m:4,c:3},
+  {a:"CT",n:"Connecticut",r:"Northeast",m:4,c:1},{a:"OK",n:"Oklahoma",r:"South",m:3,c:2},
+  {a:"MS",n:"Mississippi",r:"South",m:2,c:4},{a:"ME",n:"Maine",r:"Northeast",m:2,c:1},
+  {a:"TN",n:"Tennessee",r:"South",m:2,c:2},{a:"KS",n:"Kansas",r:"Midwest",m:1,c:1},
+  {a:"NE",n:"Nebraska",r:"Midwest",m:1,c:2},
+  {a:"NM",n:"New Mexico",r:"West",m:0,c:1},{a:"LA",n:"Louisiana",r:"South",m:0,c:5},
+  {a:"NV",n:"Nevada",r:"West",m:0,c:1},{a:"MO",n:"Missouri",r:"Midwest",m:0,c:1},
+  {a:"IA",n:"Iowa",r:"Midwest",m:0,c:1},{a:"ID",n:"Idaho",r:"West",m:0,c:1},
+  {a:"NH",n:"New Hampshire",r:"Northeast",m:0,c:1},{a:"DC",n:"D.C.",r:"South",m:0,c:1},
+  {a:"AK",n:"Alaska",r:"West",m:0,c:0},{a:"AR",n:"Arkansas",r:"South",m:0,c:0},
+  {a:"DE",n:"Delaware",r:"South",m:0,c:0},{a:"HI",n:"Hawaii",r:"West",m:0,c:0},
+  {a:"KY",n:"Kentucky",r:"South",m:0,c:0},{a:"MT",n:"Montana",r:"West",m:0,c:0},
+  {a:"ND",n:"North Dakota",r:"Midwest",m:0,c:0},{a:"SD",n:"South Dakota",r:"Midwest",m:0,c:0},
+  {a:"UT",n:"Utah",r:"West",m:0,c:0},{a:"VT",n:"Vermont",r:"Northeast",m:0,c:0},
+  {a:"WV",n:"West Virginia",r:"South",m:0,c:0},{a:"WY",n:"Wyoming",r:"West",m:0,c:0}
+ ]
+};
+// tile-grid positions [row,col], 1-indexed, 8x11
+const GRID={
+ AK:[1,1],ME:[1,11], VT:[2,10],NH:[2,11],
+ WA:[3,1],ID:[3,2],MT:[3,3],ND:[3,4],MN:[3,5],WI:[3,6],MI:[3,7],NY:[3,10],MA:[3,11],
+ OR:[4,1],NV:[4,2],WY:[4,3],SD:[4,4],IA:[4,5],IL:[4,6],IN:[4,7],OH:[4,8],PA:[4,9],NJ:[4,10],CT:[4,11],
+ CA:[5,1],UT:[5,2],CO:[5,3],NE:[5,4],MO:[5,5],KY:[5,6],WV:[5,7],VA:[5,8],MD:[5,9],DE:[5,10],RI:[5,11],
+ AZ:[6,2],NM:[6,3],KS:[6,4],AR:[6,5],TN:[6,6],NC:[6,7],SC:[6,8],DC:[6,9],
+ OK:[7,4],LA:[7,5],MS:[7,6],AL:[7,7],GA:[7,8],
+ HI:[8,1],TX:[8,4],FL:[8,9]
+};
+const fmt=n=>n.toLocaleString("en-US");
+function bucket(s){
+  if(s.c===0) return {cls:"absent",sw:"absent"};
+  if(s.m===0) return {cls:"stalled",step:"--m1",ink:"--m1-ink"};
+  let step,ink;
+  if(s.m>=400){step="--m5";ink="--m5-ink";}
+  else if(s.m>=150){step="--m4";ink="--m4-ink";}
+  else if(s.m>=50){step="--m3";ink="--m3-ink";}
+  else if(s.m>=10){step="--m2";ink="--m2-ink";}
+  else {step="--m1";ink="--m1-ink";}
+  return {cls:"",step,ink};
+}
+
+function init(){
+// KPIs
+const K=DATA.totals;
+document.getElementById("kpis").innerHTML=[
+  {v:fmt(K.members),l:"Members joined"},
+  {v:fmt(K.chapters),l:"Chapters registered"},
+  {v:fmt(K.schools),l:"U.S. schools"},
+  {v:K.present+"<small> / 51</small>",l:"States reached"},
+  {v:K.missing,l:"States w/ no presence",warn:true}
+].map(k=>`<div class="kpi${k.warn?" warn":""}"><div class="v">${k.v}</div><div class="l">${k.l}</div></div>`).join("");
+
+// Regions
+const maxR=Math.max(...DATA.regions.map(r=>r.members));
+document.getElementById("regions").innerHTML=DATA.regions.map(r=>{
+  const w=(r.members/maxR*100).toFixed(1);
+  const tag=r.tag==="top"?`<span class="tag top">Top region</span>`:r.tag==="low"?`<span class="tag low">Lowest</span>`:"";
+  return `<div>
+    <div class="rbar">
+      <div class="name">${r.region}${tag}</div>
+      <div class="track"><div class="fill" style="width:${w}%"><span class="num">${fmt(r.members)}</span></div></div>
+    </div>
+    <div class="rmeta" style="margin-left:106px;margin-top:-10px;margin-bottom:16px">
+      <b>${r.chapters}</b> chapters &middot; <b>${r.schools}</b> schools
+    </div>
+  </div>`;
+}).join("");
+
+// Map
+const tt=document.getElementById("tt");
+function showTT(e,html,sub){
+  tt.innerHTML=`<div class="tn">${html}</div>${sub}`;
+  tt.style.opacity="1";tt.setAttribute("aria-hidden","false");moveTT(e);
+}
+function moveTT(e){
+  const pad=14,w=tt.offsetWidth,h=tt.offsetHeight;
+  let x=e.clientX+pad,y=e.clientY+pad;
+  if(x+w>innerWidth-8)x=e.clientX-w-pad;
+  if(y+h>innerHeight-8)y=e.clientY-h-pad;
+  tt.style.left=x+"px";tt.style.top=y+"px";
+}
+function hideTT(){tt.style.opacity="0";tt.setAttribute("aria-hidden","true");}
+const byAbbr=Object.fromEntries(DATA.states.map(s=>[s.a,s]));
+const tiles=document.getElementById("tiles");
+Object.entries(GRID).forEach(([ab,[row,col]])=>{
+  const s=byAbbr[ab];const b=bucket(s);
+  const d=document.createElement("div");
+  d.className="tile "+b.cls;
+  d.style.gridRow=row;d.style.gridColumn=col;
+  if(b.cls==="absent"){d.style.background="var(--absent)";}
+  else{d.style.background=`var(${b.step})`;d.style.color=`var(${b.ink})`;}
+  const mv=s.c===0?"":(s.m>0?fmt(s.m):"0");
+  d.innerHTML=`<span class="ab">${ab}</span>${mv!==""?`<span class="mv">${mv}</span>`:""}`;
+  const sub=`<div class="tr">${s.r}${s.c>0?` &middot; ${fmt(s.m)} joined, ${s.c} chapter${s.c>1?"s":""}`:" &middot; no presence"}</div>`;
+  d.addEventListener("mouseenter",e=>showTT(e,s.n,sub));
+  d.addEventListener("mousemove",moveTT);
+  d.addEventListener("mouseleave",hideTT);
+  tiles.appendChild(d);
+});
+
+// Legend
+document.getElementById("legend").innerHTML=`
+  <div class="lt">Members joined</div>
+  <div class="lg"><span class="sw" style="background:var(--m5)"></span> 400+</div>
+  <div class="lg"><span class="sw" style="background:var(--m4)"></span> 150&ndash;399</div>
+  <div class="lg"><span class="sw" style="background:var(--m3)"></span> 50&ndash;149</div>
+  <div class="lg"><span class="sw" style="background:var(--m2)"></span> 10&ndash;49</div>
+  <div class="lg"><span class="sw" style="background:var(--m1)"></span> 1&ndash;9</div>
+  <div class="lg" style="margin-top:4px"><span class="sw stalled"></span> Signed up, 0 joins</div>
+  <div class="lg"><span class="sw absent"></span> No presence</div>`;
+
+// Top states
+const top=DATA.states.filter(s=>s.m>0).sort((a,b)=>b.m-a.m).slice(0,14);
+const maxS=top[0].m;
+document.getElementById("topstates").innerHTML=top.map(s=>{
+  const w=(s.m/maxS*100).toFixed(1);
+  return `<div class="sbar">
+    <div class="sn">${s.n} <span class="rg">${s.r}</span></div>
+    <div class="st"><div class="sf" style="width:${w}%"></div></div>
+    <div class="sv">${fmt(s.m)}<br><small>${s.c} ch</small></div>
+  </div>`;
+}).join("");
+
+// Stalled + absent
+const stalled=DATA.states.filter(s=>s.m===0&&s.c>0).sort((a,b)=>b.c-a.c);
+document.getElementById("stalled").innerHTML=stalled.map(s=>
+  `<span class="pill">${s.n} <span class="c">${s.c} ch</span></span>`).join("");
+const absent=DATA.states.filter(s=>s.c===0).sort((a,b)=>a.n.localeCompare(b.n));
+document.getElementById("absent").innerHTML=absent.map(s=>
+  `<span class="pill ab">${s.n}</span>`).join("");
+
+// Theme toggle
+const btn=document.getElementById("themeBtn");
+function sysDark(){return matchMedia("(prefers-color-scheme:dark)").matches;}
+function curDark(){const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":sysDark();}
+function sync(){btn.textContent=curDark()?"Light":"Dark";}
+try{const sv=localStorage.getItem("fc-theme");if(sv)document.documentElement.setAttribute("data-theme",sv);}catch(e){}
+sync();
+btn.addEventListener("click",()=>{
+  const nd=!curDark();document.documentElement.setAttribute("data-theme",nd?"dark":"light");
+  try{localStorage.setItem("fc-theme",nd?"dark":"light");}catch(e){}
+  sync();
+});
+}
+if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}else{init();}
+</script>
+
+</body>
+</html>
