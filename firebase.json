@@ -45,6 +45,20 @@
         }
       },
       {
+        "source": "/slice",
+        "run": {
+          "serviceId": "slice",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/slice/**",
+        "run": {
+          "serviceId": "slice",
+          "region": "us-central1"
+        }
+      },
+      {
         "source": "/irrigation",
         "destination": "/irrigation/index.html"
       },
