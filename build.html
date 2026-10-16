@@ -1,32 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build Request — Bijan Izadian</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18",
-    "react/jsx-runtime": "https://esm.sh/react@18/jsx-runtime",
-    "react-dom/client": "https://esm.sh/react-dom@18/client",
-    "lucide-react": "https://esm.sh/lucide-react@0.462.0?external=react"
-  }
-}
-</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>build request · bijan izadian</title>
+<meta name="description" content="Send Bijan Izadian a web app idea.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Courier New,Courier,monospace' font-size='26'%3Eb%3C/text%3E%3C/svg%3E">
+<!-- Only downloaded where Courier New isn't installed (Android, Linux). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap">
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-database-compat.js"></script>
+<style>
+  html{font-size:max(16px,min(1vw,2.3svh));color-scheme:light}
+  body{margin:0;padding:2rem;background:#fff;color:#000;font:1rem/1.75 "Courier New",Courier,"Cutive Mono",monospace;-webkit-text-size-adjust:100%}
+  a,button{color:inherit;text-decoration:none;cursor:pointer}
+  a:hover,a:focus-visible,button:hover,button:focus-visible{text-decoration:underline;outline:none}
+  p{margin:0}
+  .here{margin-top:1.75rem}
+  form{max-width:50rem;margin-top:1.75rem}
+  .row{display:grid;grid-template-columns:15ch minmax(0,1fr);gap:0 2ch;margin-bottom:1.1rem}
+  input[type=text],input[type=email],textarea{box-sizing:border-box;display:block;width:100%;margin:0;padding:0;border:0;border-bottom:1px solid #000;border-radius:0;background:none;color:#000;font:inherit}
+  textarea{padding:.25em .5ch;border:1px solid #000;resize:vertical}
+  input:focus,textarea:focus{outline:none;background:#f3f3f3}
+  .opts label{display:inline-block;margin-right:2ch;white-space:nowrap;cursor:pointer}
+  .opts input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+  .opts input + span::before{content:"[ ] "}
+  .opts input:checked + span::before{content:"[x] "}
+  .opts label:hover span,.opts input:focus-visible + span{text-decoration:underline}
+  .miss{display:block}
+  button{margin:0;padding:0;border:0;background:none;font:inherit}
+  button:disabled{cursor:default;text-decoration:none}
+  .send{margin-top:1.75rem}
+  @media (max-width: 640px){
+    .row{grid-template-columns:1fr}
+  }
+</style>
 </head>
 <body>
-<div id="root"></div>
+<p><a href="/">bijan izadian</a></p>
+<p class="here">build request</p>
+
+<form id="req" novalidate>
+  <div class="row"><label for="name">name</label><div><input id="name" name="name" type="text" maxlength="100" autocomplete="name"><span class="miss" id="miss-name" hidden></span></div></div>
+  <div class="row"><label for="email">email</label><div><input id="email" name="email" type="email" maxlength="200" autocomplete="email"><span class="miss" id="miss-email" hidden></span></div></div>
+  <div class="row"><label for="pitch">pitch</label><div><input id="pitch" name="pitch" type="text" maxlength="200"><span class="miss" id="miss-pitch" hidden></span></div></div>
+  <div class="row"><label for="problem">problem</label><div><textarea id="problem" name="problem" rows="3" maxlength="2500"></textarea><span class="miss" id="miss-problem" hidden></span></div></div>
+  <div class="row"><label for="audience">who it's for</label><div><input id="audience" name="audience" type="text" maxlength="300"><span class="miss" id="miss-audience" hidden></span></div></div>
+  <div class="row"><label for="features">must-haves</label><div><textarea id="features" name="features" rows="3" maxlength="2500"></textarea><span class="miss" id="miss-features" hidden></span></div></div>
+  <div class="row"><span id="l-timeline">timeline</span><div class="opts" role="radiogroup" aria-labelledby="l-timeline">
+    <label><input type="radio" name="timeline" value="ASAP"><span>asap</span></label>
+    <label><input type="radio" name="timeline" value="Within a month"><span>within a month</span></label>
+    <label><input type="radio" name="timeline" value="1–3 months"><span>1–3 months</span></label>
+    <label><input type="radio" name="timeline" value="Flexible"><span>flexible</span></label>
+    <span class="miss" id="miss-timeline" hidden></span></div></div>
+  <div class="row"><span id="l-budget">budget</span><div class="opts" role="radiogroup" aria-labelledby="l-budget">
+    <label><input type="radio" name="budget" value="Under $1k"><span>under $1k</span></label>
+    <label><input type="radio" name="budget" value="$1k–$5k"><span>$1k–$5k</span></label>
+    <label><input type="radio" name="budget" value="$5k–$15k"><span>$5k–$15k</span></label>
+    <label><input type="radio" name="budget" value="Let's talk"><span>let's talk</span></label>
+    <span class="miss" id="miss-budget" hidden></span></div></div>
+  <div class="row"><label for="extra">anything else</label><div><textarea id="extra" name="extra" rows="3" maxlength="2500"></textarea></div></div>
+  <div class="row"><label for="inspiration">inspiration</label><div><input id="inspiration" name="inspiration" type="text" maxlength="500"></div></div>
+  <p class="send"><button type="submit">send</button></p>
+  <p id="status" role="alert" hidden></p>
+</form>
 
 <script>
-  // idea-intake.jsx saves through window.storage.set — back it with the same Firebase
-  // project the crew sheet uses, storing each submission under intake/<key>. The
-  // database rules make intake write-once and unreadable from the browser, so this
-  // page can send a request but never list or read past ones.
+  // Each request is saved as a JSON string under intake/submissions:<id> in the
+  // site's Firebase database. The rules make intake write-once and unreadable from
+  // the browser, so this page can send a request but never list or read past ones.
   var db = firebase.initializeApp({
     apiKey: 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw',
     authDomain: 'bijanizadian-84e48.firebaseapp.com',
@@ -34,29 +76,41 @@
     projectId: 'bijanizadian-84e48'
   }).database();
 
-  window.storage = {
-    set: function (key, value) {
-      return db.ref('intake/' + key).set(value)
-        .then(function () { return true; })
-        .catch(function (e) { console.error(e); return false; });
-    }
-  };
-</script>
+  var form = document.getElementById('req');
+  var FIELDS = ['name', 'email', 'pitch', 'problem', 'audience', 'features', 'timeline', 'budget', 'extra', 'inspiration'];
+  var REQUIRED = FIELDS.slice(0, 8);
+  var value = function (n) { return (form.elements[n].value || '').trim(); };
 
-<script>
-  // idea-intake.jsx stays the single source of truth — fetch it, transpile the JSX
-  // in-browser with Babel standalone, then mount it as a native ES module.
-  (async function () {
-    var res = await fetch('/idea-intake.jsx');
-    var src = await res.text();
-    var out = Babel.transform(src, { presets: [['react', { runtime: 'automatic' }]], filename: 'idea-intake.jsx' }).code;
-    var blob = new Blob([out], { type: 'text/javascript' });
-    var url = URL.createObjectURL(blob);
-    var mod = await import(url);
-    var React = await import('react');
-    var ReactDOMClient = await import('react-dom/client');
-    ReactDOMClient.createRoot(document.getElementById('root')).render(React.createElement(mod.default));
-  })();
+  form.addEventListener('input', function (e) {
+    var miss = document.getElementById('miss-' + e.target.name);
+    if (miss) miss.hidden = true;
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var first = null;
+    REQUIRED.forEach(function (n) {
+      var v = value(n), miss = document.getElementById('miss-' + n);
+      var problem = !v ? 'required' : n === 'email' && !/\S+@\S+\.\S+/.test(v) ? 'check this' : '';
+      miss.textContent = problem; miss.hidden = !problem;
+      if (problem && !first) first = form.elements[n].length ? form.elements[n][0] : form.elements[n];
+    });
+    if (first) { first.focus(); return; }
+
+    var btn = form.querySelector('button'), status = document.getElementById('status');
+    var id = Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+    var payload = { id: id, submittedAt: new Date().toISOString() };
+    FIELDS.forEach(function (n) { payload[n] = value(n); });
+
+    btn.disabled = true; btn.textContent = 'sending…'; status.hidden = true;
+    db.ref('intake/submissions:' + id).set(JSON.stringify(payload)).then(function () {
+      form.outerHTML = '<p class="here">sent.</p>';
+    }, function (err) {
+      console.error(err);
+      status.textContent = 'couldn\'t send. try again.'; status.hidden = false;
+      btn.disabled = false; btn.textContent = 'send';
+    });
+  });
 </script>
 </body>
 </html>
