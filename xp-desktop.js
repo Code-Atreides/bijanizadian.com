@@ -24,7 +24,8 @@
  *
  * Item fields: id, label, icon, title, body (HTML), link, linkLabel, extra [{label, href}],
  *              status (small grey text after the title), corner (bottom-right), openOnLoad, menuDesc
- * Built-in icons: notepad, globe, cup, building, form, mail, doc, bin, bell, art — or pass raw '<svg …>' markup.
+ * Built-in icons: notepad, globe, cup, building, form, mail, doc, bin, bell, art — or pass raw '<svg …>' markup,
+ *                 or an image path/URL (anything with a '/' or '.'), e.g. '/assets/xp-icons/notepad.png'.
  * Options: name, subtitle, mark (letter in the start button), wallpaper ('hill' | any CSS background | false),
  *          startLeft / startRight (item ids or {label, desc, href, icon}), startHeading.
  * mount() returns { open(id), close(id), closeAll(), destroy(), root }.
@@ -47,6 +48,7 @@
 .xpd-icons{position:absolute;inset:12px}\
 .xpd-icon{position:absolute;width:78px;padding:6px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:1px solid transparent;border-radius:2px;color:#fff;cursor:default;text-align:center;transition:left .07s ease-out,top .07s ease-out}\
 .xpd-icon__img{width:34px;height:34px;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.55))}\
+img.xpd-icon__img{width:32px;height:32px;margin:1px;filter:none;pointer-events:none}\
 .xpd-icon__label{text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 5px rgba(0,0,0,.55);line-height:1.25;word-break:break-word}\
 .xpd-icon:hover{background:rgba(255,255,255,.14)}\
 .xpd-icon.is-selected{background:rgba(49,106,197,.6);border-color:rgba(255,255,255,.4)}\
@@ -73,6 +75,7 @@
 .xpd-win:not(.is-active) .xpd-win__btn--close{background:linear-gradient(#f3b59a,#e28a66)}\
 .xpd-win__body{background:var(--xpd-face);display:flex;gap:16px;padding:16px 18px 16px 16px;font-size:12.5px;line-height:1.55}\
 .xpd-win__bigicon{width:48px;height:48px;flex:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}\
+.xpd-win__body img.xpd-win__bigicon{width:32px;height:32px;filter:none}\
 .xpd-win__text{flex:1;min-width:0;max-width:60ch}\
 .xpd-win__text h2{margin:0 0 6px;font:700 14px/1.2 var(--xpd-display)}\
 .xpd-win__text h2 small{font:400 11px Tahoma,Verdana,sans-serif;color:#5f5f5f;margin-left:6px}\
@@ -116,6 +119,7 @@
 .xpd-sm__heading{margin:4px 8px 6px;font-size:11px;font-weight:700;color:#1c3f8f}\
 .xpd-sm__item{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;background:none;border:0;border-radius:3px;text-align:left;text-decoration:none;color:#000;cursor:default}\
 .xpd-sm__item svg{width:22px;height:22px;flex:none}\
+.xpd-sm__item img{width:24px;height:24px;flex:none}\
 .xpd-sm__item b{display:block;font-weight:700}\
 .xpd-sm__item small{display:block;color:#666;font-size:10px}\
 .xpd-sm__item:hover,.xpd-sm__item:focus-visible{background:var(--xpd-sel);color:#fff;outline:0}\
@@ -191,6 +195,7 @@
   function iconHtml(icon, cls) {
     icon = icon || 'doc';
     if (/^\s*<svg/i.test(icon)) return icon.replace(/<svg\b/i, '<svg class="' + cls + '" aria-hidden="true"');
+    if (/[\/.]/.test(icon)) return '<img class="' + cls + '" src="' + esc(icon) + '" alt="" draggable="false">';
     return '<svg class="' + cls + '" aria-hidden="true"><use href="#xpd-ic-' + esc(icon) + '"></use></svg>';
   }
 
