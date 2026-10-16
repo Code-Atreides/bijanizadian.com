@@ -3,287 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Bijan Izadian</title>
-<meta name="description" content="Bijan Izadian builds websites and web tools for early-stage companies. New York City.">
-<meta property="og:title" content="Bijan Izadian">
-<meta property="og:description" content="Websites and web tools for early-stage companies. New York City.">
-<meta property="og:url" content="https://bijanizadian.com/">
-<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0f0f10" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23121212'/%3E%3Ctext x='16' y='22.5' text-anchor='middle' font-family='Arial,sans-serif' font-weight='700' font-size='17' fill='%23f6f5f1'%3EB%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<title>bijan izadian</title>
+<meta name="description" content="Bijan Izadian, New York City.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23fff'/%3E%3Ctext x='16' y='23' text-anchor='middle' font-family='Courier New,Courier,monospace' font-size='26'%3Eb%3C/text%3E%3C/svg%3E">
+<!-- Only downloaded where Courier New isn't installed (Android, Linux). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cutive+Mono&display=swap">
 <style>
-  :root{
-    --bg:#f6f5f1;--ink:#121212;--muted:#686864;--faint:#9a9994;--line:#e1dfd8;--card:#fff;--accent:#2c55e8;--accent-ink:#fff;
-    --sans:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    --pad:4rem;
-    color-scheme:light dark;
-  }
-  @media (prefers-color-scheme: dark){
-    :root{--bg:#0f0f10;--ink:#ecebe7;--muted:#a09f9a;--faint:#6f6e6a;--line:#28282a;--card:#171718;--accent:#7f9cff;--accent-ink:#0f0f10}
-  }
-
-  /* One rem tracks the viewport, so a big or zoomed-out screen shows the same
-     layout scaled up instead of the same layout with wider margins. */
-  html{font-size:max(16px,min(1vw,2.3svh));scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-  @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-  *,*::before,*::after{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-  a{color:inherit;text-decoration:none}
-  ::selection{background:var(--accent);color:var(--accent-ink)}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
-  [hidden]{display:none!important}
-
-  .section{min-height:100svh;padding:0 var(--pad);display:flex;flex-direction:column}
-  .label{font:500 .75rem/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-
-  /* Buttons */
-  .btn{display:inline-flex;align-items:center;gap:.5em;height:2.75rem;padding:0 1.25rem;border-radius:999px;font:500 .9375rem/1 var(--sans);border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s}
-  .btn:hover{border-color:var(--ink)}
-  .btn--solid{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-  .btn--solid:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-  .btn--sm{height:2.25rem;padding:0 1rem;font-size:.875rem}
-  .arrow{transition:transform .15s}
-  a:hover .arrow{transform:translateX(3px)}
-
-  /* Top bar */
-  .top{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;padding:1.5rem 0}
-  .mark{font-weight:600;font-size:1rem;letter-spacing:-.01em}
-  .nav{display:flex;align-items:center;gap:2rem}
-  .nav a:not(.btn){font-size:.9375rem;color:var(--muted);transition:color .15s}
-  .nav a:not(.btn):hover{color:var(--ink)}
-
-  /* Hero */
-  .hero__main{flex:1;display:flex;flex-direction:column;justify-content:center;padding:1rem 0 2rem}
-  .hero h1{margin:1.25rem 0 0;max-width:15em;font-weight:500;font-size:4.25rem;line-height:1.02;letter-spacing:-.035em}
-  .hero h1 em{font-style:normal;color:var(--muted)}
-  .lede{margin:1.5rem 0 0;max-width:34em;font-size:1.1875rem;line-height:1.55;color:var(--muted)}
-  .lede a{color:var(--ink);border-bottom:1px solid var(--line);transition:border-color .15s}
-  .lede a:hover{border-color:var(--ink)}
-  .actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:2.25rem}
-  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2rem;margin:0;padding:1.5rem 0 2rem;border-top:1px solid var(--line)}
-  .facts dt{margin-bottom:.5rem}
-  .facts dd{margin:0;font-size:.9375rem}
-  .facts dd a{border-bottom:1px solid var(--line)}
-  .facts dd a:hover{border-color:var(--ink)}
-
-  /* Work */
-  .work{justify-content:center;padding-block:3.5rem}
-  .head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;margin-bottom:1.75rem}
-  .head h2,.about h2{margin:0;font-weight:500;font-size:2rem;letter-spacing:-.025em}
-  .projects{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--line)}
-  .project{position:relative;display:grid;grid-template-columns:6rem minmax(0,1.1fr) minmax(0,1.6fr) 13rem 1.5rem;gap:2rem;align-items:baseline;padding:1.5rem 0;border-top:1px solid var(--line)}
-  .project__year{font:400 .875rem/1.5 var(--mono);color:var(--faint)}
-  .project__name{margin:0;font-weight:500;font-size:1.375rem;letter-spacing:-.015em;line-height:1.25}
-  .project__name a::after{content:"";position:absolute;inset:0}
-  .project__sum{margin:0;color:var(--muted);font-size:.9688rem;line-height:1.55}
-  .project__role{font-size:.875rem;color:var(--muted)}
-  .project__go{justify-self:end;color:var(--faint);transition:transform .15s,color .15s}
-  .project:has(.project__name a):hover .project__go{color:var(--ink);transform:translateX(3px)}
-  .project:has(.project__name a):hover .project__name{color:var(--accent)}
-  .sub{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:.25rem .9rem;margin-top:.6rem;font:400 .8125rem/1.4 var(--mono)}
-  .sub a{color:var(--faint);transition:color .15s}
-  .sub a:hover{color:var(--ink)}
-
-  /* About + contact */
-  .about{padding-top:3.5rem}
-  .about__grid{flex:1;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:5rem;align-content:center;padding-bottom:3rem}
-  .about__text p{margin:1.25rem 0 0;max-width:32em;font-size:1.1875rem;line-height:1.6;color:var(--muted)}
-  .about__text p:first-of-type{color:var(--ink)}
-  .edu{display:flex;gap:1rem;align-items:baseline;margin-top:2rem;padding-top:1.25rem;border-top:1px solid var(--line);max-width:38rem;font-size:.9375rem}
-  .edu span:last-child{color:var(--muted)}
-  .contact{display:flex;flex-direction:column;gap:1rem}
-  .card{display:block;padding:1.5rem 1.75rem;border:1px solid var(--line);border-radius:1rem;background:var(--card);transition:border-color .15s}
-  a.card:hover{border-color:var(--ink)}
-  .card .label{display:block;margin-bottom:.75rem}
-  .card__big{display:flex;align-items:center;justify-content:space-between;gap:1rem;font-weight:500;font-size:1.5rem;letter-spacing:-.02em}
-  .card p{margin:.5rem 0 0;color:var(--muted);font-size:.9375rem;line-height:1.55}
-  .cards2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-  .cards2 .card__big{font-size:1.125rem}
-
-  .foot{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.5rem 0 calc(1.5rem + env(safe-area-inset-bottom));border-top:1px solid var(--line);font-size:.8125rem;color:var(--faint)}
-  .linkbtn{display:inline-flex;align-items:center;gap:.4em;padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer;transition:color .15s}
-  .linkbtn:hover{color:var(--ink)}
-  .linkbtn svg{width:.95em;height:.95em}
-
-  /* Team links dialog */
-  dialog{width:min(46rem,calc(100vw - 2.5rem));max-height:calc(100svh - 3rem);padding:0;border:1px solid var(--line);border-radius:1rem;background:var(--card);color:var(--ink);box-shadow:0 1.5rem 4rem rgba(0,0,0,.18)}
-  dialog::backdrop{background:rgba(10,10,10,.4)}
-  .dlg__head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.5rem;border-bottom:1px solid var(--line)}
-  .dlg__head h2{margin:0;font-weight:500;font-size:1.0625rem}
-  .dlg__body{padding:1.5rem}
-  .x{width:2rem;height:2rem;display:grid;place-items:center;border:0;border-radius:.5rem;background:none;color:var(--muted);font-size:1.25rem;cursor:pointer}
-  .x:hover{background:var(--bg);color:var(--ink)}
-  .lock p{margin:0 0 1rem;color:var(--muted)}
-  .lock__row{display:flex;gap:.6rem}
-  .input{flex:1;min-width:0;height:2.75rem;padding:0 1rem;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:inherit}
-  .input:focus{outline:none;border-color:var(--accent)}
-  .lock__err{margin:.75rem 0 0;color:#d4382c;font-size:.875rem}
-  .paths{columns:3 12rem;column-gap:2rem}
-  .paths section{break-inside:avoid;margin-bottom:1.5rem}
-  .paths h3{margin:0 0 .6rem}
-  .paths ul{list-style:none;margin:0;padding:0}
-  .paths li{margin:.2rem 0}
-  .paths a{font:400 .875rem/1.5 var(--mono);color:var(--muted)}
-  .paths a:hover{color:var(--accent)}
-
-  /* Laptops shorter than the usual 16:10 */
-  @media (max-aspect-ratio: 16/8) and (min-width: 901px){
-    .hero h1{font-size:4rem}
-  }
-
-  /* Tablets and phones */
-  @media (max-width: 900px){
-    :root{--pad:1.25rem}
-    .nav{gap:1.1rem}
-    .nav a.hide-sm{display:none}
-    .hero__main{padding:2.5rem 0 2.5rem}
-    .hero h1{font-size:2.6rem;line-height:1.05}
-    .lede{font-size:1.0625rem}
-    .facts{grid-template-columns:1fr;gap:1.1rem}
-    .work,.about{padding-top:4rem;min-height:0}
-    .project{grid-template-columns:minmax(0,1fr) 1.5rem;gap:.35rem 1rem;padding:1.35rem 0}
-    .project__year{grid-column:1;grid-row:1}
-    .project__title{grid-column:1;grid-row:2}
-    .project__go{grid-column:2;grid-row:2}
-    .project__sum{grid-column:1/-1;grid-row:3;margin-top:.25rem}
-    .project__role{grid-column:1/-1;grid-row:4;font-size:.8125rem}
-    .about__grid{grid-template-columns:1fr;gap:2.5rem;padding-top:1.5rem}
-    .cards2{grid-template-columns:1fr}
-    .foot{flex-wrap:wrap}
-  }
+  html{font-size:max(16px,min(1vw,2.3svh));color-scheme:light}
+  body{margin:0;padding:2rem;background:#fff;color:#000;font:1rem/1.75 "Courier New",Courier,"Cutive Mono",monospace;-webkit-text-size-adjust:100%}
+  a,summary{color:inherit;text-decoration:none;cursor:pointer}
+  a:hover,a:focus-visible,summary:hover,summary:focus-visible{text-decoration:underline;outline:none}
+  ul{list-style:none;margin:0;padding:0}
+  .links{margin-top:1.75rem}
+  summary{list-style:none;display:inline}
+  summary::-webkit-details-marker{display:none}
+  input{width:14ch;margin:0 0 0 2ch;padding:0;border:0;border-bottom:1px solid #000;border-radius:0;background:none;color:#000;font:inherit}
+  input:focus{outline:none}
+  .err{margin-left:1ch}
+  .paths{margin:.5rem 0 0 2ch}
+  .paths ul{margin:0 0 .75rem 2ch}
 </style>
 </head>
 <body>
-
-<section class="section hero" id="top">
-  <header class="top">
-    <a class="mark" href="/">Bijan Izadian</a>
-    <nav class="nav" aria-label="Main">
-      <a class="hide-sm" href="#work">Work</a>
-      <a class="hide-sm" href="#about">About</a>
-      <a href="#contact">Contact</a>
-      <a class="btn btn--sm" href="/build">Build request <span class="arrow" aria-hidden="true">→</span></a>
-    </nav>
-  </header>
-
-  <div class="hero__main">
-    <span class="label">Brand · Copy · Front end · Forms &amp; data</span>
-    <h1>I build websites and web tools <em>for early-stage companies.</em></h1>
-    <p class="lede">From the first landing page to the forms and internal tools behind it. Right now that’s <a href="/campus">fomo’s college program</a> and <a href="/tasks">Campus Tasks</a>.</p>
-    <div class="actions">
-      <a class="btn btn--solid" href="#work">See the work <span class="arrow" aria-hidden="true">↓</span></a>
-      <a class="btn" href="mailto:hello@bijanizadian.com">hello@bijanizadian.com</a>
-    </div>
-  </div>
-
-  <dl class="facts">
-    <div><dt class="label">Based in</dt><dd>New York City</dd></div>
-    <div><dt class="label">Studying</dt><dd>Information Systems &amp; Technology, NYU</dd></div>
-    <div><dt class="label">Taking</dt><dd><a href="/build">Build requests</a></dd></div>
-  </dl>
-</section>
-
-<section class="section work" id="work">
-  <div class="head">
-    <h2>Selected work</h2>
-    <span class="label">2025 – 2026</span>
-  </div>
-  <ol class="projects">
-    <li class="project">
-      <span class="project__year">2026</span>
-      <div class="project__title">
-        <h3 class="project__name"><a href="/campus">fomo / campus</a></h3>
-        <nav class="sub" aria-label="fomo campus pages">
-          <a href="/greekwars">greekwars</a><a href="/dinners">dinners</a><a href="/gameday">gameday</a><a href="/campus/manual">manual</a>
-        </nav>
-      </div>
-      <p class="project__sum">Pages and onboarding for fomo’s college program: Greek Wars, the dinner series, game day and the campus team, with shared checklists that keep each crew in sync.</p>
-      <span class="project__role">Onboarding · Web development</span>
-      <span class="project__go" aria-hidden="true">→</span>
-    </li>
-    <li class="project">
-      <span class="project__year">2026</span>
-      <div class="project__title"><h3 class="project__name"><a href="/tasks">Campus Tasks</a></h3></div>
-      <p class="project__sum">A workspace where one student lead per campus picks up tasks that client companies fund, sends each step for review and earns bonuses. Clients include fomo, IcyBox and Rho.</p>
-      <span class="project__role">Product · Landing page</span>
-      <span class="project__go" aria-hidden="true">→</span>
-    </li>
-    <li class="project">
-      <span class="project__year">2025</span>
-      <div class="project__title"><h3 class="project__name">whitewalls</h3></div>
-      <p class="project__sum">A custom CRM for an art gallery: the product and front end for the work that happens behind the exhibitions.</p>
-      <span class="project__role">Product · Front end</span>
-      <span class="project__go" aria-hidden="true"></span>
-    </li>
-    <li class="project">
-      <span class="project__year">—</span>
-      <div class="project__title"><h3 class="project__name">Cyrus Collective</h3></div>
-      <p class="project__sum">Gallery operations, client relations and art handling, alongside backend work for art galleries.</p>
-      <span class="project__role">Gallery operations · Backend</span>
-      <span class="project__go" aria-hidden="true"></span>
-    </li>
-  </ol>
-</section>
-
-<section class="section about" id="about">
-  <div class="about__grid">
-    <div class="about__text">
-      <h2>About</h2>
-      <p>I’m an Information Systems and Technology student at NYU, working across development, brand and the arts.</p>
-      <p>Alongside the web work for fomo and gallery software, I’ve worked on art handling, client relations and exhibition openings in New York.</p>
-      <div class="edu"><span class="label">Education</span><span>NYU School of Professional Studies · Information Systems &amp; Technology</span></div>
-    </div>
-
-    <div class="contact" id="contact">
-      <a class="card" href="mailto:hello@bijanizadian.com">
-        <span class="label">Email</span>
-        <span class="card__big">hello@bijanizadian.com <span class="arrow" aria-hidden="true">→</span></span>
-        <p>The fastest way to reach me.</p>
-      </a>
-      <div class="cards2">
-        <a class="card" href="/build">
-          <span class="label">Build request</span>
-          <span class="card__big">Open the form <span class="arrow" aria-hidden="true">→</span></span>
-          <p>Have a web app idea? Send it through the intake form and I’ll come back with scope, timing and cost.</p>
-        </a>
-        <a class="card" href="https://www.linkedin.com/in/bijan-izadian-848123265/" target="_blank" rel="noopener">
-          <span class="label">LinkedIn</span>
-          <span class="card__big">Bijan Izadian <span class="arrow" aria-hidden="true">↗</span></span>
-          <p>Work history and education.</p>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <footer class="foot">
-    <span>© 2026 Bijan Izadian · New York City</span>
-    <button class="linkbtn" type="button" data-open-team>
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>
-      team links
-    </button>
-  </footer>
-</section>
-
-<dialog id="team" aria-labelledby="team-title">
-  <div class="dlg__head">
-    <h2 id="team-title">fomo team links</h2>
-    <button class="x" type="button" data-close-team aria-label="Close">×</button>
-  </div>
-  <div class="dlg__body" id="team-body">
-    <form class="lock" data-fomo-lock>
-      <p>Type the password to see the fomo links.</p>
-      <div class="lock__row">
-        <input class="input" type="password" name="pw" aria-label="Password" autocomplete="off" required>
-        <button class="btn btn--solid" type="submit">Unlock</button>
-      </div>
-      <p class="lock__err" role="alert" hidden></p>
-    </form>
-  </div>
-</dialog>
+<p style="margin:0">bijan izadian</p>
+<ul class="links">
+  <li><a href="/campus">fomo campus</a></li>
+  <li><a href="/tasks">campus tasks</a></li>
+  <li><a href="/build">build request</a></li>
+  <li><a href="mailto:hello@bijanizadian.com">email</a></li>
+  <li><a href="https://www.linkedin.com/in/bijan-izadian-848123265/" target="_blank" rel="noopener">linkedin</a></li>
+  <li>
+    <details id="team">
+      <summary>team</summary><form data-fomo-lock style="display:inline"><input type="password" name="pw" placeholder="password" aria-label="Password" autocomplete="off" required><span class="err" role="alert" hidden></span></form>
+    </details>
+  </li>
+</ul>
 
 <script>
   // The fomo team link list is encrypted with the unlock password
@@ -291,21 +45,18 @@
   var FOMO_LOCKED = { salt: 'whp8tZzySODhl5l69Fbx8w==', iv: '7pjSd398zRA+4hq8', data: 'yX4q4LwfTUKuuKZDrVPEva0c4ah+T1PW0q24EROVe/f84n6naaSEKOCMPObDWWXnfW5y3HekVCY/qg1zcGLb29++zK7SifTH/KGWkp/3TEqnOioHp33oVWEvth9syXIrdIlS7KeZ7eSMsxn2eY8csOilXa6F4PEWLBUJlQv1UgnKzcep8gzWy3SlEzYGBWUV2nrUKXuv+NIb6EjJNy3np/lEeSgNQGizvwDG7gfQpT5Y3EbofkpydMDZKEpzkZt2kkv43sq6yFUyDSSwnnq3xOw4NYPBhwNa+csw4AOdedaDE2+r4Rh2Bv4cCeCC4KKECsIxyBpztoH9/KOdfLKkL8BzaTe9fMyoBX6cstlNpRImnRdEEBDCU04lyj7nYh5EB5ibbRJIrjmu3MLdGqvdFNmXCuK91kuF29Y6bi8hsMg1EdgK+EUa0UeDltSGygfti1e2S/Tyt5/8wSHh2Y4JW0mGoQseLMNcA28wHSs3a2oIuRAnwprgEIRy/eehht/PGkHprxg9xtgNn1Qp4muCupCazQ8muSZq3ejBWDHPZxL/wJJKJ+WHVlX7L8Iwq8mzhJgGfvaqrcplyn3q2qwEjGOfdA4Ogj7C6CBUWywDzk7oghaVrTZGjeDvAPP7PRejez77kFdAEsickrO9H8r1aA11uUa26SfVJ2exuriZT24YnRafgbCHupywppFnHjVLns49seCuDr2qc99FUJLEGyJ4G4jAhqKJCfiGYgisv5v1wjxQuxdq5RdeAT18QdJQkp9SA4tPg1dyJQR58ZVktEVpRwq3krZfCiRfKEGkH1qcSGCxVe47zEKzyerOYbyXn1l2eH6EeA3QwgYfTHD/PRjmWKGksCyVjrqtLBA92PQt2EEKEvbsM1GQ1+L6J/NtMKwsUiKIEOErGluNvnpI9TIsQENFdaFpLygjtN24uhCBQ3ULiBMiK/opSI0HNYOKq2pLK6YHRUyGUQl2OTPQaAij5ByIYPb2tIKP6FEhl6AABbmdrSk8++57xSe8nhtXZfsBNuP7jC+7Mxgb5ZFhtPsbaKf05az+7ZL0AEV03rmMJSkrrgnNoJqhP8XSE+FHZf/AP4F1dNozUZVHo6HopmefI5DBRjDmXa6dHcMKMlFr01ePt0/CULwaTH2I+0QsvT1LOjxM14AWU8f/FXSMPq6V8/6dVSDfSb7lqEZnMa7+NThL/ycQlamUUd6NirsJzzDR+SMbGgLUwa9084pqrFNY8chmqCRyn7CBa+W3XtvHQ9g7tPIpbZ1nmC34eBv/Ssk3r+5ZL1Y2T1+fSsHp6vQO8Wkn1byTQthE1tp24CjB7IGAOY12urWE7u4MkXgV0CDK4mJO6u7yn5JznXXUjLrHOFsLSXtxTtBnqcRUuO4k2XlcpfJaEEEQGtGAcK3pRgH1' };
 
   var team = document.getElementById('team');
-  document.querySelector('[data-open-team]').addEventListener('click', function () {
-    team.showModal();
-    var pw = team.querySelector('input[name=pw]');
-    if (pw) pw.focus();
+  team.addEventListener('toggle', function () {
+    var pw = team.querySelector('input');
+    if (team.open && pw) pw.focus();
   });
-  team.querySelector('[data-close-team]').addEventListener('click', function () { team.close(); });
-  team.addEventListener('click', function (e) { if (e.target === team) team.close(); });
 
   // Groups of [heading, [[path, page name], ...]].
   function fomoPaths(groups) {
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
     return '<div class="paths">' + groups.map(function (g) {
-      return '<section><h3 class="label">' + esc(g[0]) + '</h3><ul>' + g[1].map(function (p) {
+      return esc(g[0]) + '<ul>' + g[1].map(function (p) {
         return '<li><a href="' + esc(p[0]) + '" title="' + esc(p[1]) + '" target="_blank" rel="noopener">' + esc(p[0]) + '</a></li>';
-      }).join('') + '</ul></section>';
+      }).join('') + '</ul>';
     }).join('') + '</div>';
   }
 
@@ -324,13 +75,13 @@
 
   team.querySelector('[data-fomo-lock]').addEventListener('submit', function (e) {
     e.preventDefault();
-    var form = e.currentTarget, input = form.elements.pw, err = form.querySelector('.lock__err'), btn = form.querySelector('button');
-    btn.disabled = true; err.hidden = true;
+    var form = e.currentTarget, input = form.elements.pw, err = form.querySelector('.err');
+    input.disabled = true; err.hidden = true;
     unlockFomo(input.value).then(function (html) {
-      document.getElementById('team-body').innerHTML = html;
+      form.outerHTML = html;
     }, function (x) {
-      err.textContent = x && x.message === 'unsupported' ? 'This browser can\'t unlock the links.' : 'Wrong password.';
-      err.hidden = false; btn.disabled = false; input.value = ''; input.focus();
+      err.textContent = x && x.message === 'unsupported' ? 'can\'t unlock here' : 'wrong password';
+      err.hidden = false; input.disabled = false; input.value = ''; input.focus();
     });
   });
 </script>
