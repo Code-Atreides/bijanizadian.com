@@ -1,7 +1,7 @@
-// Encrypts the fomo window's path list into desktop.html, so the list is only
+// Encrypts the homepage's fomo team link list into home.html, so the list is only
 // readable after the unlock password is typed on the page.
 // Run: node scripts/encrypt-fomo-paths.mjs <password>
-// Edit GROUPS here, rerun, and commit desktop.html. The password is not stored.
+// Edit GROUPS here, rerun, and commit home.html. The password is not stored.
 import fs from 'node:fs';
 import { webcrypto as crypto } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +14,7 @@ const GROUPS = [
   ['dinners & events', [['/dinners', 'Dinner Series'], ['/dinners/apply', 'Apply to host a dinner'], ['/crewsheet', 'Dinner crew sheet'], ['/gameday', 'Game Day'], ['/hqvisitform', 'Come by fomo HQ']]],
   ['houses', [['/LAhousepitch', 'Los Angeles house'], ['/NYhousepitch', 'New York loft']]]
 ];
-const ITERATIONS = 250000; // must match the unlock code in desktop.html
+const ITERATIONS = 250000; // must match the unlock code in home.html
 
 const password = process.argv[2];
 if (!password) { console.error('Usage: node scripts/encrypt-fomo-paths.mjs <password>'); process.exit(1); }
@@ -26,9 +26,9 @@ const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: IT
 const data = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, new TextEncoder().encode(JSON.stringify(GROUPS))));
 const b64 = bytes => Buffer.from(bytes).toString('base64');
 
-const file = fileURLToPath(new URL('../desktop.html', import.meta.url));
+const file = fileURLToPath(new URL('../home.html', import.meta.url));
 const html = fs.readFileSync(file, 'utf8');
 const line = /var FOMO_LOCKED = \{[^\n]*\};/;
-if (!line.test(html)) { console.error('desktop.html: FOMO_LOCKED line not found'); process.exit(1); }
+if (!line.test(html)) { console.error('home.html: FOMO_LOCKED line not found'); process.exit(1); }
 fs.writeFileSync(file, html.replace(line, `var FOMO_LOCKED = { salt: '${b64(salt)}', iv: '${b64(iv)}', data: '${b64(data)}' };`));
-console.log(`Encrypted ${GROUPS.reduce((n, g) => n + g[1].length, 0)} paths into desktop.html.`);
+console.log(`Encrypted ${GROUPS.reduce((n, g) => n + g[1].length, 0)} paths into home.html.`);

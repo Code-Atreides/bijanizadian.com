@@ -11,7 +11,7 @@ http.createServer(async (req, res) => {
     if (!['GET','HEAD'].includes(req.method)) { res.writeHead(405).end(); return; }
     const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
     if (pathname.split('/').some(p => p.startsWith('.')) || /\.(?:json|mjs|md|zip|txt)$/i.test(pathname)) { res.writeHead(404).end(); return; }
-    const relative = pathname === '/' ? 'desktop.html' : pathname.replace(/^\/+/, '');
+    const relative = pathname === '/' ? 'home.html' : pathname.replace(/^\/+/, '');
     const base = path.resolve(root, relative);
     if (!base.startsWith(root)) { res.writeHead(403).end(); return; }
     for (const candidate of [base, `${base}.html`, path.join(base, 'index.html')]) {

@@ -92,7 +92,7 @@
       },
       {
         "source": "/",
-        "destination": "/desktop.html"
+        "destination": "/home.html"
       }
     ],
     "headers": [
