@@ -22,13 +22,12 @@
   .err{margin-left:1ch}
   .paths{margin:.5rem 0 0 2ch}
   .paths ul{margin:0 0 .75rem 2ch}
+  .paths .named{margin-left:0}
 </style>
 </head>
 <body>
 <p style="margin:0">bijan izadian</p>
 <ul class="links">
-  <li><a href="/campus">fomo campus</a></li>
-  <li><a href="/tasks">campus tasks</a></li>
   <li><a href="/build">build request</a></li>
   <li><a href="mailto:hello@bijanizadian.com">email</a></li>
   <li><a href="https://www.linkedin.com/in/bijan-izadian-848123265/" target="_blank" rel="noopener">linkedin</a></li>
@@ -40,9 +39,9 @@
 </ul>
 
 <script>
-  // The fomo team link list is encrypted with the unlock password
+  // The team links (fomo campus, campus tasks and the fomo paths) are encrypted with the unlock password
   // (scripts/encrypt-fomo-paths.mjs writes this line); it decrypts in the browser.
-  var FOMO_LOCKED = { salt: 'whp8tZzySODhl5l69Fbx8w==', iv: '7pjSd398zRA+4hq8', data: 'yX4q4LwfTUKuuKZDrVPEva0c4ah+T1PW0q24EROVe/f84n6naaSEKOCMPObDWWXnfW5y3HekVCY/qg1zcGLb29++zK7SifTH/KGWkp/3TEqnOioHp33oVWEvth9syXIrdIlS7KeZ7eSMsxn2eY8csOilXa6F4PEWLBUJlQv1UgnKzcep8gzWy3SlEzYGBWUV2nrUKXuv+NIb6EjJNy3np/lEeSgNQGizvwDG7gfQpT5Y3EbofkpydMDZKEpzkZt2kkv43sq6yFUyDSSwnnq3xOw4NYPBhwNa+csw4AOdedaDE2+r4Rh2Bv4cCeCC4KKECsIxyBpztoH9/KOdfLKkL8BzaTe9fMyoBX6cstlNpRImnRdEEBDCU04lyj7nYh5EB5ibbRJIrjmu3MLdGqvdFNmXCuK91kuF29Y6bi8hsMg1EdgK+EUa0UeDltSGygfti1e2S/Tyt5/8wSHh2Y4JW0mGoQseLMNcA28wHSs3a2oIuRAnwprgEIRy/eehht/PGkHprxg9xtgNn1Qp4muCupCazQ8muSZq3ejBWDHPZxL/wJJKJ+WHVlX7L8Iwq8mzhJgGfvaqrcplyn3q2qwEjGOfdA4Ogj7C6CBUWywDzk7oghaVrTZGjeDvAPP7PRejez77kFdAEsickrO9H8r1aA11uUa26SfVJ2exuriZT24YnRafgbCHupywppFnHjVLns49seCuDr2qc99FUJLEGyJ4G4jAhqKJCfiGYgisv5v1wjxQuxdq5RdeAT18QdJQkp9SA4tPg1dyJQR58ZVktEVpRwq3krZfCiRfKEGkH1qcSGCxVe47zEKzyerOYbyXn1l2eH6EeA3QwgYfTHD/PRjmWKGksCyVjrqtLBA92PQt2EEKEvbsM1GQ1+L6J/NtMKwsUiKIEOErGluNvnpI9TIsQENFdaFpLygjtN24uhCBQ3ULiBMiK/opSI0HNYOKq2pLK6YHRUyGUQl2OTPQaAij5ByIYPb2tIKP6FEhl6AABbmdrSk8++57xSe8nhtXZfsBNuP7jC+7Mxgb5ZFhtPsbaKf05az+7ZL0AEV03rmMJSkrrgnNoJqhP8XSE+FHZf/AP4F1dNozUZVHo6HopmefI5DBRjDmXa6dHcMKMlFr01ePt0/CULwaTH2I+0QsvT1LOjxM14AWU8f/FXSMPq6V8/6dVSDfSb7lqEZnMa7+NThL/ycQlamUUd6NirsJzzDR+SMbGgLUwa9084pqrFNY8chmqCRyn7CBa+W3XtvHQ9g7tPIpbZ1nmC34eBv/Ssk3r+5ZL1Y2T1+fSsHp6vQO8Wkn1byTQthE1tp24CjB7IGAOY12urWE7u4MkXgV0CDK4mJO6u7yn5JznXXUjLrHOFsLSXtxTtBnqcRUuO4k2XlcpfJaEEEQGtGAcK3pRgH1' };
+  var FOMO_LOCKED = { salt: 'iGbbk/m08n0Mqny/iuqNBg==', iv: 'fFsnwVftfubRYYkK', data: 'nRGh5nAxsmTCwfTGTDbtIhaOLv1DauscVtImPsXE4NWpTYoItTkyLWDY9ucQm97VnO575N04AV3AQTL2B98UGXPcRmPhSdYfzd7Hcla6zJrxO/xY1NC4GSEDUBeU7yNcoBmxv/uIUEO3EJTGGNuibX1ofjrvisP9lEiYw95Yrti3fHmThb2YynRqiirx2+bZHpCZSJ17u4E5FdkJOwH1zj8sd4J4nZ2ldfeMiqsXeuVUrwd2NNlyOr85iaBFq38XGTev0Z7pD2I/3eCgUubwH0FbHvb/hXzQbXe+wt71rczWSYXGpTnxBF03RSfAWnS4BHrEZk6zO/f2yMkbdwWs71jUc/fqtksxRItdWhrpnrjvBgBOYdBlUSVbD0WUMg3C82uxJIQxMpiNlJlMiYHB90rK+Wu7JRYsLuC9+qmdOCKYEaJ3LUgGrgk942g2iVnTCJpsmBXLocx9k/qZO80MFN1TpLzUX6I3e+xuM+isOaDAWAgLw5ciWFRPd7YfHOhL3TffRfYDtod9dHjGWjIW7DDGoCcgAC48cD4rFFNt/eUNNlKKMVaTWkNji9ACnhRHMvnq2GBg7UEaloyD2kse6Ry+bz9r2ByM87mPJ0/t6IPP0+S5/XHvCAzpbK7efQ8eb5SBLoLbV5ALxVbfuB9HKXkQQcDIMPOeZpvOOBqkRzPd9EQoXtcIfsiJOxPWHWrrx3ZekUY3nwn9c7srbGroktgkEwZDt+tyGPPGRIPjUBsQhX5XR6G5aone48cycUcwd+pncrGFvxejqQa8azqQT5S0erE6taPff7sOmB2GWlE8Ag6D4ClCOhgd3Jep3Gwylog7r0NTscvjqHR1H/Hg8ZOe5dzN1dZtakpFXMd7MuRP5ML7ffliOK2w0OQkXDo+zsS+mGGGmMSrtWfNgBDj5/vx2bBCvYYbwGN7QedeMv9h2UREfcCQ5R9j5YUCnKWH7S8JCieYvS15K5Gmm6t+KdcyvxiKzcQZWd/p6RKs2oBdKz9WZXzDw1ImEknH9GiV65/9X/z2PLJdnNrFPOTM5a4zrtsy7UPAptDOeZ2mTiRe2qCOg7TsDtwebfhMl1kZRCsV2izlfMd6RdoouZvk54mJs7W/eQNYtlX3ydbi1f2Oda28vRhAz23uc1otn/dy+2zPIT7fvnGDdy1FFpRXSCfgGS+oeUzlnkB2waFda6IOB6p4wdtwJB9811NLYuED85zDH8FHRGqEwbHVvxMKqLYRhvw8rbCJCEXF7jlquQWLLLB2FnnupSYnF9pAqMnpUORANVHGMoMy8vATObZDOvSy1dTTnGH9CEfyHB8mTdqEluL/PXnPx7/A2sgz5Drl8j2M9gu0Y7iJp49ouomKyRxS8hildvV59adva6u3gr0MLqWIEUBYS6tbCZq+ZylUKofbzGr2BMm+Dw7DGkUiNiNQjGWBaHwxmJmFcDEXaBjXUrDdRYAntzbgioNbH7HXe1FTBYYd4P8zy88amAH/SZvUiRtrmDr15qfSHA==' };
 
   var team = document.getElementById('team');
   team.addEventListener('toggle', function () {
@@ -50,14 +49,16 @@
     if (team.open && pw) pw.focus();
   });
 
-  // Groups of [heading, [[path, page name], ...]].
-  function fomoPaths(groups) {
+  // { links: [[path, label], ...] shown by label, groups: [[heading, [[path, page name], ...]], ...] shown by path }.
+  function fomoPaths(list) {
     var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-    return '<div class="paths">' + groups.map(function (g) {
-      return esc(g[0]) + '<ul>' + g[1].map(function (p) {
-        return '<li><a href="' + esc(p[0]) + '" title="' + esc(p[1]) + '" target="_blank" rel="noopener">' + esc(p[0]) + '</a></li>';
-      }).join('') + '</ul>';
-    }).join('') + '</div>';
+    var link = function (href, text, title) {
+      return '<li><a href="' + esc(href) + '"' + (title ? ' title="' + esc(title) + '"' : '') + ' target="_blank" rel="noopener">' + esc(text) + '</a></li>';
+    };
+    return '<div class="paths"><ul class="named">' + list.links.map(function (l) { return link(l[0], l[1]); }).join('') + '</ul>' +
+      list.groups.map(function (g) {
+        return esc(g[0]) + '<ul>' + g[1].map(function (p) { return link(p[0], p[0], p[1]); }).join('') + '</ul>';
+      }).join('') + '</div>';
   }
 
   function unlockFomo(password) {
