@@ -121,6 +121,32 @@
         ".read": true
       }
     },
+    "content_submissions": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      "$id": {
+        ".write": "(!data.exists() && newData.exists()) || (!newData.exists() && auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com')",
+        ".validate": "$id.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['name','email','school','link','title','submitted_at'])",
+        "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 100" },
+        "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
+        "school": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "handle": { ".validate": "newData.isString() && newData.val().matches(/^@[A-Za-z0-9_.]{1,30}$/)" },
+        "link": { ".validate": "newData.isString() && newData.val().length <= 500 && newData.val().matches(/^https:[/][/][^ ]+$/)" },
+        "title": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
+        "notes": { ".validate": "newData.isString() && newData.val().length <= 2000" },
+        "submitted_at": { ".validate": "newData.val() == now" },
+        "$other": { ".validate": false }
+      }
+    },
+    "content_status": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      "$id": {
+        ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+        ".validate": "newData.hasChildren(['status','updated_at']) && root.child('content_submissions').child($id).exists()",
+        "status": { ".validate": "newData.isString() && newData.val().matches(/^(editing|done)$/)" },
+        "updated_at": { ".validate": "newData.val() == now" },
+        "$other": { ".validate": false }
+      }
+    },
     "agencykitWorkspace": {
       ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
       ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com' && newData.exists()",

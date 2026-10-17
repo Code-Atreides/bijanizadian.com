@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Send content for editing | fomo campus</title>
+<meta name="description" content="Filmed something? Upload it to Google Drive, Dropbox or WeTransfer, paste the link here, and it goes into the fomo campus edit queue.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Send content for editing — fomo campus">
+<meta property="og:description" content="Paste a link to your files and it goes into the edit queue.">
+<meta property="og:url" content="https://bijanizadian.com/campus/submit">
+<link rel="canonical" href="https://bijanizadian.com/campus/submit">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script>document.documentElement.classList.add('js');</script>
+<!--
+  The front of the edit queue, in the /hqvisitform design language: a light
+  page, a small header, and one split card. People who filmed something upload
+  it wherever they like (Drive, Dropbox, WeTransfer) and send the link with a
+  title and notes for the editor. There is no file upload here: the project has
+  no Storage bucket, by choice. Each submission is written once to RTDB
+  content_submissions/<id>; nobody can read or change it except the team
+  account, which works through it at /campus/submissions.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+  /* The /hqvisitform palette: brand-kit fomo blue, ink and pale lavender, with
+     the cool greys that page uses for secondary text and hairlines. */
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --input: #d9ddea; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a, input, textarea { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+  h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+  b { font-weight: 500; color: var(--ink); }
+
+  /* The form fits one screen: the shell is the viewport's height, the header
+     and footer take what they need, and the card sits centred between them. */
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: 26px; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .season { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+
+  /* ---------- the card ---------- */
+  main { flex: none; margin: auto 0; display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
+
+  .invitation { padding: 30px 28px; background: var(--lavender); }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  h1 { font-size: 42px; line-height: 1.1; font-weight: 500; letter-spacing: -1.5px; margin: 16px 0 14px; }
+  h1 > span { color: var(--blue); }
+  .benefits { font-size: 15px; line-height: 1.6; color: #50566e; }
+  .info { display: grid; gap: 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--panel-rule); }
+  .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.45; }
+  .info svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
+  .info small { display: block; font-size: 12.5px; font-weight: 400; color: #68708d; line-height: 1.5; margin-top: 2px; }
+
+  .send { padding: 28px 32px 24px; background: #fff; min-width: 0; }
+  h2 { font-size: 25px; font-weight: 500; letter-spacing: -.6px; line-height: 1.2; margin-bottom: 6px; }
+  .subtitle { font-size: 14.5px; line-height: 1.5; color: var(--muted); margin-bottom: 18px; }
+
+  /* ---------- fields ---------- */
+  .form-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-pair.school-row { grid-template-columns: minmax(0, 1fr) 190px; }
+  .form-pair.link-row { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
+  .field { min-width: 0; margin-bottom: 14px; }
+  .field > label { display: block; font-size: 13.5px; font-weight: 500; }
+  .field > label span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 5px; }
+  .help { margin-top: 6px; font-size: 12px; line-height: 1.5; color: var(--muted-2); }
+  .field-error { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: #9b362e; }
+  .field input, .field textarea {
+    display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    border: 1px solid var(--input); border-radius: 7px; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field textarea { height: 68px; resize: vertical; line-height: 1.45; }
+  .field input::placeholder, .field textarea::placeholder { color: #8990a4; font-size: 14px; }
+  .field input:focus, .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .field [aria-invalid="true"] { border-color: #d0574b; }
+
+  .primary-action {
+    display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 10px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; text-decoration: none;
+    font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action.is-busy { opacity: .7; cursor: progress; }
+  .under-button { font-size: 12px; color: var(--muted-2); text-align: center; margin-top: 9px; line-height: 1.5; min-height: 18px; }
+  .under-button.is-error { color: #9b362e; font-weight: 500; }
+
+  /* ---------- sent ---------- */
+  .done-mark { width: 44px; height: 44px; border-radius: 50%; background: var(--lavender); color: var(--blue); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .summary { background: var(--tint); border: 1px solid var(--tint-line); border-radius: 8px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; margin: 0 0 16px; }
+  .summary svg { color: var(--blue); flex-shrink: 0; }
+  .summary span { min-width: 0; }
+  .summary strong { display: block; font-size: 14px; font-weight: 500; line-height: 1.4; overflow-wrap: anywhere; }
+  .summary small { display: block; font-size: 12px; color: #6a728c; margin-top: 2px; line-height: 1.45; overflow-wrap: anywhere; }
+  .option {
+    display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; height: 44px; padding: 0 16px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    font: inherit; font-size: 14px; font-weight: 500; text-decoration: none; transition: background .15s;
+  }
+  .option:hover { background: var(--lavender); }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 14px 0 16px; line-height: 1.6; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  /* only on narrow screens: the pitch's Get started, and the way back to it */
+  .get-started, .how-link { display: none !important; }
+  .how-link { align-items: center; gap: 5px; min-height: 36px; border: 0; background: none; padding: 0 0 0 12px; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); }
+  .how-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 24px; }
+    main { grid-template-columns: minmax(0, 270px) minmax(0, 1fr); }
+    .invitation { padding: 26px 22px; }
+    h1 { font-size: 36px; }
+    .send { padding: 26px 24px 22px; }
+    .form-pair.school-row { grid-template-columns: minmax(0, 1fr) 160px; }
+  }
+  /* short screens — laptops at 125% scaling, small windows: tighten the rhythm
+     rather than make anyone scroll */
+  @media (min-width: 601px) and (max-height: 760px) {
+    .site-header { height: 56px; }
+    .site-footer { padding: 8px 0 10px; }
+    .invitation { padding: 22px 24px; }
+    h1 { font-size: 36px; margin: 12px 0 10px; }
+    .benefits { font-size: 14px; line-height: 1.55; }
+    .info { margin-top: 16px; padding-top: 14px; gap: 12px; }
+    .send { padding: 20px 26px 18px; }
+    h2 { font-size: 22px; }
+    .subtitle { margin-bottom: 12px; }
+    .field { margin-bottom: 10px; }
+    .field input { min-height: 40px; padding: 8px 12px; }
+    .field textarea { height: 60px; padding: 8px 12px; }
+    .under-button { margin-top: 6px; }
+  }
+  /* stacked: the pitch first, whole, with Get started; then the form takes the card */
+  @media (max-width: 850px) {
+    .site-shell { max-width: 640px; }
+    main { grid-template-columns: 1fr; }
+    .invitation { padding: 18px 24px; border-bottom: 1px solid #dfe4fa; }
+    h1 { font-size: 28px; letter-spacing: -.8px; margin: 6px 0 0; }
+    h1 br { display: none; }
+    .benefits, .info { display: none; }
+    .js main.intro-mode .send { display: none; }
+    .js main.intro-mode .invitation { display: block; padding: 26px 24px 24px; border-bottom: 0; }
+    .js main.intro-mode h1 { font-size: 38px; letter-spacing: -1.2px; margin: 14px 0 12px; }
+    .js main.intro-mode h1 br { display: inline; }
+    .js main.intro-mode .benefits { display: block; }
+    .js main.intro-mode .info { display: grid; }
+    .js main.intro-mode .get-started { display: flex !important; margin-top: 24px; }
+    /* on the form, the header's season label becomes the way back to the pitch */
+    .js .form-open .how-link { display: inline-flex !important; }
+    .js .form-open .season { display: none; }
+  }
+  /* phones: the form's own heading carries the page, so the panel goes */
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 50px; }
+    .brand svg { width: 70px; height: 23px; }
+    .brand > span { font-size: 21px; }
+    .season { font-size: 11.5px; gap: 5px; }
+    .season svg { width: 13px; height: 13px; }
+    main { border-radius: 12px; }
+    .js .form-open main { margin: 6px 0 auto; }
+    .invitation { display: none; }
+    .js main.intro-mode .invitation { padding: 22px 18px 20px; }
+    .js main.intro-mode h1 { font-size: 34px; }
+    .js main.intro-mode .info { gap: 14px; margin-top: 18px; padding-top: 16px; }
+    .send { padding: 18px 16px 16px; }
+    h2 { font-size: 22px; margin-bottom: 12px; }
+    .subtitle { display: none; }
+    .form-pair, .form-pair.link-row { grid-template-columns: 1fr; gap: 0; }
+    .form-pair.school-row { grid-template-columns: minmax(0, 1fr) 128px; gap: 10px; }
+    .field { margin-bottom: 10px; }
+    .field > label { font-size: 13px; }
+    .field input { min-height: 40px; padding: 8px 11px; margin-top: 5px; }
+    .field textarea { height: 58px; padding: 8px 11px; margin-top: 5px; }
+    .help { display: none; }
+    .site-footer { font-size: 11px; padding: 10px 0 12px; line-height: 1.5; }
+    .footer-more { display: none; }
+  }
+  /* the smallest phones: name and email share a row, notes become one line */
+  @media (max-width: 600px) and (max-height: 700px) {
+    .form-pair:first-child { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { margin-bottom: 8px; }
+    .field textarea { height: 40px; }
+    .under-button:not(.keep):not(.is-error) { display: none; }
+    .js main.intro-mode h1 { font-size: 30px; margin: 10px 0 8px; }
+    .js main.intro-mode .info { gap: 10px; margin-top: 14px; padding-top: 12px; }
+    .js main.intro-mode .get-started { margin-top: 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <span class="season">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+      Content · Fall 2026
+    </span>
+    <button type="button" class="how-link" id="back-to-pitch"><span aria-hidden="true">←</span> How it works</button>
+  </header>
+
+  <main class="intro-mode">
+    <section class="invitation" aria-labelledby="send-title">
+      <span class="eyebrow">CONTENT · FALL 2026</span>
+      <h1 id="send-title">Send it in <br><span>for editing.</span></h1>
+      <p class="benefits">Filmed something? Share the files and it goes straight into the edit queue.</p>
+      <div class="info">
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 13v8M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="m8 17 4-4 4 4"/></svg>
+          <span>Upload it anywhere<small>Google Drive, Dropbox or WeTransfer. Put several clips in one folder.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <span>Anyone with the link<small>Set sharing so the editor can open it without asking.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span>Send the full takes<small>Untrimmed is best. Say which parts you like in the notes.</small></span>
+        </div>
+      </div>
+      <button type="button" class="primary-action get-started" id="get-started">Get started<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </section>
+
+    <section class="send" aria-label="Send your content">
+      <!-- the form -->
+      <div id="step-form">
+        <h2 tabindex="-1" id="form-title">Your content</h2>
+        <p class="subtitle">One link per video. It takes about a minute.</p>
+        <form id="send-form" novalidate>
+          <div class="form-pair">
+            <div class="field"><label for="name">Your name</label><input id="name" autocomplete="name" maxlength="100"></div>
+            <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu"></div>
+          </div>
+          <div class="form-pair school-row">
+            <div class="field"><label for="school">School</label><input id="school" autocomplete="organization" maxlength="120"></div>
+            <div class="field"><label for="handle">Handle <span>optional</span></label><input id="handle" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="31" placeholder="@yourname"></div>
+          </div>
+          <div class="form-pair link-row">
+            <div class="field">
+              <label for="link">Link to your files</label>
+              <input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="500" placeholder="drive.google.com/…" aria-describedby="link-help">
+              <p class="help" id="link-help">Drive, Dropbox or WeTransfer, shared with anyone.</p>
+            </div>
+            <div class="field"><label for="title">What is it?</label><input id="title" maxlength="120" placeholder="Game day street questions"></div>
+          </div>
+          <div class="field"><label for="notes">Notes for the editor <span>optional</span></label><textarea id="notes" maxlength="2000" placeholder="Best takes, music, captions…"></textarea></div>
+          <button type="submit" class="primary-action" id="send"><span>Send for editing</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+          <p class="under-button" id="form-status" role="status" aria-live="polite">Only the fomo team sees your details.</p>
+        </form>
+      </div>
+
+      <!-- sent -->
+      <div id="step-sent" hidden>
+        <div class="done-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h2 tabindex="-1" id="sent-title">Sent. It's in the queue.</h2>
+        <p class="subtitle">Keep the link shared until the edit is done, so the editor can get to the files.</p>
+        <div class="summary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          <span><strong id="sent-what"></strong><small id="sent-where"></small></span>
+        </div>
+        <button type="button" class="option" id="another">Send another video</button>
+        <p class="under-button keep">Your details stay filled in.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · <a href="/campus">campus</a> · <a href="/campus/mic">Set up your mic</a><span class="footer-more"> · Links stay private to the fomo team</span> · Trading involves risk, including loss of principal.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var DB = 'https://bijanizadian-84e48-default-rtdb.firebaseio.com';
+  var main = document.querySelector('main');
+  var shell = document.querySelector('.site-shell');
+  var form = document.getElementById('send-form');
+  var send = document.getElementById('send');
+  var status = document.getElementById('form-status');
+  var HELP = status.textContent;
+  function say(message, isError) { status.textContent = message || HELP; status.classList.toggle('is-error', !!isError); }
+  var fields = ['name', 'email', 'school', 'handle', 'link', 'title', 'notes'].reduce(function (all, id) {
+    all[id] = document.getElementById(id); return all;
+  }, {});
+
+  function setIntro(on) {
+    main.classList.toggle('intro-mode', on);
+    shell.classList.toggle('form-open', !on);
+  }
+  document.getElementById('get-started').addEventListener('click', function () {
+    setIntro(false); document.getElementById('form-title').focus();
+  });
+  document.getElementById('back-to-pitch').addEventListener('click', function () {
+    setIntro(true); document.getElementById('get-started').focus();
+  });
+  setIntro(true);
+
+  // people paste links without the scheme, and with a trailing space
+  function cleanLink(value) {
+    value = value.trim();
+    if (value && !/^[a-z][a-z0-9+.-]*:/i.test(value)) value = 'https://' + value;
+    try {
+      var url = new URL(value);
+      if (url.protocol !== 'https:' || !/\./.test(url.hostname)) return '';
+      return url.href;
+    } catch (e) { return ''; }
+  }
+
+  function showError(input, message) {
+    input.setAttribute('aria-invalid', 'true');
+    say(message, true);
+    input.focus();
+  }
+  Object.keys(fields).forEach(function (id) {
+    fields[id].addEventListener('input', function () { fields[id].removeAttribute('aria-invalid'); say(); });
+  });
+
+  function read() {
+    var name = fields.name.value.trim().replace(/\s+/g, ' ');
+    var email = fields.email.value.trim().toLowerCase();
+    var school = fields.school.value.trim().replace(/\s+/g, ' ');
+    var handle = fields.handle.value.trim();
+    var link = cleanLink(fields.link.value);
+    var title = fields.title.value.trim().replace(/\s+/g, ' ');
+    var notes = fields.notes.value.trim();
+    if (name.length < 2) return showError(fields.name, 'Add your name.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return showError(fields.email, 'Add an email we can reach you at.');
+    if (school.length < 2) return showError(fields.school, 'Add your school.');
+    if (handle && !/^@?[A-Za-z0-9_.]{1,30}$/.test(handle)) return showError(fields.handle, 'Handles use letters, numbers, dots and underscores.');
+    if (!link) return showError(fields.link, 'Paste the full link to your files, starting with https://.');
+    if (title.length < 2) return showError(fields.title, 'Say what the video is, in a few words.');
+    var entry = { name: name, email: email, school: school, link: link, title: title, submitted_at: { '.sv': 'timestamp' } };
+    if (handle) entry.handle = handle.charAt(0) === '@' ? handle : '@' + handle;
+    if (notes) entry.notes = notes;
+    return entry;
+  }
+
+  function newId() {
+    var chars = 'abcdefghijklmnopqrstuvwxyz0123456789', bytes = new Uint8Array(6), out = '';
+    crypto.getRandomValues(bytes);
+    for (var i = 0; i < bytes.length; i++) out += chars[bytes[i] % chars.length];
+    return Date.now().toString(36) + '-' + out;
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    if (send.disabled) return;
+    var entry = read();
+    if (!entry) return;
+    send.disabled = true; send.classList.add('is-busy'); send.querySelector('span').textContent = 'Sending…';
+    fetch(DB + '/content_submissions/' + newId() + '.json', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry)
+    }).then(function (response) {
+      if (!response.ok) throw new Error(response.status);
+      document.getElementById('sent-what').textContent = entry.title;
+      document.getElementById('sent-where').textContent = new URL(entry.link).hostname.replace(/^www\./, '') + ' · from ' + entry.name;
+      document.getElementById('step-form').hidden = true;
+      document.getElementById('step-sent').hidden = false;
+      document.getElementById('sent-title').focus();
+      say();
+    }).catch(function () {
+      say("That didn't send. Check your connection and try again.", true);
+    }).then(function () {
+      send.disabled = false; send.classList.remove('is-busy'); send.querySelector('span').textContent = 'Send for editing';
+    });
+  });
+
+  document.getElementById('another').addEventListener('click', function () {
+    ['link', 'title', 'notes'].forEach(function (id) { fields[id].value = ''; });
+    document.getElementById('step-sent').hidden = true;
+    document.getElementById('step-form').hidden = false;
+    fields.link.focus();
+  });
+})();
+</script>
+</body>
+</html>
