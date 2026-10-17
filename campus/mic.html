@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Set up your mic | fomo campus</title>
+<meta name="description" content="Your fomo content kit is on its way. Five quick steps from the box to your first post: charge the mics, wrap the flag, connect your phone, mount it and film.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Set up your mic — fomo campus">
+<meta property="og:description" content="Five quick steps from the box to your first post. Nothing to order.">
+<meta property="og:url" content="https://bijanizadian.com/campus/mic">
+<link rel="canonical" href="https://bijanizadian.com/campus/mic">
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="apple-touch-icon" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script>document.documentElement.classList.add('js');</script>
+<!--
+  The content kit guide, in the /hqvisitform design language: a light page, a
+  small header, and one split card. For campus people who are being sent a mic
+  kit, so nothing here asks them to buy anything. The kit is a Hollyland LARK A2
+  Duo (two clip-on mics, a USB-C receiver, a charging case), a TONOR TP20
+  handheld adaptor with a flag box and foam covers, and the fomo flag wrap
+  sticker (one 273 x 56 mm strip: fomo, eyes, fomo, eyes, then a plain 5 mm
+  overlap). Mic facts come from Hollyland's LARK A2 quick guide; the wrap steps
+  come from the sticker's shop notes. The five steps share one grid cell, so the
+  card keeps the tallest step's height and doesn't jump between steps.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Bold.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+  /* The /hqvisitform palette: brand-kit fomo blue, ink and pale lavender, with
+     the cool greys that page uses for secondary text and hairlines. */
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+  h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+  b { font-weight: 500; color: var(--ink); }
+
+  /* Every step fits one screen: the shell is the viewport's height, the header
+     and footer take what they need, and the card sits centred between them. */
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: 26px; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .season { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--muted); }
+
+  /* ---------- the card ---------- */
+  main { flex: none; margin: auto 0; display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; align-items: stretch; }
+
+  .invitation { padding: 30px 28px; background: var(--lavender); }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  h1 { font-size: 42px; line-height: 1.1; font-weight: 500; letter-spacing: -1.5px; margin: 16px 0 14px; }
+  h1 > span { color: var(--blue); }
+  .benefits { font-size: 15px; line-height: 1.6; color: #50566e; }
+  .info { display: grid; gap: 16px; margin-top: 22px; padding-top: 20px; border-top: 1px solid var(--panel-rule); }
+  .info > div { display: flex; gap: 11px; align-items: start; font-size: 14px; font-weight: 500; line-height: 1.45; }
+  .info svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
+  .info small { display: block; font-size: 12.5px; font-weight: 400; color: #68708d; line-height: 1.5; margin-top: 2px; }
+
+  .guide { padding: 26px 32px 24px; background: #fff; min-width: 0; display: flex; flex-direction: column; }
+
+  /* the five steps, as buttons: the guide is read in order but any step can be reopened */
+  .steps { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .steps button { display: flex; align-items: center; gap: 7px; border: 0; background: none; padding: 4px 2px; font: inherit; font-size: 13.5px; color: var(--muted-2); white-space: nowrap; border-radius: 6px; }
+  .steps button:hover em { color: var(--ink); }
+  .steps em { font-style: normal; }
+  .steps i { font-style: normal; background: var(--chip); border: 1px solid var(--line); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+  .steps .tick { display: none; }
+  .steps .active { color: var(--blue-text); font-weight: 500; }
+  .steps .active i, .steps .complete i { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .steps .complete .tick { display: block; }
+  .steps .complete b { display: none; }
+  .steps i b { color: inherit; font-weight: inherit; }
+  .steps .step-line { flex: 1 1 0; min-width: 10px; max-width: 26px; height: 1px; background: #e0e4f0; }
+
+  /* the panels share one cell, so the card holds its height from step to step */
+  .panels { flex: 1 1 auto; display: grid; }
+  .panels > section { display: flex; flex-direction: column; min-width: 0; }
+  .js .panels > section { grid-area: 1 / 1; visibility: hidden; }
+  /* each step's box takes the room the kit panel leaves, so no step ends in a white gap */
+  .panels .find, .panels .ways { flex: 1 1 auto; }
+  .panels .find { align-content: center; }
+  .js .panels > section.is-active { visibility: visible; }
+  .no-js-hide { display: none; }
+  .js .no-js-hide { display: flex; }
+
+  h2 { font-size: 25px; font-weight: 500; letter-spacing: -.6px; line-height: 1.2; margin-bottom: 6px; }
+  .subtitle { font-size: 14.5px; line-height: 1.5; color: var(--muted); margin-bottom: 16px; }
+
+  /* ---------- a step's tinted box: the written steps, and a drawing beside them ---------- */
+  .find { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 18px; align-items: center; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 16px 18px; }
+  .find.wide { grid-template-columns: 1fr; gap: 16px; }
+  .find-steps { list-style: none; display: grid; gap: 10px; counter-reset: find; }
+  .find-steps.two { grid-template-columns: 1fr 1fr; column-gap: 20px; }
+  .find-steps li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; font-size: 13.5px; line-height: 1.45; color: #50566e; counter-increment: find; }
+  .find-steps li::before { content: counter(find); display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 1px solid var(--option-line); color: var(--blue-text); font-size: 12px; font-weight: 500; }
+  .note { display: flex; gap: 9px; align-items: start; font-size: 12.5px; line-height: 1.5; color: var(--muted-2); margin-top: 12px; }
+  .note svg { color: var(--blue); flex-shrink: 0; margin-top: 1px; }
+
+  /* step 1: battery numbers */
+  .stats { display: grid; gap: 8px; }
+  .stat { display: flex; align-items: baseline; gap: 10px; background: #fff; border: 1px solid var(--tint-line); border-radius: 8px; padding: 9px 12px; }
+  .stat strong { font-size: 20px; font-weight: 500; letter-spacing: -.4px; color: var(--blue); min-width: 58px; }
+  .stat span { font-size: 12.5px; line-height: 1.35; color: #68708d; }
+
+  /* step 2: the wrap, drawn to the sticker's millimetres */
+  .strip { width: 100%; max-width: 560px; margin: 0 auto; }
+  .strip svg { width: 100%; height: auto; border-radius: 3px; box-shadow: 0 10px 24px -16px rgba(11,9,31,.5); }
+  .strip-labels { display: grid; grid-template-columns: 67fr 67fr 67fr 67fr 5fr; margin-top: 7px; font-size: 11.5px; color: var(--muted-2); text-align: center; }
+  .strip-labels span:last-child { position: relative; }
+  .strip-labels span:last-child em { position: absolute; right: 0; top: 0; font-style: normal; white-space: nowrap; color: var(--blue-text); }
+
+  /* step 3: what the mic's button and light mean */
+  .legend { background: #fff; border: 1px solid var(--tint-line); border-radius: 10px; padding: 11px 13px; font-size: 12.5px; color: #50566e; }
+  .legend h3 { font-size: 10.5px; letter-spacing: 1.4px; font-weight: 500; color: #4a558b; margin-bottom: 6px; }
+  .legend h3:not(:first-child) { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--tint-line); }
+  .legend dl { display: grid; gap: 4px; }
+  .legend dl > div { display: grid; grid-template-columns: 66px minmax(0, 1fr); gap: 8px; align-items: center; }
+  .legend .lights > div { grid-template-columns: 76px minmax(0, 1fr); }
+  .legend dt { font-weight: 500; color: var(--ink); white-space: nowrap; display: flex; align-items: center; gap: 7px; }
+  .led { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+  .led.slow { background: none; border: 2px solid var(--blue); }
+  .led.green { background: #2f9e6a; }
+  .led.red { background: #d0574b; }
+
+  /* step 4: two ways to wear it */
+  .ways { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .way { display: grid; grid-template-columns: 60px minmax(0, 1fr); gap: 16px; align-items: center; background: var(--tint); border: 1px solid var(--tint-line); border-radius: 10px; padding: 14px 16px 14px 14px; }
+  .way svg { width: 60px; height: auto; }
+  .way h3 { font-size: 15px; font-weight: 500; margin-bottom: 1px; }
+  .way h3 small { display: block; font-size: 12px; font-weight: 400; color: var(--blue-text); margin-top: 1px; }
+  .way p { font-size: 13px; line-height: 1.45; color: #50566e; margin-top: 6px; }
+
+  /* step 5: a phone, held upright */
+  .phone { width: 104px; margin: 0 auto; }
+  .phone svg { width: 100%; height: auto; }
+
+  /* ---------- back and next ---------- */
+  .nav-row { gap: 8px; margin-top: 18px; }
+  .primary-action {
+    display: flex; flex: 1 1 auto; height: 44px; align-items: center; justify-content: center; gap: 10px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; text-decoration: none;
+    font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover { background: var(--blue-hover); }
+  .option {
+    display: flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 16px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    font: inherit; font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap; transition: background .15s;
+  }
+  .option:hover { background: var(--lavender); }
+  .under-button { font-size: 12px; color: var(--muted-2); text-align: center; margin-top: 9px; line-height: 1.5; min-height: 18px; }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 14px 0 16px; line-height: 1.6; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  /* only on narrow screens: the kit's Get started, and the way back to it */
+  .get-started, .how-link { display: none !important; }
+  .how-link { align-items: center; gap: 5px; min-height: 36px; border: 0; background: none; padding: 0 0 0 12px; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); }
+  .how-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 24px; }
+    main { grid-template-columns: minmax(0, 270px) minmax(0, 1fr); }
+    .invitation { padding: 26px 22px; }
+    h1 { font-size: 36px; }
+    .guide { padding: 24px 24px 22px; }
+    .find { grid-template-columns: minmax(0, 1fr) 200px; gap: 14px; padding: 14px; }
+    .steps { gap: 7px; }
+  }
+  /* beside the kit panel the two cards get narrow, so they drop their drawings */
+  @media (max-width: 960px) {
+    .way { grid-template-columns: 1fr; }
+    .way svg { display: none; }
+  }
+  /* short screens — laptops at 125% scaling, small windows: tighten the rhythm
+     rather than make anyone scroll */
+  @media (min-width: 601px) and (max-height: 760px) {
+    .site-header { height: 56px; }
+    .site-footer { padding: 8px 0 10px; }
+    .invitation { padding: 22px 24px; }
+    h1 { font-size: 36px; margin: 12px 0 10px; }
+    .benefits { font-size: 14px; line-height: 1.55; }
+    .info { margin-top: 16px; padding-top: 14px; gap: 12px; }
+    .guide { padding: 20px 26px 18px; }
+    .steps { margin-bottom: 14px; }
+    h2 { font-size: 22px; }
+    .subtitle { margin-bottom: 12px; }
+    .find { padding: 12px 14px; }
+    .nav-row { margin-top: 14px; }
+  }
+  /* stacked: the kit panel first, whole, with Get started; then the steps take the card */
+  @media (max-width: 850px) {
+    .site-shell { max-width: 640px; }
+    main { grid-template-columns: 1fr; }
+    .invitation { padding: 18px 24px; border-bottom: 1px solid #dfe4fa; }
+    h1 { font-size: 28px; letter-spacing: -.8px; margin: 6px 0 0; }
+    h1 br { display: none; }
+    .benefits, .info { display: none; }
+    .js main.intro-mode .guide { display: none; }
+    .js main.intro-mode .invitation { display: block; padding: 26px 24px 24px; border-bottom: 0; }
+    .js main.intro-mode h1 { font-size: 38px; letter-spacing: -1.2px; margin: 14px 0 12px; }
+    .js main.intro-mode h1 br { display: inline; }
+    .js main.intro-mode .benefits { display: block; }
+    .js main.intro-mode .info { display: grid; }
+    .js main.intro-mode .get-started { display: flex !important; margin-top: 24px; width: 100%; }
+    /* in the steps, the header's season label becomes the way back to the kit */
+    .js .guide-open .how-link { display: inline-flex !important; }
+    .js .guide-open .season { display: none; }
+    .find { grid-template-columns: minmax(0, 1fr) 190px; }
+    .ways { grid-template-columns: 1fr 1fr; }
+    .way { grid-template-columns: 60px minmax(0, 1fr); }
+    .way svg { display: block; }
+  }
+  /* phones: the step's own heading carries the page, so the panel goes */
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 50px; }
+    .brand svg { width: 70px; height: 23px; }
+    .brand > span { font-size: 21px; }
+    .season { font-size: 11.5px; gap: 5px; }
+    .season svg { width: 13px; height: 13px; }
+    main { border-radius: 12px; }
+    /* phones: each step takes its own height, with the card held near the top,
+       rather than every step padding out to the tallest one */
+    .js .guide-open main { margin: 6px 0 auto; }
+    .js .panels > section { grid-area: auto; }
+    .js .panels > section:not(.is-active) { display: none; }
+    .panels .find, .panels .ways { flex: none; }
+    .invitation { display: none; }
+    .js main.intro-mode .invitation { padding: 22px 18px 20px; }
+    .js main.intro-mode h1 { font-size: 34px; }
+    .js main.intro-mode .info { gap: 14px; margin-top: 18px; padding-top: 16px; }
+    .guide { padding: 16px 16px 16px; }
+    h2 { font-size: 21px; }
+    .subtitle { font-size: 13.5px; margin-bottom: 12px; }
+    /* five named steps don't fit on a phone: keep every circle, name only the current step */
+    .steps { gap: 6px; margin-bottom: 12px; }
+    .steps button:not(.active) em { display: none; }
+    .find { grid-template-columns: 1fr; gap: 12px; padding: 12px; }
+    .find-steps { gap: 8px; }
+    .find-steps.two { grid-template-columns: 1fr; }
+    .find-steps li { font-size: 13px; }
+    .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; order: -1; }
+    .stat { flex-direction: column; gap: 2px; padding: 8px 9px; }
+    .stat strong { font-size: 17px; min-width: 0; }
+    .stat span { font-size: 11px; }
+    /* the legend as tiles: three taps across, then the four lights two by two */
+    .legend { padding: 10px 11px; }
+    .legend h3:not(:first-child) { margin-top: 8px; padding-top: 8px; }
+    .legend .taps { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+    .legend .taps > div { grid-template-columns: 1fr; gap: 0; align-items: start; }
+    .legend .taps .extra { display: none; }
+    .legend .lights { grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+    .legend .lights > div { grid-template-columns: auto minmax(0, 1fr); gap: 7px; }
+    .legend .lights dt span { display: none; }
+    .footer-more { display: none; }
+    .ways { grid-template-columns: 1fr; gap: 8px; }
+    .way { padding: 11px 12px 11px 10px; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+    .way svg { width: 40px; }
+    .way p { font-size: 12.5px; margin-top: 4px; }
+    .phone { width: 92px; order: -1; }
+    .strip-labels em { display: none; }
+    .note { font-size: 12px; margin-top: 10px; }
+    .nav-row { margin-top: 14px; }
+    .site-footer { font-size: 11px; padding: 10px 0 12px; line-height: 1.5; }
+  }
+  /* narrow phones wrap every line, so the steps lose their optional subtitles */
+  @media (max-width: 380px) {
+    .subtitle:not(.keep) { display: none; }
+    h2 { margin-bottom: 10px; }
+    .phone { width: 72px; }
+  }
+  /* the smallest phones keep the written steps and drop the drawings */
+  @media (max-width: 600px) and (max-height: 700px) {
+    .strip-labels, .subtitle:not(.keep), .legend, .way svg, .phone { display: none; }
+    h2 { margin-bottom: 10px; }
+    .way { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="eyes" viewBox="9 24 83 52">
+      <path d="M36.97 24.36c7.13 0 12.82 3.59 15.97 9.24-4.19 4.44-7.29 10.16-8.48 16.4-1.19 6.24-.28 11.96 2.21 16.4-5.32 5.65-12.38 9.24-19.51 9.24-8.73 0-15.3-5.38-17.7-13.32h17.39c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H14.18c5.44-7.94 14.07-13.32 22.79-13.32Z" fill="currentColor"/>
+      <path d="M72.33 24.36c12.75 0 20.89 11.48 18.18 25.64-2.71 14.16-15.24 25.64-27.99 25.64-8.73 0-15.3-5.38-17.7-13.32h19.34c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H49.53c5.44-7.94 14.07-13.32 22.8-13.32Z" fill="currentColor"/>
+    </symbol>
+    <!-- the TONOR handle with the wrapped flag box and a foam cover -->
+    <symbol id="handheld" viewBox="0 0 60 150">
+      <rect x="15" y="2" width="30" height="34" rx="14" fill="#2a2840"/>
+      <rect x="7" y="38" width="46" height="36" rx="3" fill="#516af6"/>
+      <use href="#wordmark" x="13" y="50" width="34" height="11" color="#eaedff"/>
+      <rect x="24" y="74" width="12" height="6" fill="#2a2840"/>
+      <rect x="20" y="79" width="20" height="69" rx="9" fill="#0b091f"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <span class="season">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>
+      Content kit · Fall 2026
+    </span>
+    <button type="button" class="how-link" id="back-to-kit"><span aria-hidden="true">←</span> What's in the kit</button>
+  </header>
+
+  <main class="intro-mode">
+    <section class="invitation" aria-labelledby="kit-title">
+      <span class="eyebrow">CONTENT KIT · FALL 2026</span>
+      <h1 id="kit-title">Set up your <br><span>mic.</span></h1>
+      <p class="benefits">Your kit is on its way, so there's nothing to order. Five quick steps from the box to your first post.</p>
+      <div class="info">
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg>
+          <span>Hollyland LARK A2<small>Two wireless clip-on mics, a receiver and a charging case.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 7.6-6 8.2a1 1 0 0 0 .1 1.3l.8.8a1 1 0 0 0 1.3.1L15.1 12"/><path d="M16.5 21.2c-1-.7-2.1-1.2-3.5-1.2-2.1 0-3.9 2.4-6 2-2.1-.4-2.8-3.4-1.5-4.5"/><circle cx="16" cy="7" r="5"/></svg>
+          <span>TONOR handheld<small>A mic handle with a flag box.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+          <span>fomo flag wrap<small>One sticker for all four sides.</small></span>
+        </div>
+        <div>
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+          <span>Your phone<small>USB-C: iPhone 15 and up, or Android.</small></span>
+        </div>
+      </div>
+      <button type="button" class="primary-action get-started" id="get-started">Get started<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </section>
+
+    <section class="guide" aria-label="Set up your mic, step by step">
+      <nav class="steps no-js-hide" aria-label="Setup steps">
+        <button type="button" class="active" aria-current="step"><i><b>1</b><svg class="tick" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Charge</em></button>
+        <span class="step-line"></span>
+        <button type="button"><i><b>2</b><svg class="tick" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Flag</em></button>
+        <span class="step-line"></span>
+        <button type="button"><i><b>3</b><svg class="tick" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Connect</em></button>
+        <span class="step-line"></span>
+        <button type="button"><i><b>4</b><svg class="tick" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Mount</em></button>
+        <span class="step-line"></span>
+        <button type="button"><i><b>5</b><svg class="tick" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></i><em>Post</em></button>
+      </nav>
+
+      <div class="panels">
+        <!-- 1 · charge -->
+        <section id="step-charge" class="is-active" aria-labelledby="t-charge">
+          <h2 id="t-charge" tabindex="-1">Charge it first</h2>
+          <p class="subtitle">The two mics charge inside their case, like earbuds.</p>
+          <div class="find">
+            <ol class="find-steps">
+              <li><span>Leave both mics in the <b>charging case</b> and plug the case into any <b>USB-C</b> charger.</span></li>
+              <li><span>Let it charge fully before your first shoot.</span></li>
+              <li><span>Put the mics back in the case after every shoot, so they're charged for the next one.</span></li>
+            </ol>
+            <div class="stats">
+              <div class="stat"><strong>7 h</strong><span>of recording per mic</span></div>
+              <div class="stat"><strong>42 h</strong><span>in total with the case</span></div>
+              <div class="stat"><strong>10 min</strong><span>in the case, about 1 h of filming</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2 · wrap the flag -->
+        <section id="step-flag" aria-labelledby="t-flag">
+          <h2 id="t-flag" tabindex="-1">Put fomo on the flag</h2>
+          <p class="subtitle">The sticker is one strip that wraps all four sides: fomo, eyes, fomo, eyes.</p>
+          <div class="find wide">
+            <figure class="strip">
+              <svg viewBox="0 0 273 56" role="img" aria-label="The flag wrap: fomo, eyes, fomo, eyes on fomo blue, with a plain blue end that overlaps the start">
+                <rect width="273" height="56" fill="#516af6"/>
+                <g color="#eaedff">
+                  <use href="#wordmark" x="11.5" y="20.95" width="44" height="14.1"/>
+                  <use href="#eyes" x="78.5" y="14.2" width="44" height="27.6"/>
+                  <use href="#wordmark" x="145.5" y="20.95" width="44" height="14.1"/>
+                  <use href="#eyes" x="212.5" y="14.2" width="44" height="27.6"/>
+                </g>
+                <g stroke="#eaedff" stroke-opacity=".45" stroke-width=".4" stroke-dasharray="1.6 1.6" fill="none">
+                  <path d="M67 0v56M134 0v56M201 0v56M268 0v56M0 2h273M0 54h273"/>
+                </g>
+              </svg>
+              <figcaption class="strip-labels" aria-hidden="true"><span>1 · fomo</span><span>2 · eyes</span><span>3 · fomo</span><span>4 · eyes</span><span><em>overlap ↑</em></span></figcaption>
+            </figure>
+            <ol class="find-steps two">
+              <li><span>Slide the <b>flag</b> off the handle and wipe it clean and dry.</span></li>
+              <li><span>Peel the backing and start at a <b>back corner</b>, top edge lined up.</span></li>
+              <li><span>Wrap one side at a time, smoothing each flat so every logo sits centred.</span></li>
+              <li><span>Lay the <b>plain blue end</b> over where you started, then fold the thin top and bottom edges over.</span></li>
+            </ol>
+          </div>
+        </section>
+
+        <!-- 3 · connect -->
+        <section id="step-connect" aria-labelledby="t-connect">
+          <h2 id="t-connect" tabindex="-1">Connect to your phone</h2>
+          <p class="subtitle">The mics come paired to the receiver, so there's no app to set up.</p>
+          <div class="find">
+            <ol class="find-steps">
+              <li><span>Plug the <b>USB-C receiver</b> into your phone's charging port.</span></li>
+              <li><span>Take a mic out of the case. It turns on and connects by itself.</span></li>
+              <li><span>A <b>solid blue</b> light means you're connected.</span></li>
+              <li><span>Still flashing? Hold the receiver's button for <b>3 s</b>, then hold the button on the switched-off mic for <b>6 s</b>. They pair.</span></li>
+            </ol>
+            <div class="legend">
+              <h3>MIC BUTTON</h3>
+              <dl class="taps">
+                <div><dt>1 tap</dt><dd>Noise cancelling</dd></div>
+                <div><dt>2 taps</dt><dd>Mute</dd></div>
+                <div><dt>3 taps</dt><dd>Record on the mic</dd></div>
+                <div class="extra"><dt>Hold 3 s</dt><dd>On / off</dd></div>
+              </dl>
+              <h3>LIGHT</h3>
+              <dl class="lights">
+                <div><dt><i class="led"></i><span>Blue</span></dt><dd>Connected</dd></div>
+                <div><dt><i class="led slow"></i><span>Flashing</span></dt><dd>Not connected</dd></div>
+                <div><dt><i class="led green"></i><span>Green</span></dt><dd>Noise cancelling</dd></div>
+                <div><dt><i class="led red"></i><span>Red</span></dt><dd>Muted</dd></div>
+              </dl>
+            </div>
+          </div>
+          <p class="note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg><span>Older iPhone with a Lightning port? The receiver won't fit, so tell the fomo team before you film.</span></p>
+        </section>
+
+        <!-- 4 · mount -->
+        <section id="step-mount" aria-labelledby="t-mount">
+          <h2 id="t-mount" tabindex="-1">Handheld or clip-on</h2>
+          <p class="subtitle">You have two mics, and both record into your phone at once.</p>
+          <div class="ways">
+            <div class="way">
+              <svg viewBox="0 0 60 150" aria-hidden="true"><use href="#handheld"/></svg>
+              <div>
+                <h3>Handheld<small>Street questions and interviews</small></h3>
+                <p>Fit a mic into the slot on top of the handle, slide the flag on and add the black or grey foam. Hold it a fist below the speaker's chin, fomo side to camera.</p>
+              </div>
+            </div>
+            <div class="way">
+              <svg viewBox="0 0 60 150" aria-hidden="true"><circle cx="30" cy="40" r="14" fill="#cfd5f1"/><path d="M2 122c0-37 12-56 28-56s28 19 28 56v24H2z" fill="#cfd5f1"/><rect x="35" y="80" width="12" height="17" rx="3.5" fill="#0b091f"/><circle cx="41" cy="85.5" r="2" fill="#516af6"/></svg>
+              <div>
+                <h3>Clip-on<small>Talking to camera</small></h3>
+                <p>Clip the other mic to your shirt, about a hand below your chin. Outside or windy? Put on the furry windshield.</p>
+              </div>
+            </div>
+          </div>
+          <p class="note"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Interviewing someone? Clip one mic on yourself and point the handheld at them.</span></p>
+        </section>
+
+        <!-- 5 · film and post -->
+        <section id="step-post" aria-labelledby="t-post">
+          <h2 id="t-post" tabindex="-1">Film your first post</h2>
+          <p class="subtitle keep">Open your camera, TikTok or Instagram and record as usual. The receiver is now your phone's mic.</p>
+          <div class="find">
+            <ol class="find-steps">
+              <li><span>Record a <b>10-second test</b> and play it back before every shoot.</span></li>
+              <li><span>Shoot <b>vertical</b>, with the fomo side of the flag toward the camera.</span></li>
+              <li><span>Loud spot? <b>Tap the mic once</b> for noise cancelling. Its light turns green.</span></li>
+              <li><span>Keep it about people and campus. Never show anyone's balance or promise returns.</span></li>
+            </ol>
+            <div class="phone" aria-hidden="true">
+              <svg viewBox="0 0 120 210">
+                <rect x="3" y="3" width="114" height="204" rx="18" fill="#0b091f"/>
+                <rect x="9" y="9" width="102" height="192" rx="13" fill="#221d4b"/>
+                <circle cx="22" cy="24" r="3.5" fill="#d0574b"/>
+                <text x="30" y="27.5" font-family="Aeonik, Arial, sans-serif" font-size="10" fill="#eaedff">0:10</text>
+                <rect x="44" y="190" width="32" height="3" rx="1.5" fill="#eaedff" fill-opacity=".5"/>
+                <use href="#handheld" x="30" y="48" width="60" height="150"/>
+              </svg>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="nav-row no-js-hide">
+        <button type="button" class="option" id="prev" hidden><span aria-hidden="true">←</span> Back</button>
+        <button type="button" class="primary-action" id="next"><span>Next: Wrap the flag</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+        <a class="primary-action" id="submit-post" href="https://milomessina.com/tasks" target="_blank" rel="noopener" hidden><span>Submit your post link</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h10v10M7 17 17 7"/></svg></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · <a href="/campus">campus</a><span class="footer-more"> · Your kit is sent to you, nothing to order</span> · <a href="https://www.hollyland.com/support/lark-a2" target="_blank" rel="noopener">LARK A2 manual</a> · Trading involves risk, including loss of principal.
+  </footer>
+</div>
+
+<script>
+(function () {
+  var ids = ['charge', 'flag', 'connect', 'mount', 'post'];
+  var names = ['Charge it', 'Wrap the flag', 'Connect', 'Mount it', 'Film & post'];
+  var main = document.querySelector('main');
+  var panels = ids.map(function (id) { return document.getElementById('step-' + id); });
+  var dots = [].slice.call(document.querySelectorAll('.steps button'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var submit = document.getElementById('submit-post');
+  var shell = document.querySelector('.site-shell');
+  var current = 0;
+
+  function setIntro(on) {
+    main.classList.toggle('intro-mode', on);
+    shell.classList.toggle('guide-open', !on);
+  }
+
+  function show(i, focus) {
+    current = i;
+    panels.forEach(function (panel, n) { panel.classList.toggle('is-active', n === i); });
+    dots.forEach(function (dot, n) {
+      dot.classList.toggle('active', n === i);
+      dot.classList.toggle('complete', n < i);
+      dot.setAttribute('aria-label', 'Step ' + (n + 1) + ': ' + names[n] + (n < i ? ', done' : ''));
+      if (n === i) dot.setAttribute('aria-current', 'step'); else dot.removeAttribute('aria-current');
+    });
+    var last = i === ids.length - 1;
+    prev.hidden = i === 0;
+    next.hidden = last;
+    submit.hidden = !last;
+    if (!last) next.querySelector('span').textContent = 'Next: ' + names[i + 1];
+    if (focus) {
+      if (history.replaceState) history.replaceState(null, '', '#' + ids[i]);
+      panels[i].querySelector('h2').focus();
+    }
+  }
+
+  dots.forEach(function (dot, n) { dot.addEventListener('click', function () { show(n, true); }); });
+  prev.addEventListener('click', function () { show(Math.max(0, current - 1), true); });
+  next.addEventListener('click', function () { show(Math.min(ids.length - 1, current + 1), true); });
+
+  // narrow screens open on the kit; Get started swaps the card to the steps
+  document.getElementById('get-started').addEventListener('click', function () {
+    setIntro(false);
+    show(current, true);
+  });
+  document.getElementById('back-to-kit').addEventListener('click', function () {
+    setIntro(true);
+    document.getElementById('get-started').focus();
+  });
+
+  // a shared link to a step (/campus/mic#connect) opens on that step
+  var start = ids.indexOf(location.hash.slice(1));
+  setIntro(start < 0);
+  show(Math.max(0, start), false);
+})();
+</script>
+</body>
+</html>
