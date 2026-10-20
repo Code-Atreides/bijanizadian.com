@@ -184,17 +184,9 @@
   }
   .tile-hit { cursor: pointer; padding: 0; }
   .tile-hit video, .tile-hit img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .tile-hit::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(6,5,16,.88) 0%, rgba(6,5,16,.35) 26%, rgba(6,5,16,0) 46%), linear-gradient(to bottom, rgba(6,5,16,.4), rgba(6,5,16,0) 18%); pointer-events: none; }
   @media (hover: hover) {
     .tile-hit:hover, .cta-card:hover { scale: 1.025; border-color: rgba(172,184,249,.36); box-shadow: 0 34px 70px -34px rgba(81,106,246,.6); }
-    .tile-hit:hover .tile-sound span { max-width: 120px; opacity: 1; margin-left: 2px; }
   }
-  .tile-tag { position: absolute; z-index: 2; top: 12px; left: 12px; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 5px 9px; border-radius: 99px; background: rgba(11,9,31,.55); color: var(--lavender); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--hairline); }
-  .tile-sound { position: absolute; z-index: 2; top: 10px; right: 10px; display: flex; align-items: center; height: 30px; padding: 0 8px; border-radius: 99px; background: rgba(11,9,31,.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--hairline); font-size: 11.5px; font-weight: 700; color: var(--lavender); }
-  .tile-sound span { max-width: 0; opacity: 0; overflow: hidden; white-space: nowrap; transition: max-width .3s, opacity .3s, margin .3s; }
-  .tile-meta { position: absolute; z-index: 2; left: 14px; right: 14px; bottom: 13px; display: grid; gap: 2px; }
-  .tile-meta strong { font-size: clamp(13px, 1vw, 15px); font-weight: 700; line-height: 1.25; letter-spacing: -.01em; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .tile-meta small { font-size: 12px; font-weight: 500; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* before the first drop: slots that shimmer, quietly */
   .slot { background: radial-gradient(120% 62% at 50% 0%, rgba(34,29,75,.9) 0%, rgba(18,17,26,1) 70%); }
@@ -337,9 +329,6 @@
     .views .live { display: none; }
     .intro-cta .btn { padding: 10px 14px; font-size: 14px; }
     .tile-hit, .slot, .cta-card { border-radius: 16px; }
-    .tile-meta { left: 11px; right: 11px; bottom: 10px; }
-    .tile-sound { display: none; }
-    .tile-tag { top: 9px; left: 9px; font-size: 10px; padding: 4px 7px; }
     .slot b { left: 11px; bottom: 28px; }
     .slot small { left: 11px; bottom: 11px; }
     .cta-card .eyes { width: 30px; }
@@ -655,17 +644,8 @@
     player.preload = 'metadata';
     if (video.poster) player.poster = video.poster;
     player.src = video.preview || video.src;
+    // the tile is the video alone: no tag, badge or caption on top of it
     hit.appendChild(player);
-    if (video.tag) hit.appendChild(el('span', 'tile-tag', video.tag));
-    var sound = el('span', 'tile-sound');
-    sound.setAttribute('aria-hidden', 'true');
-    sound.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="m22 9-6 6M16 9l6 6"/></svg>';
-    sound.appendChild(el('span', '', 'Tap for sound'));
-    hit.appendChild(sound);
-    var caption = el('span', 'tile-meta');
-    if (video.title) caption.appendChild(el('strong', '', video.title));
-    if (meta(video)) caption.appendChild(el('small', '', meta(video)));
-    hit.appendChild(caption);
     hit.addEventListener('click', function () { openPlayer(index); });
     li.appendChild(hit);
     if (observer) observer.observe(player);
