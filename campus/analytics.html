@@ -12,7 +12,7 @@
 <script src="/assets/content-auth.js?v=2" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
 <script src="/assets/content-schools.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=5" defer></script>
+<script src="/assets/content-analytics.js?v=6" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -116,7 +116,7 @@
   .refetching { opacity: .55; transition: opacity .2s; }
 
   /* ---------- stat tiles ---------- */
-  .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
   .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 13px 14px; min-width: 0; }
   .stat span { display: block; font-size: 12.5px; color: var(--muted); }
   .stat strong { display: block; font-size: 28px; font-weight: 500; letter-spacing: -.8px; line-height: 1.15; margin-top: 4px; }
@@ -205,6 +205,8 @@
   /* tracked creators */
   .tracked .handle { color: var(--ink); }
   .tracked td > span.muted { display: block; font-size: 12px; line-height: 1.45; margin-top: 2px; }
+  .tracked td:first-child { min-width: 112px; }
+  .tracked td > span.followers { display: block; font-size: 12.5px; line-height: 1.45; margin-top: 2px; font-variant-numeric: tabular-nums; }
   .tracked td > .pill { margin-top: 4px; }
   .tracked .status { font-size: 12.5px; line-height: 1.45; }
   .tracked .status small { display: block; color: var(--muted-2); }
@@ -265,7 +267,7 @@
     .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
     .queue-head h1 { font-size: 28px; }
     .kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .kpis .stat:first-child { grid-column: 1 / -1; }
+    .kpis .stat:first-child, .kpis .stat:last-child { grid-column: 1 / -1; }
     .stat strong { font-size: 24px; }
     .card { padding: 14px; }
     .tool-label { display: none; }
@@ -343,6 +345,10 @@
 
       <!-- one filter row: everything below re-renders against it -->
       <div class="filters">
+        <div class="segmented" id="metrics" role="group" aria-label="Measure">
+          <button type="button" data-metric="views" aria-pressed="true">Views</button>
+          <button type="button" data-metric="likes" aria-pressed="false">Likes</button>
+        </div>
         <div class="segmented" id="ranges" role="group" aria-label="Date range">
           <button type="button" data-range="7" aria-pressed="false">7 days</button>
           <button type="button" data-range="30" aria-pressed="true">30 days</button>
@@ -363,10 +369,11 @@
       <div id="board">
         <div class="kpis">
           <div class="stat hero"><span id="k-gained-label">Views gained · last 30 days</span><strong id="k-gained">0</strong><small id="k-gained-sub">&nbsp;</small></div>
-          <div class="stat"><span>Total views</span><strong id="k-views">0</strong><small id="k-views-sub">all time</small></div>
+          <div class="stat"><span id="k-total-label">Total views</span><strong id="k-total">0</strong><small id="k-total-sub">all time</small></div>
           <div class="stat"><span>Posts tracked</span><strong id="k-posts">0</strong><small id="k-posts-sub">&nbsp;</small></div>
-          <div class="stat"><span>Avg views per post</span><strong id="k-avg">0</strong><small id="k-avg-sub">all time</small></div>
-          <div class="stat"><span>Engagement rate</span><strong id="k-eng">—</strong><small>likes, comments, shares ÷ views</small></div>
+          <div class="stat"><span id="k-avg-label">Avg views per post</span><strong id="k-avg">0</strong><small id="k-avg-sub">all time</small></div>
+          <div class="stat"><span>Engagement rate</span><strong id="k-eng">—</strong><small title="Likes, comments and shares ÷ views, for posts with views">interactions per view</small></div>
+          <div class="stat"><span>Followers</span><strong id="k-followers">—</strong><small id="k-followers-sub">tracked accounts</small></div>
         </div>
 
         <div class="row">
@@ -377,7 +384,7 @@
             </div>
             <div class="chart" id="time-chart"></div>
             <div id="time-table-wrap" hidden></div>
-            <p class="card-note">Between two updates, a post's views are drawn as a straight line.</p>
+            <p class="card-note" id="time-note">Between two updates, a post's views are drawn as a straight line.</p>
           </section>
           <section class="card" aria-labelledby="c-platform">
             <div class="card-head"><h2 id="c-platform">Views by platform</h2><p>all time</p></div>
@@ -393,7 +400,7 @@
           <div class="map-grid" id="map-view">
             <div class="map" id="map"><div class="tiles" id="tiles" role="list" aria-label="Views by state"></div></div>
             <div>
-              <p class="legend-title">Views, all time</p>
+              <p class="legend-title" id="map-legend-title">Views, all time</p>
               <ul class="legend" id="map-legend"></ul>
               <p class="legend-title">By region</p>
               <ul class="bars regions" id="region-bars"></ul>
@@ -406,11 +413,11 @@
         <div class="row even">
           <section class="card" aria-labelledby="c-creators">
             <div class="card-head"><h2 id="c-creators">Top creators</h2><p id="c-creators-sub">by views</p></div>
-            <table class="table"><thead><tr><th scope="col">Creator</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="creators-gained-head">Gained</th></tr></thead><tbody id="creator-rows"></tbody></table>
+            <table class="table"><thead><tr><th scope="col">Creator</th><th scope="col" class="num">Posts</th><th scope="col" class="num" id="creators-metric-head">Views</th><th scope="col" class="num" id="creators-gained-head">Gained</th></tr></thead><tbody id="creator-rows"></tbody></table>
           </section>
           <section class="card" aria-labelledby="c-schools">
-            <div class="card-head"><h2 id="c-schools">Top schools</h2><p>by views</p></div>
-            <table class="table"><thead><tr><th scope="col">School</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="schools-gained-head">Gained</th></tr></thead><tbody id="school-rows"></tbody></table>
+            <div class="card-head"><h2 id="c-schools">Top schools</h2><p id="c-schools-sub">by views</p></div>
+            <table class="table"><thead><tr><th scope="col">School</th><th scope="col" class="num">Posts</th><th scope="col" class="num" id="schools-metric-head">Views</th><th scope="col" class="num" id="schools-gained-head">Gained</th></tr></thead><tbody id="school-rows"></tbody></table>
           </section>
         </div>
 
@@ -418,7 +425,7 @@
           <div class="card-head">
             <div>
               <h2 id="c-tracked">Creators we track</h2>
-              <p class="sub">Their new TikToks and Instagram reels, with numbers, are pulled in every morning. Instagram hides views, so add those with Update numbers.</p>
+              <p class="sub">Every morning: their new TikToks and Instagram reels with likes and comments, plus each account's followers. Instagram hides views, so add those with Update numbers.</p>
             </div>
             <div class="posts-tools">
               <button type="button" class="option" id="check-all">Check everyone now</button>
@@ -427,12 +434,12 @@
           </div>
           <p class="tracked-note" id="tracked-note" role="status" aria-live="polite"></p>
           <table class="table tracked posts" id="tracked-table">
-            <thead><tr><th scope="col">Creator</th><th scope="col">TikTok</th><th scope="col">Instagram</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col">Last checked</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
+            <thead><tr><th scope="col">Creator</th><th scope="col">TikTok</th><th scope="col">Instagram</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Likes</th><th scope="col" class="num">Views</th><th scope="col">Last checked</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
             <tbody id="tracked-rows"></tbody>
           </table>
           <div class="empty" id="tracked-empty" hidden>
             <strong>No creators tracked yet.</strong>
-            <span>Add a creator's TikTok or Instagram, and their public posts and numbers are logged for you every day.</span>
+            <span>Add a creator's TikTok or Instagram, and their public posts, numbers and followers are logged for you every day.</span>
             <button type="button" class="primary-action small" id="add-first-creator">Add the first creator</button>
           </div>
         </section>
@@ -447,6 +454,7 @@
               </label>
               <select id="sort" aria-label="Sort posts">
                 <option value="views">Most views</option>
+                <option value="likes">Most likes</option>
                 <option value="gained">Most gained</option>
                 <option value="engagement">Best engagement</option>
                 <option value="newest">Newest</option>
@@ -454,7 +462,7 @@
             </div>
           </div>
           <table class="table posts" id="posts-table">
-            <thead><tr><th scope="col">Post</th><th scope="col">Creator</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="posts-gained-head">Gained</th><th scope="col" class="num">Engagement</th><th scope="col" class="num">Updated</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
+            <thead><tr><th scope="col">Post</th><th scope="col">Creator</th><th scope="col" class="num">Views</th><th scope="col" class="num">Likes</th><th scope="col" class="num" id="posts-gained-head">Gained</th><th scope="col" class="num">Engagement</th><th scope="col" class="num">Updated</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
             <tbody id="post-rows"></tbody>
           </table>
           <div class="empty" id="posts-empty" hidden>

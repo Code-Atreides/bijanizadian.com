@@ -1,6 +1,6 @@
 // Offline checks for track.js: node track.test.mjs
 import assert from 'node:assert/strict';
-import { normalizeProfile, externalId, rowToPost, plan, summary, newId } from './track.js';
+import { normalizeProfile, externalId, rowToPost, plan, summary, newId, followerPlan, dayKey } from './track.js';
 
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('ok -', name); };
@@ -138,6 +138,24 @@ test('views typed in by the team survive the next Instagram check', () => {
     rows: [{ platform: 'instagram', row: { ...igLive('Dep1N5tIZMG'), likes: 26 } }], now: NOW + 0.5 * H, rand });
   assert.equal(again.updates['content_posts/mfp3cccc-cccccc/snapshots/auto'].likes, 26);
   assert.equal(Object.keys(again.updates).filter(k => k.includes('/snapshots/')).length, 1);
+});
+
+test('follower counts land on the right creator, one count per day', () => {
+  // the shape Bright Data's Profiles datasets returned on 2026-10-20
+  const rows = [
+    { account: 'ava_chen', followers: 66, posts_count: 2, url: 'https://www.instagram.com/ava_chen/', input: { url: 'https://www.instagram.com/ava_chen/' } },
+    { account: 'stranger', followers: 5000, url: 'https://www.instagram.com/stranger/', input: { url: 'https://www.instagram.com/stranger/' } },
+    { error: 'Profile not found', input: { url: 'https://www.instagram.com/gone/' } },
+    { account: 'ava_chen', followers: null, input: { url: 'https://www.instagram.com/ava_chen/' } }
+  ];
+  const updates = followerPlan({ creators, platform: 'instagram', rows, now: NOW });
+  assert.deepEqual(updates, {
+    'content_creators/mfc1aaaa-aaaaa1/followers/instagram': { count: 66, at: NOW },
+    'content_creators/mfc1aaaa-aaaaa1/followers_log/instagram/2026-10-20': 66
+  });
+  const tt = followerPlan({ creators, platform: 'tiktok', rows: [{ account_id: 'marcuslee', followers: 96400, url: 'https://www.tiktok.com/@marcuslee', input: { url: 'https://www.tiktok.com/@marcuslee' } }], now: NOW });
+  assert.equal(tt['content_creators/mfc2bbbb-bbbbb2/followers/tiktok'].count, 96400);
+  assert.equal(dayKey(Date.UTC(2026, 9, 21, 2, 0)), '2026-10-20', 'days follow Eastern time');
 });
 
 test('ids match the database rules', () => {

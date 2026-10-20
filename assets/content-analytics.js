@@ -12,6 +12,10 @@
 // 2026, so tracked Instagram posts update likes and comments on their own and
 // their views stay unknown (null, shown as "—", left out of totals and rates)
 // until the team types them in with Update numbers.
+// The Views | Likes switch picks the number every total, chart and ranking is
+// built on. Each tracked account also gets one follower count a day
+// (content_creators/<id>/followers and followers_log), shown with its change
+// over the date range.
 // Each post can also carry the state it's for (the map, via content-geo.js),
 // the time it went up and the hashtags it used, which /campus/studio learns from.
 // Everything typed in is untrusted: it goes into the page as text, and a post
@@ -28,7 +32,8 @@
   // one blue, light to dark: checked as an ordinal ramp (monotone, visible steps, light end >= 2:1)
   var RAMP = ['#9eacf9', '#7c8df5', '#5c6fed', '#4252d6', '#2b33a8'];
 
-  var posts = [], submissions = {}, creators = {}, pending = {}, range = 30, platform = 'all', loading = false, loadedAt = 0;
+  var posts = [], submissions = {}, creators = {}, pending = {}, range = 30, platform = 'all', metric = 'views', loading = false, loadedAt = 0;
+  var METRIC_KEY = 'content-analytics-metric';
   var editingCreator = null;
   var editing = null, numbersFor = null, chart = null;
 
@@ -109,10 +114,10 @@
     for (var i = sorted.length - 1; i >= 0; i--) if (sorted[i][metric] !== null && sorted[i][metric] !== undefined) return sorted[i][metric];
     return null;
   }
-  // a post's current numbers: the newest known value of each; views stay null until one is logged
+  // a post's current numbers: the newest known value of each; views and likes stay null until one is logged
   function latestOf(sorted, fallbackAt) {
     var out = { at: sorted.length ? sorted[sorted.length - 1].at : fallbackAt };
-    METRICS.forEach(function (m) { var v = lastKnown(sorted, m); out[m] = v === null && m !== 'views' ? 0 : v; });
+    METRICS.forEach(function (m) { var v = lastKnown(sorted, m); out[m] = v === null && (m === 'comments' || m === 'shares') ? 0 : v; });
     return out;
   }
   // the same, as stored in latest: unknown numbers are left out
@@ -133,7 +138,7 @@
     var posted = Number(data.posted_at) || (snaps[0] ? snaps[0].at : 0);
     return {
       id: id, data: data, snaps: snaps, posted: posted,
-      viewSnaps: snaps.filter(function (s) { return s.views !== null; }),
+      series: { views: snaps.filter(function (s) { return s.views !== null; }), likes: snaps.filter(function (s) { return s.likes !== null; }) },
       latest: latestOf(snaps, posted),
       creator: creator, handle: (sub && sub.handle) || '',
       creatorKey: ((sub && sub.email) || creator).toLowerCase(),
@@ -143,21 +148,26 @@
     };
   }
 
-  // views at moment t: 0 before posting, straight lines between snapshots with views, flat after the last
-  function viewsAt(post, t) {
+  // views or likes at moment t: 0 before posting, straight lines between the snapshots that have it, flat after the last
+  function valueAt(post, t, m) {
+    m = m || metric;
     if (t < post.posted) return 0;
-    var prevT = post.posted, prevV = 0;
-    for (var i = 0; i < post.viewSnaps.length; i++) {
-      var s = post.viewSnaps[i];
-      if (s.at >= t) return s.at <= prevT ? s.views : prevV + (s.views - prevV) * (t - prevT) / (s.at - prevT);
-      if (s.at > prevT) { prevT = s.at; prevV = s.views; } else prevV = s.views;
+    var list = post.series[m], prevT = post.posted, prevV = 0;
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      if (s.at >= t) return s.at <= prevT ? s[m] : prevV + (s[m] - prevV) * (t - prevT) / (s.at - prevT);
+      if (s.at > prevT) { prevT = s.at; prevV = s[m]; } else prevV = s[m];
     }
     return prevV;
   }
-  function engagement(snap) { return snap.likes + snap.comments + snap.shares; }
-  function hasViews(post) { return post.latest.views !== null; }
-  function viewsOf(post) { return post.latest.views || 0; }
-  var NO_VIEWS = 'Instagram doesn\'t share view counts. Add them from the app with Update numbers.';
+  function engagement(snap) { return (snap.likes || 0) + snap.comments + snap.shares; }
+  // the switch: m defaults to the measure picked above the charts
+  function has(post, m) { return post.latest[m || metric] !== null; }
+  function valueOf(post, m) { return post.latest[m || metric] || 0; }
+  function metricName(m) { m = m || metric; return m.charAt(0).toUpperCase() + m.slice(1); }
+  function missingNote(m) {
+    return (m || metric) === 'views' ? 'Instagram doesn\'t share view counts. Add them from the app with Update numbers.' : 'No like count yet. The creator may hide likes on this post.';
+  }
 
   async function load() {
     if (loading) return;
@@ -188,34 +198,40 @@
 
   function render() {
     var now = Date.now(), list = visible(), start = range ? now - range * DAY : -Infinity;
-    var label = range ? 'last ' + range + ' days' : 'all time';
-    var views = 0, engaged = 0, counted = 0, gained = 0, gainers = 0, postedIn = 0, lastUpdate = 0;
+    var label = range ? 'last ' + range + ' days' : 'all time', name = metricName();
+    var total = 0, counted = 0, views = 0, engaged = 0, gained = 0, gainers = 0, postedIn = 0, lastUpdate = 0;
     list.forEach(function (post) {
-      if (hasViews(post)) { views += post.latest.views; engaged += engagement(post.latest); counted++; }
-      post.gained = viewsAt(post, now) - (range ? viewsAt(post, start) : 0);
+      if (has(post)) { total += post.latest[metric]; counted++; }
+      if (has(post, 'views')) { views += post.latest.views; engaged += engagement(post.latest); }
+      post.gained = valueAt(post, now) - (range ? valueAt(post, start) : 0);
       gained += post.gained; if (post.gained > 0) gainers++;
       if (post.posted >= start) postedIn++;
       lastUpdate = Math.max(lastUpdate, post.latest.at || 0);
     });
 
-    $('k-gained-label').textContent = range ? 'Views gained · ' + label : 'Views · all time';
+    $('k-gained-label').textContent = range ? name + ' gained · ' + range + ' days' : name + ' · all time';
     $('k-gained').textContent = fmt(gained); $('k-gained').title = full(gained);
     $('k-gained-sub').textContent = list.length ? 'across ' + gainers + (gainers === 1 ? ' post' : ' posts') : ' ';
-    $('k-views').textContent = fmt(views); $('k-views').title = full(views);
+    $('k-total-label').textContent = 'Total ' + metric;
+    $('k-total').textContent = fmt(total); $('k-total').title = full(total);
     var missing = list.length - counted;
-    $('k-views-sub').textContent = 'all time' + (missing ? ' · ' + missing + ' without views' : '');
-    $('k-views-sub').title = missing ? NO_VIEWS : '';
-    $('k-avg-sub').textContent = missing ? 'posts with views' : 'all time';
+    $('k-total-sub').textContent = 'all time' + (missing ? ' · ' + missing + ' without ' + metric : '');
+    $('k-total-sub').title = missing ? missingNote() : '';
+    $('k-avg-label').textContent = 'Avg ' + metric + ' per post';
+    $('k-avg-sub').textContent = missing ? 'posts with ' + metric : 'all time';
     $('k-posts').textContent = list.length;
-    $('k-posts-sub').textContent = range ? postedIn + ' posted in the ' + label : ' ';
-    $('k-avg').textContent = counted ? fmt(views / counted) : list.length ? '—' : '0';
+    $('k-posts-sub').textContent = range ? postedIn + ' posted in ' + range + ' days' : ' ';
+    $('k-avg').textContent = counted ? fmt(total / counted) : list.length ? '—' : '0';
     $('k-eng').textContent = views ? pct(engaged / views) : '—';
     $('an-summary').textContent = posts.length
       ? posts.length + (posts.length === 1 ? ' post' : ' posts') + ' tracked · last update ' + ago(lastUpdate)
       : 'No posts logged yet.';
     var short = range ? 'Gained · ' + range + 'd' : 'Gained';
     ['creators-gained-head', 'schools-gained-head', 'posts-gained-head'].forEach(function (id) { $(id).textContent = short; });
+    ['creators-metric-head', 'schools-metric-head'].forEach(function (id) { $(id).textContent = name; });
+    $('c-creators-sub').textContent = $('c-schools-sub').textContent = 'by ' + metric;
 
+    renderFollowers(start);
     renderChart(list, now, label);
     renderPlatforms(list);
     renderMap(list);
@@ -233,10 +249,10 @@
     var from = startOfDay(first), days = Math.max(1, Math.ceil((now - from) / DAY)), step = days > 120 ? 7 : 1, points = [];
     for (var d = 0; d <= days; d += step) {
       var t = Math.min(from + (d + 1) * DAY - 1, now);
-      points.push({ t: t, v: list.reduce(function (sum, post) { return sum + viewsAt(post, t); }, 0) });
+      points.push({ t: t, v: list.reduce(function (sum, post) { return sum + valueAt(post, t); }, 0) });
       if (t >= now) break;
     }
-    if (points[points.length - 1].t < now) points.push({ t: now, v: list.reduce(function (sum, post) { return sum + viewsAt(post, now); }, 0) });
+    if (points[points.length - 1].t < now) points.push({ t: now, v: list.reduce(function (sum, post) { return sum + valueAt(post, now); }, 0) });
     return points;
   }
   function niceMax(v) {
@@ -248,6 +264,8 @@
   function renderChart(list, now, label) {
     var box = $('time-chart'), points = series(list, now);
     box.textContent = '';
+    $('c-time').textContent = 'Total ' + metric + ' over time';
+    $('time-note').textContent = 'Between two updates, a post\'s ' + metric + ' are drawn as a straight line.';
     renderTimeTable(points);
     if (!points.length) {
       box.appendChild(el('div', 'chart-empty', posts.length ? 'No posts on this platform yet.' : 'Log a post to start the chart.'));
@@ -260,7 +278,7 @@
     var y = function (v) { return m.t + ph - v / max * ph; };
 
     var root = svg('svg', { viewBox: '0 0 ' + w + ' ' + h, role: 'img', tabindex: '0',
-      'aria-label': 'Total views, ' + label + ': from ' + full(points[0].v) + ' to ' + full(points[points.length - 1].v) + '. Use the arrow keys to read each day.' });
+      'aria-label': 'Total ' + metric + ', ' + label + ': from ' + full(points[0].v) + ' to ' + full(points[points.length - 1].v) + '. Use the arrow keys to read each day.' });
     var grid = svg('g', { class: 'grid' });
     for (var i = 0; i <= 4; i++) {
       var gv = max / 4 * i, gy = y(gv);
@@ -301,7 +319,7 @@
       crossLine.setAttribute('x1', px); crossLine.setAttribute('x2', px);
       crossDot.setAttribute('cx', px); crossDot.setAttribute('cy', py);
       cross.setAttribute('visibility', 'visible');
-      tipValue.textContent = full(p.v) + ' views';
+      tipValue.textContent = full(p.v) + ' ' + metric;
       tipDate.textContent = longDay(p.t);
       tip.hidden = false;
       tip.style.left = Math.max(70, Math.min(w - 70, px)) + 'px';
@@ -328,7 +346,7 @@
     var wrap = $('time-table-wrap');
     wrap.textContent = '';
     var table = el('table', 'table'), head = el('thead'), row = el('tr'), body = el('tbody');
-    row.appendChild(el('th', '', 'Day')); var th = el('th', 'num', 'Total views'); row.appendChild(th);
+    row.appendChild(el('th', '', 'Day')); var th = el('th', 'num', 'Total ' + metric); row.appendChild(th);
     head.appendChild(row); table.appendChild(head);
     points.slice().reverse().forEach(function (p) {
       var tr = el('tr'); tr.appendChild(el('td', '', longDay(p.t))); tr.appendChild(el('td', 'num', full(p.v))); body.appendChild(tr);
@@ -337,29 +355,30 @@
     if (!points.length) wrap.appendChild(el('p', 'muted', 'No data yet.'));
   }
 
-  // ---------- views by platform: one hue for every bar, the value at its tip ----------
+  // ---------- by platform: one hue for every bar, the value at its tip ----------
 
   function renderPlatforms(list) {
     var ul = $('platform-bars'), totals = {};
     ul.textContent = '';
+    $('c-platform').textContent = metricName() + ' by platform';
     list.forEach(function (post) {
       var key = PLATFORMS[post.data.platform] ? post.data.platform : 'other';
-      totals[key] = totals[key] || { views: 0, posts: 0, counted: 0 };
-      totals[key].views += viewsOf(post); totals[key].posts++; if (hasViews(post)) totals[key].counted++;
+      totals[key] = totals[key] || { sum: 0, posts: 0, counted: 0 };
+      totals[key].sum += valueOf(post); totals[key].posts++; if (has(post)) totals[key].counted++;
     });
-    var keys = Object.keys(totals).sort(function (a, b) { return totals[b].views - totals[a].views; });
+    var keys = Object.keys(totals).sort(function (a, b) { return totals[b].sum - totals[a].sum; });
     if (!keys.length) { ul.appendChild(el('li', 'muted', 'No posts yet.')); return; }
-    var max = Math.max.apply(null, keys.map(function (k) { return totals[k].views; })) || 1;
+    var max = Math.max.apply(null, keys.map(function (k) { return totals[k].sum; })) || 1;
     keys.forEach(function (key) {
       var none = !totals[key].counted;
-      var li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', none ? '—' : fmt(totals[key].views));
+      var li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', none ? '—' : fmt(totals[key].sum));
       li.appendChild(el('span', 'name', PLATFORMS[key]));
-      bar.style.width = 'calc((100% - 74px) * ' + (totals[key].views / max).toFixed(4) + ')';
+      bar.style.width = 'calc((100% - 74px) * ' + (totals[key].sum / max).toFixed(4) + ')';
       if (none) bar.style.minWidth = '0';
-      val.title = none ? NO_VIEWS : full(totals[key].views) + ' views';
+      val.title = none ? missingNote() : full(totals[key].sum) + ' ' + metric;
       val.appendChild(el('span', 'sub', totals[key].posts + (totals[key].posts === 1 ? ' post' : ' posts')));
       track.appendChild(bar); track.appendChild(val); li.appendChild(track);
-      li.setAttribute('aria-label', PLATFORMS[key] + ': ' + (none ? 'no views logged' : full(totals[key].views) + ' views') + ' from ' + totals[key].posts + ' posts');
+      li.setAttribute('aria-label', PLATFORMS[key] + ': ' + (none ? 'no ' + metric + ' logged' : full(totals[key].sum) + ' ' + metric) + ' from ' + totals[key].posts + ' posts');
       ul.appendChild(li);
     });
   }
@@ -376,15 +395,17 @@
 
   function renderMap(list) {
     var byState = {}, byRegion = {}, unmapped = 0;
+    $('map-legend-title').textContent = metricName() + ', all time';
+    $('tiles').setAttribute('aria-label', metricName() + ' by state');
     list.forEach(function (post) {
       if (!post.state) { unmapped++; return; }
-      var s = byState[post.state] = byState[post.state] || { posts: 0, views: 0, gained: 0, counted: 0 };
-      s.posts++; s.views += viewsOf(post); s.gained += post.gained; if (hasViews(post)) s.counted++;
+      var s = byState[post.state] = byState[post.state] || { posts: 0, sum: 0, gained: 0, counted: 0 };
+      s.posts++; s.sum += valueOf(post); s.gained += post.gained; if (has(post)) s.counted++;
       var region = GEO.STATES[post.state].region;
-      var r = byRegion[region] = byRegion[region] || { posts: 0, views: 0 };
-      r.posts++; r.views += viewsOf(post);
+      var r = byRegion[region] = byRegion[region] || { posts: 0, sum: 0 };
+      r.posts++; r.sum += valueOf(post);
     });
-    var totals = Object.keys(byState).map(function (k) { return byState[k].views; });
+    var totals = Object.keys(byState).map(function (k) { return byState[k].sum; });
     var max = Math.max.apply(null, [0].concat(totals)), min = Math.min.apply(null, totals.length ? totals : [0]);
     var cuts = thresholds(min, max);
     var step = function (v) { var i = 0; while (i < cuts.length && v >= cuts[i]) i++; return Math.min(i + (RAMP.length - 1 - cuts.length), RAMP.length - 1); };
@@ -401,15 +422,15 @@
       tile.setAttribute('role', 'listitem');
       tile.appendChild(el('b', '', abbr));
       if (s) {
-        var fill = RAMP[step(s.views)];
+        var fill = RAMP[step(s.sum)];
         tile.style.background = fill; tile.style.color = inkFor(fill);
-        tile.appendChild(el('small', '', s.counted ? fmt(s.views) : '—'));
+        tile.appendChild(el('small', '', s.counted ? fmt(s.sum) : '—'));
         tile.tabIndex = 0;
       }
-      var label = g.name + ': ' + (s ? (s.counted ? full(s.views) + ' views' : 'no views logged') + ' from ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : 'no posts');
+      var label = g.name + ': ' + (s ? (s.counted ? full(s.sum) + ' ' + metric : 'no ' + metric + ' logged') + ' from ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : 'no posts');
       tile.setAttribute('aria-label', label);
       var show = function () {
-        tipValue.textContent = s ? (s.counted ? full(s.views) + ' views' : 'No views logged yet') : 'No posts yet';
+        tipValue.textContent = s ? (s.counted ? full(s.sum) + ' ' + metric : 'No ' + metric + ' logged yet') : 'No posts yet';
         tipSub.textContent = g.name + ' · ' + g.region + (s ? ' · ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : '');
         tip.hidden = false;
         var box = wrap.getBoundingClientRect(), t = tile.getBoundingClientRect();
@@ -435,14 +456,14 @@
     var none = el('li'); none.appendChild(el('i', 'none')); none.appendChild(document.createTextNode('No posts')); legend.appendChild(none);
 
     // regions: one hue for every bar
-    var bars = $('region-bars'), rmax = Math.max.apply(null, [1].concat(GEO.REGIONS.map(function (r) { return byRegion[r] ? byRegion[r].views : 0; })));
+    var bars = $('region-bars'), rmax = Math.max.apply(null, [1].concat(GEO.REGIONS.map(function (r) { return byRegion[r] ? byRegion[r].sum : 0; })));
     bars.textContent = '';
-    GEO.REGIONS.slice().sort(function (a, b) { return (byRegion[b] ? byRegion[b].views : 0) - (byRegion[a] ? byRegion[a].views : 0); }).forEach(function (region) {
-      var r = byRegion[region] || { posts: 0, views: 0 }, li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', fmt(r.views));
+    GEO.REGIONS.slice().sort(function (a, b) { return (byRegion[b] ? byRegion[b].sum : 0) - (byRegion[a] ? byRegion[a].sum : 0); }).forEach(function (region) {
+      var r = byRegion[region] || { posts: 0, sum: 0 }, li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', fmt(r.sum));
       li.appendChild(el('span', 'name', region));
-      bar.style.width = 'calc((100% - 52px) * ' + (r.views / rmax).toFixed(4) + ')';
-      if (!r.views) bar.style.minWidth = '0';
-      val.title = full(r.views) + ' views from ' + r.posts + ' posts';
+      bar.style.width = 'calc((100% - 52px) * ' + (r.sum / rmax).toFixed(4) + ')';
+      if (!r.sum) bar.style.minWidth = '0';
+      val.title = full(r.sum) + ' ' + metric + ' from ' + r.posts + ' posts';
       track.appendChild(bar); track.appendChild(val); li.appendChild(track); bars.appendChild(li);
     });
     $('unmapped').hidden = !unmapped;
@@ -451,12 +472,12 @@
     // the table twin
     var tw = $('map-table-wrap'), table = el('table', 'table'), head = el('tr'), body = el('tbody');
     tw.textContent = '';
-    ['State', 'Region', 'Posts', 'Views', $('posts-gained-head').textContent].forEach(function (h, i) { head.appendChild(el('th', i > 1 ? 'num' : '', h)); });
+    ['State', 'Region', 'Posts', metricName(), $('posts-gained-head').textContent].forEach(function (h, i) { head.appendChild(el('th', i > 1 ? 'num' : '', h)); });
     var thead = el('thead'); thead.appendChild(head); table.appendChild(thead);
-    Object.keys(byState).sort(function (a, b) { return byState[b].views - byState[a].views; }).forEach(function (abbr) {
+    Object.keys(byState).sort(function (a, b) { return byState[b].sum - byState[a].sum; }).forEach(function (abbr) {
       var s = byState[abbr], tr = el('tr');
       tr.appendChild(el('td', '', GEO.STATES[abbr].name)); tr.appendChild(el('td', '', GEO.STATES[abbr].region));
-      tr.appendChild(el('td', 'num', s.posts)); tr.appendChild(el('td', 'num', s.counted ? full(s.views) : '—')); tr.appendChild(el('td', 'num', (s.gained > 0 ? '+' : '') + full(s.gained)));
+      tr.appendChild(el('td', 'num', s.posts)); tr.appendChild(el('td', 'num', s.counted ? full(s.sum) : '—')); tr.appendChild(el('td', 'num', (s.gained > 0 ? '+' : '') + full(s.gained)));
       body.appendChild(tr);
     });
     table.appendChild(body); tw.appendChild(table);
@@ -470,10 +491,10 @@
     body.textContent = '';
     list.forEach(function (post) {
       var key = keyOf(post) || '—';
-      if (!groups[key]) groups[key] = { label: describe(post), posts: 0, views: 0, gained: 0, counted: 0 };
-      groups[key].posts++; groups[key].views += viewsOf(post); groups[key].gained += post.gained; if (hasViews(post)) groups[key].counted++;
+      if (!groups[key]) groups[key] = { label: describe(post), posts: 0, sum: 0, gained: 0, counted: 0 };
+      groups[key].posts++; groups[key].sum += valueOf(post); groups[key].gained += post.gained; if (has(post)) groups[key].counted++;
     });
-    var rows = Object.keys(groups).map(function (k) { return groups[k]; }).sort(function (a, b) { return b.views - a.views; }).slice(0, 8);
+    var rows = Object.keys(groups).map(function (k) { return groups[k]; }).sort(function (a, b) { return b.sum - a.sum; }).slice(0, 8);
     if (!rows.length) {
       var tr = el('tr'), td = el('td', 'muted', 'Nothing yet.'); td.colSpan = 4; tr.appendChild(td); body.appendChild(tr); return;
     }
@@ -483,7 +504,7 @@
       if (g.label.sub) who.appendChild(el('span', 'muted', g.label.sub));
       tr.appendChild(who);
       tr.appendChild(el('td', 'num', g.posts));
-      var v = el('td', 'num', g.counted ? fmt(g.views) : '—'); v.title = g.counted ? full(g.views) : NO_VIEWS; tr.appendChild(v);
+      var v = el('td', 'num', g.counted ? fmt(g.sum) : '—'); v.title = g.counted ? full(g.sum) : missingNote(); tr.appendChild(v);
       var gn = el('td', 'num' + (g.gained > 0 ? ' up' : ''), (g.gained > 0 ? '+' : '') + fmt(g.gained)); gn.title = full(g.gained); tr.appendChild(gn);
       body.appendChild(tr);
     });
@@ -498,12 +519,13 @@
       return !query || [post.data.title, post.creator, post.handle, post.school, post.data.url, PLATFORMS[post.data.platform]].join(' ').toLowerCase().indexOf(query) > -1;
     });
     var rate = function (post) { return post.latest.views ? engagement(post.latest) / post.latest.views : -1; };
-    var seen = function (post) { return hasViews(post) ? post.latest.views : -1; };
+    var seen = function (post, m) { return has(post, m) ? post.latest[m] : -1; };
     rows.sort(function (a, b) {
       if (sort === 'gained') return b.gained - a.gained;
       if (sort === 'engagement') return rate(b) - rate(a);
       if (sort === 'newest') return b.posted - a.posted;
-      return seen(b) - seen(a);
+      if (sort === 'likes') return seen(b, 'likes') - seen(a, 'likes');
+      return seen(b, 'views') - seen(a, 'views');
     });
     $('posts-table').hidden = !rows.length;
     $('posts-empty').hidden = rows.length > 0;
@@ -538,10 +560,12 @@
     if (post.school || post.handle) who.appendChild(el('span', 'muted', [post.handle, post.school].filter(Boolean).join(' · ')));
     tr.appendChild(who);
 
-    if (hasViews(post)) cell(tr, 'num', 'Views', fmt(post.latest.views), full(post.latest.views));
-    else cell(tr, 'num muted', 'Views', '—', NO_VIEWS);
-    if (hasViews(post)) cell(tr, 'num' + (post.gained > 0 ? ' up' : ''), $('posts-gained-head').textContent, (post.gained > 0 ? '+' : '') + fmt(post.gained), full(post.gained));
-    else cell(tr, 'num muted', $('posts-gained-head').textContent, '—', NO_VIEWS);
+    ['views', 'likes'].forEach(function (m) {
+      if (has(post, m)) cell(tr, 'num', metricName(m), fmt(post.latest[m]), full(post.latest[m]));
+      else cell(tr, 'num muted', metricName(m), '—', missingNote(m));
+    });
+    if (has(post)) cell(tr, 'num' + (post.gained > 0 ? ' up' : ''), $('posts-gained-head').textContent, (post.gained > 0 ? '+' : '') + fmt(post.gained), full(post.gained) + ' ' + metric);
+    else cell(tr, 'num muted', $('posts-gained-head').textContent, '—', missingNote());
     cell(tr, 'num', 'Engagement', post.latest.views ? pct(engagement(post.latest) / post.latest.views) : '—',
       full(post.latest.likes) + ' likes · ' + full(post.latest.comments) + ' comments · ' + full(post.latest.shares) + ' shares');
     cell(tr, 'num', 'Updated', post.latest.at ? ago(post.latest.at) : '—', post.latest.at ? new Date(post.latest.at).toLocaleString() : '');
@@ -633,7 +657,7 @@
     var out = {}, names = ['views', 'likes', 'comments', 'shares'];
     for (var i = 0; i < names.length; i++) {
       var input = $(prefix + names[i]), raw = input.value.trim();
-      if (!raw) { if (names[i] === 'views' && required) return { error: 'Add the view count.', input: input }; out[names[i]] = 0; continue; }
+      if (!raw) { if (names[i] === 'views' && required) return { error: 'Add the view count.', input: input }; continue; }
       var n = Number(raw);
       if (!isFinite(n) || n < 0 || n % 1 || n > 1e11) return { error: 'Numbers are whole and 0 or more.', input: input };
       out[names[i]] = n;
@@ -690,7 +714,7 @@
     $('n-date').value = dateInput(Date.now());
     $('n-date').max = dateInput(Date.now());
     $('n-date').min = dateInput(post.posted || 0);
-    $('n-views').value = hasViews(post) ? post.latest.views : ''; $('n-likes').value = post.latest.likes;
+    $('n-views').value = has(post, 'views') ? post.latest.views : ''; $('n-likes').value = has(post, 'likes') ? post.latest.likes : '';
     $('n-comments').value = post.latest.comments; $('n-shares').value = post.latest.shares;
     document.querySelectorAll('#numbers-form [aria-invalid]').forEach(function (n) { n.removeAttribute('aria-invalid'); });
     setError('numbers-error');
@@ -763,6 +787,41 @@
     catch (error) { failed(error); }
   }
 
+  // ---------- followers: one count a day for each tracked account ----------
+
+  function dayTime(key) { return new Date(key + 'T12:00').getTime(); }
+  // an account's newest count and its change since the range began (or since its first count, if later)
+  function followerStats(c, p, start) {
+    var latest = c && c.followers && c.followers[p], now = latest ? known(latest.count) : null;
+    if (now === null) return null;
+    var log = (c.followers_log && c.followers_log[p]) || {};
+    var days = Object.keys(log).filter(function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d) && known(log[d]) !== null; }).sort(), base = null;
+    days.forEach(function (d) { if (dayTime(d) <= start) base = d; });
+    if (!base) base = days[0];
+    return { count: now, at: Number(latest.at) || 0, change: base ? now - known(log[base]) : 0, since: base ? dayTime(base) : 0 };
+  }
+  // a change only means something once there is a count from an earlier day
+  function counted(f) { return f.since && startOfDay(f.since) < startOfDay(Date.now()); }
+  function change(n) { return (n < 0 ? '−' : '+') + fmt(Math.abs(n)); }
+
+  function renderFollowers(start) {
+    var total = 0, delta = 0, since = 0, accounts = 0;
+    Object.keys(creators).forEach(function (id) {
+      ['tiktok', 'instagram'].forEach(function (p) {
+        if (platform !== 'all' && platform !== p) return;
+        var f = followerStats(creators[id], p, start);
+        if (!f) return;
+        accounts++; total += f.count;
+        if (counted(f)) { delta += f.change; since = since ? Math.min(since, f.since) : f.since; }
+      });
+    });
+    $('k-followers').textContent = accounts ? fmt(total) : '—';
+    $('k-followers').title = accounts ? full(total) + ' followers across ' + accounts + (accounts === 1 ? ' tracked account' : ' tracked accounts') : '';
+    $('k-followers-sub').textContent = !accounts ? 'none counted yet'
+      : since ? change(delta) + ' since ' + shortDay(since)
+      : accounts + (accounts === 1 ? ' account' : ' accounts') + ' · first count today';
+  }
+
   // ---------- tracked creators ----------
 
   var HANDLE = { tiktok: /^[A-Za-z0-9._]{2,24}$/, instagram: /^[A-Za-z0-9._]{1,30}$/ };
@@ -787,6 +846,7 @@
 
   function renderTracked() {
     var body = $('tracked-rows'), ids = Object.keys(creators).sort(function (a, b) { return String(creators[a].name).localeCompare(String(creators[b].name)); });
+    var start = range ? Date.now() - range * DAY : -Infinity;
     body.textContent = '';
     $('tracked-table').hidden = !ids.length; $('tracked-empty').hidden = !!ids.length; $('check-all').hidden = !ids.length;
     ids.forEach(function (id) {
@@ -800,13 +860,21 @@
         var url = c[platform] && safeLink(c[platform]);
         if (url) { var a = el('a', 'handle', handleOf(c[platform])); a.href = url.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; td.appendChild(a); }
         else td.appendChild(el('span', 'muted', '—'));
+        var f = url && followerStats(c, platform, start);
+        if (f) {
+          var line = el('span', 'followers', full(f.count) + (f.count === 1 ? ' follower' : ' followers') + (counted(f) ? ' · ' + change(f.change) + ' since ' + shortDay(f.since) : ''));
+          line.title = full(f.count) + ' followers, counted ' + longDay(f.at);
+          td.appendChild(line);
+        }
         if (c[platform + '_result']) td.appendChild(el('span', 'muted', c[platform + '_result']));
         tr.appendChild(td);
       });
       cell(tr, 'num', 'Posts', mine.length);
-      var views = mine.reduce(function (s, p) { return s + viewsOf(p); }, 0), counted = mine.filter(hasViews).length;
-      if (mine.length && !counted) cell(tr, 'num muted', 'Views', '—', NO_VIEWS);
-      else cell(tr, 'num', 'Views', fmt(views), full(views) + (counted < mine.length ? ' · ' + (mine.length - counted) + ' posts without views' : ''));
+      ['likes', 'views'].forEach(function (m) {
+        var sum = mine.reduce(function (s, p) { return s + valueOf(p, m); }, 0), known = mine.filter(function (p) { return has(p, m); }).length;
+        if (mine.length && !known) cell(tr, 'num muted', metricName(m), '—', missingNote(m));
+        else cell(tr, 'num', metricName(m), fmt(sum), full(sum) + (known < mine.length ? ' · ' + (mine.length - known) + ' posts without ' + m : ''));
+      });
       var status = el('td', 'status'), busy = checking(id);
       status.dataset.label = 'Last checked';
       if (busy.length) { status.classList.add('busy'); status.textContent = 'Checking now…'; status.appendChild(el('small', '', 'started ' + ago(Math.min.apply(null, busy.map(function (b) { return b.started_at; }))) + ', results land within ~30 min')); }
@@ -863,7 +931,13 @@
     var save = $('creator-save'); save.disabled = true;
     try {
       var id = editingCreator;
-      if (id) await db('PATCH', '/content_creators/' + id, details);
+      if (id) {
+        var before = creators[id] || {}, patch = Object.assign({}, details);
+        ['tiktok', 'instagram'].forEach(function (p) {
+          if ((before[p] || null) !== details[p]) { patch['followers/' + p] = null; patch['followers_log/' + p] = null; }
+        });
+        await db('PATCH', '/content_creators/' + id, patch);
+      }
       else {
         id = newId();
         var body = { created_at: { '.sv': 'timestamp' } };
@@ -936,6 +1010,17 @@
   }
 
   // ---------- controls ----------
+
+  function setMetric(value) {
+    metric = value === 'likes' ? 'likes' : 'views';
+    try { localStorage.setItem(METRIC_KEY, metric); } catch (e) {}
+    document.querySelectorAll('#metrics button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.metric === metric)); });
+    if ($('sort').value === 'views' || $('sort').value === 'likes') $('sort').value = metric;
+  }
+  try { setMetric(localStorage.getItem(METRIC_KEY)); } catch (e) { setMetric('views'); }
+  document.querySelectorAll('#metrics button').forEach(function (button) {
+    button.addEventListener('click', function () { setMetric(button.dataset.metric); if (window.contentAuth.signedIn()) render(); });
+  });
 
   document.querySelectorAll('#ranges button').forEach(function (button) {
     button.addEventListener('click', function () {

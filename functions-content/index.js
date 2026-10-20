@@ -3,9 +3,10 @@
 // project's other functions.
 //
 //   contentTrackDaily  every day at 9 AM ET: asks Bright Data for each tracked
-//                      creator's latest TikTok and Instagram posts
+//                      creator's latest TikTok and Instagram posts, and for
+//                      each account's profile (its follower count)
 //   contentCollect     every 15 minutes: picks up finished Bright Data
-//                      snapshots and writes posts and numbers (track.js)
+//                      snapshots and writes posts, numbers and followers (track.js)
 //   contentTrackNow    POST /campus/api/track (Hosting rewrite), team only:
 //                      the same request for one creator or everyone, now
 //
@@ -18,7 +19,7 @@ import { defineSecret } from 'firebase-functions/params';
 import { initializeApp } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
 import { getAuth } from 'firebase-admin/auth';
-import { DATASETS, POSTS_PER_PROFILE, normalizeProfile, plan, summary } from './track.js';
+import { DATASETS, PROFILES, POSTS_PER_PROFILE, normalizeProfile, plan, followerPlan, summary } from './track.js';
 
 initializeApp();
 setGlobalOptions({ region: 'us-central1', maxInstances: 2 });
@@ -69,7 +70,15 @@ async function startChecks(only) {
       const message = problem(res);
       list.forEach(x => { updates[`content_creators/${x.id}/last_error`] = message; updates[`content_creators/${x.id}/last_checked_at`] = now; });
       updates['content_sync/last_error'] = { at: now, message };
+      continue;
     }
+    // followers: a second, quiet job; a failure here leaves yesterday's count in place
+    const prof = await brightData('POST', `/datasets/v3/trigger?dataset_id=${PROFILES[platform].id}&include_errors=true`,
+      list.map(x => ({ url: x.profile.url })));
+    const profSnapshot = prof.json && prof.json.snapshot_id;
+    if (profSnapshot && /^[A-Za-z0-9_-]{4,80}$/.test(profSnapshot)) {
+      updates[`content_sync/pending/${profSnapshot}`] = { platform, kind: 'profiles', started_at: now, creators: list.map(x => x.id).join(',') };
+    } else console.warn('profiles trigger failed', platform, prof.status);
   }
   if (Object.keys(updates).length) await db.ref().update(updates);
   return started;
@@ -81,9 +90,11 @@ async function collect() {
   const pending = (await db.ref('content_sync/pending').get()).val() || {};
   for (const [snapshot, info] of Object.entries(pending)) {
     const ids = String(info.creators || '').split(',').filter(Boolean);
+    const profiles = info.kind === 'profiles';
     const now = Date.now(), updates = {};
     const fail = message => {
       updates[`content_sync/pending/${snapshot}`] = null;
+      if (profiles) return; // the posts job reports problems on each creator's row
       ids.forEach(id => { updates[`content_creators/${id}/last_error`] = message; updates[`content_creators/${id}/last_checked_at`] = now; });
     };
     if (now - Number(info.started_at || 0) > PENDING_TTL) { fail('Bright Data didn\'t finish within a day.'); await db.ref().update(updates); continue; }
@@ -93,11 +104,19 @@ async function collect() {
     if (status !== 'ready') continue;
     const data = await brightData('GET', `/datasets/v3/snapshot/${snapshot}?format=json`);
     if (data.status !== 200 || !Array.isArray(data.json)) continue;
+    if (profiles) {
+      const creators = (await db.ref('content_creators').get()).val() || {};
+      Object.assign(updates, followerPlan({ creators, platform: info.platform, rows: data.json, now }));
+      updates[`content_sync/pending/${snapshot}`] = null;
+      await db.ref().update(updates);
+      continue;
+    }
     const [creators, posts] = await Promise.all([db.ref('content_creators').get(), db.ref('content_posts').get()]);
     const rows = data.json.map(row => ({ platform: info.platform, row, input: (row.input && row.input.url) || (row.discovery_input && row.discovery_input.url) || '' }));
     const result = plan({ creators: creators.val() || {}, posts: posts.val() || {}, rows, now });
     Object.assign(updates, result.updates);
-    ids.forEach(id => {
+    // a creator removed while the check ran stays removed
+    ids.filter(id => (creators.val() || {})[id]).forEach(id => {
       updates[`content_creators/${id}/last_checked_at`] = now;
       updates[`content_creators/${id}/${info.platform}_result`] = summary(result.report[id], info.platform);
       updates[`content_creators/${id}/last_error`] = null;

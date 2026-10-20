@@ -256,6 +256,20 @@
         "tiktok_result": { ".validate": "newData.isString() && newData.val().length <= 200" },
         "instagram_result": { ".validate": "newData.isString() && newData.val().length <= 200" },
         "last_error": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "followers": {
+          "$platform": {
+            ".validate": "$platform.matches(/^(tiktok|instagram)$/) && newData.hasChildren(['count','at'])",
+            "count": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000000 && newData.val() % 1 == 0" },
+            "at": { ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000" },
+            "$other": { ".validate": false }
+          }
+        },
+        "followers_log": {
+          "$platform": {
+            ".validate": "$platform.matches(/^(tiktok|instagram)$/)",
+            "$day": { ".validate": "$day.matches(/^20[0-9][0-9]-[01][0-9]-[0-3][0-9]$/) && newData.isNumber() && newData.val() >= 0 && newData.val() <= 10000000000 && newData.val() % 1 == 0" }
+          }
+        },
         "$other": { ".validate": false }
       }
     },

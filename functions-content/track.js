@@ -1,11 +1,17 @@
 // Content tracking for the campus media CRM: turns Bright Data's TikTok and
 // Instagram scraper rows into RTDB content_posts (new videos) and dated
-// snapshots (numbers for videos already known). Pure functions only, so the
+// snapshots (numbers for videos already known), and profile rows into each
+// tracked account's daily follower count. Pure functions only, so the
 // logic is tested offline (track.test.mjs); index.js does the I/O.
 
 export const DATASETS = {
   tiktok: { id: 'gd_lu702nij2f790tmv9h', name: 'TikTok - Posts', discoverBy: 'profile_url' },
   instagram: { id: 'gd_lyclm20il4r5helnj', name: 'Instagram - Reels', discoverBy: 'url' }
+};
+// follower counts come from each account's profile, one row per account
+export const PROFILES = {
+  tiktok: { id: 'gd_l1villgoiiidt09ci', name: 'TikTok - Profiles' },
+  instagram: { id: 'gd_l1vikfch901nx3by4', name: 'Instagram - Profiles' }
 };
 export const POSTS_PER_PROFILE = 8;
 // a second run within this window updates the last snapshot instead of adding one
@@ -164,6 +170,36 @@ export function plan({ creators, posts, rows, now, rand = Math.random }) {
     }
   }
   return { updates, report };
+}
+
+// ---------- followers ----------
+
+// the team's calendar day for a count (one follower count per account per day)
+export function dayKey(now, timeZone = 'America/New_York') {
+  return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(now));
+}
+
+// profile rows to follower counts: content_creators/<id>/followers/<platform> holds
+// the newest count, followers_log/<platform>/<day> one count a day
+export function followerPlan({ creators, platform, rows, now }) {
+  const updates = {}, byHandle = {};
+  for (const [id, c] of Object.entries(creators || {})) {
+    const p = c && c[platform] ? normalizeProfile(platform, c[platform]) : null;
+    if (p) byHandle[p.handle.toLowerCase()] = id;
+  }
+  const day = dayKey(now);
+  for (const row of rows || []) {
+    if (!row || row.error || row.error_code) continue;
+    const followers = sent(row.followers);
+    if (followers === undefined) continue;
+    const profile = [row.input && row.input.url, row.url, row.profile_url].map(v => normalizeProfile(platform, v)).find(Boolean);
+    const handle = (profile ? profile.handle : String((platform === 'tiktok' ? row.account_id : row.account) || '')).toLowerCase();
+    const id = byHandle[handle];
+    if (!id) continue;
+    updates[`content_creators/${id}/followers/${platform}`] = { count: followers, at: now };
+    updates[`content_creators/${id}/followers_log/${platform}/${day}`] = followers;
+  }
+  return updates;
 }
 
 // the line each creator shows under their handle; only reels are collected on Instagram
