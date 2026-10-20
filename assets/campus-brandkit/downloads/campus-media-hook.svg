@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-labelledby="title description">
+  <title id="title">fomo campus — hook shade, reels and tiktok overlay</title>
+  <desc id="description">A soft fomo ink shade over the top half, so white hook text typed in the app reads on any footage. 1080 × 1920, 9:16. Transparent: place it on its own overlay track and stretch it to fill the frame. Use: first 1–3 seconds.</desc>
+  <metadata>Text box for Reels and TikTok: 72 px left, 180 px right, 270 px top, 480 px bottom. Type hooks and captions in the app you post to (Instagram: Modern; TikTok: Classic), white and lowercase. The fomo wordmark and campus mark paths are unchanged from the masters; keep them flat. Editable Aeonik text.</metadata>
+  <defs>
+    <style>text{font-family:Aeonik,Arial,sans-serif}</style>
+    
+    
+    <linearGradient id="shade-top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B091F" stop-opacity="0.66"/><stop offset="0.5" stop-color="#0B091F" stop-opacity="0.3"/><stop offset="1" stop-color="#0B091F" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect id="hook-shade" width="1080" height="1060" fill="url(#shade-top)"/>
+</svg>

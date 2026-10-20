@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-labelledby="title description">
+  <title id="title">fomo campus — call to action, reels and tiktok overlay</title>
+  <desc id="description">dm “fomo” to get the link over a soft ink shade, with the hand-drawn arrow sweeping down-left toward the handle. 1080 × 1920, 9:16. Transparent: place it on its own overlay track and stretch it to fill the frame. Use: last 3 seconds.</desc>
+  <metadata>Text box for Reels and TikTok: 72 px left, 180 px right, 270 px top, 480 px bottom. Type hooks and captions in the app you post to (Instagram: Modern; TikTok: Classic), white and lowercase. The fomo wordmark and campus mark paths are unchanged from the masters; keep them flat. Editable Aeonik text.</metadata>
+  <defs>
+    <style>text{font-family:Aeonik,Arial,sans-serif}</style>
+    
+    
+    <linearGradient id="shade-bottom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B091F" stop-opacity="0"/><stop offset="0.4" stop-color="#0B091F" stop-opacity="0.45"/><stop offset="1" stop-color="#0B091F" stop-opacity="0.72"/></linearGradient>
+  </defs>
+  <rect id="cta-shade" y="960" width="1080" height="960" fill="url(#shade-bottom)"/>
+  <g id="call-to-action">
+    <text x="900" y="1392" font-size="40" font-weight="500" fill="#FFFFFF" text-anchor="end">dm “fomo” to get the link</text>
+    <path id="cta-arrow" d="M157 0C142.5 34.5 97.5 72 0 87M26 65L0 87L30 104" transform="translate(250 1334) scale(1.1)" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

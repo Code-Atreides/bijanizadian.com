@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1080" height="1920" viewBox="0 0 1080 1920" role="img" aria-labelledby="title description">
+  <title id="title">fomo campus — safe-zone guide, reels and tiktok overlay</title>
+  <desc id="description">A placement guide: the app header, button rail, and caption zones shaded, with the text box outlined. Never export it. 1080 × 1920, 9:16. Transparent: place it on its own overlay track and stretch it to fill the frame. Use: while placing text, then delete.</desc>
+  <metadata>Text box for Reels and TikTok: 72 px left, 180 px right, 270 px top, 480 px bottom. Type hooks and captions in the app you post to (Instagram: Modern; TikTok: Classic), white and lowercase. The fomo wordmark and campus mark paths are unchanged from the masters; keep them flat. Editable Aeonik text.</metadata>
+  <defs>
+    <style>text{font-family:Aeonik,Arial,sans-serif}</style>
+    
+    
+    
+  </defs>
+  <g id="zones" fill="#0B091F" fill-opacity=".55">
+    <rect width="1080" height="270"/>
+    <rect y="1440" width="1080" height="480"/>
+    <rect x="900" y="270" width="180" height="1170"/>
+    <rect y="270" width="72" height="1170" fill-opacity=".3"/>
+  </g>
+  <g id="zone-labels">
+    <text x="540" y="150" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="middle">app header · 270 px</text>
+    <text x="540" y="1700" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="middle">caption · handle · audio · 480 px</text>
+    <text x="990" y="866" font-size="32" font-weight="500" fill="#FFFFFF" text-anchor="middle" transform="rotate(-90 990 855)">buttons · 180 px</text>
+  </g>
+  <rect id="text-box" x="72" y="270" width="828" height="1170" fill="none" stroke="#ACB8F9" stroke-width="3" stroke-dasharray="14 10"/>
+  <g id="text-box-label">
+    <rect x="84" y="288" width="284" height="56" rx="12" fill="#0B091F" fill-opacity=".6"/>
+    <text x="104" y="327" font-size="32" font-weight="500" fill="#FFFFFF">keep text in here</text>
+  </g>
+</svg>
