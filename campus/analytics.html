@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Campus media analytics | fomo campus</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script src="/assets/content-auth.js?v=1" defer></script>
+<script src="/assets/content-analytics.js?v=1" defer></script>
+<!--
+  Campus media analytics, the performance side of the media CRM: every posted
+  video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
+  Each update is a dated snapshot in RTDB content_posts/<id>/snapshots, so the
+  page can chart growth; latest holds the newest snapshot for quick totals.
+  Platforms don't let a site read view counts without app approval, so numbers
+  are logged by hand. Team-only, like /campus/submissions: same sign-in
+  (assets/content-auth.js), same database rule, and no inline script, so the
+  page's Content-Security-Policy (firebase.json) keeps scripts to this origin.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --input: #d9ddea; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+    --grid: #eef0f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a, input, select { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  h1:focus, h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: 26px; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
+  .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
+  .pages a:hover { color: var(--ink); }
+  .pages a[aria-current="page"] { background: #fff; color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
+  .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
+  .text-button:hover { background: var(--lavender); }
+  .text-button.danger { color: #9b362e; }
+  .text-button.danger:hover { background: #fff1ef; }
+
+  main { flex: 1 0 auto; }
+
+  /* ---------- sign in ---------- */
+  .signin { max-width: 420px; margin: 9vh auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .signin-head { background: var(--lavender); padding: 24px 28px 22px; }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  .signin h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; margin-top: 12px; }
+  .signin h1 span { color: var(--blue); }
+  .signin-body { padding: 22px 28px 24px; }
+  .signin-body p { font-size: 14px; line-height: 1.55; color: var(--muted); margin-bottom: 14px; }
+  .field { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 12px; min-width: 0; }
+  .field span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 4px; }
+  .field input, .field select, .search input {
+    display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field select:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .field input[aria-invalid="true"] { border-color: #d0574b; }
+  .primary-action {
+    display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 8px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action:disabled { opacity: .7; cursor: progress; }
+  .primary-action.small { width: auto; height: 38px; padding: 0 14px; font-size: 13.5px; }
+  .notice { font-size: 13px; line-height: 1.5; margin-top: 12px; color: var(--blue-text); min-height: 20px; }
+  .notice.is-error { color: #9b362e; }
+
+  /* ---------- head, tools and the one filter row ---------- */
+  .queue-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px 0 16px; flex-wrap: wrap; }
+  .queue-head .eyebrow { margin-bottom: 8px; }
+  .queue-head h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; }
+  .queue-head p { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .option {
+    display: flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 13px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    font: inherit; font-size: 13.5px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background .15s;
+  }
+  .option:hover { background: var(--lavender); }
+  .option.icon { width: 38px; padding: 0; }
+  .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .segmented { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; }
+  .segmented button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 34px; padding: 0 12px; }
+  .segmented button + button { border-left: 1px solid var(--option-line); }
+  .segmented button:hover { color: var(--ink); background: var(--tint); }
+  .segmented button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
+  .filters select { height: 36px; border: 1px solid var(--option-line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); padding: 0 10px; }
+  .queue-error { font-size: 13.5px; line-height: 1.5; background: #fff1ef; padding: 10px 12px; border-radius: 6px; color: #9b362e; margin: 0 0 12px; }
+  .refetching { opacity: .55; transition: opacity .2s; }
+
+  /* ---------- stat tiles ---------- */
+  .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 13px 14px; min-width: 0; }
+  .stat span { display: block; font-size: 12.5px; color: var(--muted); }
+  .stat strong { display: block; font-size: 28px; font-weight: 500; letter-spacing: -.8px; line-height: 1.15; margin-top: 4px; }
+  .stat small { display: block; font-size: 12px; color: var(--muted-2); margin-top: 2px; }
+  .stat.hero { background: var(--lavender); border-color: var(--option-line); }
+  .stat.hero strong { color: var(--blue-text); }
+
+  /* ---------- cards ---------- */
+  .row { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); gap: 14px; margin-bottom: 14px; }
+  .row.even { grid-template-columns: 1fr 1fr; }
+  .card { border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; min-width: 0; background: #fff; }
+  .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .card h2 { font-size: 15.5px; font-weight: 500; letter-spacing: -.2px; }
+  .card-head p { font-size: 12.5px; color: var(--muted-2); }
+  .card-note { font-size: 12px; color: var(--faint); margin-top: 10px; line-height: 1.5; }
+
+  /* line chart: one series, fomo blue, a 10% wash, hairline grid, crosshair */
+  .chart { position: relative; }
+  .chart svg { width: 100%; height: 230px; overflow: visible; }
+  .chart .grid line { stroke: var(--grid); stroke-width: 1; }
+  .chart .tick { font-size: 11px; fill: var(--faint); font-variant-numeric: tabular-nums; }
+  .chart .area { fill: rgba(81,106,246,.1); }
+  .chart .line { fill: none; stroke: var(--blue); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .chart .end { fill: var(--blue); stroke: #fff; stroke-width: 2; }
+  .chart .end-label { font-size: 12px; font-weight: 500; fill: var(--ink); }
+  .chart .cross { stroke: var(--panel-rule); stroke-width: 1; }
+  .chart .cross-dot { fill: var(--blue); stroke: #fff; stroke-width: 2; }
+  .chart svg:focus { outline: none; }
+  .chart svg:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; border-radius: 4px; }
+  .tip { position: absolute; top: 0; pointer-events: none; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; box-shadow: 0 8px 24px -10px rgba(11,9,31,.25); white-space: nowrap; translate: -50% 0; }
+  .tip strong { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; }
+  .tip strong::before { content: ""; width: 12px; height: 2px; border-radius: 2px; background: var(--blue); }
+  .tip span { display: block; font-size: 12px; color: var(--muted-2); margin-top: 1px; }
+  .chart-empty { height: 230px; display: flex; align-items: center; justify-content: center; text-align: center; color: var(--muted-2); font-size: 14px; border: 1px dashed var(--line); border-radius: 8px; }
+
+  /* bars: one hue for every platform, value at the tip */
+  .bars { list-style: none; display: grid; gap: 12px; }
+  .bars li { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 10px; align-items: center; font-size: 13px; }
+  .bars .name { color: var(--muted); }
+  .bars .track { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .bars .bar { height: 14px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--blue); }
+  .bars .val { font-weight: 500; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bars .sub { color: var(--faint); font-weight: 400; margin-left: 4px; }
+
+  /* tables */
+  .table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .table th { text-align: left; font-size: 11px; letter-spacing: 1.1px; font-weight: 500; color: var(--faint); text-transform: uppercase; padding: 0 10px 8px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .table td { padding: 10px 10px 10px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: #50566e; line-height: 1.4; }
+  .table tr:last-child td { border-bottom: 0; }
+  .table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table th.num { text-align: right; }
+  .table td strong { display: block; font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+  .table td a { color: var(--blue-text); text-decoration: none; }
+  .table td a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .table .up { color: var(--ink); font-weight: 500; }
+  .table .actions { white-space: nowrap; text-align: right; padding-right: 0; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: .3px; color: var(--blue-text); background: var(--lavender); border-radius: 99px; padding: 2px 8px; margin-right: 6px; vertical-align: 1px; }
+  .muted { color: var(--faint); }
+  .posts-tools { display: flex; gap: 8px; align-items: center; }
+  .search { position: relative; width: 220px; }
+  .search input { margin: 0; min-height: 34px; padding: 6px 10px 6px 30px; font-size: 13.5px; }
+  .search svg { position: absolute; left: 10px; top: 10px; color: var(--faint); }
+  .posts-tools select { height: 34px; border: 1px solid var(--option-line); border-radius: 7px; background: #fff; font: inherit; font-size: 13px; padding: 0 8px; }
+  .empty { text-align: center; padding: 36px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+  .empty strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .empty .primary-action { margin: 14px auto 0; }
+
+  /* ---------- dialogs ---------- */
+  dialog { margin: auto; border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(11,9,31,.45); }
+  dialog::backdrop { background: rgba(11,9,31,.42); }
+  .dlg { padding: 22px 24px 20px; }
+  .dlg h2 { font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
+  .dlg .lede { font-size: 13.5px; color: var(--muted); margin: 4px 0 16px; overflow-wrap: anywhere; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .fieldset-title { font-size: 11.5px; letter-spacing: 1.4px; font-weight: 500; color: #4a558b; margin: 6px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .dlg-actions .primary-action { width: auto; padding: 0 18px; }
+  .dlg-error { font-size: 13px; color: #9b362e; min-height: 18px; margin-top: 4px; }
+  .history { list-style: none; margin-top: 4px; max-height: 190px; overflow-y: auto; border-top: 1px solid var(--line); }
+  .history li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: #50566e; font-variant-numeric: tabular-nums; }
+  .history li b { font-weight: 500; color: var(--ink); }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 28px 0 16px; line-height: 1.6; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 24px; }
+    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .row, .row.even { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .queue-head { align-items: start; }
+    .posts-tools { flex-wrap: wrap; }
+    .search { width: auto; flex: 1; }
+    /* posts read as cards on a phone */
+    .posts thead { display: none; }
+    .posts tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .posts tr:last-child { border-bottom: 0; }
+    .posts td { border: 0; padding: 0; text-align: left !important; }
+    .posts td:nth-child(1), .posts td:nth-child(2) { grid-column: 1 / -1; }
+    .posts td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+    .posts td.actions { grid-column: 1 / -1; margin-top: 4px; }
+    .quad { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 54px; gap: 10px; }
+    .brand svg { width: 64px; height: 21px; }
+    .brand > span { display: none; }
+    .pages { margin-left: 0; }
+    .account span { display: none; }
+    .signin { margin-top: 4vh; }
+    .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
+    .queue-head h1 { font-size: 28px; }
+    .kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .kpis .stat:first-child { grid-column: 1 / -1; }
+    .stat strong { font-size: 24px; }
+    .card { padding: 14px; }
+    .tool-label { display: none; }
+    .pair { grid-template-columns: 1fr; gap: 0; }
+    .dlg { padding: 18px 16px 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <nav class="pages" aria-label="Media CRM">
+      <a href="/campus/submissions">Queue</a>
+      <a href="/campus/analytics" aria-current="page">Analytics</a>
+    </nav>
+    <div class="account" id="account" hidden>
+      <span id="account-email"></span>
+      <button type="button" class="text-button" id="sign-out">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- signed out: the same emailed sign-in link as the queue -->
+    <section class="signin" id="signin" hidden aria-labelledby="signin-title">
+      <div class="signin-head">
+        <span class="eyebrow">TEAM ONLY</span>
+        <h1 id="signin-title" tabindex="-1">Media <span>analytics.</span></h1>
+      </div>
+      <div class="signin-body">
+        <form id="link-form" novalidate>
+          <p>Sign in with the team email to see how campus media is performing.</p>
+          <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
+        </form>
+        <form id="finish-form" novalidate hidden>
+          <p>Confirm the email address that got the sign-in link.</p>
+          <label class="field">Email<input id="finish-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="finish-send">Finish signing in</button>
+        </form>
+        <p class="notice" id="signin-notice" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- signed in: the dashboard -->
+    <section id="analytics" hidden aria-labelledby="an-title">
+      <div class="queue-head">
+        <div>
+          <span class="eyebrow">CAMPUS MEDIA · TEAM ONLY</span>
+          <h1 id="an-title" tabindex="-1">Analytics</h1>
+          <p id="an-summary">Loading…</p>
+        </div>
+        <div class="tools">
+          <button type="button" class="primary-action small" id="log-post"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Log a post</button>
+          <button type="button" class="option" id="export" title="Download every snapshot as a spreadsheet"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="tool-label">Export CSV</span></button>
+          <button type="button" class="option icon" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg></button>
+        </div>
+      </div>
+
+      <!-- one filter row: everything below re-renders against it -->
+      <div class="filters">
+        <div class="segmented" id="ranges" role="group" aria-label="Date range">
+          <button type="button" data-range="7" aria-pressed="false">7 days</button>
+          <button type="button" data-range="30" aria-pressed="true">30 days</button>
+          <button type="button" data-range="90" aria-pressed="false">90 days</button>
+          <button type="button" data-range="0" aria-pressed="false">All time</button>
+        </div>
+        <select id="platform" aria-label="Platform">
+          <option value="all">All platforms</option>
+          <option value="tiktok">TikTok</option>
+          <option value="instagram">Instagram</option>
+          <option value="youtube">YouTube</option>
+          <option value="x">X</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <p class="queue-error" id="an-error" role="alert" hidden></p>
+
+      <div id="board">
+        <div class="kpis">
+          <div class="stat hero"><span id="k-gained-label">Views gained · last 30 days</span><strong id="k-gained">0</strong><small id="k-gained-sub">&nbsp;</small></div>
+          <div class="stat"><span>Total views</span><strong id="k-views">0</strong><small>all time</small></div>
+          <div class="stat"><span>Posts tracked</span><strong id="k-posts">0</strong><small id="k-posts-sub">&nbsp;</small></div>
+          <div class="stat"><span>Avg views per post</span><strong id="k-avg">0</strong><small>all time</small></div>
+          <div class="stat"><span>Engagement rate</span><strong id="k-eng">—</strong><small>likes, comments, shares ÷ views</small></div>
+        </div>
+
+        <div class="row">
+          <section class="card" aria-labelledby="c-time">
+            <div class="card-head">
+              <h2 id="c-time">Total views over time</h2>
+              <button type="button" class="text-button" id="time-toggle" aria-pressed="false">Show as table</button>
+            </div>
+            <div class="chart" id="time-chart"></div>
+            <div id="time-table-wrap" hidden></div>
+            <p class="card-note">Between two updates, a post's views are drawn as a straight line.</p>
+          </section>
+          <section class="card" aria-labelledby="c-platform">
+            <div class="card-head"><h2 id="c-platform">Views by platform</h2><p>all time</p></div>
+            <ul class="bars" id="platform-bars"></ul>
+          </section>
+        </div>
+
+        <div class="row even">
+          <section class="card" aria-labelledby="c-creators">
+            <div class="card-head"><h2 id="c-creators">Top creators</h2><p id="c-creators-sub">by views</p></div>
+            <table class="table"><thead><tr><th scope="col">Creator</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="creators-gained-head">Gained</th></tr></thead><tbody id="creator-rows"></tbody></table>
+          </section>
+          <section class="card" aria-labelledby="c-schools">
+            <div class="card-head"><h2 id="c-schools">Top schools</h2><p>by views</p></div>
+            <table class="table"><thead><tr><th scope="col">School</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="schools-gained-head">Gained</th></tr></thead><tbody id="school-rows"></tbody></table>
+          </section>
+        </div>
+
+        <section class="card" aria-labelledby="c-posts">
+          <div class="card-head">
+            <h2 id="c-posts">Posts</h2>
+            <div class="posts-tools">
+              <label class="search">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <input id="search" type="search" placeholder="Search posts" aria-label="Search posts" autocomplete="off">
+              </label>
+              <select id="sort" aria-label="Sort posts">
+                <option value="views">Most views</option>
+                <option value="gained">Most gained</option>
+                <option value="engagement">Best engagement</option>
+                <option value="newest">Newest</option>
+              </select>
+            </div>
+          </div>
+          <table class="table posts" id="posts-table">
+            <thead><tr><th scope="col">Post</th><th scope="col">Creator</th><th scope="col" class="num">Views</th><th scope="col" class="num" id="posts-gained-head">Gained</th><th scope="col" class="num">Engagement</th><th scope="col" class="num">Updated</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
+            <tbody id="post-rows"></tbody>
+          </table>
+          <div class="empty" id="posts-empty" hidden>
+            <strong id="posts-empty-title">No posts logged yet.</strong>
+            <span id="posts-empty-text">Log a posted video with its link and today's numbers. Each update after that adds a dated point.</span>
+            <button type="button" class="primary-action small" id="log-first">Log the first post</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · Team only
+  </footer>
+</div>
+
+<!-- log or edit a post -->
+<dialog id="post-dialog" aria-labelledby="post-dialog-title">
+  <form class="dlg" id="post-form" method="dialog" novalidate>
+    <h2 id="post-dialog-title">Log a post</h2>
+    <p class="lede" id="post-dialog-lede">Paste the link to the posted video, then today's numbers.</p>
+    <label class="field">From a submission <span>optional</span>
+      <select id="f-submission"><option value="">None</option></select>
+    </label>
+    <label class="field">Post link<input id="f-url" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="500" placeholder="tiktok.com/@…/video/…"></label>
+    <div class="pair">
+      <label class="field">Platform
+        <select id="f-platform"><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="youtube">YouTube</option><option value="x">X</option><option value="other">Other</option></select>
+      </label>
+      <label class="field">Posted on<input id="f-posted" type="date"></label>
+    </div>
+    <label class="field">Title<input id="f-title" maxlength="120" placeholder="What the video is"></label>
+    <div class="pair">
+      <label class="field">Creator <span>optional</span><input id="f-creator" maxlength="100" list="creator-list" autocomplete="off"></label>
+      <label class="field">School <span>optional</span><input id="f-school" maxlength="120" list="school-list" autocomplete="off"></label>
+    </div>
+    <div id="f-numbers">
+      <p class="fieldset-title">NUMBERS RIGHT NOW</p>
+      <div class="quad">
+        <label class="field">Views<input id="f-views" type="number" inputmode="numeric" min="0" step="1"></label>
+        <label class="field">Likes<input id="f-likes" type="number" inputmode="numeric" min="0" step="1"></label>
+        <label class="field">Comments<input id="f-comments" type="number" inputmode="numeric" min="0" step="1"></label>
+        <label class="field">Shares<input id="f-shares" type="number" inputmode="numeric" min="0" step="1"></label>
+      </div>
+    </div>
+    <p class="dlg-error" id="post-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="post-save">Save post</button>
+    </div>
+  </form>
+</dialog>
+<datalist id="creator-list"></datalist>
+<datalist id="school-list"></datalist>
+
+<!-- add a dated snapshot -->
+<dialog id="numbers-dialog" aria-labelledby="numbers-title">
+  <form class="dlg" id="numbers-form" method="dialog" novalidate>
+    <h2 id="numbers-title">Update numbers</h2>
+    <p class="lede" id="numbers-lede"></p>
+    <div class="pair">
+      <label class="field">As of<input id="n-date" type="date"></label>
+      <span></span>
+    </div>
+    <div class="quad">
+      <label class="field">Views<input id="n-views" type="number" inputmode="numeric" min="0" step="1"></label>
+      <label class="field">Likes<input id="n-likes" type="number" inputmode="numeric" min="0" step="1"></label>
+      <label class="field">Comments<input id="n-comments" type="number" inputmode="numeric" min="0" step="1"></label>
+      <label class="field">Shares<input id="n-shares" type="number" inputmode="numeric" min="0" step="1"></label>
+    </div>
+    <p class="dlg-error" id="numbers-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="numbers-save">Save numbers</button>
+    </div>
+    <p class="fieldset-title">HISTORY</p>
+    <ul class="history" id="history"></ul>
+  </form>
+</dialog>
+</body>
+</html>

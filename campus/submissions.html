@@ -9,7 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<script src="/assets/content-inbox.js?v=2" defer></script>
+<script src="/assets/content-auth.js?v=1" defer></script>
+<script src="/assets/content-inbox.js?v=3" defer></script>
 <!--
   The back of the edit queue: everything sent from /campus/submit, for the team
   account only. Sign-in is an emailed link, the same as /agencykit, and the
@@ -45,6 +46,10 @@
   .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
   .brand svg { width: 80px; height: 26px; }
   .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
+  .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
+  .pages a:hover { color: var(--ink); }
+  .pages a[aria-current="page"] { background: #fff; color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
   .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
   .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
@@ -178,7 +183,9 @@
     .site-shell { padding: 0 14px; }
     .site-header { height: 54px; }
     .brand svg { width: 70px; height: 23px; }
-    .brand > span { font-size: 21px; }
+    .brand > span { display: none; }
+    .brand svg { width: 64px; height: 21px; }
+    .pages { margin-left: 0; }
     .account span { display: none; }
     .signin { margin-top: 4vh; }
     .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
@@ -220,6 +227,10 @@
       <svg aria-hidden="true"><use href="#wordmark"/></svg>
       <span>/campus</span>
     </a>
+    <nav class="pages" aria-label="Media CRM">
+      <a href="/campus/submissions" aria-current="page">Queue</a>
+      <a href="/campus/analytics">Analytics</a>
+    </nav>
     <div class="account" id="account" hidden>
       <span id="account-email"></span>
       <button type="button" class="text-button" id="sign-out">Sign out</button>
@@ -296,7 +307,7 @@
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submit">Submission form</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/analytics">Analytics</a> · Team only
   </footer>
 </div>
 </body>

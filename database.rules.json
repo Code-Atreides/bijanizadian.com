@@ -147,6 +147,84 @@
         "$other": { ".validate": false }
       }
     },
+    "content_posts": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      "$post": {
+        ".validate": "$post.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['url','platform','title','posted_at','latest'])",
+        "url": {
+          ".validate": "newData.isString() && newData.val().length <= 500 && newData.val().matches(/^https:[/][/][^ ]+$/)"
+        },
+        "platform": {
+          ".validate": "newData.isString() && newData.val().matches(/^(tiktok|instagram|youtube|x|other)$/)"
+        },
+        "title": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 120"
+        },
+        "creator": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "school": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "submission": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/)"
+        },
+        "posted_at": {
+          ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000"
+        },
+        "created_at": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "latest": {
+          ".validate": "newData.hasChildren(['views','at'])",
+          "views": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+          },
+          "likes": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+          },
+          "comments": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+          },
+          "shares": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+          },
+          "at": {
+            ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "snapshots": {
+          "$snap": {
+            ".validate": "$snap.matches(/^[a-z0-9-]{6,24}$/) && newData.hasChildren(['views','at'])",
+            "views": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+            },
+            "likes": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+            },
+            "comments": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+            },
+            "shares": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
+            },
+            "at": {
+              ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000"
+            },
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
     "agencykitWorkspace": {
       ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
       ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com' && newData.exists()",
