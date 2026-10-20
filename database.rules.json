@@ -192,7 +192,7 @@
           ".validate": "newData.isNumber() && newData.val() <= now"
         },
         "latest": {
-          ".validate": "newData.hasChildren(['views','at'])",
+          ".validate": "newData.hasChildren(['at'])",
           "views": {
             ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
           },
@@ -214,7 +214,7 @@
         },
         "snapshots": {
           "$snap": {
-            ".validate": "$snap.matches(/^[a-z0-9-]{6,24}$/) && newData.hasChildren(['views','at'])",
+            ".validate": "$snap.matches(/^[a-z0-9-]{6,24}$/) && newData.hasChildren(['at'])",
             "views": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000000 && newData.val() % 1 == 0"
             },

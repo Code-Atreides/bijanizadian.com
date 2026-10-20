@@ -99,7 +99,7 @@ async function collect() {
     Object.assign(updates, result.updates);
     ids.forEach(id => {
       updates[`content_creators/${id}/last_checked_at`] = now;
-      updates[`content_creators/${id}/${info.platform}_result`] = summary(result.report[id]);
+      updates[`content_creators/${id}/${info.platform}_result`] = summary(result.report[id], info.platform);
       updates[`content_creators/${id}/last_error`] = null;
     });
     updates[`content_sync/pending/${snapshot}`] = null;

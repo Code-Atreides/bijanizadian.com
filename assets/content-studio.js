@@ -122,7 +122,10 @@
 
   function count(v) { v = Number(v); return isFinite(v) && v >= 0 ? Math.floor(v) : 0; }
   function normalize(id, data) {
-    var snaps = Object.keys(data.snapshots || {}).map(function (key) { var s = data.snapshots[key] || {}; return { at: Number(s.at) || 0, views: count(s.views) }; })
+    // only snapshots with views count: tracked Instagram posts have none until the team adds them
+    var snaps = Object.keys(data.snapshots || {}).map(function (key) { return data.snapshots[key] || {}; })
+      .filter(function (s) { return s.views !== null && s.views !== undefined && s.views !== ''; })
+      .map(function (s) { return { at: Number(s.at) || 0, views: count(s.views) }; })
       .sort(function (a, b) { return a.at - b.at; });
     var state = GEO.STATES[data.state] ? data.state : '';
     return {
@@ -311,8 +314,8 @@
       var card = el('article', 'card plan'), head = el('header'), inRegion = matching(region, null);
       head.appendChild(el('h2', '', region));
       head.appendChild(el('span', 'zones', GEO.REGION_ZONES[region].map(function (z) { return GEO.ZONES[z].label; }).join(' · ')));
-      var views = inRegion.reduce(function (s, p) { return s + p.latest.views; }, 0);
-      head.appendChild(el('span', 'so-far', inRegion.length ? inRegion.length + (inRegion.length === 1 ? ' post' : ' posts') + ' · ' + fmt(views) + ' views so far' : 'No posts here yet'));
+      var views = inRegion.reduce(function (s, p) { return s + p.latest.views; }, 0), counted = inRegion.filter(function (p) { return p.snaps.length; }).length;
+      head.appendChild(el('span', 'so-far', inRegion.length ? inRegion.length + (inRegion.length === 1 ? ' post' : ' posts') + ' · ' + (counted ? fmt(views) + ' views so far' : 'no views logged yet') : 'No posts here yet'));
       card.appendChild(head);
       var pick = el('label', 'campus-pick'), select = el('select'), campuses = campusesIn(region), top = topCampuses(region, 2);
       pick.appendChild(el('span', '', 'Local tags from'));

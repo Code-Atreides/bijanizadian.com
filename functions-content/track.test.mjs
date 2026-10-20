@@ -66,7 +66,7 @@ test('new videos become posts for the right creator', () => {
   assert.equal(tt.creator, 'Ava Chen'); assert.equal(tt.state, 'CA'); assert.equal(tt.source, 'brightdata');
   assert.equal(tt.creator_id, 'mfc1aaaa-aaaaa1'); assert.equal(tt.latest.views, 52000); assert.equal(Object.keys(tt.snapshots).length, 1);
   assert.match(Object.keys(tt.snapshots)[0], /^[a-z0-9-]{6,24}$/);
-  assert.deepEqual(report['mfc1aaaa-aaaaa1'], { found: 2, added: 2, updated: 0, errors: 0 });
+  assert.deepEqual(report['mfc1aaaa-aaaaa1'], { found: 2, added: 2, updated: 0, errors: 0, noViews: 0 });
   assert.equal(summary(report['mfc1aaaa-aaaaa1']), '2 posts, 2 new · numbers updated');
 });
 
@@ -83,7 +83,7 @@ test('known videos get a new dated snapshot, including manually logged ones', ()
   assert.equal(updates['content_posts/mfp1aaaa-aaaaaa/external_id'], 'tiktok:7412345678901234567');
   assert.equal(updates['content_posts/mfp1aaaa-aaaaaa/creator_id'], 'mfc1aaaa-aaaaa1');
   assert.equal(Object.keys(updates).some(k => /^content_posts\/[^/]+$/.test(k)), false, 'no duplicate post');
-  assert.deepEqual(report['mfc1aaaa-aaaaa1'], { found: 1, added: 0, updated: 1, errors: 0 });
+  assert.deepEqual(report['mfc1aaaa-aaaaa1'], { found: 1, added: 0, updated: 1, errors: 0, noViews: 0 });
 });
 
 test('a second check the same day refreshes the snapshot instead of adding one', () => {
@@ -103,8 +103,41 @@ test('unknown accounts, duplicates and error rows are skipped', () => {
   ];
   const { updates, report } = plan({ creators, posts: {}, rows, now: NOW, rand });
   assert.equal(Object.keys(updates).filter(k => /^content_posts\/[^/]+$/.test(k)).length, 1);
-  assert.deepEqual(report['mfc2bbbb-bbbbb2'], { found: 0, added: 0, updated: 0, errors: 1 });
+  assert.deepEqual(report['mfc2bbbb-bbbbb2'], { found: 0, added: 0, updated: 0, errors: 1, noViews: 0 });
   assert.equal(summary(report['mfc2bbbb-bbbbb2']), 'No posts came back');
+});
+
+// what Bright Data's Instagram Reels dataset really sends since July 2026
+const igLive = (code) => ({
+  url: `https://www.instagram.com/p/${code}/`, user_posted: 'ava_chen', date_posted: '2026-10-18T23:14:12.000Z', product_type: 'clips',
+  description: 'Rush week recap', likes: 25, num_comments: 2, views: null, video_play_count: null
+});
+
+test('Instagram views that never came back stay unknown, not 0', () => {
+  const ig = rowToPost('instagram', igLive('Dep1N5tIZMG'), NOW);
+  assert.deepEqual(ig.numbers, { likes: 25, comments: 2 });
+  const { updates, report } = plan({ creators, posts: {}, rows: [{ platform: 'instagram', row: igLive('Dep1N5tIZMG') }], now: NOW, rand });
+  const post = Object.values(updates)[0];
+  assert.deepEqual(post.latest, { likes: 25, comments: 2, at: NOW });
+  assert.equal('views' in Object.values(post.snapshots)[0], false);
+  assert.equal(summary(report['mfc1aaaa-aaaaa1'], 'instagram'), '1 post, 1 new · likes and comments updated, Instagram hides views');
+  assert.equal(summary({ found: 0, added: 0, updated: 0, errors: 0 }, 'instagram'), 'No public reels found');
+});
+
+test('views typed in by the team survive the next Instagram check', () => {
+  const posts = { 'mfp3cccc-cccccc': { url: 'https://www.instagram.com/p/Dep1N5tIZMG/', platform: 'instagram', title: 'Rush week', external_id: 'instagram:Dep1N5tIZMG',
+    latest: { at: NOW - 1 * H, views: 1200, likes: 20, comments: 2, shares: 3 }, snapshots: { typed: { at: NOW - 1 * H, views: 1200, likes: 20, comments: 2, shares: 3 } } } };
+  const { updates } = plan({ creators, posts, rows: [{ platform: 'instagram', row: igLive('Dep1N5tIZMG') }], now: NOW, rand });
+  assert.equal(updates['content_posts/mfp3cccc-cccccc/snapshots/typed'], undefined, 'the typed snapshot is left alone');
+  const added = Object.entries(updates).filter(([k]) => k.includes('/snapshots/'));
+  assert.equal(added.length, 1);
+  assert.deepEqual(added[0][1], { likes: 25, comments: 2, at: NOW });
+  assert.deepEqual(updates['content_posts/mfp3cccc-cccccc/latest'], { at: NOW, views: 1200, likes: 25, comments: 2, shares: 3 });
+  // a second check soon after refreshes its own snapshot, not the typed one
+  const again = plan({ creators, posts: { 'mfp3cccc-cccccc': { ...posts['mfp3cccc-cccccc'], snapshots: { ...posts['mfp3cccc-cccccc'].snapshots, auto: added[0][1] } } },
+    rows: [{ platform: 'instagram', row: { ...igLive('Dep1N5tIZMG'), likes: 26 } }], now: NOW + 0.5 * H, rand });
+  assert.equal(again.updates['content_posts/mfp3cccc-cccccc/snapshots/auto'].likes, 26);
+  assert.equal(Object.keys(again.updates).filter(k => k.includes('/snapshots/')).length, 1);
 });
 
 test('ids match the database rules', () => {

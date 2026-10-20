@@ -47,7 +47,15 @@ export function externalId(platform, url) {
   return m ? 'instagram:' + m[1] : '';
 }
 
-function count(v) { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0; }
+// a number the scraper actually sent, or undefined; a missing count is unknown, not 0
+function sent(v) {
+  if (v === null || v === undefined || v === '') return undefined;
+  const n = Number(v);
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : undefined;
+}
+function numbers(values) {
+  return Object.fromEntries(Object.entries(values).filter(([, v]) => v !== undefined));
+}
 function when(v, now) {
   const n = typeof v === 'number' ? (v < 1e12 ? v * 1000 : v) : Date.parse(v);
   return Number.isFinite(n) && n >= EARLIEST && n <= now + 86400000 ? n : null;
@@ -65,7 +73,10 @@ function titleFrom(caption, platform, handle) {
   return line.length > 120 ? line.slice(0, 117).trimEnd() + '…' : line;
 }
 
-// one scraper row to a post, or null for an error row or a row without a video link
+// one scraper row to a post, or null for an error row or a row without a video link.
+// Instagram stopped showing view counts to logged-out visitors in July 2026, so
+// Bright Data's Instagram rows carry likes and comments but views: null; those
+// posts get no views here and the team adds them from the app.
 export function rowToPost(platform, row, now) {
   if (!row || row.error || row.error_code) return null;
   const url = String(row.url || '');
@@ -79,9 +90,9 @@ export function rowToPost(platform, row, now) {
     postedAt: when(tiktok ? row.create_time : row.date_posted, now),
     title: titleFrom(caption, platform, handle || 'creator'),
     hashtags: tagsFrom(row.hashtags, caption),
-    numbers: tiktok
-      ? { views: count(row.play_count), likes: count(row.digg_count), comments: count(row.comment_count), shares: count(row.share_count ?? row.num_share_count) }
-      : { views: count(row.views ?? row.video_play_count ?? row.video_view_count), likes: count(row.likes), comments: count(row.num_comments), shares: count(row.shares) }
+    numbers: numbers(tiktok
+      ? { views: sent(row.play_count), likes: sent(row.digg_count), comments: sent(row.comment_count), shares: sent(row.share_count ?? row.num_share_count) }
+      : { views: sent(row.views ?? row.video_play_count ?? row.video_view_count), likes: sent(row.likes), comments: sent(row.num_comments), shares: sent(row.shares) })
   };
 }
 
@@ -115,21 +126,25 @@ export function plan({ creators, posts, rows, now, rand = Math.random }) {
     const item = rowToPost(platform, row, now);
     const inputHandle = input ? (normalizeProfile(platform, input) || {}).handle : '';
     const creatorId = byHandle[platform][(item && item.handle) || ''] || byHandle[platform][(inputHandle || '').toLowerCase()];
-    if (creatorId) report[creatorId] = report[creatorId] || { found: 0, added: 0, updated: 0, errors: 0 };
+    if (creatorId) report[creatorId] = report[creatorId] || { found: 0, added: 0, updated: 0, errors: 0, noViews: 0 };
     if (!item) { if (creatorId) report[creatorId].errors++; continue; }
     if (!creatorId || seen.has(item.externalId)) continue;
     seen.add(item.externalId);
     report[creatorId].found++;
+    if (item.numbers.views === undefined) report[creatorId].noViews++;
     const snap = { ...item.numbers, at: now };
     const hit = known[item.externalId];
     if (hit) {
-      // a snapshot from the last few hours is refreshed rather than duplicated
+      // a snapshot from the last few hours is refreshed rather than duplicated, unless
+      // it holds a number this row lacks (views the team typed in for an Instagram post)
       const snaps = (hit.post && hit.post.snapshots) || {};
       const recent = Object.entries(snaps).filter(([, s]) => s && now - Number(s.at) < SNAPSHOT_GAP).sort((a, b) => b[1].at - a[1].at)[0];
-      const snapId = recent ? recent[0] : newId(now, rand);
+      const refresh = recent && Object.keys(recent[1]).every(k => k in snap);
+      const snapId = refresh ? recent[0] : newId(now, rand);
       updates[`content_posts/${hit.id}/snapshots/${snapId}`] = snap;
       const newest = Object.values(snaps).reduce((m, s) => Math.max(m, Number(s && s.at) || 0), 0);
-      if (now >= newest) updates[`content_posts/${hit.id}/latest`] = snap;
+      // latest keeps the last known value of anything this row doesn't have
+      if (now >= newest) updates[`content_posts/${hit.id}/latest`] = { ...numbers(hit.post.latest || {}), ...snap };
       if (!hit.post.external_id) updates[`content_posts/${hit.id}/external_id`] = item.externalId;
       if (!hit.post.creator_id) updates[`content_posts/${hit.id}/creator_id`] = creatorId;
       report[creatorId].updated++;
@@ -151,8 +166,10 @@ export function plan({ creators, posts, rows, now, rand = Math.random }) {
   return { updates, report };
 }
 
-// the line each creator shows under "Last checked"
-export function summary(r) {
-  if (!r || !r.found) return r && r.errors ? 'No posts came back' : 'No public posts found';
-  return r.found + (r.found === 1 ? ' post' : ' posts') + (r.added ? ', ' + r.added + ' new' : '') + ' · numbers updated';
+// the line each creator shows under their handle; only reels are collected on Instagram
+export function summary(r, platform) {
+  if (!r || !r.found) return r && r.errors ? 'No posts came back' : platform === 'instagram' ? 'No public reels found' : 'No public posts found';
+  return r.found + (r.found === 1 ? ' post' : ' posts') + (r.added ? ', ' + r.added + ' new' : '') +
+    (r.noViews !== r.found ? ' · numbers updated'
+      : platform === 'instagram' ? ' · likes and comments updated, Instagram hides views' : ' · numbers updated, no views came back');
 }
