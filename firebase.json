@@ -27,6 +27,7 @@
       "portfolio/**",
       "fomo-hq-portal/**",
       "housepitch/**/*.mov",
+      "fomocontent/**",
       "greekwars-onboarding/**",
       "greekwars-onboarding.zip"
     ],
@@ -132,7 +133,7 @@
         ]
       },
       {
-        "source": "**/*.@(js|css|svg|png|jpg|jpeg|webp|woff2|pdf|ico)",
+        "source": "**/*.@(js|css|svg|png|jpg|jpeg|webp|woff2|pdf|ico|mp4)",
         "headers": [
           {
             "key": "Cache-Control",

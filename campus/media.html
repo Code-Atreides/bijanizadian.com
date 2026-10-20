@@ -21,12 +21,17 @@
   fomo/campus/media: the home of the campus media push. Three views on one page,
   switched by the hash: the wall (default), #faq and #turn-in.
 
-  The wall reads /campus/media/videos.json. To add a video, put the file (and a
-  poster frame) in /campus/media/videos/ and add an entry:
-    { "src": "/campus/media/videos/clip.mp4", "poster": "/campus/media/videos/clip.jpg",
-      "title": "Game day street questions", "handle": "@name", "school": "USC", "tag": "Game day" }
-  Only src is required. Tiles play muted while on screen; tapping one opens the
-  player with sound. Until there are videos, the wall shows "drop" slots.
+  The wall reads /campus/media/videos.json. Each video is three files in
+  /campus/media/videos/, made from the raw footage in fomocontent/ (which is
+  never committed or deployed):
+    <slug>.mp4          the player: H.264, 720p max, 30fps max, AAC 128k, +faststart
+    <slug>.preview.mp4  the tile: 360p, first 12s, no audio, so the wall stays light
+    <slug>.jpg          the poster frame, 540px wide
+  and an entry, in wall order:
+    { "src": "/campus/media/videos/clip.mp4", "preview": "/campus/media/videos/clip.preview.mp4",
+      "poster": "/campus/media/videos/clip.jpg", "title": "...", "handle": "@name", "school": "USC", "tag": "Creators" }
+  Only src is required. Tiles play the preview muted while on screen; tapping one
+  opens the player with sound. With no videos, the wall shows "drop" slots.
 
   Turn in writes to RTDB content_submissions, the same write-once node as
   /campus/submit, so everything lands in the team CRM at /campus/submissions.
@@ -550,7 +555,7 @@
     <a href="#faq">FAQ</a>
     <a href="#turn-in">Turn in</a>
   </nav>
-  <span>Trading involves risk, including loss of principal.</span>
+  <span>Trading involves risk, including loss of principal. A prize is not a trading return.</span>
 </footer>
 
 <dialog class="player" id="player" aria-label="Video player">
@@ -643,13 +648,13 @@
     li.style.setProperty('--i', index);
     var hit = el('button', 'tile-hit');
     hit.type = 'button';
-    hit.setAttribute('aria-label', 'Watch ' + (video.title || 'video') + (meta(video) ? ', ' + meta(video) : ''));
+    hit.setAttribute('aria-label', 'Watch ' + (video.title || (video.tag ? video.tag + ' video' : 'video')) + (meta(video) ? ', ' + meta(video) : ''));
     var player = document.createElement('video');
     player.muted = true; player.loop = true; player.playsInline = true;
     player.setAttribute('muted', ''); player.setAttribute('playsinline', '');
     player.preload = 'metadata';
     if (video.poster) player.poster = video.poster;
-    player.src = video.src;
+    player.src = video.preview || video.src;
     hit.appendChild(player);
     if (video.tag) hit.appendChild(el('span', 'tile-tag', video.tag));
     var sound = el('span', 'tile-sound');
@@ -756,7 +761,7 @@
     big.poster = video.poster || '';
     big.src = video.src;
     big.muted = false;
-    $('player-title').textContent = video.title || '';
+    $('player-title').textContent = video.title || video.tag || '';
     $('player-meta').textContent = meta(video);
     $('player-prev').disabled = at === 0;
     $('player-next').disabled = at === shown.length - 1;

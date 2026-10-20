@@ -1,3 +1,13 @@
 {
-  "videos": []
+  "videos": [
+    { "src": "/campus/media/videos/greek-wars-reel.mp4", "preview": "/campus/media/videos/greek-wars-reel.preview.mp4", "poster": "/campus/media/videos/greek-wars-reel.jpg", "title": "Your chapter vs every chapter", "tag": "Greek Wars" },
+    { "src": "/campus/media/videos/frat-switch-up.mp4", "preview": "/campus/media/videos/frat-switch-up.preview.mp4", "poster": "/campus/media/videos/frat-switch-up.jpg", "title": "When your first college friend joins a frat", "tag": "Creators" },
+    { "src": "/campus/media/videos/fomo-campus-animated.mp4", "preview": "/campus/media/videos/fomo-campus-animated.preview.mp4", "poster": "/campus/media/videos/fomo-campus-animated.jpg", "title": "fomo university, animated", "tag": "Animation" },
+    { "src": "/campus/media/videos/creator-bedroom.mp4", "preview": "/campus/media/videos/creator-bedroom.preview.mp4", "poster": "/campus/media/videos/creator-bedroom.jpg", "tag": "Creators" },
+    { "src": "/campus/media/videos/onboard-your-chapter.mp4", "preview": "/campus/media/videos/onboard-your-chapter.preview.mp4", "poster": "/campus/media/videos/onboard-your-chapter.jpg", "title": "Onboard your chapter", "tag": "Greek Wars" },
+    { "src": "/campus/media/videos/creator-fit-check.mp4", "preview": "/campus/media/videos/creator-fit-check.preview.mp4", "poster": "/campus/media/videos/creator-fit-check.jpg", "tag": "Creators" },
+    { "src": "/campus/media/videos/greek-wars-village.mp4", "preview": "/campus/media/videos/greek-wars-village.preview.mp4", "poster": "/campus/media/videos/greek-wars-village.jpg", "title": "Inside the Greek Wars village", "tag": "Greek Wars" },
+    { "src": "/campus/media/videos/creator-golf.mp4", "preview": "/campus/media/videos/creator-golf.preview.mp4", "poster": "/campus/media/videos/creator-golf.jpg", "tag": "Creators" },
+    { "src": "/campus/media/videos/creator-couch.mp4", "preview": "/campus/media/videos/creator-couch.preview.mp4", "poster": "/campus/media/videos/creator-couch.jpg", "tag": "Creators" }
+  ]
 }
