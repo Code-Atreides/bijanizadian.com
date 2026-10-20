@@ -1,5 +1,6 @@
 {
   "videos": [
+    { "src": "/campus/media/videos/street-stocks-interview.mp4", "preview": "/campus/media/videos/street-stocks-interview.preview.mp4", "poster": "/campus/media/videos/street-stocks-interview.jpg", "tag": "Street questions" },
     { "src": "/campus/media/videos/greek-wars-reel.mp4", "preview": "/campus/media/videos/greek-wars-reel.preview.mp4", "poster": "/campus/media/videos/greek-wars-reel.jpg", "title": "Your chapter vs every chapter", "tag": "Greek Wars" },
     { "src": "/campus/media/videos/frat-switch-up.mp4", "preview": "/campus/media/videos/frat-switch-up.preview.mp4", "poster": "/campus/media/videos/frat-switch-up.jpg", "title": "When your first college friend joins a frat", "tag": "Creators" },
     { "src": "/campus/media/videos/fomo-campus-animated.mp4", "preview": "/campus/media/videos/fomo-campus-animated.preview.mp4", "poster": "/campus/media/videos/fomo-campus-animated.jpg", "title": "fomo university, animated", "tag": "Animation" },
