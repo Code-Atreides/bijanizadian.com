@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b091f">
-<title>fomo/campus/media</title>
+<title>fomo/media</title>
 <meta name="description" content="Every video from the fomo campus media push, in one place. Watch the drops, read the FAQ, and turn in your own footage for editing.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="fomo/campus/media">
+<meta property="og:title" content="fomo/media">
 <meta property="og:description" content="campus, on camera. Every video from the fomo campus media push, in one place.">
 <meta property="og:url" content="https://bijanizadian.com/campus/media">
 <meta property="og:image" content="https://bijanizadian.com/campus/astronaut.webp">
@@ -18,7 +18,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <script>document.documentElement.classList.add('js');</script>
 <!--
-  fomo/campus/media: the home of the campus media push. Three views on one page,
+  fomo/media: the home of the campus media push. Three views on one page,
   switched by the hash: the wall (default), #faq and #turn-in.
 
   The wall reads /campus/media/videos.json. Each video is three files in
@@ -120,17 +120,14 @@
   main { flex: 1 0 auto; }
   .view { padding: 0 var(--gutter); max-width: 1680px; margin: 0 auto; width: 100%; scroll-margin-top: var(--header); }
 
-  /* ---------- the lockup: fomo/campus/media, parents dimmed, slashes electric ---------- */
-  .lockup { display: inline-flex; align-items: baseline; gap: .04em; line-height: 1; color: var(--lavender); }
-  .lockup svg { height: clamp(26px, 2.7vw, 42px); width: auto; }
-  .lockup .slash { font-size: clamp(24px, 2.45vw, 38px); font-weight: 700; letter-spacing: -.045em; }
+  /* ---------- the hero says fomo/media, nothing else: the lockup is the h1, its slash electric ---------- */
+  .lockup { display: inline-flex; align-items: baseline; gap: .04em; margin: 0; line-height: 1; color: var(--lavender); }
+  .lockup svg { height: clamp(30px, 3.3vw, 52px); width: auto; }
+  .lockup .slash { font-size: clamp(27px, 3vw, 47px); font-weight: 700; letter-spacing: -.045em; }
   .lockup .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
-  .lockup .up { opacity: .5; }
 
   /* ---------- watch: a compact intro, then the wall ---------- */
   .intro { display: flex; justify-content: space-between; align-items: end; gap: 18px 40px; flex-wrap: wrap; padding: clamp(20px, 3.2vh, 36px) 0 clamp(14px, 2.2vh, 20px); }
-  .intro h1 { margin-top: 10px; font-size: clamp(28px, 2.7vw, 44px); font-weight: 700; letter-spacing: -.05em; line-height: 1.12; color: var(--lavender); }
-  .intro h1 span { background: linear-gradient(92deg, var(--glow), var(--blue) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .intro-cta { display: flex; gap: 10px; flex-wrap: wrap; }
   .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; min-height: 36px; margin-bottom: 16px; }
   .count { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--faint); }
@@ -425,11 +422,10 @@
   <section class="view" id="watch" data-view="watch" aria-labelledby="watch-title">
     <div class="intro">
       <div>
-        <div class="lockup" role="img" aria-label="fomo/campus/media">
+        <h1 class="lockup" id="watch-title" tabindex="-1" aria-label="fomo/media">
           <svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg>
-          <span class="slash"><i>/</i><span class="up">campus</span><i>/</i>media</span>
-        </div>
-        <h1 id="watch-title" tabindex="-1">campus, <span>on camera.</span></h1>
+          <span class="slash" aria-hidden="true"><i>/</i>media</span>
+        </h1>
       </div>
       <div class="intro-cta">
         <a class="btn btn--primary" href="#turn-in">Turn in content<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></a>
@@ -578,7 +574,7 @@
   // ---------- views ----------
   var sections = [].slice.call(document.querySelectorAll('main > .view'));
   var tabs = [].slice.call(document.querySelectorAll('.views a'));
-  var TITLES = { watch: 'fomo/campus/media', faq: 'FAQ · fomo/campus/media', 'turn-in': 'Turn in · fomo/campus/media' };
+  var TITLES = { watch: 'fomo/media', faq: 'FAQ · fomo/media', 'turn-in': 'Turn in · fomo/media' };
   var current = null;
 
   function route(focus) {
