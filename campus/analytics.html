@@ -9,10 +9,10 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<script src="/assets/content-auth.js?v=1" defer></script>
+<script src="/assets/content-auth.js?v=2" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
 <script src="/assets/content-schools.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=3" defer></script>
+<script src="/assets/content-analytics.js?v=4" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -201,6 +201,19 @@
   .legend i.none { background: var(--chip); border: 1px dashed var(--line); }
   .bars.regions li { grid-template-columns: 76px minmax(0, 1fr); }
   .unmapped { font-size: 12.5px; color: var(--muted-2); margin-top: 14px; line-height: 1.5; }
+
+  /* tracked creators */
+  .tracked .handle { color: var(--ink); }
+  .tracked td > span.muted { display: block; font-size: 12px; line-height: 1.45; margin-top: 2px; }
+  .tracked td > .pill { margin-top: 4px; }
+  .tracked .status { font-size: 12.5px; line-height: 1.45; }
+  .tracked .status small { display: block; color: var(--muted-2); }
+  .tracked .status.err { color: #9b362e; }
+  .tracked .status.busy { color: var(--blue-text); font-weight: 500; }
+  .card-head .sub { font-size: 12.5px; color: var(--muted-2); margin-top: 3px; }
+  .tracked-note { font-size: 12.5px; color: var(--blue-text); margin: -4px 0 10px; min-height: 18px; }
+  .check { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; margin: 2px 0 6px; }
+  .check input { width: 16px; height: 16px; accent-color: var(--blue); }
 
   /* ---------- dialogs ---------- */
   dialog { margin: auto; border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(11,9,31,.45); }
@@ -401,6 +414,29 @@
           </section>
         </div>
 
+        <section class="card" aria-labelledby="c-tracked" style="margin-bottom:14px">
+          <div class="card-head">
+            <div>
+              <h2 id="c-tracked">Creators we track</h2>
+              <p class="sub">Their new TikTok and Instagram posts and numbers are pulled in every morning.</p>
+            </div>
+            <div class="posts-tools">
+              <button type="button" class="option" id="check-all">Check everyone now</button>
+              <button type="button" class="primary-action small" id="add-creator"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add creator</button>
+            </div>
+          </div>
+          <p class="tracked-note" id="tracked-note" role="status" aria-live="polite"></p>
+          <table class="table tracked posts" id="tracked-table">
+            <thead><tr><th scope="col">Creator</th><th scope="col">TikTok</th><th scope="col">Instagram</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Views</th><th scope="col">Last checked</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
+            <tbody id="tracked-rows"></tbody>
+          </table>
+          <div class="empty" id="tracked-empty" hidden>
+            <strong>No creators tracked yet.</strong>
+            <span>Add a creator's TikTok or Instagram, and their public posts and numbers are logged for you every day.</span>
+            <button type="button" class="primary-action small" id="add-first-creator">Add the first creator</button>
+          </div>
+        </section>
+
         <section class="card" aria-labelledby="c-posts">
           <div class="card-head">
             <h2 id="c-posts">Posts</h2>
@@ -481,6 +517,27 @@
 </dialog>
 <datalist id="creator-list"></datalist>
 <datalist id="school-list"></datalist>
+
+<!-- add or edit a tracked creator -->
+<dialog id="creator-dialog" aria-labelledby="creator-title">
+  <form class="dlg" id="creator-form" method="dialog" novalidate>
+    <h2 id="creator-title">Add a creator</h2>
+    <p class="lede" id="creator-lede">Their public posts are checked every morning, and new videos are logged with their numbers.</p>
+    <label class="field">Name<input id="c-name" maxlength="100" autocomplete="off"></label>
+    <div class="pair">
+      <label class="field">School <span>optional</span><input id="c-school" maxlength="120" list="school-list" autocomplete="off"></label>
+      <label class="field">State <span>for the map</span><select id="c-state"><option value="">Not set</option></select></label>
+    </div>
+    <label class="field">TikTok <span>@handle or profile link</span><input id="c-tiktok" maxlength="200" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@handle"></label>
+    <label class="field">Instagram <span>@handle or profile link, public account</span><input id="c-instagram" maxlength="200" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@handle"></label>
+    <label class="check"><input type="checkbox" id="c-active" checked> Track this creator every day</label>
+    <p class="dlg-error" id="creator-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="creator-save">Save creator</button>
+    </div>
+  </form>
+</dialog>
 
 <!-- add a dated snapshot -->
 <dialog id="numbers-dialog" aria-labelledby="numbers-title">

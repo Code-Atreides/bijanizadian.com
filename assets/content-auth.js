@@ -151,5 +151,5 @@
     else showSignIn('');
   }
 
-  window.contentAuth = { init: init, db: db, handle: handle, signedIn: function () { return !!auth; } };
+  window.contentAuth = { init: init, db: db, handle: handle, idToken: token, signedIn: function () { return !!auth; } };
 })();

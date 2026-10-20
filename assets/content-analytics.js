@@ -4,6 +4,10 @@
 // of its views, likes, comments and shares; latest mirrors the newest snapshot.
 // Between snapshots a post's views are interpolated in a straight line from
 // (posted, 0), which is what "views gained" in a range and the chart are built on.
+// Creators can be tracked (RTDB content_creators): the content backend
+// (functions-content) pulls their public TikTok and Instagram posts through
+// Bright Data every morning, logs new videos (source "brightdata") and adds a
+// dated snapshot to known ones; "Check now" asks it to run straight away.
 // Each post can also carry the state it's for (the map, via content-geo.js),
 // the time it went up and the hashtags it used, which /campus/studio learns from.
 // Everything typed in is untrusted: it goes into the page as text, and a post
@@ -20,7 +24,8 @@
   // one blue, light to dark: checked as an ordinal ramp (monotone, visible steps, light end >= 2:1)
   var RAMP = ['#9eacf9', '#7c8df5', '#5c6fed', '#4252d6', '#2b33a8'];
 
-  var posts = [], submissions = {}, range = 30, platform = 'all', loading = false, loadedAt = 0;
+  var posts = [], submissions = {}, creators = {}, pending = {}, range = 30, platform = 'all', loading = false, loadedAt = 0;
+  var editingCreator = null;
   var editing = null, numbersFor = null, chart = null;
 
   // ---------- formatting ----------
@@ -129,8 +134,10 @@
     if (loading) return;
     loading = true; $('board').classList.add('refetching'); $('refresh').disabled = true;
     try {
-      var results = await Promise.all([db('GET', '/content_posts'), db('GET', '/content_submissions')]);
+      var results = await Promise.all([db('GET', '/content_posts'), db('GET', '/content_submissions'), db('GET', '/content_creators'), db('GET', '/content_sync/pending')]);
       submissions = results[1] || {};
+      creators = results[2] || {};
+      pending = results[3] || {};
       var raw = results[0] || {};
       posts = Object.keys(raw).map(function (id) { return normalize(id, raw[id] || {}); });
       loadedAt = Date.now();
@@ -182,6 +189,7 @@
     renderGroup('creator-rows', list, function (post) { return post.creatorKey || ''; }, function (post) { return { name: post.creator || 'Unattributed', sub: post.handle }; });
     renderGroup('school-rows', list, function (post) { return post.school.trim().toLowerCase(); }, function (post) { return { name: post.school || 'No school' }; });
     renderPosts(list);
+    renderTracked();
   }
 
   // ---------- views over time: one series, so no legend; the title names it ----------
@@ -484,6 +492,7 @@
     what.appendChild(title);
     var meta = el('span', 'muted');
     meta.appendChild(el('span', 'pill', PLATFORMS[post.data.platform] || 'Other'));
+    if (post.data.source === 'brightdata') { var auto = el('span', 'pill', 'Auto'); auto.title = 'Logged and updated automatically from the creator\'s profile'; meta.appendChild(auto); }
     meta.appendChild(document.createTextNode('Posted ' + (post.posted ? shortDay(post.posted) : '—')));
     what.appendChild(meta);
     tr.appendChild(what);
@@ -716,6 +725,153 @@
     catch (error) { failed(error); }
   }
 
+  // ---------- tracked creators ----------
+
+  var HANDLE = { tiktok: /^[A-Za-z0-9._]{2,24}$/, instagram: /^[A-Za-z0-9._]{1,30}$/ };
+  // "@name", "name" or a profile link, to the profile URL the backend uses (the same rules as functions-content/track.js)
+  function profileUrl(platform, value) {
+    var text = String(value || '').trim(), handle = '';
+    if (!text) return '';
+    if (/^(https?:\/\/)?(www\.|m\.)?(tiktok|instagram)\.com\//i.test(text)) {
+      var url = safeLink(/^https?:/i.test(text) ? text.replace(/^http:/i, 'https:') : 'https://' + text);
+      if (!url || url.hostname.replace(/^(www|m)\./, '') !== platform + '.com') return null;
+      var first = url.pathname.split('/').filter(Boolean)[0] || '';
+      handle = platform === 'tiktok' ? (first.charAt(0) === '@' ? first.slice(1) : '') : first;
+    } else handle = text.replace(/^@/, '');
+    if (!HANDLE[platform].test(handle) || (platform === 'instagram' && /^(p|reel|reels|stories|explore)$/i.test(handle))) return null;
+    return platform === 'tiktok' ? 'https://www.tiktok.com/@' + handle : 'https://www.instagram.com/' + handle + '/';
+  }
+  function handleOf(url) { var m = /(?:@|instagram\.com\/)([A-Za-z0-9._]+)/.exec(url || ''); return m ? '@' + m[1] : ''; }
+  function checking(id) {
+    return Object.keys(pending).filter(function (k) { return String(pending[k].creators || '').split(',').indexOf(id) > -1; })
+      .map(function (k) { return pending[k]; });
+  }
+
+  function renderTracked() {
+    var body = $('tracked-rows'), ids = Object.keys(creators).sort(function (a, b) { return String(creators[a].name).localeCompare(String(creators[b].name)); });
+    body.textContent = '';
+    $('tracked-table').hidden = !ids.length; $('tracked-empty').hidden = !!ids.length; $('check-all').hidden = !ids.length;
+    ids.forEach(function (id) {
+      var c = creators[id] || {}, tr = el('tr'), who = el('td'), mine = posts.filter(function (p) { return p.data.creator_id === id; });
+      who.appendChild(el('strong', '', c.name || 'Unnamed'));
+      if (c.school || c.state) who.appendChild(el('span', 'muted', [c.school, c.state].filter(Boolean).join(' · ')));
+      if (c.active === false) who.appendChild(el('span', 'pill', 'Paused'));
+      tr.appendChild(who);
+      ['tiktok', 'instagram'].forEach(function (platform) {
+        var td = el('td'); td.dataset.label = PLATFORMS[platform];
+        var url = c[platform] && safeLink(c[platform]);
+        if (url) { var a = el('a', 'handle', handleOf(c[platform])); a.href = url.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; td.appendChild(a); }
+        else td.appendChild(el('span', 'muted', '—'));
+        if (c[platform + '_result']) td.appendChild(el('span', 'muted', c[platform + '_result']));
+        tr.appendChild(td);
+      });
+      cell(tr, 'num', 'Posts', mine.length);
+      var views = mine.reduce(function (s, p) { return s + p.latest.views; }, 0);
+      cell(tr, 'num', 'Views', fmt(views), full(views));
+      var status = el('td', 'status'), busy = checking(id);
+      status.dataset.label = 'Last checked';
+      if (busy.length) { status.classList.add('busy'); status.textContent = 'Checking now…'; status.appendChild(el('small', '', 'started ' + ago(Math.min.apply(null, busy.map(function (b) { return b.started_at; }))) + ', results land within ~30 min')); }
+      else if (c.last_error) { status.classList.add('err'); status.textContent = c.last_error; if (c.last_checked_at) status.appendChild(el('small', '', ago(c.last_checked_at))); }
+      else status.textContent = c.last_checked_at ? ago(c.last_checked_at) : 'Not checked yet';
+      tr.appendChild(status);
+      var actions = el('td', 'actions');
+      [['Check now', 'text-button', function (b) { checkNow(id, b); }], ['Edit', 'text-button', function () { openCreator(id); }], ['Remove', 'text-button danger', function () { removeCreator(id); }]].forEach(function (spec) {
+        var b = el('button', spec[1], spec[0]); b.type = 'button';
+        b.setAttribute('aria-label', spec[0] + ': ' + (c.name || 'creator'));
+        if (spec[0] === 'Check now' && (busy.length || c.active === false || !(c.tiktok || c.instagram))) b.disabled = true;
+        b.addEventListener('click', function () { spec[2](b); }); actions.appendChild(b);
+      });
+      tr.appendChild(actions);
+      body.appendChild(tr);
+    });
+  }
+
+  (function fillCreatorStates() {
+    var select = $('c-state');
+    GEO.sorted().forEach(function (s) { select.appendChild(new Option(s.name, s.abbr)); });
+  })();
+
+  function openCreator(id) {
+    editingCreator = id || null;
+    var c = id ? creators[id] || {} : {};
+    $('creator-title').textContent = id ? 'Edit creator' : 'Add a creator';
+    $('creator-save').textContent = id ? 'Save changes' : 'Save creator';
+    $('c-name').value = c.name || ''; $('c-school').value = c.school || ''; $('c-state').value = c.state || '';
+    $('c-tiktok').value = c.tiktok ? handleOf(c.tiktok) : ''; $('c-instagram').value = c.instagram ? handleOf(c.instagram) : '';
+    $('c-active').checked = c.active !== false;
+    document.querySelectorAll('#creator-form [aria-invalid]').forEach(function (n) { n.removeAttribute('aria-invalid'); });
+    setError('creator-error');
+    $('creator-dialog').showModal();
+    $('c-name').focus();
+  }
+  $('c-school').addEventListener('change', function () { if (!$('c-state').value) $('c-state').value = stateForSchool(this.value); });
+  $('creator-form').addEventListener('input', function (event) { event.target.removeAttribute('aria-invalid'); setError('creator-error'); });
+
+  $('creator-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var fail = function (input, message) { input.setAttribute('aria-invalid', 'true'); input.focus(); setError('creator-error', message); };
+    document.querySelectorAll('#creator-form [aria-invalid]').forEach(function (n) { n.removeAttribute('aria-invalid'); });
+    var name = $('c-name').value.trim().replace(/\s+/g, ' ');
+    var tiktok = profileUrl('tiktok', $('c-tiktok').value), instagram = profileUrl('instagram', $('c-instagram').value);
+    if (!name) return fail($('c-name'), 'Add the creator\'s name.');
+    if (tiktok === null) return fail($('c-tiktok'), 'That isn\'t a TikTok handle or profile link.');
+    if (instagram === null) return fail($('c-instagram'), 'That isn\'t an Instagram handle or profile link.');
+    if (!tiktok && !instagram) return fail($('c-tiktok'), 'Add a TikTok or Instagram account to track.');
+    var details = {
+      name: name, school: $('c-school').value.trim().replace(/\s+/g, ' ') || null, state: $('c-state').value || null,
+      tiktok: tiktok || null, instagram: instagram || null, active: $('c-active').checked
+    };
+    var save = $('creator-save'); save.disabled = true;
+    try {
+      var id = editingCreator;
+      if (id) await db('PATCH', '/content_creators/' + id, details);
+      else {
+        id = newId();
+        var body = { created_at: { '.sv': 'timestamp' } };
+        Object.keys(details).forEach(function (k) { if (details[k] !== null) body[k] = details[k]; });
+        await db('PUT', '/content_creators/' + id, body);
+      }
+      $('creator-dialog').close();
+      await load();
+      if (!editingCreator && details.active) checkNow(id, null);
+    } catch (error) {
+      if (!window.contentAuth.handle(error)) setError('creator-error', 'That didn\'t save. Check your connection and try again.');
+    } finally { save.disabled = false; }
+  });
+
+  async function removeCreator(id) {
+    var c = creators[id] || {};
+    if (!confirm('Stop tracking ' + (c.name || 'this creator') + '? Posts already logged stay.')) return;
+    try { await db('DELETE', '/content_creators/' + id); await load(); }
+    catch (error) { failed(error); }
+  }
+
+  async function checkNow(id, button) {
+    var note = $('tracked-note');
+    if (button) button.disabled = true;
+    note.textContent = 'Asking for the latest posts…';
+    try {
+      var token = await window.contentAuth.idToken();
+      var response = await fetch('/campus/api/track', {
+        method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify(id ? { creator: id } : {}), signal: AbortSignal.timeout(130000)
+      });
+      if (response.status === 403) { window.contentAuth.handle(new Error('no-access')); return; }
+      var result = await response.json().catch(function () { return {}; });
+      if (!response.ok) throw new Error(result.error || 'failed');
+      note.textContent = (result.started || []).length
+        ? 'Checking now. New posts and numbers usually land within 30 minutes.'
+        : 'Bright Data didn\'t start the check. The creator\'s row says why.';
+      await load();
+    } catch (error) {
+      if (!window.contentAuth.handle(error)) note.textContent = 'The check couldn\'t start. Try again in a minute.';
+    } finally { if (button) button.disabled = false; }
+  }
+
+  $('add-creator').addEventListener('click', function () { openCreator(null); });
+  $('add-first-creator').addEventListener('click', function () { openCreator(null); });
+  $('check-all').addEventListener('click', function () { checkNow(null, this); });
+
   // ---------- CSV: one row per snapshot, so the history goes with it ----------
 
   function csvCell(value) {
@@ -783,7 +939,7 @@
   });
 
   window.contentAuth.init({
-    main: 'analytics', onOpen: load, onSignOut: function () { posts = []; },
+    main: 'analytics', onOpen: load, onSignOut: function () { posts = []; creators = {}; pending = {}; },
     denied: 'This email can\'t open media analytics.'
   });
 })();

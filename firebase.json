@@ -1,4 +1,11 @@
 {
+  "functions": [
+    {
+      "source": "functions-content",
+      "codebase": "content",
+      "ignore": ["node_modules", "*.test.mjs", ".git", "*.log"]
+    }
+  ],
   "database": {
     "rules": "database.rules.json"
   },
@@ -28,12 +35,20 @@
       "fomo-hq-portal/**",
       "housepitch/**/*.mov",
       "fomocontent/**",
+      "functions-content/**",
       "greekwars-onboarding/**",
       "greekwars-onboarding.zip"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
     "rewrites": [
+      {
+        "source": "/campus/api/track",
+        "function": {
+          "functionId": "contentTrackNow",
+          "region": "us-central1"
+        }
+      },
       {
         "source": "/agencykit",
         "destination": "/agencykit/index.html"
@@ -128,7 +143,7 @@
         "headers": [
           {
             "key": "Content-Security-Policy",
-            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://bijanizadian-84e48-default-rtdb.firebaseio.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
+            "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://bijanizadian-84e48-default-rtdb.firebaseio.com; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
           },
           {
             "key": "X-Robots-Tag",

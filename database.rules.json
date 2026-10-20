@@ -173,6 +173,15 @@
         "state": {
           ".validate": "newData.isString() && newData.val().matches(/^[A-Z]{2}$/)"
         },
+        "source": {
+          ".validate": "newData.val() == 'brightdata'"
+        },
+        "external_id": {
+          ".validate": "newData.isString() && newData.val().matches(/^(tiktok|instagram):[A-Za-z0-9_-]{5,40}$/)"
+        },
+        "creator_id": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/)"
+        },
         "hashtags": {
           ".validate": "newData.isString() && newData.val().length <= 500"
         },
@@ -230,6 +239,29 @@
           ".validate": false
         }
       }
+    },
+    "content_creators": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      "$creator": {
+        ".validate": "$creator.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['name','created_at'])",
+        "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100" },
+        "school": { ".validate": "newData.isString() && newData.val().length <= 120" },
+        "state": { ".validate": "newData.isString() && newData.val().matches(/^[A-Z]{2}$/)" },
+        "tiktok": { ".validate": "newData.isString() && newData.val().matches(/^https:[/][/]www[.]tiktok[.]com[/]@[A-Za-z0-9._]{2,24}$/)" },
+        "instagram": { ".validate": "newData.isString() && newData.val().matches(/^https:[/][/]www[.]instagram[.]com[/][A-Za-z0-9._]{1,30}[/]$/)" },
+        "active": { ".validate": "newData.isBoolean()" },
+        "created_at": { ".validate": "newData.isNumber() && newData.val() <= now" },
+        "last_checked_at": { ".validate": "newData.isNumber()" },
+        "tiktok_result": { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "instagram_result": { ".validate": "newData.isString() && newData.val().length <= 200" },
+        "last_error": { ".validate": "newData.isString() && newData.val().length <= 300" },
+        "$other": { ".validate": false }
+      }
+    },
+    "content_sync": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": false
     },
     "content_tags": {
       ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
