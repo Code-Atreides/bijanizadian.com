@@ -133,8 +133,8 @@
       METRICS.forEach(function (m) { snap[m] = known(s[m]); });
       return snap;
     }).sort(function (a, b) { return a.at - b.at; });
-    var sub = data.submission ? submissions[data.submission] : null;
-    var creator = (sub && sub.name) || data.creator || '';
+    var sub = data.submission ? submissions[data.submission] : null, tracked = data.creator_id ? creators[data.creator_id] : null;
+    var creator = (sub && sub.name) || data.creator || (tracked && tracked.name) || '';
     var posted = Number(data.posted_at) || (snaps[0] ? snaps[0].at : 0);
     return {
       id: id, data: data, snaps: snaps, posted: posted,
@@ -142,8 +142,8 @@
       latest: latestOf(snaps, posted),
       creator: creator, handle: (sub && sub.handle) || '',
       creatorKey: ((sub && sub.email) || creator).toLowerCase(),
-      school: (sub && sub.school) || data.school || '',
-      state: GEO.STATES[data.state] ? data.state : '',
+      school: (sub && sub.school) || data.school || (tracked && tracked.school) || '',
+      state: GEO.STATES[data.state] ? data.state : tracked && GEO.STATES[tracked.state] ? tracked.state : '',
       tags: data.hashtags || ''
     };
   }
@@ -360,7 +360,7 @@
   function renderPlatforms(list) {
     var ul = $('platform-bars'), totals = {};
     ul.textContent = '';
-    $('c-platform').textContent = metricName() + ' by platform';
+    $('platform-metric-title').textContent = metricName() + ', all time';
     list.forEach(function (post) {
       var key = PLATFORMS[post.data.platform] ? post.data.platform : 'other';
       totals[key] = totals[key] || { sum: 0, posts: 0, counted: 0 };
@@ -405,8 +405,9 @@
       var r = byRegion[region] = byRegion[region] || { posts: 0, sum: 0 };
       r.posts++; r.sum += valueOf(post);
     });
-    var totals = Object.keys(byState).map(function (k) { return byState[k].sum; });
+    var totals = Object.keys(byState).filter(function (k) { return byState[k].counted && byState[k].sum > 0; }).map(function (k) { return byState[k].sum; });
     var max = Math.max.apply(null, [0].concat(totals)), min = Math.min.apply(null, totals.length ? totals : [0]);
+    var unknown = Object.keys(byState).some(function (k) { return !byState[k].counted; });
     var cuts = thresholds(min, max);
     var step = function (v) { var i = 0; while (i < cuts.length && v >= cuts[i]) i++; return Math.min(i + (RAMP.length - 1 - cuts.length), RAMP.length - 1); };
 
@@ -417,16 +418,16 @@
     var tipValue = el('strong'), tipSub = el('span');
     tip.appendChild(tipValue); tip.appendChild(tipSub); wrap.appendChild(tip);
     Object.keys(GEO.STATES).forEach(function (abbr) {
-      var g = GEO.STATES[abbr], s = byState[abbr], tile = el('div', 'tile' + (s ? ' has' : ''));
+      var g = GEO.STATES[abbr], s = byState[abbr], tile = el('div', 'tile' + (s ? (s.counted ? ' has' : ' nodata') : ''));
       tile.style.gridRow = g.row; tile.style.gridColumn = g.col;
       tile.setAttribute('role', 'listitem');
       tile.appendChild(el('b', '', abbr));
-      if (s) {
+      if (s && s.counted) {
         var fill = RAMP[step(s.sum)];
         tile.style.background = fill; tile.style.color = inkFor(fill);
-        tile.appendChild(el('small', '', s.counted ? fmt(s.sum) : '—'));
-        tile.tabIndex = 0;
+        tile.appendChild(el('small', '', fmt(s.sum)));
       }
+      if (s) tile.tabIndex = 0;
       var label = g.name + ': ' + (s ? (s.counted ? full(s.sum) + ' ' + metric : 'no ' + metric + ' logged') + ' from ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : 'no posts');
       tile.setAttribute('aria-label', label);
       var show = function () {
@@ -453,6 +454,7 @@
         legend.insertBefore(li, legend.firstChild);
       });
     }
+    if (unknown) { var nod = el('li'); nod.appendChild(el('i', 'nodata')); nod.appendChild(document.createTextNode('Posted, no ' + metric + ' logged')); legend.appendChild(nod); }
     var none = el('li'); none.appendChild(el('i', 'none')); none.appendChild(document.createTextNode('No posts')); legend.appendChild(none);
 
     // regions: one hue for every bar
@@ -477,7 +479,7 @@
     Object.keys(byState).sort(function (a, b) { return byState[b].sum - byState[a].sum; }).forEach(function (abbr) {
       var s = byState[abbr], tr = el('tr');
       tr.appendChild(el('td', '', GEO.STATES[abbr].name)); tr.appendChild(el('td', '', GEO.STATES[abbr].region));
-      tr.appendChild(el('td', 'num', s.posts)); tr.appendChild(el('td', 'num', s.counted ? full(s.sum) : '—')); tr.appendChild(el('td', 'num', (s.gained > 0 ? '+' : '') + full(s.gained)));
+      tr.appendChild(el('td', 'num', s.posts)); tr.appendChild(el('td', 'num', s.counted ? full(s.sum) : '—')); tr.appendChild(el('td', 'num', s.counted ? (s.gained > 0 ? '+' : '') + full(s.gained) : '—'));
       body.appendChild(tr);
     });
     table.appendChild(body); tw.appendChild(table);
@@ -505,7 +507,7 @@
       tr.appendChild(who);
       tr.appendChild(el('td', 'num', g.posts));
       var v = el('td', 'num', g.counted ? fmt(g.sum) : '—'); v.title = g.counted ? full(g.sum) : missingNote(); tr.appendChild(v);
-      var gn = el('td', 'num' + (g.gained > 0 ? ' up' : ''), (g.gained > 0 ? '+' : '') + fmt(g.gained)); gn.title = full(g.gained); tr.appendChild(gn);
+      var gn = el('td', 'num' + (g.counted && g.gained > 0 ? ' up' : ''), g.counted ? (g.gained > 0 ? '+' : '') + fmt(g.gained) : '—'); gn.title = g.counted ? full(g.gained) : missingNote(); tr.appendChild(gn);
       body.appendChild(tr);
     });
   }
@@ -805,15 +807,30 @@
   function change(n) { return (n < 0 ? '−' : '+') + fmt(Math.abs(n)); }
 
   function renderFollowers(start) {
-    var total = 0, delta = 0, since = 0, accounts = 0;
+    var total = 0, delta = 0, since = 0, accounts = 0, byPlatform = {};
     Object.keys(creators).forEach(function (id) {
       ['tiktok', 'instagram'].forEach(function (p) {
         if (platform !== 'all' && platform !== p) return;
         var f = followerStats(creators[id], p, start);
         if (!f) return;
-        accounts++; total += f.count;
-        if (counted(f)) { delta += f.change; since = since ? Math.min(since, f.since) : f.since; }
+        var b = byPlatform[p] = byPlatform[p] || { count: 0, delta: 0, accounts: 0, grew: false };
+        accounts++; total += f.count; b.accounts++; b.count += f.count;
+        if (counted(f)) { delta += f.change; b.delta += f.change; b.grew = true; since = since ? Math.min(since, f.since) : f.since; }
       });
+    });
+    var keys = Object.keys(byPlatform).sort(function (a, b) { return byPlatform[b].count - byPlatform[a].count; });
+    var max = Math.max.apply(null, [1].concat(keys.map(function (k) { return byPlatform[k].count; }))), ul = $('follower-bars');
+    ul.textContent = '';
+    $('platform-followers').hidden = !keys.length;
+    keys.forEach(function (key) {
+      var b = byPlatform[key], li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', fmt(b.count));
+      li.appendChild(el('span', 'name', PLATFORMS[key]));
+      bar.style.width = 'calc((100% - 74px) * ' + (b.count / max).toFixed(4) + ')';
+      val.title = full(b.count) + ' followers across ' + b.accounts + (b.accounts === 1 ? ' account' : ' accounts');
+      val.appendChild(el('span', 'sub', b.grew ? change(b.delta) : b.accounts + (b.accounts === 1 ? ' account' : ' accounts')));
+      track.appendChild(bar); track.appendChild(val); li.appendChild(track);
+      li.setAttribute('aria-label', PLATFORMS[key] + ': ' + full(b.count) + ' followers');
+      ul.appendChild(li);
     });
     $('k-followers').textContent = accounts ? fmt(total) : '—';
     $('k-followers').title = accounts ? full(total) + ' followers across ' + accounts + (accounts === 1 ? ' tracked account' : ' tracked accounts') : '';
@@ -858,6 +875,7 @@
       ['tiktok', 'instagram'].forEach(function (platform) {
         var td = el('td'); td.dataset.label = PLATFORMS[platform];
         var url = c[platform] && safeLink(c[platform]);
+        if (!url) td.className = 'no-account';
         if (url) { var a = el('a', 'handle', handleOf(c[platform])); a.href = url.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; td.appendChild(a); }
         else td.appendChild(el('span', 'muted', '—'));
         var f = url && followerStats(c, platform, start);

@@ -100,9 +100,10 @@
 
   .queue-head .eyebrow { margin-bottom: 8px; }
   .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
-  .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 12px 14px; }
-  .stat strong { display: block; font-size: 26px; font-weight: 500; letter-spacing: -.8px; line-height: 1.1; }
-  .stat span { font-size: 12.5px; color: var(--muted); }
+  .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 13px 14px; min-width: 0; }
+  .stat span { display: block; font-size: 12.5px; color: var(--muted); }
+  .stat strong { display: block; font-size: 28px; font-weight: 500; letter-spacing: -.8px; line-height: 1.15; margin-top: 4px; }
+  .stat small { display: block; font-size: 12px; color: var(--muted-2); margin-top: 2px; }
   .switch-row { display: flex; align-items: end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
   .modes { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; margin-bottom: 8px; flex: none; }
   .modes button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 32px; padding: 0 12px; }
@@ -181,8 +182,7 @@
   }
   @media (max-width: 600px) {
     .site-shell { padding: 0 14px; }
-    .site-header { height: 54px; }
-    .brand svg { width: 70px; height: 23px; }
+    .site-header { height: 54px; gap: 10px; }
     .brand > span { display: none; }
     .brand svg { width: 64px; height: 21px; }
     .pages { margin-left: 0; }
@@ -191,7 +191,7 @@
     .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
     .queue-head h1 { font-size: 28px; }
     .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .stat strong { font-size: 22px; }
+    .stat strong { font-size: 24px; }
     .switch-row { flex-direction: column-reverse; align-items: stretch; gap: 0; }
     .modes { align-self: flex-start; margin-top: 4px; }
     /* creators read as cards on a phone */
@@ -279,10 +279,10 @@
         </div>
       </div>
       <div class="stats">
-        <div class="stat"><strong id="stat-total">0</strong><span>Submissions</span></div>
-        <div class="stat"><strong id="stat-creators">0</strong><span>Creators</span></div>
-        <div class="stat"><strong id="stat-schools">0</strong><span>Schools</span></div>
-        <div class="stat"><strong id="stat-week">0</strong><span>This week</span></div>
+        <div class="stat"><span>Submissions</span><strong id="stat-total">0</strong><small>all time</small></div>
+        <div class="stat"><span>Creators</span><strong id="stat-creators">0</strong><small>who turned something in</small></div>
+        <div class="stat"><span>Schools</span><strong id="stat-schools">0</strong><small>represented</small></div>
+        <div class="stat"><span>This week</span><strong id="stat-week">0</strong><small>last 7 days</small></div>
       </div>
       <div class="switch-row">
         <div class="tabs" id="tabs" role="group" aria-label="Show">

@@ -662,7 +662,7 @@
   }
 
   function ctaTile(first, order) {
-    var li = el('li', 'tile');
+    var li = el('li', 'tile cta-tile');
     li.style.setProperty('--i', order);
     var card = el('a', 'cta-card');
     card.href = '#turn-in';
@@ -707,8 +707,34 @@
       shown.forEach(function (video, index) { wall.appendChild(videoTile(video, index)); });
       wall.appendChild(ctaTile(false, shown.length));
     }
+    fillRow();
     syncPlayback();
   }
+
+  // a wall of more than one row ends on a full row: a gap of one or two becomes drops to come,
+  // and when a bigger gap would be left but the videos fill their rows alone, the invite tile
+  // steps aside (the hero keeps its button)
+  var wallCols = 0;
+  function fillRow() {
+    wallCols = parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 1;
+    wall.querySelectorAll('.filler').forEach(function (tile) { tile.remove(); });
+    var cta = wall.querySelector('.cta-tile');
+    if (cta) cta.hidden = false;
+    if (!videos.length || !cta) return;
+    var count = wall.children.length;
+    if (count <= wallCols || count % wallCols === 0) return;
+    var need = wallCols - count % wallCols;
+    if (need > 1 && (count - 1) % wallCols === 0) { cta.hidden = true; return; }
+    if (need > 2) return;
+    for (var k = 0; k < need; k++) {
+      var slot = slotTile(videos.length + 2 + k);
+      slot.classList.add('filler');
+      wall.appendChild(slot);
+    }
+  }
+  window.addEventListener('resize', function () {
+    if ((parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 1) !== wallCols) fillRow();
+  });
 
   function renderChips() {
     var tags = [];
