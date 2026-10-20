@@ -58,6 +58,7 @@
     --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
     --gutter: clamp(16px, 3vw, 40px);
     --header: 64px;
+    --eyes-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='9 24 83 52'%3E%3Cpath d='M36.97 24.36c7.13 0 12.82 3.59 15.97 9.24-4.19 4.44-7.29 10.16-8.48 16.4-1.19 6.24-.28 11.96 2.21 16.4-5.32 5.65-12.38 9.24-19.51 9.24-8.73 0-15.3-5.38-17.7-13.32h17.39c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H14.18c5.44-7.94 14.07-13.32 22.79-13.32Z'/%3E%3Cpath d='M72.33 24.36c12.75 0 20.89 11.48 18.18 25.64-2.71 14.16-15.24 25.64-27.99 25.64-8.73 0-15.3-5.38-17.7-13.32h19.34c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H49.53c5.44-7.94 14.07-13.32 22.8-13.32Z'/%3E%3C/svg%3E");
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   [hidden] { display: none !important; }
@@ -200,6 +201,14 @@
   .cta-card { display: flex; flex-direction: column; justify-content: space-between; padding: clamp(14px, 1.3vw, 22px);
     background: radial-gradient(130% 62% at 50% 0%, rgba(172,184,249,.9) 0%, rgba(172,184,249,0) 72%), var(--blue); border-color: rgba(234,237,255,.22); color: #fff; }
   .cta-card .eyes { width: 38px; color: #fff; }
+  /* the same corner eyes on every video, in glass: an eye-shaped pane of frosted
+     glass over the footage, lit from the top, with a soft shadow beneath so it
+     still reads on bright shots */
+  .tile-eyes { position: absolute; z-index: 2; top: clamp(14px, 1.3vw, 22px); left: clamp(14px, 1.3vw, 22px); width: 38px; aspect-ratio: 83 / 52; pointer-events: none; }
+  .tile-eyes svg { position: absolute; inset: 0; width: 100%; height: 100%; color: rgba(6,5,16,.42); translate: 0 1.5px; filter: blur(2.5px); }
+  .tile-eyes i { position: absolute; inset: 0; -webkit-mask: var(--eyes-mask) center / contain no-repeat; mask: var(--eyes-mask) center / contain no-repeat;
+    background: linear-gradient(170deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.5) 52%, rgba(234,237,255,.72) 100%);
+    -webkit-backdrop-filter: blur(10px) saturate(1.6) brightness(1.15); backdrop-filter: blur(10px) saturate(1.6) brightness(1.15); }
   .cta-card .cta-k { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.82); }
   .cta-card strong { display: block; margin-top: 8px; font-size: clamp(22px, 2.1vw, 34px); font-weight: 700; line-height: 1.08; letter-spacing: -.045em; color: #fff; }
   .cta-card .cta-go { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; padding: 9px 13px; border-radius: 10px; background: rgba(11,9,31,.28); border: 1px solid rgba(234,237,255,.3); font-size: 13.5px; font-weight: 700; color: #fff; align-self: flex-start; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -332,6 +341,7 @@
     .slot b { left: 11px; bottom: 28px; }
     .slot small { left: 11px; bottom: 11px; }
     .cta-card .eyes { width: 30px; }
+    .tile-eyes { width: 30px; }
     .cta-card .cta-go { white-space: nowrap; font-size: 12.5px; padding: 8px 10px; gap: 5px; }
     .count { margin-left: 0; }
     /* filters swipe sideways instead of stacking */
@@ -644,8 +654,13 @@
     player.preload = 'metadata';
     if (video.poster) player.poster = video.poster;
     player.src = video.preview || video.src;
-    // the tile is the video alone: no tag, badge or caption on top of it
+    // the tile is the video, with only the glass eyes in its corner
     hit.appendChild(player);
+    var mark = el('span', 'tile-eyes');
+    mark.setAttribute('aria-hidden', 'true');
+    mark.appendChild(use('eyes'));
+    mark.appendChild(el('i'));
+    hit.appendChild(mark);
     hit.addEventListener('click', function () { openPlayer(index); });
     li.appendChild(hit);
     if (observer) observer.observe(player);
