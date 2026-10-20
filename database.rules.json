@@ -170,6 +170,12 @@
         "submission": {
           ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/)"
         },
+        "state": {
+          ".validate": "newData.isString() && newData.val().matches(/^[A-Z]{2}$/)"
+        },
+        "hashtags": {
+          ".validate": "newData.isString() && newData.val().length <= 500"
+        },
         "posted_at": {
           ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000"
         },
@@ -223,6 +229,13 @@
         "$other": {
           ".validate": false
         }
+      }
+    },
+    "content_tags": {
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      "$scope": {
+        ".validate": "$scope.matches(/^(all|region-(west|midwest|south|northeast)|topic-[a-z0-9-]{2,30})$/) && newData.isString() && newData.val().length <= 1000"
       }
     },
     "agencykitWorkspace": {

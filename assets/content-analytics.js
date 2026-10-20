@@ -4,6 +4,8 @@
 // of its views, likes, comments and shares; latest mirrors the newest snapshot.
 // Between snapshots a post's views are interpolated in a straight line from
 // (posted, 0), which is what "views gained" in a range and the chart are built on.
+// Each post can also carry the state it's for (the map, via content-geo.js),
+// the time it went up and the hashtags it used, which /campus/studio learns from.
 // Everything typed in is untrusted: it goes into the page as text, and a post
 // link becomes an <a> only if it is https. Sign-in comes from content-auth.js.
 (function () {
@@ -14,6 +16,9 @@
   var DAY = 86400000;
   var PLATFORMS = { tiktok: 'TikTok', instagram: 'Instagram', youtube: 'YouTube', x: 'X', other: 'Other' };
   var SVG = 'http://www.w3.org/2000/svg';
+  var GEO = window.contentGeo;
+  // one blue, light to dark: checked as an ordinal ramp (monotone, visible steps, light end >= 2:1)
+  var RAMP = ['#9eacf9', '#7c8df5', '#5c6fed', '#4252d6', '#2b33a8'];
 
   var posts = [], submissions = {}, range = 30, platform = 'all', loading = false, loadedAt = 0;
   var editing = null, numbersFor = null, chart = null;
@@ -75,6 +80,16 @@
     return out;
   }
   function newId() { return Date.now().toString(36) + '-' + randomId(6); }
+  function cleanTags(value) {
+    var seen = {};
+    return String(value || '').split(/[\s,]+/).map(function (t) { return t.replace(/^#+/, '').toLowerCase().replace(/[^\p{L}\p{N}_]/gu, ''); })
+      .filter(function (t) { if (!t || seen[t]) return false; seen[t] = 1; return true; }).slice(0, 30).map(function (t) { return '#' + t; }).join(' ');
+  }
+  function inkFor(hex) {
+    var c = [1, 3, 5].map(function (i) { var v = parseInt(hex.slice(i, i + 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+    var lum = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    return (1.05) / (lum + 0.05) > (lum + 0.05) / (0.0036 + 0.05) ? '#ffffff' : '#0b091f';
+  }
 
   // ---------- the data ----------
 
@@ -91,7 +106,9 @@
       latest: snaps.length ? snaps[snaps.length - 1] : { views: 0, likes: 0, comments: 0, shares: 0, at: posted },
       creator: creator, handle: (sub && sub.handle) || '',
       creatorKey: ((sub && sub.email) || creator).toLowerCase(),
-      school: (sub && sub.school) || data.school || ''
+      school: (sub && sub.school) || data.school || '',
+      state: GEO.STATES[data.state] ? data.state : '',
+      tags: data.hashtags || ''
     };
   }
 
@@ -161,6 +178,7 @@
 
     renderChart(list, now, label);
     renderPlatforms(list);
+    renderMap(list);
     renderGroup('creator-rows', list, function (post) { return post.creatorKey || ''; }, function (post) { return { name: post.creator || 'Unattributed', sub: post.handle }; });
     renderGroup('school-rows', list, function (post) { return post.school.trim().toLowerCase(); }, function (post) { return { name: post.school || 'No school' }; });
     renderPosts(list);
@@ -303,6 +321,105 @@
     });
   }
 
+  // ---------- where it's posted ----------
+
+  function twoFigures(v) { if (v < 10) return Math.round(v); var p = Math.pow(10, Math.floor(Math.log10(v)) - 1); return Math.round(v / p) * p; }
+  // five steps on a log scale between the smallest and largest state, rounded to two figures
+  function thresholds(min, max) {
+    var out = [];
+    if (max > min) for (var i = 1; i < 5; i++) out.push(twoFigures(min * Math.pow(max / min, i / 5)));
+    return out.filter(function (v, i, a) { return v > min && v <= max && a.indexOf(v) === i; });
+  }
+
+  function renderMap(list) {
+    var byState = {}, byRegion = {}, unmapped = 0;
+    list.forEach(function (post) {
+      if (!post.state) { unmapped++; return; }
+      var s = byState[post.state] = byState[post.state] || { posts: 0, views: 0, gained: 0 };
+      s.posts++; s.views += post.latest.views; s.gained += post.gained;
+      var region = GEO.STATES[post.state].region;
+      var r = byRegion[region] = byRegion[region] || { posts: 0, views: 0 };
+      r.posts++; r.views += post.latest.views;
+    });
+    var totals = Object.keys(byState).map(function (k) { return byState[k].views; });
+    var max = Math.max.apply(null, [0].concat(totals)), min = Math.min.apply(null, totals.length ? totals : [0]);
+    var cuts = thresholds(min, max);
+    var step = function (v) { var i = 0; while (i < cuts.length && v >= cuts[i]) i++; return Math.min(i + (RAMP.length - 1 - cuts.length), RAMP.length - 1); };
+
+    var tiles = $('tiles'), wrap = $('map');
+    tiles.textContent = '';
+    var old = wrap.querySelector('.tip'); if (old) old.remove();
+    var tip = el('div', 'tip'); tip.hidden = true;
+    var tipValue = el('strong'), tipSub = el('span');
+    tip.appendChild(tipValue); tip.appendChild(tipSub); wrap.appendChild(tip);
+    Object.keys(GEO.STATES).forEach(function (abbr) {
+      var g = GEO.STATES[abbr], s = byState[abbr], tile = el('div', 'tile' + (s ? ' has' : ''));
+      tile.style.gridRow = g.row; tile.style.gridColumn = g.col;
+      tile.setAttribute('role', 'listitem');
+      tile.appendChild(el('b', '', abbr));
+      if (s) {
+        var fill = RAMP[step(s.views)];
+        tile.style.background = fill; tile.style.color = inkFor(fill);
+        tile.appendChild(el('small', '', fmt(s.views)));
+        tile.tabIndex = 0;
+      }
+      var label = g.name + ': ' + (s ? full(s.views) + ' views from ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : 'no posts');
+      tile.setAttribute('aria-label', label);
+      var show = function () {
+        tipValue.textContent = s ? full(s.views) + ' views' : 'No posts yet';
+        tipSub.textContent = g.name + ' · ' + g.region + (s ? ' · ' + s.posts + (s.posts === 1 ? ' post' : ' posts') : '');
+        tip.hidden = false;
+        var box = wrap.getBoundingClientRect(), t = tile.getBoundingClientRect();
+        tip.style.left = Math.max(80, Math.min(box.width - 80, t.left - box.left + wrap.scrollLeft + t.width / 2)) + 'px';
+        tip.style.top = Math.max(0, t.top - box.top - 58) + 'px';
+      };
+      tile.addEventListener('pointerenter', show); tile.addEventListener('focus', show);
+      tile.addEventListener('pointerleave', function () { tip.hidden = true; }); tile.addEventListener('blur', function () { tip.hidden = true; });
+      tiles.appendChild(tile);
+    });
+
+    // legend: one row per step in use, then the empty state
+    var legend = $('map-legend'), bounds = [min].concat(cuts);
+    legend.textContent = '';
+    if (max > 0) {
+      bounds.forEach(function (lo, i) {
+        var hi = i + 1 < bounds.length ? bounds[i + 1] : null, li = el('li'), sw = el('i');
+        sw.style.background = RAMP[Math.min(i + (RAMP.length - 1 - cuts.length), RAMP.length - 1)];
+        li.appendChild(sw); li.appendChild(document.createTextNode(hi ? fmt(lo) + '–' + fmt(hi - 1) : fmt(lo) + '+'));
+        legend.insertBefore(li, legend.firstChild);
+      });
+    }
+    var none = el('li'); none.appendChild(el('i', 'none')); none.appendChild(document.createTextNode('No posts')); legend.appendChild(none);
+
+    // regions: one hue for every bar
+    var bars = $('region-bars'), rmax = Math.max.apply(null, [1].concat(GEO.REGIONS.map(function (r) { return byRegion[r] ? byRegion[r].views : 0; })));
+    bars.textContent = '';
+    GEO.REGIONS.slice().sort(function (a, b) { return (byRegion[b] ? byRegion[b].views : 0) - (byRegion[a] ? byRegion[a].views : 0); }).forEach(function (region) {
+      var r = byRegion[region] || { posts: 0, views: 0 }, li = el('li'), track = el('span', 'track'), bar = el('span', 'bar'), val = el('span', 'val', fmt(r.views));
+      li.appendChild(el('span', 'name', region));
+      bar.style.width = 'calc((100% - 52px) * ' + (r.views / rmax).toFixed(4) + ')';
+      if (!r.views) bar.style.minWidth = '0';
+      val.title = full(r.views) + ' views from ' + r.posts + ' posts';
+      track.appendChild(bar); track.appendChild(val); li.appendChild(track); bars.appendChild(li);
+    });
+    $('unmapped').hidden = !unmapped;
+    $('unmapped').textContent = unmapped + (unmapped === 1 ? ' post has' : ' posts have') + ' no state yet. Edit ' + (unmapped === 1 ? 'it' : 'them') + ' to put ' + (unmapped === 1 ? 'it' : 'them') + ' on the map.';
+
+    // the table twin
+    var tw = $('map-table-wrap'), table = el('table', 'table'), head = el('tr'), body = el('tbody');
+    tw.textContent = '';
+    ['State', 'Region', 'Posts', 'Views', $('posts-gained-head').textContent].forEach(function (h, i) { head.appendChild(el('th', i > 1 ? 'num' : '', h)); });
+    var thead = el('thead'); thead.appendChild(head); table.appendChild(thead);
+    Object.keys(byState).sort(function (a, b) { return byState[b].views - byState[a].views; }).forEach(function (abbr) {
+      var s = byState[abbr], tr = el('tr');
+      tr.appendChild(el('td', '', GEO.STATES[abbr].name)); tr.appendChild(el('td', '', GEO.STATES[abbr].region));
+      tr.appendChild(el('td', 'num', s.posts)); tr.appendChild(el('td', 'num', full(s.views))); tr.appendChild(el('td', 'num', (s.gained > 0 ? '+' : '') + full(s.gained)));
+      body.appendChild(tr);
+    });
+    table.appendChild(body); tw.appendChild(table);
+    if (!Object.keys(byState).length) tw.appendChild(el('p', 'muted', 'No posts with a state yet.'));
+  }
+
   // ---------- top creators and schools ----------
 
   function renderGroup(id, list, keyOf, describe) {
@@ -396,6 +513,18 @@
 
   // ---------- log or edit a post ----------
 
+  (function fillStates() {
+    var select = $('f-state');
+    GEO.sorted().forEach(function (s) { select.appendChild(new Option(s.name, s.abbr)); });
+  })();
+  function timeInput(t) { var d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  // a school logged before already knows its state
+  function stateForSchool(school) {
+    school = String(school || '').trim().toLowerCase();
+    var hit = school && posts.filter(function (p) { return p.state && p.school.trim().toLowerCase() === school; })[0];
+    return hit ? hit.state : '';
+  }
+
   function fillLists() {
     var creators = {}, schools = {};
     Object.keys(submissions).forEach(function (id) { var s = submissions[id] || {}; if (s.name) creators[s.name] = 1; if (s.school) schools[s.school] = 1; });
@@ -426,6 +555,9 @@
     $('f-platform').value = d.platform || 'tiktok';
     $('f-posted').value = dateInput(post ? post.posted : Date.now());
     $('f-posted').max = dateInput(Date.now());
+    $('f-time').value = timeInput(post ? post.posted : Date.now());
+    $('f-state').value = post ? post.state : '';
+    $('f-tags').value = post ? post.tags : '';
     $('f-title').value = d.title || '';
     $('f-creator').value = d.creator || '';
     $('f-school').value = d.school || '';
@@ -443,7 +575,9 @@
     if (!$('f-title').value.trim()) $('f-title').value = s.title || '';
     $('f-creator').value = s.name || '';
     $('f-school').value = s.school || '';
+    if (!$('f-state').value) $('f-state').value = stateForSchool(s.school);
   });
+  $('f-school').addEventListener('change', function () { if (!$('f-state').value) $('f-state').value = stateForSchool(this.value); });
 
   function numbersFrom(prefix, required) {
     var out = {}, names = ['views', 'likes', 'comments', 'shares'];
@@ -462,22 +596,25 @@
     var fail = function (input, message) { input.setAttribute('aria-invalid', 'true'); input.focus(); setError('post-error', message); };
     document.querySelectorAll('#post-form [aria-invalid]').forEach(function (n) { n.removeAttribute('aria-invalid'); });
     var url = cleanLink($('f-url').value), title = $('f-title').value.trim().replace(/\s+/g, ' ');
-    var posted = fromDateInput($('f-posted').value);
+    var posted = fromDateInput($('f-posted').value), time = /^(\d{2}):(\d{2})$/.exec($('f-time').value || '12:00');
+    if (time) posted += (Number(time[1]) * 60 + Number(time[2])) * 60000;
     if (!url) return fail($('f-url'), 'Paste the full link to the post.');
     if (!isFinite(posted)) return fail($('f-posted'), 'Pick the day it went up.');
-    if (posted > Date.now()) return fail($('f-posted'), 'That day hasn\'t happened yet.');
+    if (posted > Date.now() + 5 * 60000) return fail($('f-time'), 'That time hasn\'t happened yet.');
     if (!title) return fail($('f-title'), 'Give the post a title.');
     var details = {
       url: url, platform: $('f-platform').value, title: title, posted_at: posted,
       creator: $('f-creator').value.trim().replace(/\s+/g, ' ') || null,
       school: $('f-school').value.trim().replace(/\s+/g, ' ') || null,
-      submission: $('f-submission').value || null
+      submission: $('f-submission').value || null,
+      state: $('f-state').value || null,
+      hashtags: cleanTags($('f-tags').value) || null
     };
     var save = $('post-save'); save.disabled = true;
     try {
       if (editing) {
         var first = editing.snaps[0];
-        if (first && first.at < posted) return fail($('f-posted'), 'This post has numbers from before that day.');
+        if (first && first.at < posted) return fail($('f-posted'), 'This post has numbers from before then.');
         await db('PATCH', '/content_posts/' + editing.id, details);
       } else {
         var numbers = numbersFrom('f-', true);
@@ -584,11 +721,12 @@
     return '"' + text.replace(/"/g, '""') + '"';
   }
   function exportCsv() {
-    var lines = [['post_id', 'title', 'platform', 'url', 'creator', 'school', 'posted_on', 'numbers_at', 'views', 'likes', 'comments', 'shares'].join(',')];
+    var lines = [['post_id', 'title', 'platform', 'url', 'creator', 'school', 'state', 'region', 'posted_at', 'hashtags', 'numbers_at', 'views', 'likes', 'comments', 'shares'].join(',')];
     posts.forEach(function (post) {
       post.snaps.forEach(function (snap) {
         lines.push([post.id, post.data.title, PLATFORMS[post.data.platform] || 'Other', post.data.url, post.creator, post.school,
-          post.posted ? dateInput(post.posted) : '', new Date(snap.at).toISOString(), snap.views, snap.likes, snap.comments, snap.shares].map(csvCell).join(','));
+          post.state, post.state ? GEO.STATES[post.state].region : '', post.posted ? new Date(post.posted).toISOString() : '', post.tags,
+          new Date(snap.at).toISOString(), snap.views, snap.likes, snap.comments, snap.shares].map(csvCell).join(','));
       });
     });
     var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
@@ -615,6 +753,12 @@
   $('log-first').addEventListener('click', function () { openPost(null); });
   $('export').addEventListener('click', exportCsv);
   $('refresh').addEventListener('click', load);
+  $('map-toggle').addEventListener('click', function () {
+    var table = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', String(table));
+    this.textContent = table ? 'Show as map' : 'Show as table';
+    $('map-view').hidden = table; $('map-table-wrap').hidden = !table;
+  });
   $('time-toggle').addEventListener('click', function () {
     var table = this.getAttribute('aria-pressed') !== 'true';
     this.setAttribute('aria-pressed', String(table));

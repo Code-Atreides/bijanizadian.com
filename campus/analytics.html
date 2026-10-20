@@ -10,7 +10,8 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-auth.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=1" defer></script>
+<script src="/assets/content-geo.js?v=1" defer></script>
+<script src="/assets/content-analytics.js?v=2" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -182,6 +183,24 @@
   .empty strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
   .empty .primary-action { margin: 14px auto 0; }
 
+  /* the map: the /region tile grid, shaded by views on one validated blue ramp */
+  .map-grid { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 22px; align-items: start; }
+  .map { position: relative; overflow-x: auto; }
+  .tiles { display: grid; grid-template-columns: repeat(11, minmax(30px, 1fr)); gap: 5px; min-width: 400px; }
+  .tile { aspect-ratio: 1; border-radius: 7px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.1; background: var(--chip); color: var(--faint); border: 1px dashed var(--line); cursor: default; transition: transform .15s, box-shadow .15s; }
+  .tile.has { border: 0; }
+  .tile b { font-size: 12px; font-weight: 500; }
+  .tile small { font-size: 9.5px; margin-top: 2px; opacity: .92; font-variant-numeric: tabular-nums; }
+  .tile.has:hover, .tile.has:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(11,9,31,.2); }
+  .map .tip { top: 0; }
+  .legend-title { font-size: 11.5px; letter-spacing: 1.2px; font-weight: 500; color: var(--faint); text-transform: uppercase; margin-bottom: 8px; }
+  .legend { list-style: none; display: grid; gap: 5px; margin-bottom: 18px; font-size: 12.5px; color: var(--muted); }
+  .legend li { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
+  .legend i { width: 14px; height: 10px; border-radius: 3px; }
+  .legend i.none { background: var(--chip); border: 1px dashed var(--line); }
+  .bars.regions li { grid-template-columns: 76px minmax(0, 1fr); }
+  .unmapped { font-size: 12.5px; color: var(--muted-2); margin-top: 14px; line-height: 1.5; }
+
   /* ---------- dialogs ---------- */
   dialog { margin: auto; border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(11,9,31,.45); }
   dialog::backdrop { background: rgba(11,9,31,.42); }
@@ -205,6 +224,7 @@
     .site-shell { padding: 0 24px; }
     .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .row, .row.even { grid-template-columns: 1fr; }
+    .map-grid { grid-template-columns: 1fr; }
   }
   @media (max-width: 760px) {
     .queue-head { align-items: start; }
@@ -262,6 +282,7 @@
     <nav class="pages" aria-label="Media CRM">
       <a href="/campus/submissions">Queue</a>
       <a href="/campus/analytics" aria-current="page">Analytics</a>
+      <a href="/campus/studio">Studio</a>
     </nav>
     <div class="account" id="account" hidden>
       <span id="account-email"></span>
@@ -350,6 +371,24 @@
           </section>
         </div>
 
+        <section class="card" aria-labelledby="c-map" style="margin-bottom:14px">
+          <div class="card-head">
+            <h2 id="c-map">Where it's posted</h2>
+            <button type="button" class="text-button" id="map-toggle" aria-pressed="false">Show as table</button>
+          </div>
+          <div class="map-grid" id="map-view">
+            <div class="map" id="map"><div class="tiles" id="tiles" role="list" aria-label="Views by state"></div></div>
+            <div>
+              <p class="legend-title">Views, all time</p>
+              <ul class="legend" id="map-legend"></ul>
+              <p class="legend-title">By region</p>
+              <ul class="bars regions" id="region-bars"></ul>
+              <p class="unmapped" id="unmapped" hidden></p>
+            </div>
+          </div>
+          <div id="map-table-wrap" hidden></div>
+        </section>
+
         <div class="row even">
           <section class="card" aria-labelledby="c-creators">
             <div class="card-head"><h2 id="c-creators">Top creators</h2><p id="c-creators-sub">by views</p></div>
@@ -392,7 +431,7 @@
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · <a href="/campus/studio">Studio</a> · Team only
   </footer>
 </div>
 
@@ -409,13 +448,20 @@
       <label class="field">Platform
         <select id="f-platform"><option value="tiktok">TikTok</option><option value="instagram">Instagram</option><option value="youtube">YouTube</option><option value="x">X</option><option value="other">Other</option></select>
       </label>
+      <label class="field">State <span>where it's for</span>
+        <select id="f-state"><option value="">Not set</option></select>
+      </label>
+    </div>
+    <div class="pair">
       <label class="field">Posted on<input id="f-posted" type="date"></label>
+      <label class="field">At <span>your time</span><input id="f-time" type="time"></label>
     </div>
     <label class="field">Title<input id="f-title" maxlength="120" placeholder="What the video is"></label>
     <div class="pair">
       <label class="field">Creator <span>optional</span><input id="f-creator" maxlength="100" list="creator-list" autocomplete="off"></label>
       <label class="field">School <span>optional</span><input id="f-school" maxlength="120" list="school-list" autocomplete="off"></label>
     </div>
+    <label class="field">Hashtags used <span>optional</span><input id="f-tags" maxlength="500" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="#fomo #gameday #usc"></label>
     <div id="f-numbers">
       <p class="fieldset-title">NUMBERS RIGHT NOW</p>
       <div class="quad">
