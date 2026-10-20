@@ -6,9 +6,11 @@
 // start from general guidance for college audiences. Once a region has 4+ timed
 // posts on a platform with 3 days of numbers, the plan uses the team's own best
 // slot instead (average views in the first 3 days, by weekday and time block).
-// Hashtags: the team's proven tags for that region and platform, then brand,
-// topic and local tags from the hashtag library (RTDB content_tags, falling back
-// to starter sets), with school and state tags from posts already in the region.
+// Hashtags, 5 per platform (Instagram's limit since December 2025): a tag that
+// has performed there, the brand tag, a topic tag, and two local tags: the real
+// student hashtags of the program's campuses in the region (content-schools.js),
+// its top campuses by default or one picked on the card. The team can replace
+// any list in the hashtag library (RTDB content_tags).
 // Everything typed in is untrusted and goes into the page as text.
 (function () {
   'use strict';
@@ -16,12 +18,14 @@
   var $ = function (id) { return document.getElementById(id); };
   var db = window.contentAuth.db;
   var GEO = window.contentGeo;
+  var CAMPUS = window.contentSchools;
   var DAY = 86400000;
   var RAMP = ['#9eacf9', '#7c8df5', '#5c6fed', '#4252d6', '#2b33a8'];
   var DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   var WEEK = [1, 2, 3, 4, 5, 6, 0];
-  var PLATFORMS = { tiktok: { name: 'TikTok', count: 5, quota: { learned: 1, brand: 1, topic: 2, local: 1 } },
-    instagram: { name: 'Instagram', count: 8, quota: { learned: 2, brand: 1, topic: 3, local: 2 } } };
+  // Instagram takes at most 5 hashtags a post; TikTok works best with 3 to 5
+  var PLATFORMS = { tiktok: { name: 'TikTok', count: 5, quota: { learned: 1, brand: 1, topic: 1, local: 2 } },
+    instagram: { name: 'Instagram', count: 5, quota: { learned: 1, brand: 1, topic: 1, local: 2 } } };
   var TOPICS = [
     { id: 'greek-wars', name: 'Greek Wars', tags: '#greeklife #greekwars #frat #sorority' },
     { id: 'game-day', name: 'Game day', tags: '#gameday #collegefootball #tailgate #studentsection' },
@@ -31,7 +35,7 @@
     { id: 'dinners', name: 'Dinners', tags: '#dinnerparty #collegefriends #friends' },
     { id: 'other', name: 'Anything else', tags: '' }
   ];
-  var STARTER = { all: '#fomo #collegelife #college #campuslife', 'region-west': '#westcoast', 'region-midwest': '#midwest', 'region-south': '#southern', 'region-northeast': '#eastcoast' };
+  var STARTER = { all: '#fomo #collegelife' };
   TOPICS.forEach(function (t) { STARTER['topic-' + t.id] = t.tags; });
   // starting points, in the audience's local time: general guidance for college audiences, not measured
   var WINDOWS = {
@@ -46,8 +50,9 @@
   var LEARN_MIN = 4;
   var HERE = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  var posts = [], library = {}, topic = 'greek-wars', platforms = { tiktok: true, instagram: true }, regions = {}, loading = false, loadedAt = 0;
-  GEO.REGIONS.forEach(function (r) { regions[r] = true; });
+  // nothing is picked until the team picks it
+  var posts = [], library = {}, topic = 'greek-wars', platforms = { tiktok: false, instagram: false }, regions = {}, focus = {}, loading = false, loadedAt = 0;
+  GEO.REGIONS.forEach(function (r) { regions[r] = false; focus[r] = ''; });
 
   // ---------- small helpers ----------
 
@@ -66,7 +71,6 @@
     return String(value || '').split(/[\s,]+/).map(function (t) { return t.replace(/^#+/, '').toLowerCase().replace(/[^\p{L}\p{N}_]/gu, ''); })
       .filter(function (t) { if (!t || seen[t]) return false; seen[t] = 1; return true; }).slice(0, 30).map(function (t) { return '#' + t; });
   }
-  function slugTag(text) { var t = String(text || '').toLowerCase().replace(/[^\p{L}\p{N}]/gu, ''); return t && t.length <= 30 ? '#' + t : ''; }
   function inkFor(hex) {
     var c = [1, 3, 5].map(function (i) { var v = parseInt(hex.slice(i, i + 2), 16) / 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
     var lum = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
@@ -198,9 +202,34 @@
       .sort(function (a, b) { return (b.avg === null ? -1 : b.avg) - (a.avg === null ? -1 : a.avg) || b.posts - a.posts; });
   }
 
+  // ---------- campuses ----------
+
+  function campusesIn(region) {
+    var posted = {};
+    posts.forEach(function (p) { var c = CAMPUS.find(p.school); if (c) posted[c.name] = (posted[c.name] || 0) + 1; });
+    return CAMPUS.list.filter(function (c) { return GEO.STATES[c.state] && GEO.STATES[c.state].region === region; })
+      .sort(function (a, b) { return (posted[b.name] || 0) - (posted[a.name] || 0) || b.members - a.members || b.chapters - a.chapters || a.short.localeCompare(b.short); });
+  }
+  function topCampuses(region, n) { return campusesIn(region).slice(0, n); }
+  // first tags first, so two slots go to two campuses' best-known tags
+  function interleave(campuses) {
+    var out = [], depth = Math.max.apply(null, [0].concat(campuses.map(function (c) { return c.tags.length; })));
+    for (var i = 0; i < depth; i++) campuses.forEach(function (c) { if (c.tags[i]) out.push({ tag: c.tags[i], campus: c }); });
+    return out;
+  }
+  function regionStarter(region) { return interleave(topCampuses(region, 3)).map(function (t) { return t.tag; }).join(' '); }
+
   // ---------- the plan ----------
 
-  function libraryTags(scope) { return cleanTags(library[scope] !== undefined ? library[scope] : STARTER[scope] || ''); }
+  function starterFor(scope) { return scope.indexOf('region-') === 0 ? regionStarter(scope.slice(7, 8).toUpperCase() + scope.slice(8)) : STARTER[scope] || ''; }
+  function libraryTags(scope) { return cleanTags(library[scope] !== undefined ? library[scope] : starterFor(scope)); }
+  function localTags(region) {
+    var picked = focus[region] && CAMPUS.list.filter(function (c) { return c.name === focus[region]; })[0];
+    if (picked) return interleave([picked]);
+    var scope = 'region-' + region.toLowerCase();
+    if (library[scope] !== undefined) return libraryTags(scope).map(function (t) { return { tag: t, campus: null }; });
+    return interleave(topCampuses(region, 2));
+  }
 
   function schedule(region, platform) {
     var learned = slots(region, platform), best = learned.list.filter(function (c) { return c.n >= 2; })[0];
@@ -231,24 +260,20 @@
       }
     }
     var proven = tagStats(region, platform).filter(function (s) { return s.n3 >= 2; });
-    var inRegion = matching(region, null);
-    var schoolCount = {}, stateCount = {};
-    inRegion.forEach(function (p) { var t = slugTag(p.school); if (t) schoolCount[t] = (schoolCount[t] || 0) + 1; if (p.state) stateCount[p.state] = (stateCount[p.state] || 0) + 1; });
-    var schools = Object.keys(schoolCount).sort(function (a, b) { return schoolCount[b] - schoolCount[a]; });
-    var states = Object.keys(stateCount).sort(function (a, b) { return stateCount[b] - stateCount[a]; }).map(function (s) { return slugTag(GEO.STATES[s].name); });
-    var brand = libraryTags('all'), topicTags = libraryTags('topic-' + topic), local = libraryTags('region-' + region.toLowerCase());
+    var brand = libraryTags('all'), topicTags = libraryTags('topic-' + topic), local = localTags(region);
     var topicName = TOPICS.filter(function (t) { return t.id === topic; })[0].name;
+    var provenWhy = function (s) { return 'Proven here: ' + full(s.avg) + ' avg views in 3 days over ' + s.n3 + ' posts'; };
+    var localWhy = function (t) { return t.campus ? 'Campus: ' + t.campus.short + (t.campus.members ? ' (' + t.campus.members + ' fomo members)' : '') : 'Your ' + region + ' list'; };
 
-    add(proven, quota.learned, function (s) { return 'Proven here: ' + full(s.avg) + ' avg views in 3 days over ' + s.n3 + ' posts'; }, true);
+    add(proven, quota.learned, provenWhy, true);
     add(brand, quota.brand, 'Brand');
+    add(local, quota.local, localWhy);
     add(topicTags, quota.topic, 'Topic: ' + topicName);
-    add(schools.concat(local, states), quota.local, function (t) { return schools.indexOf(t) > -1 ? 'A school you\'ve posted for here' : states.indexOf(t) > -1 ? 'A state you\'ve posted for here' : 'Local: ' + region; });
-    // fill to the platform's size from whatever is left, in the same order
-    var count = PLATFORMS[platform].count - out.length;
-    add(proven, count, function (s) { return 'Proven here: ' + full(s.avg) + ' avg views in 3 days over ' + s.n3 + ' posts'; }, true); count = PLATFORMS[platform].count - out.length;
-    add(topicTags, count, 'Topic: ' + topicName); count = PLATFORMS[platform].count - out.length;
-    add(schools.concat(local, states), count, 'Local: ' + region); count = PLATFORMS[platform].count - out.length;
-    add(brand, count, 'Broad reach');
+    // fill to the platform's size from whatever is left: topic, then local, then broad
+    var room = function () { return PLATFORMS[platform].count - out.length; };
+    add(topicTags, room(), 'Topic: ' + topicName);
+    add(local, room(), localWhy);
+    add(brand, room(), 'Broad reach');
     return out;
   }
 
@@ -278,7 +303,8 @@
     box.textContent = '';
     if (!chosen.length || !plats.length) {
       var empty = el('div', 'card empty plans-empty');
-      empty.appendChild(el('strong', '', 'Pick at least one region and one platform.'));
+      empty.appendChild(el('strong', '', 'Where are you posting?'));
+      empty.appendChild(el('span', '', 'Pick TikTok or Instagram and at least one region above, and the plan for each region shows up here.'));
       box.appendChild(empty); return;
     }
     chosen.forEach(function (region) {
@@ -288,6 +314,15 @@
       var views = inRegion.reduce(function (s, p) { return s + p.latest.views; }, 0);
       head.appendChild(el('span', 'so-far', inRegion.length ? inRegion.length + (inRegion.length === 1 ? ' post' : ' posts') + ' · ' + fmt(views) + ' views so far' : 'No posts here yet'));
       card.appendChild(head);
+      var pick = el('label', 'campus-pick'), select = el('select'), campuses = campusesIn(region), top = topCampuses(region, 2);
+      pick.appendChild(el('span', '', 'Local tags from'));
+      select.appendChild(new Option(library['region-' + region.toLowerCase()] !== undefined ? 'Your ' + region + ' list' : 'Top campuses: ' + top.map(function (c) { return c.short; }).join(' & '), ''));
+      campuses.forEach(function (c) { select.appendChild(new Option(c.short + (c.members ? ' · ' + c.members + ' members' : ''), c.name)); });
+      select.value = focus[region];
+      select.setAttribute('aria-label', 'Local hashtags for the ' + region + ' come from');
+      select.addEventListener('change', function () { focus[region] = this.value; renderPlans(); });
+      pick.appendChild(select);
+      card.appendChild(pick);
       plats.forEach(function (platform) {
         var plan = planFor(region, platform), block = el('section', 'pblock'), bh = el('div', 'pblock-head');
         bh.appendChild(el('span', 'pname', PLATFORMS[platform].name));
@@ -316,7 +351,7 @@
         copy.type = 'button'; copy.appendChild(label);
         copy.setAttribute('aria-label', 'Copy the ' + PLATFORMS[platform].name + ' hashtags for the ' + region);
         copy.addEventListener('click', function () { copyText(plan.tags.map(function (t) { return t.tag; }).join(' '), copy, label); });
-        row.appendChild(el('small', '', plan.tags.length + ' tags · hover one to see why'));
+        row.appendChild(el('small', '', plan.tags.length + ' tags' + (platform === 'instagram' ? ', Instagram\'s limit' : '') + ' · hover one to see why'));
         row.appendChild(copy);
         block.appendChild(row);
         card.appendChild(block);
@@ -387,7 +422,7 @@
   // ---------- the hashtag library ----------
 
   var SCOPES = [{ id: 'all', name: 'All regions: brand & broad' }]
-    .concat(GEO.REGIONS.map(function (r) { return { id: 'region-' + r.toLowerCase(), name: 'Region: ' + r }; }))
+    .concat(GEO.REGIONS.map(function (r) { return { id: 'region-' + r.toLowerCase(), name: 'Region: ' + r + ' (campus tags)' }; }))
     .concat(TOPICS.map(function (t) { return { id: 'topic-' + t.id, name: 'Topic: ' + t.name }; }));
   function renderLibrary() {
     var scope = $('lib-scope').value, mine = library[scope] !== undefined;
@@ -423,7 +458,7 @@
 
   TOPICS.forEach(function (t) { $('topic').appendChild(new Option(t.name, t.id)); });
   GEO.REGIONS.forEach(function (r) {
-    var b = el('button', 'toggle', r); b.type = 'button'; b.dataset.region = r; b.setAttribute('aria-pressed', 'true');
+    var b = el('button', 'toggle', r); b.type = 'button'; b.dataset.region = r; b.setAttribute('aria-pressed', 'false');
     $('regions').appendChild(b);
     $('learn-region').appendChild(new Option(r, r));
   });
@@ -442,7 +477,12 @@
   $('lib-scope').addEventListener('change', renderLibrary);
   $('lib-save').addEventListener('click', function () { saveLibrary(false); });
   $('lib-reset').addEventListener('click', function () { saveLibrary(true); });
-  $('copy-plan').addEventListener('click', function () { copyText(planText(), this, $('copy-plan-label')); });
+  $('copy-plan').addEventListener('click', function () {
+    if (!GEO.REGIONS.some(function (r) { return regions[r]; }) || !Object.keys(platforms).some(function (p) { return platforms[p]; })) {
+      var label = $('copy-plan-label'); label.textContent = 'Pick a platform and region first'; setTimeout(function () { label.textContent = 'Copy the plan'; }, 1800); return;
+    }
+    copyText(planText(), this, $('copy-plan-label'));
+  });
   $('refresh').addEventListener('click', load);
   document.addEventListener('visibilitychange', function () {
     if (document.visibilityState === 'visible' && window.contentAuth.signedIn() && Date.now() - loadedAt > 60000) load();

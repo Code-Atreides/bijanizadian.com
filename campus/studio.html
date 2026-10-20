@@ -11,7 +11,8 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-auth.js?v=1" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
-<script src="/assets/content-studio.js?v=1" defer></script>
+<script src="/assets/content-schools.js?v=1" defer></script>
+<script src="/assets/content-studio.js?v=2" defer></script>
 <!--
   Viralify Studio, the planning side of the media CRM: for each region, when to
   post on TikTok and Instagram and which hashtags to use. It starts from general
@@ -265,8 +266,10 @@
   .toggles { display: flex; gap: 6px; flex-wrap: wrap; }
   .toggle { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 99px; border: 1px solid var(--option-line); background: #fff; color: var(--muted-2); font: inherit; font-size: 13px; font-weight: 500; }
   .toggle:hover { color: var(--ink); background: var(--tint); }
-  .toggle[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
-  .toggle[aria-pressed="true"]::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--blue); }
+  /* picked reads as filled fomo blue; not picked stays an outline */
+  .toggle[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .toggle[aria-pressed="true"]:hover { background: var(--blue-hover); color: #fff; }
+  .toggle[aria-pressed="true"]::before { content: ""; width: 9px; height: 5px; border: solid #fff; border-width: 0 0 2px 2px; rotate: -45deg; translate: 0 -2px; }
 
   .plans { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
   .plan header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
@@ -291,6 +294,9 @@
   .copy-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
   .copy-row small { font-size: 12px; color: var(--faint); }
   .plans-empty { grid-column: 1 / -1; }
+  .plans-empty span { display: block; }
+  .campus-pick { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 12.5px; color: var(--muted-2); }
+  .campus-pick select { height: 32px; max-width: 100%; min-width: 0; border: 1px solid var(--option-line); border-radius: 7px; background: #fff; font: inherit; font-size: 13px; color: var(--ink); padding: 0 8px; }
 
   /* heatmap: a real table whose cells carry the ramp */
   .learn-filters { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -392,8 +398,8 @@
       <div class="planner">
         <label class="group"><span>Topic</span><select id="topic"></select></label>
         <div class="group"><span>Post on</span><div class="toggles" id="platforms" role="group" aria-label="Platforms">
-          <button type="button" class="toggle" data-platform="tiktok" aria-pressed="true">TikTok</button>
-          <button type="button" class="toggle" data-platform="instagram" aria-pressed="true">Instagram</button>
+          <button type="button" class="toggle" data-platform="tiktok" aria-pressed="false">TikTok</button>
+          <button type="button" class="toggle" data-platform="instagram" aria-pressed="false">Instagram</button>
         </div></div>
         <div class="group"><span>Regions</span><div class="toggles" id="regions" role="group" aria-label="Regions"></div></div>
       </div>

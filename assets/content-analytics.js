@@ -518,8 +518,10 @@
     GEO.sorted().forEach(function (s) { select.appendChild(new Option(s.name, s.abbr)); });
   })();
   function timeInput(t) { var d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
-  // a school logged before already knows its state
+  // a program school, or a school logged before, already knows its state
   function stateForSchool(school) {
+    var known = window.contentSchools && window.contentSchools.find(school);
+    if (known) return known.state;
     school = String(school || '').trim().toLowerCase();
     var hit = school && posts.filter(function (p) { return p.state && p.school.trim().toLowerCase() === school; })[0];
     return hit ? hit.state : '';
@@ -529,6 +531,7 @@
     var creators = {}, schools = {};
     Object.keys(submissions).forEach(function (id) { var s = submissions[id] || {}; if (s.name) creators[s.name] = 1; if (s.school) schools[s.school] = 1; });
     posts.forEach(function (post) { if (post.creator) creators[post.creator] = 1; if (post.school) schools[post.school] = 1; });
+    if (window.contentSchools) window.contentSchools.list.forEach(function (c) { schools[c.name] = 1; });
     [['creator-list', creators], ['school-list', schools]].forEach(function (pair) {
       var list = $(pair[0]); list.textContent = '';
       Object.keys(pair[1]).sort().forEach(function (value) { var o = el('option'); o.value = value; list.appendChild(o); });
