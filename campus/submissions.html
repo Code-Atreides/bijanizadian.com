@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
-<title>Edit queue | fomo campus</title>
+<title>Campus media CRM | fomo campus</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<script src="/assets/content-inbox.js?v=1" defer></script>
+<script src="/assets/content-inbox.js?v=2" defer></script>
 <!--
   The back of the edit queue: everything sent from /campus/submit, for the team
   account only. Sign-in is an emailed link, the same as /agencykit, and the
@@ -93,7 +93,27 @@
   .option:hover { background: var(--lavender); }
   .option.icon { width: 38px; padding: 0; }
 
-  .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+  .queue-head .eyebrow { margin-bottom: 8px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+  .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 12px 14px; }
+  .stat strong { display: block; font-size: 26px; font-weight: 500; letter-spacing: -.8px; line-height: 1.1; }
+  .stat span { font-size: 12.5px; color: var(--muted); }
+  .switch-row { display: flex; align-items: end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+  .modes { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; margin-bottom: 8px; flex: none; }
+  .modes button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 32px; padding: 0 12px; }
+  .modes button + button { border-left: 1px solid var(--option-line); }
+  .modes button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
+  .people-count { font-size: 14px; color: var(--muted-2); padding: 9px 0 11px; }
+  .people { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .people th { text-align: left; font-size: 11.5px; letter-spacing: 1.2px; font-weight: 500; color: var(--faint); text-transform: uppercase; padding: 12px 12px 8px 0; border-bottom: 1px solid var(--line); }
+  .people td { padding: 13px 12px 13px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: #50566e; line-height: 1.45; }
+  .people td strong { display: block; font-weight: 500; color: var(--ink); }
+  .people td a { color: var(--blue-text); text-decoration: none; overflow-wrap: anywhere; }
+  .people td a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .people .num { font-size: 15px; font-weight: 500; color: var(--ink); }
+  .people .split { display: block; font-size: 12px; color: var(--muted-2); }
+  .people td:last-child { padding-right: 0; text-align: right; }
+  .tabs { display: flex; gap: 6px; }
   .tabs button { border: 0; background: none; font: inherit; font-size: 14px; color: var(--muted-2); padding: 9px 4px 11px; margin-right: 14px; border-bottom: 2px solid transparent; margin-bottom: -1px; display: flex; gap: 7px; align-items: center; }
   .tabs button:hover { color: var(--ink); }
   .tabs button[aria-pressed="true"] { color: var(--blue-text); font-weight: 500; border-bottom-color: var(--blue); }
@@ -130,6 +150,7 @@
   .remove { border: 0; background: none; color: var(--faint); width: 32px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
   .remove:hover { background: #fff1ef; color: #9b362e; }
 
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .empty { text-align: center; padding: 56px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
   .empty strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
 
@@ -145,7 +166,7 @@
   .when-inline { display: none; color: var(--muted-2); }
   @media (max-width: 760px) {
     .queue-head { align-items: start; }
-    .tools { width: 100%; }
+    .tools { width: 100%; flex-wrap: wrap; }
     .search { flex: 1; width: auto; }
     .item { grid-template-columns: 1fr; gap: 10px; }
     /* the files button gets its own row; status and delete share the next */
@@ -162,9 +183,21 @@
     .signin { margin-top: 4vh; }
     .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
     .queue-head h1 { font-size: 28px; }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .stat strong { font-size: 22px; }
+    .switch-row { flex-direction: column-reverse; align-items: stretch; gap: 0; }
+    .modes { align-self: flex-start; margin-top: 4px; }
+    /* creators read as cards on a phone */
+    .people thead { display: none; }
+    .people tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .people td { border: 0; padding: 0; }
+    .people td:nth-child(1), .people td:nth-child(2), .people td:nth-child(3) { grid-column: 1; }
+    .people td:nth-child(4) { grid-column: 2; grid-row: 1; text-align: right; }
+    .people td:nth-child(5) { grid-column: 2; grid-row: 2; text-align: right; }
+    .people td:last-child { grid-column: 1 / -1; text-align: left; margin-top: 6px; }
     .tabs { overflow-x: auto; scrollbar-width: none; }
     .tabs button { margin-right: 8px; }
-    .copy-label { display: none; }
+    .copy-label, .csv-label { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -198,11 +231,11 @@
     <section class="signin" id="signin" hidden aria-labelledby="signin-title">
       <div class="signin-head">
         <span class="eyebrow">TEAM ONLY</span>
-        <h1 id="signin-title" tabindex="-1">Edit <span>queue.</span></h1>
+        <h1 id="signin-title" tabindex="-1">Campus <span>media.</span></h1>
       </div>
       <div class="signin-body">
         <form id="link-form" novalidate>
-          <p>Sign in with the team email to see everything sent from <a href="/campus/submit">/campus/submit</a>.</p>
+          <p>Sign in with the team email to see everything turned in from <a href="/campus/media#turn-in">/campus/media</a> and <a href="/campus/submit">/campus/submit</a>.</p>
           <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
           <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
         </form>
@@ -219,32 +252,51 @@
     <section id="queue" hidden aria-labelledby="queue-title">
       <div class="queue-head">
         <div>
-          <h1 id="queue-title" tabindex="-1">Edit queue</h1>
+          <span class="eyebrow">CAMPUS MEDIA · TEAM ONLY</span>
+          <h1 id="queue-title" tabindex="-1">Media CRM</h1>
           <p id="queue-summary">Loading…</p>
         </div>
         <div class="tools">
           <label class="search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-            <input id="search" type="search" placeholder="Search names, schools, titles" aria-label="Search submissions" autocomplete="off">
+            <input id="search" type="search" placeholder="Search names, schools, emails" aria-label="Search" autocomplete="off">
           </label>
-          <button type="button" class="option" id="copy-form" title="Copy the link to /campus/submit"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="copy-label">Copy form link</span></button>
+          <button type="button" class="option" id="copy-form" title="Copy the link to turn in content"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span class="copy-label">Copy turn-in link</span></button>
+          <button type="button" class="option" id="export" title="Download every submission as a spreadsheet"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span class="csv-label">Export CSV</span></button>
           <button type="button" class="option icon" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg></button>
         </div>
       </div>
-      <div class="tabs" role="group" aria-label="Show">
-        <button type="button" data-filter="new" aria-pressed="true">New <b id="count-new">0</b></button>
-        <button type="button" data-filter="editing" aria-pressed="false">Editing <b id="count-editing">0</b></button>
-        <button type="button" data-filter="done" aria-pressed="false">Done <b id="count-done">0</b></button>
-        <button type="button" data-filter="all" aria-pressed="false">All <b id="count-all">0</b></button>
+      <div class="stats">
+        <div class="stat"><strong id="stat-total">0</strong><span>Submissions</span></div>
+        <div class="stat"><strong id="stat-creators">0</strong><span>Creators</span></div>
+        <div class="stat"><strong id="stat-schools">0</strong><span>Schools</span></div>
+        <div class="stat"><strong id="stat-week">0</strong><span>This week</span></div>
+      </div>
+      <div class="switch-row">
+        <div class="tabs" id="tabs" role="group" aria-label="Show">
+          <button type="button" data-filter="new" aria-pressed="true">New <b id="count-new">0</b></button>
+          <button type="button" data-filter="editing" aria-pressed="false">Editing <b id="count-editing">0</b></button>
+          <button type="button" data-filter="done" aria-pressed="false">Done <b id="count-done">0</b></button>
+          <button type="button" data-filter="all" aria-pressed="false">All <b id="count-all">0</b></button>
+        </div>
+        <p class="people-count" id="people-count" hidden></p>
+        <div class="modes" role="group" aria-label="View">
+          <button type="button" data-mode="queue" aria-pressed="true">Submissions</button>
+          <button type="button" data-mode="creators" aria-pressed="false">Creators</button>
+        </div>
       </div>
       <p class="queue-error" id="queue-error" role="alert" hidden></p>
       <ol class="list" id="list"></ol>
-      <div class="empty" id="empty" hidden><strong id="empty-title">Nothing new.</strong><span id="empty-text">New submissions from /campus/submit show up here.</span></div>
+      <table class="people" id="people" hidden>
+        <thead><tr><th scope="col">Creator</th><th scope="col">School</th><th scope="col">Contact</th><th scope="col">Turned in</th><th scope="col">Last</th><th scope="col"><span class="sr">Open</span></th></tr></thead>
+        <tbody id="people-rows"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden><strong id="empty-title">Nothing new.</strong><span id="empty-text">New submissions show up here.</span></div>
     </section>
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/submit">Submission form</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submit">Submission form</a> · Team only
   </footer>
 </div>
 </body>

@@ -1,6 +1,7 @@
-// The edit queue at /campus/submissions: an emailed sign-in link (as on
-// /agencykit), then every entry in RTDB content_submissions with its status
-// from content_status. Only the team's verified email can read either node,
+// The campus media CRM at /campus/submissions: an emailed sign-in link (as on
+// /agencykit), then every entry in RTDB content_submissions (turned in from
+// /campus/media or /campus/submit) with its status from content_status, plus
+// a creators view rolled up by email and a CSV export. Only the team's verified email can read either node,
 // so a signed-in stranger gets "no access" from the database itself.
 // Submitted values are untrusted: they go into the page as text, and a file
 // link becomes an <a> only if it is https.
@@ -9,7 +10,7 @@
 
   var API_KEY = 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw';
   var DB = 'https://bijanizadian-84e48-default-rtdb.firebaseio.com';
-  var FORM_URL = 'https://bijanizadian.com/campus/submit';
+  var FORM_URL = 'https://bijanizadian.com/campus/media#turn-in';
   var SESSION = 'content-inbox-session-v1', EMAIL = 'content-inbox-email';
   var STATUSES = ['new', 'editing', 'done'];
   var LABELS = { 'new': 'New', editing: 'Editing', done: 'Done' };
@@ -21,7 +22,7 @@
   };
   var $ = function (id) { return document.getElementById(id); };
 
-  var auth = null, items = [], filter = 'new', loadedAt = 0, loading = false;
+  var auth = null, items = [], filter = 'new', mode = 'queue', loadedAt = 0, loading = false;
   try { auth = JSON.parse(saved.get(SESSION) || 'null'); } catch (e) { auth = null; }
   if (!auth || !auth.refreshToken) auth = null;
 
@@ -140,7 +141,7 @@
 
   function failed(error) {
     if (error.message === 'signed-out') return signOut('Your session ended. Sign in again.', true);
-    if (error.message === 'no-access') return signOut('This email can\'t open the edit queue.', true);
+    if (error.message === 'no-access') return signOut('This email can\'t open the media CRM.', true);
     $('queue-error').textContent = 'The queue couldn\'t update. Check your connection and refresh.';
     $('queue-error').hidden = false;
   }
@@ -302,6 +303,57 @@
     return li;
   }
 
+  // ---------- creators: everyone who has turned something in, by email ----------
+
+  function creators() {
+    var byEmail = {};
+    // items are newest first, so the first entry per email holds their latest details
+    items.forEach(function (item) {
+      var entry = item.entry, key = String(entry.email || '').toLowerCase() || 'no-email:' + item.id;
+      var person = byEmail[key];
+      if (!person) person = byEmail[key] = { email: entry.email || '', name: entry.name || '', school: entry.school || '', handle: '', last: entry.submitted_at || 0, total: 0, 'new': 0, editing: 0, done: 0 };
+      if (!person.handle && entry.handle) person.handle = entry.handle;
+      person.total++; person[item.status]++;
+    });
+    return Object.keys(byEmail).map(function (key) { return byEmail[key]; });
+  }
+
+  function personRow(person) {
+    var tr = document.createElement('tr');
+    var who = document.createElement('td');
+    who.appendChild(el('strong', '', person.name || 'No name'));
+    if (person.handle) who.appendChild(el('span', '', person.handle));
+    tr.appendChild(who);
+    tr.appendChild(el('td', '', person.school));
+    var contact = document.createElement('td');
+    if (person.email) { var mail = el('a', '', person.email); mail.href = 'mailto:' + person.email; contact.appendChild(mail); }
+    tr.appendChild(contact);
+    var count = document.createElement('td');
+    count.appendChild(el('span', 'num', person.total));
+    var split = [];
+    STATUSES.forEach(function (status) { if (person[status]) split.push(person[status] + ' ' + LABELS[status].toLowerCase()); });
+    count.appendChild(el('span', 'split', split.join(' · ')));
+    tr.appendChild(count);
+    var last = el('td', '', person.last ? ago(person.last) : '');
+    if (person.last) last.title = new Date(person.last).toLocaleString();
+    tr.appendChild(last);
+    var action = document.createElement('td');
+    var view = el('button', 'text-button', 'View submissions');
+    view.type = 'button';
+    view.addEventListener('click', function () {
+      $('search').value = person.email || person.name;
+      setFilter('all'); setMode('queue');
+    });
+    action.appendChild(view);
+    tr.appendChild(action);
+    return tr;
+  }
+
+  function personMatches(person, query) {
+    if (!query) return true;
+    return [person.name, person.school, person.handle, person.email].join(' ').toLowerCase().indexOf(query) > -1;
+  }
+
   function render() {
     var counts = { 'new': 0, editing: 0, done: 0, all: items.length };
     items.forEach(function (item) { counts[item.status]++; });
@@ -310,33 +362,86 @@
       ? counts['new'] + ' new · ' + counts.editing + ' editing · ' + counts.done + ' done'
       : 'No submissions yet.';
 
-    var query = $('search').value.trim().toLowerCase();
-    var shown = items.filter(function (item) { return (filter === 'all' || item.status === filter) && matches(item, query); });
-    var list = $('list');
-    list.textContent = '';
-    shown.forEach(function (item) { list.appendChild(row(item)); });
+    var people = creators(), weekAgo = Date.now() - 7 * 86400000, schools = {};
+    items.forEach(function (item) { if (item.entry.school) schools[item.entry.school.trim().toLowerCase()] = true; });
+    $('stat-total').textContent = items.length;
+    $('stat-creators').textContent = people.length;
+    $('stat-schools').textContent = Object.keys(schools).length;
+    $('stat-week').textContent = items.filter(function (item) { return (item.entry.submitted_at || 0) > weekAgo; }).length;
 
-    $('empty').hidden = shown.length > 0;
-    if (!shown.length) {
-      $('empty-title').textContent = query ? 'No matches.' : filter === 'all' ? 'No submissions yet.' : 'Nothing ' + LABELS[filter].toLowerCase() + '.';
-      $('empty-text').textContent = query ? 'Try another name, school or title.' : 'New submissions from /campus/submit show up here.';
+    var query = $('search').value.trim().toLowerCase();
+    var list = $('list'), rows = $('people-rows');
+    list.textContent = ''; rows.textContent = '';
+    var creatorsMode = mode === 'creators';
+    $('tabs').hidden = creatorsMode; $('people-count').hidden = !creatorsMode;
+    list.hidden = creatorsMode; $('people').hidden = !creatorsMode;
+
+    var count;
+    if (creatorsMode) {
+      var found = people.filter(function (person) { return personMatches(person, query); });
+      found.forEach(function (person) { rows.appendChild(personRow(person)); });
+      $('people-count').textContent = people.length + (people.length === 1 ? ' creator' : ' creators') + ' · newest first';
+      $('people').hidden = !found.length;
+      count = found.length;
+    } else {
+      var shown = items.filter(function (item) { return (filter === 'all' || item.status === filter) && matches(item, query); });
+      shown.forEach(function (item) { list.appendChild(row(item)); });
+      count = shown.length;
+    }
+
+    $('empty').hidden = count > 0;
+    if (!count) {
+      $('empty-title').textContent = query ? 'No matches.' : creatorsMode || filter === 'all' ? 'No submissions yet.' : 'Nothing ' + LABELS[filter].toLowerCase() + '.';
+      $('empty-text').textContent = query ? 'Try another name, school or email.' : 'Anything turned in from /campus/media or /campus/submit shows up here.';
     }
   }
 
+  function setFilter(value) {
+    filter = value;
+    document.querySelectorAll('.tabs button').forEach(function (other) { other.setAttribute('aria-pressed', String(other.dataset.filter === value)); });
+  }
+  function setMode(value) {
+    mode = value;
+    document.querySelectorAll('.modes button').forEach(function (other) { other.setAttribute('aria-pressed', String(other.dataset.mode === value)); });
+    render();
+  }
+
+  // ---------- CSV export: every submission, whatever the filter ----------
+
+  function csvCell(value) {
+    var text = value === undefined || value === null ? '' : String(value);
+    // a cell that starts with = + - @ would run as a formula in a spreadsheet
+    if (/^[=+\-@\t\r]/.test(text)) text = "'" + text;
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+  function exportCsv() {
+    var header = ['submitted_at', 'status', 'title', 'name', 'email', 'school', 'handle', 'link', 'notes'];
+    var lines = [header.join(',')].concat(items.map(function (item) {
+      var entry = item.entry;
+      return [entry.submitted_at ? new Date(entry.submitted_at).toISOString() : '', item.status, entry.title, entry.name, entry.email, entry.school, entry.handle, entry.link, entry.notes].map(csvCell).join(',');
+    }));
+    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'campus-media-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(link); link.click(); link.remove();
+    setTimeout(function () { URL.revokeObjectURL(link.href); }, 1000);
+  }
+
   document.querySelectorAll('.tabs button').forEach(function (button) {
-    button.addEventListener('click', function () {
-      filter = button.dataset.filter;
-      document.querySelectorAll('.tabs button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === button)); });
-      render();
-    });
+    button.addEventListener('click', function () { setFilter(button.dataset.filter); render(); });
   });
+  document.querySelectorAll('.modes button').forEach(function (button) {
+    button.addEventListener('click', function () { setMode(button.dataset.mode); });
+  });
+  $('export').addEventListener('click', exportCsv);
   $('search').addEventListener('input', function () { render(); });
   $('refresh').addEventListener('click', load);
   $('copy-form').addEventListener('click', function () {
     var label = $('copy-form').querySelector('.copy-label');
     navigator.clipboard.writeText(FORM_URL).then(function () {
-      label.textContent = 'Copied'; setTimeout(function () { label.textContent = 'Copy form link'; }, 1600);
-    }, function () { prompt('Form link', FORM_URL); });
+      label.textContent = 'Copied'; setTimeout(function () { label.textContent = 'Copy turn-in link'; }, 1600);
+    }, function () { prompt('Turn-in link', FORM_URL); });
   });
   // coming back to the tab shows anything sent in the meantime
   document.addEventListener('visibilitychange', function () {
