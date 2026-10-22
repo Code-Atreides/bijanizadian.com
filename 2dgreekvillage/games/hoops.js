@@ -1,5 +1,5 @@
-import {rect,text,line,disc,ring,BRAND,fomo,eyesSprite} from '../pixel-art.js?v=10';
-import {heroSprite} from '../story-art.js?v=10';
+import {rect,text,line,disc,ring,BRAND,fomo,eyesSprite} from '../pixel-art.js?v=11';
+import {heroSprite} from '../story-art.js?v=11';
 
 // Court Kings: ten balls, a timing meter and real projectile physics. The
 // meter only sets launch speed; the rim, backboard and floor decide the rest.

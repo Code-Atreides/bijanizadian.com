@@ -1,10 +1,10 @@
-import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=10';
-import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=10';
+import {PixelArt,C,BRAND,rect,poly,line,text,fomo,houseBanner,disc} from './pixel-art.js?v=11';
+import {memberPose,hash,clamp,letters,ROAD} from './world-model.js?v=11';
 import {helipadState} from './shared/village-helipad.js?v=183';
 import {footballState,footballPlayer,footballBall} from './shared/village-football.js?v=183';
-import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=10';
+import {pixelViewport,pixelView,worldPoint as viewWorldPoint,screenPoint as viewScreenPoint,fitZoom as viewFitZoom} from './pixel-view.js?v=11';
 import {helipadFanPose} from './shared/village-helipad-fans.js?v=183';
-import {heroSprite,drawLanding} from './story-art.js?v=10';
+import {heroSprite,drawLanding} from './story-art.js?v=11';
 
 // Traffic drives on the right. Each loop is a closed lane circuit around a
 // block; cars queue behind each other, yield at merges and stop for the player.

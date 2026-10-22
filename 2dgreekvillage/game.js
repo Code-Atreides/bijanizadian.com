@@ -1,8 +1,8 @@
-import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=10';
-import {VillageRenderer} from './renderer.js?v=10';
-import {StoryDirector} from './story-ui.js?v=10';
-import {LANDING} from './story-model.js?v=10';
-import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=10';
+import {createWorld,clamp,letters,titleCase,houseStandings,backyardUnlocked,onboardingGoal,houseEarnings,campusIdentity,nearInteraction,canMove} from './world-model.js?v=11';
+import {VillageRenderer} from './renderer.js?v=11';
+import {StoryDirector} from './story-ui.js?v=11';
+import {LANDING} from './story-model.js?v=11';
+import {Arcade,GAMES,VENUE_GAME} from './arcade.js?v=11';
 import {startChapterFeed} from './shared/chapter-feed.js?v=183';
 import {searchChapters} from './shared/village-chapter-search.js?v=183';
 const $=id=>document.getElementById(id),canvas=$('world'),mini=$('mini'),reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -72,7 +72,7 @@ function showProfile(id){const c=state.chapters.find(c=>c.id===id);if(!c)return;
  const goal=onboardingGoal(c),message=c.joined<=30?`${31-c.joined} more members to appear in the village.`:backyardUnlocked(c)?'Backyard pool unlocked. Your chapter earned it.':goal===null?'Active roster needed to set the pool goal.':`${Math.max(0,goal-c.joined)} more members to unlock the backyard pool.`;d.append(node('p','profile-message',message));const earned=houseEarnings(c);if(earned!==null)d.append(node('p','dialog-description',money(earned)+' earned · '+money(6.25)+' per onboarded member'));
  if(c.joined>30){const b=node('button','primary','Visit this house ↗');b.onclick=()=>{$('profile-dialog').close();selectChapter(id,{quest:true});};d.append(b);}else{const a=node('a','join','Rally your chapter ↗');a.href='https://fomocampus.com/onboard/';a.target='_blank';a.rel='noopener';d.append(a);}openDialog('profile-dialog');
 }
-function showClaim(){const d=$('profile-content');d.replaceChildren();const icon=node('div','profile-icon');const img=node('img');img.src='./assets/fomo-campus-white.svg';img.alt='';icon.append(img);icon.style.background='var(--brand)';d.append(icon,node('span','eyebrow','THE NEXT LOT ON GREEK ROW'),node('h2','','Your lot is waiting.'),node('p','profile-message','Get 31 members onboarded and your chapter’s house is built right here. Reach 80% of your roster to unlock the backyard pool.'));const a=node('a','join','Bring your chapter ↗');a.href='https://fomocampus.com/onboard/';a.target='_blank';a.rel='noopener';d.append(a);openDialog('profile-dialog');}
+function showClaim(){const d=$('profile-content');d.replaceChildren();const icon=node('div','profile-icon');const img=node('img');img.src='./assets/fomo-campus-white.svg?v=2';img.alt='';icon.append(img);icon.style.background='var(--brand)';d.append(icon,node('span','eyebrow','THE NEXT LOT ON GREEK ROW'),node('h2','','Your lot is waiting.'),node('p','profile-message','Get 31 members onboarded and your chapter’s house is built right here. Reach 80% of your roster to unlock the backyard pool.'));const a=node('a','join','Bring your chapter ↗');a.href='https://fomocampus.com/onboard/';a.target='_blank';a.rel='noopener';d.append(a);openDialog('profile-dialog');}
 function openLeaderboard(){const ranks=houseStandings(state.chapters,'members');$('leaderboard-list').replaceChildren(...ranks.slice(0,30).map(c=>row(c,true)));$('leaderboard-total').textContent=`${state.chapters.reduce((s,c)=>s+c.joined,0).toLocaleString()} members · ${state.chapters.length} registered chapters · ${state.world.visible.length} houses`;openDialog('leaderboard-dialog');}
 $('leaderboard-open').onclick=openLeaderboard;$('help').onclick=()=>openDialog('about-dialog');
 function activate(hit){if(!hit)return;stopIntro();if(hit.type==='chapter')selectChapter(hit.id,{focus:state.mode==='map',quest:true});else if(hit.type==='claim')showClaim();else if(hit.type==='blimp')window.open('https://discord.gg/FhvKtyvFJp','_blank','noopener');else if(hit.id==='leaderboard')openLeaderboard();else if(hit.id==='trophy'){go('trophy');toast('National Champion · Trading prize amount will be announced later.');}else go(hit.id);}

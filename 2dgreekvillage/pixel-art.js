@@ -1,5 +1,5 @@
-import {hash,letters,ROAD} from './world-model.js?v=10';
-import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=10';
+import {hash,letters,ROAD} from './world-model.js?v=11';
+import {BRAND,EYES_PATHS,WORDMARK_PATHS,CAMPUS_MARK} from './brand.js?v=11';
 export {BRAND};
 
 // Deliberate value steps: cool ink, warm stone, jewel roofs and sunlit foliage.
@@ -79,7 +79,7 @@ function markSprite(kind,w,h,color,paint){
 const approved=col=>[BRAND.pale,BRAND.white,BRAND.blue,BRAND.ink].includes(col)?col:BRAND.pale;
 export function eyesSprite(size,color=BRAND.pale){size=Math.max(4,Math.round(size));return markSprite('eyes',size,size,approved(color),g=>{g.scale(size/100,size/100);for(const p of EYES_PATHS)g.fill(new Path2D(p));});}
 export function wordmarkSprite(width,color=BRAND.pale){width=Math.max(12,Math.round(width));const h=Math.max(4,Math.round(width*24/75));return markSprite('word',width,h,approved(color),g=>{g.scale(width/75,h/24);for(const p of WORDMARK_PATHS)g.fill(new Path2D(p));});}
-export function campusSprite(width,color=BRAND.pale){width=Math.max(16,Math.round(width));const h=Math.round(width*CAMPUS_MARK.height/CAMPUS_MARK.width);return markSprite('campus',width,h,approved(color),g=>{const s=width/CAMPUS_MARK.width,[k,tx,ty]=CAMPUS_MARK.transform;g.scale(s,s);g.translate(tx,ty);g.scale(k,k);g.fill(new Path2D(CAMPUS_MARK.path),'evenodd');});}
+export function campusSprite(width,color=BRAND.pale){width=Math.max(16,Math.round(width));const h=Math.round(width*CAMPUS_MARK.height/CAMPUS_MARK.width);return markSprite('campus',width,h,approved(color),g=>{const s=width/CAMPUS_MARK.width;g.scale(s,s);for(const p of CAMPUS_MARK.paths)g.fill(new Path2D(p),'evenodd');});}
 // Draws the eyes inside a size × size box (the symbol's original 100-unit box).
 export function fomo(c,x,y,size,color=BRAND.pale){const s=eyesSprite(size,color);if(s)c.drawImage(s,Math.round(x),Math.round(y));}
 export function shade(hex,k){const s=hex.replace('#','');return '#'+[0,2,4].map(i=>Math.min(255,Math.max(0,parseInt(s.slice(i,i+2),16)+k)).toString(16).padStart(2,'0')).join('');}

@@ -1,5 +1,5 @@
-import {rect,poly,line,text} from './pixel-art.js?v=10';
-import {paintHero,HERO_W,HERO_H} from './hero-art.js?v=10';
+import {rect,poly,line,text} from './pixel-art.js?v=11';
+import {paintHero,HERO_W,HERO_H} from './hero-art.js?v=11';
 
 // Brand kit: campus purple is fomo blue #516AF6, lit with light blue #ACB8F9
 // and lavender #EAEDFF, shaded toward ink #0B091F.

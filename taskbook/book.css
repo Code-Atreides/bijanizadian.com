@@ -135,7 +135,7 @@ body:not(.is-spread) .edge-l,body:not(.is-spread) .edge-lb{opacity:0}
    and the mask on its face. */
 svg.defs{position:absolute}
 .cover-mark{position:absolute;left:50%;top:20%;translate:-50% 0;width:16%;aspect-ratio:1;filter:url(#deboss)}
-.cover-mark i{position:absolute;inset:0;border-radius:22%;background:color-mix(in srgb,var(--board) 78%,#000);-webkit-mask:url('fomo-campus.svg?v=1') 50% 54%/72% auto no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:url('fomo-campus.svg?v=1') 50% 54%/72% auto no-repeat exclude,linear-gradient(#000 0 0)}
+.cover-mark i{position:absolute;inset:0;border-radius:22%;background:color-mix(in srgb,var(--board) 78%,#000);-webkit-mask:url('fomo-campus.svg?v=2') 50% 54%/72% auto no-repeat,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:url('fomo-campus.svg?v=2') 50% 54%/72% auto no-repeat exclude,linear-gradient(#000 0 0)}
 .cover-edge{position:absolute;pointer-events:none;backface-visibility:visible;-webkit-backface-visibility:visible;background:color-mix(in srgb,var(--board) 72%,#000)}
 .cover-edge-r{top:0;right:-.5px;width:3px;height:100%;transform-origin:right center;transform:rotateY(-90deg);background:color-mix(in srgb,var(--board) 82%,#fff)}
 .cover-edge-b{left:0;bottom:-.5px;width:100%;height:3px;transform-origin:center bottom;transform:rotateX(90deg)}

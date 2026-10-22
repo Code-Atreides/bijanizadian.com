@@ -1,7 +1,7 @@
-import {rect,text,textWidth,BRAND,campusSprite,eyesSprite} from './pixel-art.js?v=10';
-import {HoopsGame} from './games/hoops.js?v=10';
-import {GridironGame} from './games/gridiron.js?v=10';
-import {FlightGame} from './games/flight.js?v=10';
+import {rect,text,textWidth,BRAND,campusSprite,eyesSprite} from './pixel-art.js?v=11';
+import {HoopsGame} from './games/hoops.js?v=11';
+import {GridironGame} from './games/gridiron.js?v=11';
+import {FlightGame} from './games/flight.js?v=11';
 
 // The arcade runs each mini-game on a 320 × 180 console-resolution buffer,
 // scaled by a whole number so every game pixel is a crisp square.
