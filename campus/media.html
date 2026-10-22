@@ -61,7 +61,7 @@
     --btn-fill: rgba(96,106,247,.5); --btn-fill-hover: rgba(96,106,247,.8);
     --btn-quiet: rgba(255,255,255,.12); --btn-quiet-hover: rgba(255,255,255,.2);
     --gutter: clamp(16px, 3vw, 40px);
-    --header: 64px;
+    --header: clamp(72px, 5vw, 80px);
     /* every tab starts the same distance under the tab pill (pill bottom + 20px) */
     --view-top: 12px;
     --eyes-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='9 24 83 52'%3E%3Cpath d='M36.97 24.36c7.13 0 12.82 3.59 15.97 9.24-4.19 4.44-7.29 10.16-8.48 16.4-1.19 6.24-.28 11.96 2.21 16.4-5.32 5.65-12.38 9.24-19.51 9.24-8.73 0-15.3-5.38-17.7-13.32h17.39c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H14.18c5.44-7.94 14.07-13.32 22.79-13.32Z'/%3E%3Cpath d='M72.33 24.36c12.75 0 20.89 11.48 18.18 25.64-2.71 14.16-15.24 25.64-27.99 25.64-8.73 0-15.3-5.38-17.7-13.32h19.34c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H49.53c5.44-7.94 14.07-13.32 22.8-13.32Z'/%3E%3C/svg%3E");
@@ -114,8 +114,6 @@
   /* once the page scrolls, a soft band keeps the title and button readable over the wall */
   .site-header.scrolled { pointer-events: auto; background: rgba(11,9,31,.62); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom-color: var(--hairline); }
   .head-lockup { justify-self: start; display: block; text-decoration: none; border-radius: 6px; }
-  .head-lockup .lockup svg { height: 28px; }
-  .head-lockup .lockup .slash { font-size: 25.5px; }
   .head-cta { justify-self: end; padding: 9px 16px; font-size: 14px; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .views { pointer-events: auto; display: flex; gap: 2px; padding: 4px; border-radius: 14px; border: 1px solid var(--hairline);
@@ -384,8 +382,6 @@
   /* ---------- smaller screens ---------- */
   @media (max-width: 1040px) {
     .head-cta { display: none; }
-    .head-lockup .lockup svg { height: 24px; }
-    .head-lockup .lockup .slash { font-size: 22px; }
   }
   @media (max-width: 760px) {
     .site-header { display: contents; }
