@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Caption archive | fomo campus</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script src="/assets/content-auth.js?v=2" defer></script>
+<script src="/assets/content-captions.js?v=1" defer></script>
+<!--
+  Caption archive, the words side of the media CRM: every caption the campus
+  program has posted with, to search, filter by hashtag and copy. Captions sit
+  on the posts in RTDB content_posts/<id>/caption, saved by the tracker as
+  creators post, or added here and on /campus/analytics. Team-only, like the
+  queue and analytics: same sign-in (assets/content-auth.js), same database
+  rule, and no inline script, so the page's Content-Security-Policy
+  (firebase.json) keeps scripts to this origin.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --input: #d9ddea; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+    --grid: #eef0f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a, input, select { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  h1:focus, h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: 26px; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
+  .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
+  .pages a:hover { color: var(--ink); }
+  .pages a[aria-current="page"] { background: #fff; color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
+  .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
+  .text-button:hover { background: var(--lavender); }
+  .text-button.danger { color: #9b362e; }
+  .text-button.danger:hover { background: #fff1ef; }
+
+  main { flex: 1 0 auto; }
+
+  /* ---------- sign in ---------- */
+  .signin { max-width: 420px; margin: 9vh auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .signin-head { background: var(--lavender); padding: 24px 28px 22px; }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  .signin h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; margin-top: 12px; }
+  .signin h1 span { color: var(--blue); }
+  .signin-body { padding: 22px 28px 24px; }
+  .signin-body p { font-size: 14px; line-height: 1.55; color: var(--muted); margin-bottom: 14px; }
+  .field { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 12px; min-width: 0; }
+  .field span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 4px; }
+  .field input, .field select, .search input {
+    display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field select:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .field input[aria-invalid="true"] { border-color: #d0574b; }
+  .primary-action {
+    display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 8px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action:disabled { opacity: .7; cursor: progress; }
+  .primary-action.small { width: auto; height: 38px; padding: 0 14px; font-size: 13.5px; white-space: nowrap; }
+  .posts-tools .option { white-space: nowrap; }
+  .notice { font-size: 13px; line-height: 1.5; margin-top: 12px; color: var(--blue-text); min-height: 20px; }
+  .notice.is-error { color: #9b362e; }
+
+  /* ---------- head, tools and the one filter row ---------- */
+  .queue-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px 0 16px; flex-wrap: wrap; }
+  .queue-head .eyebrow { margin-bottom: 8px; }
+  .queue-head h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; }
+  .queue-head p { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .option {
+    display: flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 13px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    font: inherit; font-size: 13.5px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background .15s;
+  }
+  .option:hover { background: var(--lavender); }
+  .option.icon { width: 38px; padding: 0; }
+  .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .segmented { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; }
+  .segmented button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 34px; padding: 0 12px; }
+  .segmented button + button { border-left: 1px solid var(--option-line); }
+  .segmented button:hover { color: var(--ink); background: var(--tint); }
+  .segmented button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
+  .filters select { height: 36px; border: 1px solid var(--option-line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); padding: 0 10px; }
+  .queue-error { font-size: 13.5px; line-height: 1.5; background: #fff1ef; padding: 10px 12px; border-radius: 6px; color: #9b362e; margin: 0 0 12px; }
+  .refetching { opacity: .55; transition: opacity .2s; }
+
+  /* ---------- the archive ---------- */
+  .search { display: flex; align-items: center; gap: 8px; height: 38px; width: 260px; padding: 0 12px; border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--faint); }
+  .search input { border: 0; min-height: 0; height: 100%; margin: 0; padding: 0; font-size: 14px; box-shadow: none !important; }
+  .views { display: flex; gap: 6px; }
+  .views button { border: 0; background: none; font: inherit; font-size: 14px; color: var(--muted-2); padding: 7px 4px 9px; margin-right: 12px; border-bottom: 2px solid transparent; display: flex; gap: 7px; align-items: center; }
+  .views button:hover { color: var(--ink); }
+  .views button[aria-pressed="true"] { color: var(--blue-text); font-weight: 500; border-bottom-color: var(--blue); }
+  .views b { font-weight: 500; font-size: 11.5px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--chip); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; }
+  .views [aria-pressed="true"] b { background: var(--lavender); color: var(--blue-text); }
+  .switch-row { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .switch-row .filters { margin-bottom: 8px; }
+  .tag-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tag-row > span { font-size: 11.5px; letter-spacing: 1.2px; font-weight: 500; color: var(--faint); margin-right: 4px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid var(--option-line); border-radius: 15px; background: #fff; font: inherit; font-size: 13px; color: var(--blue-text); }
+  .chip b { font-weight: 500; font-size: 11.5px; color: var(--faint); }
+  .chip:hover { background: var(--tint); }
+  .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .chip[aria-pressed="true"] b { color: rgba(255,255,255,.8); }
+
+  .caption-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .cap { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 10px; display: flex; flex-direction: column; min-width: 0; background: #fff; }
+  .cap-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; min-width: 0; }
+  .cap-meta strong { font-weight: 500; margin-left: 2px; }
+  .cap-meta .muted { color: var(--muted-2); }
+  .pill { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 10px; background: var(--lavender); color: var(--blue-text); font-size: 11.5px; font-weight: 500; }
+  .cap-text { margin-top: 10px; font-size: 14.5px; line-height: 1.55; color: #2b2d3f; white-space: pre-line; overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .cap.is-open .cap-text { display: block; }
+  .cap-text .tag { color: var(--blue-text); }
+  .more { align-self: flex-start; border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 4px 0 0; }
+  .more:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .cap-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 10px; }
+  .cap-nums { font-size: 12.5px; color: var(--muted-2); font-variant-numeric: tabular-nums; }
+  .cap-actions { display: flex; gap: 2px; margin-right: -8px; }
+
+  .missing-list { list-style: none; }
+  .miss { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .miss strong { display: block; font-size: 15px; font-weight: 500; margin-bottom: 5px; overflow-wrap: anywhere; }
+  .miss strong a { color: inherit; text-decoration: none; }
+  .miss strong a:hover { color: var(--blue-text); text-decoration: underline; text-underline-offset: 3px; }
+
+  .empty { text-align: center; padding: 56px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+  .empty strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .offscreen { position: fixed; left: -9999px; top: 0; opacity: 0; }
+
+  /* ---------- dialogs ---------- */
+  dialog { margin: auto; border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(11,9,31,.45); }
+  dialog::backdrop { background: rgba(11,9,31,.42); }
+  .dlg { padding: 22px 24px 20px; }
+  .dlg h2 { font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
+  .dlg .lede { font-size: 13.5px; color: var(--muted); margin: 4px 0 16px; overflow-wrap: anywhere; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .fieldset-title { font-size: 11.5px; letter-spacing: 1.4px; font-weight: 500; color: #4a558b; margin: 6px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .dlg-actions .primary-action { width: auto; padding: 0 18px; }
+  .dlg-error { font-size: 13px; color: #9b362e; min-height: 18px; margin-top: 4px; }
+  .field textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: #fff; border: 1px solid var(--input); border-radius: 7px; outline: none; resize: vertical; min-height: 190px; }
+  .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .count { font-size: 12px; color: var(--muted-2); text-align: right; margin-top: -6px; font-variant-numeric: tabular-nums; }
+  .count.over { color: #9b362e; }
+  .history { list-style: none; margin-top: 4px; max-height: 190px; overflow-y: auto; border-top: 1px solid var(--line); }
+  .history li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: #50566e; font-variant-numeric: tabular-nums; }
+  .history li b { font-weight: 500; color: var(--ink); }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 28px 0 16px; line-height: 1.6; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 24px; }
+  }
+  @media (max-width: 760px) {
+    .queue-head { align-items: start; }
+    .tools { width: 100%; }
+    .search { flex: 1; width: auto; }
+    .caption-list { grid-template-columns: 1fr; }
+    .switch-row { flex-direction: column-reverse; align-items: stretch; gap: 0; }
+  }
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 54px; gap: 10px; }
+    .brand svg { width: 64px; height: 21px; }
+    .brand > span { display: none; }
+    .pages { margin-left: 0; }
+    .pages a { padding: 6px 8px; font-size: 12.5px; }
+    .account .text-button { padding: 6px 4px; }
+    .account span { display: none; }
+    .signin { margin-top: 4vh; }
+    .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
+    .queue-head h1 { font-size: 28px; }
+    .tool-label { display: none; }
+    .cap { padding: 13px 14px 8px; }
+    .miss { align-items: start; flex-direction: column; gap: 8px; }
+    /* the hashtags swipe on one row */
+    #tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px 2px; width: calc(100% + 28px); }
+    #tags::-webkit-scrollbar { display: none; }
+    .chip { flex: none; }
+    .dlg { padding: 18px 16px 16px; }
+  }
+  @media (max-width: 359px) {
+    .site-header { gap: 6px; }
+    .brand svg { width: 52px; height: 17px; }
+    .pages a { padding: 6px 6px; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <nav class="pages" aria-label="Media CRM">
+      <a href="/campus/submissions">Queue</a>
+      <a href="/campus/analytics">Analytics</a>
+      <a href="/campus/captions" aria-current="page">Captions</a>
+    </nav>
+    <div class="account" id="account" hidden>
+      <span id="account-email"></span>
+      <button type="button" class="text-button" id="sign-out">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- signed out: the same emailed sign-in link as the queue -->
+    <section class="signin" id="signin" hidden aria-labelledby="signin-title">
+      <div class="signin-head">
+        <span class="eyebrow">TEAM ONLY</span>
+        <h1 id="signin-title" tabindex="-1">Caption <span>archive.</span></h1>
+      </div>
+      <div class="signin-body">
+        <form id="link-form" novalidate>
+          <p>Sign in with the team email to see every caption campus media has posted with.</p>
+          <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
+        </form>
+        <form id="finish-form" novalidate hidden>
+          <p>Confirm the email address that got the sign-in link.</p>
+          <label class="field">Email<input id="finish-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="finish-send">Finish signing in</button>
+        </form>
+        <p class="notice" id="signin-notice" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- signed in: the archive -->
+    <section id="captions" hidden aria-labelledby="cap-title">
+      <div class="queue-head">
+        <div>
+          <span class="eyebrow">CAMPUS MEDIA · TEAM ONLY</span>
+          <h1 id="cap-title" tabindex="-1">Caption archive</h1>
+          <p id="cap-summary">Loading…</p>
+        </div>
+        <div class="tools">
+          <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search" type="search" placeholder="Search captions or creators" aria-label="Search captions" autocomplete="off"></label>
+          <button type="button" class="option" id="export"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg><span class="tool-label">Export CSV</span></button>
+          <button type="button" class="option icon" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg></button>
+        </div>
+      </div>
+      <p class="queue-error" id="cap-error" role="alert" hidden></p>
+
+      <div id="board">
+        <div class="switch-row">
+          <div class="views" id="views" role="group" aria-label="Show">
+            <button type="button" data-view="captions" aria-pressed="true">Captions <b id="n-captions">0</b></button>
+            <button type="button" data-view="missing" aria-pressed="false">Missing <b id="n-missing">0</b></button>
+          </div>
+          <div class="filters">
+            <select id="platform" aria-label="Platform">
+              <option value="all">All platforms</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram</option>
+              <option value="youtube">YouTube</option>
+              <option value="x">X</option>
+              <option value="other">Other</option>
+            </select>
+            <select id="sort" aria-label="Sort captions">
+              <option value="newest">Newest</option>
+              <option value="likes">Most likes</option>
+              <option value="views">Most views</option>
+            </select>
+          </div>
+        </div>
+        <div class="tag-row" id="tag-row" hidden><span>TOP HASHTAGS</span><div class="tag-row" id="tags"></div></div>
+        <div class="caption-list" id="caption-list"></div>
+        <ul class="missing-list" id="missing-list" hidden></ul>
+        <div class="empty" id="cap-empty" hidden>
+          <strong id="cap-empty-title">No captions yet.</strong>
+          <span id="cap-empty-text"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · <a href="/campus/analytics">Analytics</a> · Team only
+  </footer>
+</div>
+
+<!-- add or edit a caption -->
+<dialog id="caption-dialog" aria-labelledby="caption-title">
+  <form class="dlg" id="caption-form" method="dialog" novalidate>
+    <h2 id="caption-title">Edit caption</h2>
+    <p class="lede" id="caption-lede"></p>
+    <label class="field">Caption<textarea id="c-text" maxlength="4000" spellcheck="true" placeholder="Paste the caption exactly as it went up, hashtags and all"></textarea></label>
+    <p class="count" id="c-count"></p>
+    <p class="dlg-error" id="caption-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="caption-save">Save caption</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>

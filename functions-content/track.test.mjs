@@ -1,6 +1,6 @@
 // Offline checks for track.js: node track.test.mjs
 import assert from 'node:assert/strict';
-import { normalizeProfile, externalId, rowToPost, plan, summary, newId, followerPlan, dayKey } from './track.js';
+import { normalizeProfile, externalId, rowToPost, plan, summary, newId, followerPlan, dayKey, recentVideos } from './track.js';
 
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log('ok -', name); };
@@ -156,6 +156,49 @@ test('follower counts land on the right creator, one count per day', () => {
   const tt = followerPlan({ creators, platform: 'tiktok', rows: [{ account_id: 'marcuslee', followers: 96400, url: 'https://www.tiktok.com/@marcuslee', input: { url: 'https://www.tiktok.com/@marcuslee' } }], now: NOW });
   assert.equal(tt['content_creators/mfc2bbbb-bbbbb2/followers/tiktok'].count, 96400);
   assert.equal(dayKey(Date.UTC(2026, 9, 21, 2, 0)), '2026-10-20', 'days follow Eastern time');
+});
+
+// Instagram - Posts, collected by link: the shape it returned on 2026-10-22
+const igByLink = (code, likes, caption = 'Wouldn\u2019t trust bro with a penny \ud83d\ude2d #reels #viral #crypto #fomo') => ({
+  url: `https://www.instagram.com/p/${code}`, user_posted: 'ava_chen', date_posted: '2026-10-20T23:14:47.000Z', likes, num_comments: 0,
+  content_type: 'Reel', description: caption, input: { url: `https://www.instagram.com/p/${code}`, country: '' }
+});
+
+test('captions come in with new posts and fill in once on known ones', () => {
+  const fresh = plan({ creators, posts: {}, rows: [{ platform: 'instagram', row: igByLink('Deu_MVToZ8a', 11), input: 'https://www.instagram.com/p/Deu_MVToZ8a' }], now: NOW, rand });
+  const post = Object.values(fresh.updates)[0];
+  assert.equal(post.caption, 'Wouldn\u2019t trust bro with a penny \ud83d\ude2d #reels #viral #crypto #fomo');
+  assert.equal(post.hashtags, '#reels #viral #crypto #fomo');
+  assert.equal(post.creator_id, 'mfc1aaaa-aaaaa1', 'the creator comes from user_posted, not the post link');
+  assert.deepEqual(post.latest, { likes: 11, comments: 0, at: NOW });
+  const known = { 'mfp4dddd-dddddd': { url: 'https://www.instagram.com/p/Deu_MVToZ8a/', platform: 'instagram', title: 'x', external_id: 'instagram:Deu_MVToZ8a', latest: { at: NOW - 30 * H, likes: 9 }, snapshots: { a: { at: NOW - 30 * H, likes: 9 } } } };
+  const again = plan({ creators, posts: known, rows: [{ platform: 'instagram', row: igByLink('Deu_MVToZ8a', 12) }], now: NOW, rand });
+  assert.match(again.updates['content_posts/mfp4dddd-dddddd/caption'], /^Wouldn/);
+  const typed = { 'mfp4dddd-dddddd': { ...known['mfp4dddd-dddddd'], caption: 'Fixed by the team' } };
+  const kept = plan({ creators, posts: typed, rows: [{ platform: 'instagram', row: igByLink('Deu_MVToZ8a', 12) }], now: NOW, rand });
+  assert.equal(kept.updates['content_posts/mfp4dddd-dddddd/caption'], undefined, 'a caption already there is kept');
+  assert.equal(summary(again.report['mfc1aaaa-aaaaa1'], 'instagram'), '1 post · likes and comments updated, Instagram hides views');
+});
+
+test('Instagram profile rows list the recent reels to collect, not photos or old posts', () => {
+  const day = d => new Date(NOW - d * 86400000).toISOString();
+  const rows = [
+    { account: 'ava_chen', input: { url: 'https://www.instagram.com/ava_chen/' }, posts: [
+      { url: 'https://www.instagram.com/p/Deu_MVToZ8a', content_type: 'Video', datetime: day(1) },
+      { url: 'https://www.instagram.com/p/DevRonENi1P', content_type: 'Image', datetime: day(1) },
+      { url: 'https://www.instagram.com/p/DenIXc_Irhr', content_type: 'Video', datetime: day(5) },
+      { url: 'https://www.instagram.com/p/OldOldOld12', content_type: 'Video', datetime: day(90) }
+    ] },
+    { input: { url: 'https://www.instagram.com/someoneelse/' }, posts: [{ url: 'https://www.instagram.com/p/Zzzzzzzzz1', content_type: 'Video', datetime: day(1) }] },
+    { input: { url: 'https://www.instagram.com/ava_chen/' }, error: 'Profile not found', error_code: 'dead_page' }
+  ];
+  const { picks, failed } = recentVideos({ creators, platform: 'instagram', rows, now: NOW });
+  assert.deepEqual(picks, [
+    { url: 'https://www.instagram.com/p/Deu_MVToZ8a/', creatorId: 'mfc1aaaa-aaaaa1' },
+    { url: 'https://www.instagram.com/p/DenIXc_Irhr/', creatorId: 'mfc1aaaa-aaaaa1' }
+  ]);
+  assert.deepEqual(failed, ['mfc1aaaa-aaaaa1']);
+  assert.equal(recentVideos({ creators, platform: 'instagram', rows: rows.slice(0, 1), now: NOW, max: 1 }).picks.length, 1);
 });
 
 test('ids match the database rules', () => {

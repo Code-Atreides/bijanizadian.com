@@ -122,7 +122,7 @@
         ]
       },
       {
-        "source": "/campus/studio",
+        "source": "/campus/captions",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -235,6 +235,11 @@
       }
     ],
     "redirects": [
+      {
+        "source": "/campus/studio",
+        "destination": "/campus/captions",
+        "type": 301
+      },
       {
         "source": "/hq",
         "destination": "/hqvisitform",

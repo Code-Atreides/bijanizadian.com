@@ -17,7 +17,8 @@
 // (content_creators/<id>/followers and followers_log), shown with its change
 // over the date range.
 // Each post can also carry the state it's for (the map, via content-geo.js),
-// the time it went up and the hashtags it used, which /campus/studio learns from.
+// the time it went up and its caption (hashtags are read from it), which the
+// caption archive at /campus/captions collects.
 // Everything typed in is untrusted: it goes into the page as text, and a post
 // link becomes an <a> only if it is https. Sign-in comes from content-auth.js.
 (function () {
@@ -518,7 +519,7 @@
     var body = $('post-rows'), query = $('search').value.trim().toLowerCase(), sort = $('sort').value;
     body.textContent = '';
     var rows = list.filter(function (post) {
-      return !query || [post.data.title, post.creator, post.handle, post.school, post.data.url, PLATFORMS[post.data.platform]].join(' ').toLowerCase().indexOf(query) > -1;
+      return !query || [post.data.title, post.creator, post.handle, post.school, post.data.url, post.data.caption, PLATFORMS[post.data.platform]].join(' ').toLowerCase().indexOf(query) > -1;
     });
     var rate = function (post) { return post.latest.views ? engagement(post.latest) / post.latest.views : -1; };
     var seen = function (post, m) { return has(post, m) ? post.latest[m] : -1; };
@@ -633,7 +634,7 @@
     $('f-posted').max = dateInput(Date.now());
     $('f-time').value = timeInput(post ? post.posted : Date.now());
     $('f-state').value = post ? post.state : '';
-    $('f-tags').value = post ? post.tags : '';
+    $('f-caption').value = post ? post.data.caption || '' : '';
     $('f-title').value = d.title || '';
     $('f-creator').value = d.creator || '';
     $('f-school').value = d.school || '';
@@ -678,13 +679,16 @@
     if (!isFinite(posted)) return fail($('f-posted'), 'Pick the day it went up.');
     if (posted > Date.now() + 5 * 60000) return fail($('f-time'), 'That time hasn\'t happened yet.');
     if (!title) return fail($('f-title'), 'Give the post a title.');
+    var caption = $('f-caption').value.replace(/\r\n?/g, '\n').trim();
     var details = {
       url: url, platform: $('f-platform').value, title: title, posted_at: posted,
       creator: $('f-creator').value.trim().replace(/\s+/g, ' ') || null,
       school: $('f-school').value.trim().replace(/\s+/g, ' ') || null,
       submission: $('f-submission').value || null,
       state: $('f-state').value || null,
-      hashtags: cleanTags($('f-tags').value) || null
+      caption: caption || null,
+      // hashtags come from the caption; without one, a post keeps the ones it has
+      hashtags: cleanTags((caption.match(/#[\p{L}\p{N}_]+/gu) || []).join(' ')) || (editing && editing.data.hashtags) || null
     };
     var save = $('post-save'); save.disabled = true;
     try {

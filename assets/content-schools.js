@@ -1,4 +1,4 @@
-// The fomo campus program's schools, for local hashtags in /campus/studio and
+// The fomo campus program's schools, for
 // state prefill in /campus/analytics. Members and chapters are from the Greek
 // Wars chapter registrations snapshot of 2026-10-05 (2dgreekvillage/snapshot.json)
 // and only rank campuses within a region. Tags are each school's well-known

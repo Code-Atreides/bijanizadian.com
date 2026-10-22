@@ -1,12 +1,17 @@
 // Content tracking for the campus media CRM: turns Bright Data's TikTok and
-// Instagram scraper rows into RTDB content_posts (new videos) and dated
-// snapshots (numbers for videos already known), and profile rows into each
-// tracked account's daily follower count. Pure functions only, so the
-// logic is tested offline (track.test.mjs); index.js does the I/O.
+// Instagram scraper rows into RTDB content_posts (new videos, with their
+// captions) and dated snapshots (numbers for videos already known), and
+// profile rows into each tracked account's daily follower count. Pure
+// functions only, so the logic is tested offline (track.test.mjs); index.js
+// does the I/O.
 
+// TikTok posts are discovered from the profile link. Instagram's reel discovery
+// (Instagram - Reels) has been refused by Instagram ("too many requests") since
+// 2026-10-21, so Instagram goes in two steps: the profile row lists the recent
+// reels (recentVideos), then each reel is collected by its link here.
 export const DATASETS = {
   tiktok: { id: 'gd_lu702nij2f790tmv9h', name: 'TikTok - Posts', discoverBy: 'profile_url' },
-  instagram: { id: 'gd_lyclm20il4r5helnj', name: 'Instagram - Reels', discoverBy: 'url' }
+  instagram: { id: 'gd_lk5ns7kz21pck8jpis', name: 'Instagram - Posts', byUrl: true }
 };
 // follower counts come from each account's profile, one row per account
 export const PROFILES = {
@@ -14,6 +19,9 @@ export const PROFILES = {
   instagram: { id: 'gd_l1vikfch901nx3by4', name: 'Instagram - Profiles' }
 };
 export const POSTS_PER_PROFILE = 8;
+// reels older than this stop being re-collected every day
+export const RECENT_DAYS = 45;
+export const CAPTION_MAX = 4000;
 // a second run within this window updates the last snapshot instead of adding one
 export const SNAPSHOT_GAP = 6 * 3600 * 1000;
 const EARLIEST = Date.UTC(2020, 0, 1);
@@ -90,9 +98,9 @@ export function rowToPost(platform, row, now) {
   if (!id || !/^https:\/\//.test(url)) return null;
   const tiktok = platform === 'tiktok';
   const handle = String((tiktok ? row.profile_username : row.user_posted) || '').replace(/^@/, '');
-  const caption = row.description || row.caption || '';
+  const caption = String(row.description || row.caption || '').replace(/\r\n?/g, '\n').trim();
   return {
-    externalId: id, url: url.split('?')[0], handle: handle.toLowerCase(),
+    externalId: id, url: url.split('?')[0], handle: handle.toLowerCase(), caption: caption.slice(0, CAPTION_MAX),
     postedAt: when(tiktok ? row.create_time : row.date_posted, now),
     title: titleFrom(caption, platform, handle || 'creator'),
     hashtags: tagsFrom(row.hashtags, caption),
@@ -152,6 +160,8 @@ export function plan({ creators, posts, rows, now, rand = Math.random }) {
       // latest keeps the last known value of anything this row doesn't have
       if (now >= newest) updates[`content_posts/${hit.id}/latest`] = { ...numbers(hit.post.latest || {}), ...snap };
       if (!hit.post.external_id) updates[`content_posts/${hit.id}/external_id`] = item.externalId;
+      // a caption fills in once; one the team typed or fixed is never overwritten
+      if (!hit.post.caption && item.caption) updates[`content_posts/${hit.id}/caption`] = item.caption;
       if (!hit.post.creator_id) updates[`content_posts/${hit.id}/creator_id`] = creatorId;
       report[creatorId].updated++;
     } else {
@@ -165,6 +175,7 @@ export function plan({ creators, posts, rows, now, rand = Math.random }) {
       if (c.school) post.school = String(c.school).slice(0, 120);
       if (/^[A-Z]{2}$/.test(c.state || '')) post.state = c.state;
       if (item.hashtags) post.hashtags = item.hashtags.slice(0, 500);
+      if (item.caption) post.caption = item.caption;
       updates[`content_posts/${newId(now, rand)}`] = post;
       report[creatorId].added++;
     }
@@ -179,27 +190,56 @@ export function dayKey(now, timeZone = 'America/New_York') {
   return new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(now));
 }
 
-// profile rows to follower counts: content_creators/<id>/followers/<platform> holds
-// the newest count, followers_log/<platform>/<day> one count a day
-export function followerPlan({ creators, platform, rows, now }) {
-  const updates = {}, byHandle = {};
+function creatorsByHandle(creators, platform) {
+  const byHandle = {};
   for (const [id, c] of Object.entries(creators || {})) {
     const p = c && c[platform] ? normalizeProfile(platform, c[platform]) : null;
     if (p) byHandle[p.handle.toLowerCase()] = id;
   }
+  return byHandle;
+}
+// the creator a profile row (or its error row) belongs to
+function profileCreator(byHandle, platform, row) {
+  const profile = [row.input && row.input.url, row.url, row.profile_url].map(v => normalizeProfile(platform, v)).find(Boolean);
+  const handle = (profile ? profile.handle : String((platform === 'tiktok' ? row.account_id : row.account) || '')).toLowerCase();
+  return byHandle[handle] || '';
+}
+
+// profile rows to follower counts: content_creators/<id>/followers/<platform> holds
+// the newest count, followers_log/<platform>/<day> one count a day
+export function followerPlan({ creators, platform, rows, now }) {
+  const updates = {}, byHandle = creatorsByHandle(creators, platform);
   const day = dayKey(now);
   for (const row of rows || []) {
     if (!row || row.error || row.error_code) continue;
     const followers = sent(row.followers);
     if (followers === undefined) continue;
-    const profile = [row.input && row.input.url, row.url, row.profile_url].map(v => normalizeProfile(platform, v)).find(Boolean);
-    const handle = (profile ? profile.handle : String((platform === 'tiktok' ? row.account_id : row.account) || '')).toLowerCase();
-    const id = byHandle[handle];
+    const id = profileCreator(byHandle, platform, row);
     if (!id) continue;
     updates[`content_creators/${id}/followers/${platform}`] = { count: followers, at: now };
     updates[`content_creators/${id}/followers_log/${platform}/${day}`] = followers;
   }
   return updates;
+}
+
+// Instagram profile rows to the reels to collect by link next: each account's newest
+// videos from the last RECENT_DAYS, up to POSTS_PER_PROFILE. Photos are left out.
+export function recentVideos({ creators, platform, rows, now, max = POSTS_PER_PROFILE, days = RECENT_DAYS }) {
+  const byHandle = creatorsByHandle(creators, platform), picks = [], failed = [];
+  for (const row of rows || []) {
+    if (!row) continue;
+    const creatorId = profileCreator(byHandle, platform, row);
+    if (!creatorId) continue;
+    if (row.error || row.error_code) { failed.push(creatorId); continue; }
+    const videos = (Array.isArray(row.posts) ? row.posts : [])
+      .filter(p => p && /video|reel|clip/i.test(String(p.content_type || '')) && externalId(platform, p.url))
+      .map(p => ({ code: externalId(platform, p.url).split(':')[1], at: Date.parse(p.datetime) }))
+      .filter(p => !Number.isFinite(p.at) || now - p.at <= days * 86400000)
+      .sort((a, b) => (b.at || 0) - (a.at || 0))
+      .slice(0, max);
+    for (const v of videos) picks.push({ url: 'https://www.instagram.com/p/' + v.code + '/', creatorId });
+  }
+  return { picks, failed };
 }
 
 // the line each creator shows under their handle; only reels are collected on Instagram

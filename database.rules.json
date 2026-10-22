@@ -185,6 +185,9 @@
         "hashtags": {
           ".validate": "newData.isString() && newData.val().length <= 500"
         },
+        "caption": {
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 4000"
+        },
         "posted_at": {
           ".validate": "newData.isNumber() && newData.val() >= 1577836800000 && newData.val() <= now + 86400000"
         },

@@ -1,7 +1,7 @@
 // Where campus media goes: the 50 states and D.C., each with its region (the
 // four used on /region), its main time zone (split states use the zone most of
 // their campuses sit in) and its tile on the 8 x 11 U.S. tile-grid map /region
-// draws. Shared by /campus/analytics (the map) and /campus/studio (schedules).
+// draws, for /campus/analytics (the map).
 (function () {
   'use strict';
 

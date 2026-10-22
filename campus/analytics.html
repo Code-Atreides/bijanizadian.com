@@ -12,7 +12,7 @@
 <script src="/assets/content-auth.js?v=2" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
 <script src="/assets/content-schools.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=7" defer></script>
+<script src="/assets/content-analytics.js?v=8" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -82,6 +82,8 @@
   }
   .field input:focus, .field select:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
   .field input[aria-invalid="true"] { border-color: #d0574b; }
+  .field textarea { display: block; width: 100%; margin-top: 6px; padding: 9px 12px; font: inherit; font-size: 15px; line-height: 1.45; color: var(--ink); background: #fff; border: 1px solid var(--input); border-radius: 7px; outline: none; resize: vertical; }
+  .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
   .primary-action {
     display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 8px;
     border: 0; border-radius: 7px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
@@ -268,6 +270,8 @@
     .brand svg { width: 64px; height: 21px; }
     .brand > span { display: none; }
     .pages { margin-left: 0; }
+    .pages a { padding: 6px 8px; font-size: 12.5px; }
+    .account .text-button { padding: 6px 4px; }
     .account span { display: none; }
     .signin { margin-top: 4vh; }
     .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
@@ -280,6 +284,11 @@
     .tool-label { display: none; }
     .pair { grid-template-columns: 1fr; gap: 0; }
     .dlg { padding: 18px 16px 16px; }
+  }
+  @media (max-width: 359px) {
+    .site-header { gap: 6px; }
+    .brand svg { width: 52px; height: 17px; }
+    .pages a { padding: 6px 6px; font-size: 12px; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -305,7 +314,7 @@
     <nav class="pages" aria-label="Media CRM">
       <a href="/campus/submissions">Queue</a>
       <a href="/campus/analytics" aria-current="page">Analytics</a>
-      <a href="/campus/studio">Studio</a>
+      <a href="/campus/captions">Captions</a>
     </nav>
     <div class="account" id="account" hidden>
       <span id="account-email"></span>
@@ -488,7 +497,7 @@
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · <a href="/campus/studio">Studio</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · <a href="/campus/captions">Captions</a> · Team only
   </footer>
 </div>
 
@@ -518,7 +527,7 @@
       <label class="field">Creator <span>optional</span><input id="f-creator" maxlength="100" list="creator-list" autocomplete="off"></label>
       <label class="field">School <span>optional</span><input id="f-school" maxlength="120" list="school-list" autocomplete="off"></label>
     </div>
-    <label class="field">Hashtags used <span>optional</span><input id="f-tags" maxlength="500" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="#fomo #gameday #usc"></label>
+    <label class="field">Caption <span>optional, saved to the caption archive</span><textarea id="f-caption" maxlength="4000" rows="3" placeholder="Paste the caption it went up with, hashtags and all"></textarea></label>
     <div id="f-numbers">
       <p class="fieldset-title">NUMBERS RIGHT NOW</p>
       <div class="quad">
