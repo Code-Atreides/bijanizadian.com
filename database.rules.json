@@ -133,7 +133,7 @@
         "link": { ".validate": "newData.isString() && newData.val().length <= 500 && newData.val().matches(/^https:[/][/][^ ]+$/)" },
         "title": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 120" },
         "notes": { ".validate": "newData.isString() && newData.val().length <= 2000" },
-        "challenge": { ".validate": "newData.isString() && newData.val().matches(/^bar-fall-2026$/)" },
+        "bounty": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9-]{3,40}$/)" },
         "submitted_at": { ".validate": "newData.val() == now" },
         "$other": { ".validate": false }
       }

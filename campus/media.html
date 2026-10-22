@@ -36,15 +36,13 @@
   Turn in writes to RTDB content_submissions, the same write-once node as
   /campus/submit, so everything lands in the team CRM at /campus/submissions.
 
-  The bar challenge sits on the wall, under the lockup: the best fomo video
-  filmed at a bar on campus, app in hand, wins the prize. "Enter the
-  challenge" opens Turn in with the challenge box ticked, and those entries
-  carry challenge: "bar-fall-2026" so the team can pull them in the Queue.
-  The prize is the one line marked PRIZE below; it shows as a blank until set.
-
-  Brand kit: fomo ink with the #221D4B halo (technical & premium), Aeonik, the
-  fomo.family button set, electric blue only in the lockup's slashes, and the
-  brand gradient (#516AF6 + #ACB8F9 glow) as the one focal tile on the wall.
+  Bounties (#bounties) are paid briefs, each with its own wall of 9:16
+  entries. They come from /campus/media/bounties.json: id, title, status
+  (open or closed), season, prize ("$500", or "" for a blank until it's set),
+  deadline (YYYY-MM-DD, optional), brief, steps, the Turn in checkbox note,
+  rules, and videos in the same shape as the wall's. "Enter the bounty" opens
+  Turn in with that bounty ticked; the submission carries bounty: <id>, which
+  the Queue tags. The first bounty is Bar videos.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -145,9 +143,15 @@
   .chips button:hover { color: var(--lavender); border-color: rgba(203,208,235,.28); }
   .chips button[aria-pressed="true"] { background: var(--lavender); border-color: var(--lavender); color: var(--ink); }
 
-  /* ---------- the bar challenge: one card between the lockup and the wall ---------- */
-  .challenge {
-    position: relative; overflow: hidden; isolation: isolate; margin-bottom: clamp(16px, 2.4vh, 24px);
+  /* ---------- media bounties: each bounty is a brief, then its own wall ---------- */
+  .bounties-head { display: flex; justify-content: space-between; align-items: end; gap: 12px 40px; flex-wrap: wrap; padding: clamp(20px, 3.2vh, 36px) 0 clamp(14px, 2.2vh, 22px); }
+  .bounties-head h2 { margin-top: 8px; font-size: clamp(34px, 3.6vw, 54px); font-weight: 700; letter-spacing: -.045em; line-height: 1.04; color: var(--lavender); }
+  .bounties-head h2 span { background: linear-gradient(92deg, var(--glow), var(--blue) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .bounties-head p { max-width: 46ch; font-size: 15px; color: var(--soft); }
+  .bounty { margin-bottom: clamp(36px, 6vh, 64px); }
+  .bounty-note { padding: 40px 0 80px; font-size: 15px; color: var(--soft); }
+  .bounty-card {
+    position: relative; overflow: hidden; isolation: isolate; margin-bottom: 18px;
     display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 48px; align-items: center;
     padding: clamp(18px, 2.6vh, 26px) clamp(18px, 2.2vw, 30px); border-radius: 22px; border: 1px solid rgba(172,184,249,.18);
     background: radial-gradient(520px 260px at 0% 0%, rgba(81,106,246,.34), rgba(81,106,246,0) 70%),
@@ -155,46 +159,52 @@
     box-shadow: 0 30px 70px -40px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.05);
   }
   /* the eyes, oversized and faint, behind the prize */
-  .challenge::after { content: ""; position: absolute; z-index: -1; right: -48px; top: 50%; translate: 0 -50%; width: 400px; aspect-ratio: 83 / 52;
+  .bounty-card::after { content: ""; position: absolute; z-index: -1; right: -48px; top: 50%; translate: 0 -50%; width: 400px; aspect-ratio: 83 / 52;
     background: linear-gradient(135deg, #acb8f9, #516af6); opacity: .09; -webkit-mask: var(--eyes-mask) center / contain no-repeat; mask: var(--eyes-mask) center / contain no-repeat; }
-  .challenge .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--glow); }
-  .challenge .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 4px rgba(172,184,249,.15); animation: pulse 2.4s ease-in-out infinite; }
-  .challenge h2 { font-size: clamp(28px, 2.7vw, 42px); line-height: 1.04; font-weight: 700; letter-spacing: -.045em; margin: 8px 0 6px; color: var(--lavender); }
-  .challenge h2 span { color: var(--glow); }
-  .challenge-copy > p { font-size: 15px; color: var(--soft); max-width: 640px; }
+  .bounty-card .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .14em; }
+  .bounty-card .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 4px rgba(172,184,249,.15); animation: pulse 2.4s ease-in-out infinite; }
+  .bounty.closed .eyebrow i { animation: none; background: var(--faint); box-shadow: none; }
+  .bounty-card h3 { font-size: clamp(28px, 2.7vw, 42px); line-height: 1.04; font-weight: 700; letter-spacing: -.045em; margin: 8px 0 6px; color: var(--lavender); }
+  .bounty-card h3 span { color: var(--glow); }
+  .bounty-copy > p { font-size: 15px; color: var(--soft); max-width: 640px; }
   .steps-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 26px; margin-top: 14px; }
-  .challenge-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px; counter-reset: step; }
-  .challenge-steps li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lavender); counter-increment: step; }
-  .challenge-steps li::before { content: counter(step); flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  .bounty-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px; counter-reset: step; }
+  .bounty-steps li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lavender); counter-increment: step; }
+  .bounty-steps li::before { content: counter(step); flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
     background: rgba(81,106,246,.28); border: 1px solid rgba(172,184,249,.3); font-size: 12px; font-weight: 700; color: #fff; }
-  .challenge-steps small { display: block; font-size: 12.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
+  .bounty-steps small { display: block; font-size: 12.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
   .prize { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; text-align: right; }
-  .prize-label { font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--soft); }
-  .prize-amount { display: flex; align-items: flex-end; font-size: clamp(54px, 5.6vw, 84px); font-weight: 700; line-height: .9; letter-spacing: -.05em; margin-top: -6px;
+  .prize-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--soft); }
+  .prize-amount { display: flex; align-items: flex-end; justify-content: flex-end; font-size: clamp(54px, 5.6vw, 84px); font-weight: 700; line-height: .9; letter-spacing: -.05em; margin-top: 2px;
     background: linear-gradient(180deg, #fff 10%, #acb8f9 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   /* an unset prize is a fill-in blank, not underscores */
   .prize-amount .blank { display: inline-block; width: 1.6em; height: .09em; margin: 0 0 .06em .06em; border-radius: 2px; background: linear-gradient(90deg, #acb8f9, #516af6); }
-  .prize-note { font-size: 12.5px; color: var(--faint); margin-top: -6px; }
+  .prize-note { display: block; font-size: 12.5px; color: var(--faint); margin-top: 6px; }
   .rules-toggle { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 99px; padding: 5px 12px; font-size: 13px; color: var(--soft); cursor: pointer; transition: color .15s, border-color .15s; }
   .rules-toggle::after { content: "+"; font-size: 15px; line-height: 1; color: var(--glow); }
   .rules-toggle[aria-expanded="true"]::after { content: "−"; }
   .rules-toggle:hover { color: var(--lavender); border-color: rgba(203,208,235,.28); }
-  .challenge-rules { grid-column: 1 / -1; border-top: 1px solid var(--hairline); padding-top: 12px; }
-  .challenge-rules ul { margin: 0 0 2px 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 40px; font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .bounty-rules { grid-column: 1 / -1; border-top: 1px solid var(--hairline); padding-top: 12px; }
+  .bounty-rules ul { margin: 0 0 2px 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 40px; font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .bounty-wall-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 2px 14px; }
+  .bounty-wall-head h4 { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+  .bounty-wall-head span { font-size: 13px; color: var(--faint); }
+  .tab-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; line-height: 1; }
+  .views a[aria-current="page"] .tab-count { background: rgba(255,255,255,.9); color: var(--ink); }
   @media (max-width: 900px) {
-    .challenge { grid-template-columns: 1fr; }
+    .bounty-card { grid-template-columns: 1fr; }
     .prize { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; text-align: left; }
-    .prize-amount { font-size: 52px; }
-    .challenge::after { top: auto; bottom: -60px; translate: none; width: 300px; }
-    .challenge-rules ul { grid-template-columns: 1fr; }
+    .prize-amount { font-size: 52px; justify-content: flex-start; }
+    .bounty-card::after { top: auto; bottom: -60px; translate: none; width: 300px; }
+    .bounty-rules ul { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
-    .challenge { border-radius: 18px; gap: 14px; }
-    .challenge h2 { margin-top: 6px; }
-    .challenge-copy > p { font-size: 14.5px; line-height: 1.45; }
+    .bounty-card { border-radius: 18px; gap: 14px; }
+    .bounty-card h3 { margin-top: 6px; }
+    .bounty-copy > p { font-size: 14.5px; line-height: 1.45; }
     .steps-row { align-items: flex-start; flex-direction: column; gap: 12px; }
-    .challenge-steps { flex-direction: column; gap: 8px; }
-    .challenge-steps small { display: none; }
+    .bounty-steps { flex-direction: column; gap: 8px; }
+    .bounty-steps small { display: none; }
     .prize { gap: 10px 16px; }
     .prize-amount { font-size: 44px; }
     .prize .btn { width: 100%; }
@@ -438,8 +448,14 @@
     .pitch h2 { font-size: 32px; }
     .tips { gap: 10px; margin-top: 16px; padding-top: 14px; }
   }
-  @media (max-width: 380px) {
+  /* four tabs: the "/campus" label goes first, then the tabs tighten */
+  @media (max-width: 440px) {
     .brand span { display: none; }
+    .views a { padding: 6px 9px; }
+  }
+  @media (max-width: 350px) {
+    .site-header { gap: 8px; }
+    .views a { padding: 6px 7px; font-size: 12.5px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::after { animation: none !important; transition: none !important; }
@@ -472,6 +488,7 @@
   </a>
   <nav class="views" aria-label="campus media">
     <a href="#watch" data-view="watch" aria-current="page"><i class="live" aria-hidden="true"></i>Watch</a>
+    <a href="#bounties" data-view="bounties">Bounties<b class="tab-count" id="bounty-count" hidden></b></a>
     <a href="#faq" data-view="faq">FAQ</a>
     <a href="#turn-in" data-view="turn-in">Turn in</a>
   </nav>
@@ -495,46 +512,23 @@
         <a class="btn btn--primary" href="#turn-in">Turn in content<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></a>
       </div>
     </div>
-    <section class="challenge" id="challenge" aria-labelledby="challenge-title">
-      <div class="challenge-copy">
-        <span class="eyebrow"><i aria-hidden="true"></i>THE BAR CHALLENGE · FALL 2026</span>
-        <h2 id="challenge-title">the bar <span>challenge.</span></h2>
-        <p>Make the best fomo video at a bar on your campus, with the app in hand. The best one wins.</p>
-        <div class="steps-row">
-          <ol class="challenge-steps">
-            <li><span>Film it at a bar near campus<small>Vertical, real, your crowd.</small></span></li>
-            <li><span>fomo in hand, on camera<small>The app is part of the video.</small></span></li>
-            <li><span>Turn it in<small>One link, challenge box ticked.</small></span></li>
-          </ol>
-          <button type="button" class="rules-toggle" id="rules-toggle" aria-expanded="false" aria-controls="challenge-rules">Rules</button>
-        </div>
-      </div>
-      <div class="prize">
-        <div>
-          <span class="prize-label">WINNER GETS</span>
-          <!-- PRIZE: put the amount in place of the blank, e.g. <strong class="prize-amount">$500</strong>, and drop the note under it -->
-          <strong class="prize-amount" aria-label="A cash prize, amount coming soon">$<span class="blank" aria-hidden="true"></span></strong>
-          <span class="prize-note">Amount drops soon</span>
-        </div>
-        <a class="btn btn--solid" href="#turn-in" id="enter-challenge">Enter the challenge<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></a>
-      </div>
-      <div class="challenge-rules" id="challenge-rules" hidden>
-        <ul>
-          <li>21+ only. Film where you're allowed to, with the bar's okay and the okay of everyone on camera.</li>
-          <li>Drink responsibly. Nobody has to drink to be in your video.</li>
-          <li>Show the fomo app, but never show a balance or promise returns.</li>
-          <li>No purchase or deposit needed to enter. You can enter more than one video.</li>
-          <li>The fomo team picks the winner on creativity, energy and how fomo shows up, and emails them.</li>
-          <li>Entries may be edited and posted on fomo's channels, with credit to your handle.</li>
-        </ul>
-      </div>
-    </section>
-
     <div class="bar">
       <div class="chips" id="chips" role="group" aria-label="Filter videos" hidden></div>
       <p class="count" id="count"><i aria-hidden="true"></i><span>First drops landing soon</span></p>
     </div>
     <ul class="wall" id="wall" aria-label="Videos"></ul>
+  </section>
+
+  <!-- bounties: paid briefs, each with its own wall (bounties.json) -->
+  <section class="view" id="bounties" data-view="bounties" aria-labelledby="bounties-title" hidden>
+    <div class="bounties-head">
+      <div>
+        <span class="eyebrow">PAID BRIEFS</span>
+        <h2 id="bounties-title" tabindex="-1">media <span>bounties.</span></h2>
+      </div>
+      <p>Paid briefs for campus creators. Film what the bounty asks, turn it in, and the best video takes the prize.</p>
+    </div>
+    <div id="bounty-list"><p class="bounty-note">Loading bounties…</p></div>
   </section>
 
   <!-- faq -->
@@ -557,8 +551,8 @@
         <p class="answer">Real moments on your campus: street questions, game days, dinners, chapter events, a day in your life. Shoot <b>vertical</b>. Keep it about people and campus, and never show anyone's balance or promise returns.</p>
       </details>
       <details name="faq">
-        <summary>How does the bar challenge work?<i aria-hidden="true"></i></summary>
-        <p class="answer">Film the best fomo video you can at a bar on your campus, with the app in hand and on camera. Turn it in with <b>Enter it in the bar challenge</b> ticked. It's 21+ only, and the fomo team picks the winner. <a href="#watch">See the prize and rules</a>.</p>
+        <summary>What are media bounties?<i aria-hidden="true"></i></summary>
+        <p class="answer">Paid briefs. Film what a bounty asks, turn it in with that bounty ticked, and the fomo team picks the best video for the prize. The current one is <b>Bar videos</b>: the best fomo video at a bar on your campus, app in hand (21+). <a href="#bounties">See the bounties</a>.</p>
       </details>
       <details name="faq">
         <summary>What gear do I need?<i aria-hidden="true"></i></summary>
@@ -619,7 +613,7 @@
               <div class="field"><label for="title">What is it?</label><input id="title" maxlength="120" placeholder="Game day street questions"></div>
             </div>
             <div class="field"><label for="notes">Notes for the editor <span>optional</span></label><textarea id="notes" maxlength="2000" placeholder="Best takes, music, captions…"></textarea></div>
-            <label class="check"><input type="checkbox" id="challenge-entry"><span>Enter it in the bar challenge<small>21+ · filmed at a bar near campus, fomo app in hand</small></span></label>
+            <div id="bounty-field" hidden></div>
             <button type="submit" class="btn btn--solid send" id="send"><span>Send for editing</span><svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></button>
             <p class="status" id="form-status" role="status" aria-live="polite">Only the fomo team sees your details.</p>
           </form>
@@ -649,6 +643,7 @@
   <nav aria-label="More">
     <a href="/campus">campus</a>
     <a href="/campus/mic">Set up your mic</a>
+    <a href="#bounties">Bounties</a>
     <a href="#faq">FAQ</a>
     <a href="#turn-in">Turn in</a>
   </nav>
@@ -676,7 +671,7 @@
   // ---------- views ----------
   var sections = [].slice.call(document.querySelectorAll('main > .view'));
   var tabs = [].slice.call(document.querySelectorAll('.views a'));
-  var TITLES = { watch: 'fomo/media', faq: 'FAQ · fomo/media', 'turn-in': 'Turn in · fomo/media' };
+  var TITLES = { watch: 'fomo/media', bounties: 'Bounties · fomo/media', faq: 'FAQ · fomo/media', 'turn-in': 'Turn in · fomo/media' };
   var current = null;
 
   function route(focus) {
@@ -729,10 +724,12 @@
     syncPlayback();
   }, { threshold: 0.35 }) : null;
 
+  // every wall plays only on its own open view: the main wall on Watch, entries on Bounties
   function syncPlayback() {
-    var playing = current === 'watch' && !$('player').open && !reduced && document.visibilityState === 'visible';
-    wall.querySelectorAll('video').forEach(function (video) {
-      if (playing && (!observer || visible.has(video))) {
+    var on = !$('player').open && !reduced && document.visibilityState === 'visible';
+    document.querySelectorAll('.wall video').forEach(function (video) {
+      var view = video.closest('.view');
+      if (on && view && view.dataset.view === current && (!observer || visible.has(video))) {
         var attempt = video.play();
         if (attempt && attempt.catch) attempt.catch(function () {});
       } else if (!video.paused) video.pause();
@@ -740,7 +737,7 @@
   }
   document.addEventListener('visibilitychange', syncPlayback);
 
-  function videoTile(video, index) {
+  function videoTile(video, index, list) {
     var li = el('li', 'tile');
     li.style.setProperty('--i', index);
     var hit = el('button', 'tile-hit');
@@ -759,26 +756,28 @@
     mark.appendChild(use('eyes'));
     mark.appendChild(el('i'));
     hit.appendChild(mark);
-    hit.addEventListener('click', function () { openPlayer(index); });
+    hit.addEventListener('click', function () { openPlayer(list, index); });
     li.appendChild(hit);
     if (observer) observer.observe(player);
     return li;
   }
 
-  function ctaTile(first, order) {
+  // the invite tile: turn in content, or enter the bounty whose wall it's on
+  function ctaTile(first, order, bounty) {
     var li = el('li', 'tile cta-tile');
     li.style.setProperty('--i', order);
     var card = el('a', 'cta-card');
     card.href = '#turn-in';
+    if (bounty) card.addEventListener('click', function (event) { event.preventDefault(); enterBounty(bounty.id); });
     var top = el('span');
     top.appendChild(use('eyes', 'eyes'));
     card.appendChild(top);
     var copy = el('span');
     copy.appendChild(el('span', 'cta-k', 'your video here'));
     var big = el('strong');
-    big.innerHTML = first ? 'be the<br>first drop.' : 'make the<br>next drop.';
+    big.innerHTML = bounty ? (first ? 'be the<br>first entry.' : 'enter<br>yours.') : first ? 'be the<br>first drop.' : 'make the<br>next drop.';
     copy.appendChild(big);
-    var go = el('span', 'cta-go', 'Turn in content');
+    var go = el('span', 'cta-go', bounty ? 'Enter the bounty' : 'Turn in content');
     go.appendChild(use('arrow'));
     go.lastChild.setAttribute('width', '15'); go.lastChild.setAttribute('height', '15');
     copy.appendChild(go);
@@ -787,28 +786,31 @@
     return li;
   }
 
-  function slotTile(n) {
+  function slotTile(n, word) {
     var li = el('li', 'tile');
     li.setAttribute('aria-hidden', 'true');
     li.style.setProperty('--i', n);
     var slot = el('div', 'slot');
     slot.appendChild(use('eyes'));
-    slot.appendChild(el('b', '', 'drop ' + String(n).padStart(2, '0')));
+    slot.appendChild(el('b', '', (word || 'drop') + ' ' + String(n).padStart(2, '0')));
     slot.appendChild(el('small', '', 'coming soon'));
     li.appendChild(slot);
     return li;
   }
 
+  function forget(host) {
+    host.querySelectorAll('video').forEach(function (video) { if (observer) observer.unobserve(video); visible.delete(video); });
+  }
+
   function render() {
-    if (observer) observer.disconnect();
-    visible.clear();
+    forget(wall);
     wall.textContent = '';
     shown = filter === 'All' ? videos.slice() : videos.filter(function (video) { return video.tag === filter; });
     if (!videos.length) {
       wall.appendChild(ctaTile(true, 0));
       for (var n = 1; n <= 11; n++) wall.appendChild(slotTile(n));
     } else {
-      shown.forEach(function (video, index) { wall.appendChild(videoTile(video, index)); });
+      shown.forEach(function (video, index) { wall.appendChild(videoTile(video, index, shown)); });
       wall.appendChild(ctaTile(false, shown.length));
     }
     fillRow();
@@ -837,8 +839,144 @@
     }
   }
   window.addEventListener('resize', function () {
-    if ((parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 1) !== wallCols) fillRow();
+    if ((parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 1) !== wallCols) { fillRow(); renderBounties(); }
   });
+
+  // ---------- bounties ----------
+  var bounties = [];
+  function isOpen(bounty) { return bounty.status !== 'closed'; }
+  function bountyName(id) { var hit = bounties.filter(function (b) { return b.id === id; })[0]; return hit ? hit.title : 'the'; }
+  function shortDate(value) {
+    var t = Date.parse(String(value || '') + 'T12:00:00');
+    return isFinite(t) ? new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+  }
+
+  function bountyBlock(b) {
+    var open = isOpen(b), article = el('article', 'bounty' + (open ? '' : ' closed'));
+    article.id = 'bounty-' + b.id;
+    var cardBox = el('div', 'bounty-card'), copy = el('div', 'bounty-copy');
+    var eyebrow = el('span', 'eyebrow');
+    eyebrow.appendChild(el('i'));
+    eyebrow.lastChild.setAttribute('aria-hidden', 'true');
+    eyebrow.appendChild(document.createTextNode([open ? 'OPEN BOUNTY' : 'CLOSED', b.season].filter(Boolean).join(' · ').toUpperCase()));
+    copy.appendChild(eyebrow);
+    // "Bar videos" reads as "bar videos." with the last word lit
+    var words = String(b.title || 'Bounty').toLowerCase().split(' '), h3 = el('h3', '', words.slice(0, -1).join(' ') + (words.length > 1 ? ' ' : ''));
+    h3.appendChild(el('span', '', words[words.length - 1] + '.'));
+    copy.appendChild(h3);
+    if (b.brief) copy.appendChild(el('p', '', b.brief));
+    var row = el('div', 'steps-row'), steps = el('ol', 'bounty-steps');
+    (Array.isArray(b.steps) ? b.steps : []).forEach(function (step) {
+      var li = el('li'), span = el('span', '', step[0]);
+      if (step[1]) span.appendChild(el('small', '', step[1]));
+      li.appendChild(span); steps.appendChild(li);
+    });
+    row.appendChild(steps);
+    var rules = el('div', 'bounty-rules');
+    rules.id = 'rules-' + b.id; rules.hidden = true;
+    if (Array.isArray(b.rules) && b.rules.length) {
+      var toggle = el('button', 'rules-toggle', 'Rules');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', rules.id);
+      toggle.addEventListener('click', function () {
+        var show = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(show)); rules.hidden = !show;
+      });
+      row.appendChild(toggle);
+      var ul = el('ul');
+      b.rules.forEach(function (rule) { ul.appendChild(el('li', '', rule)); });
+      rules.appendChild(ul);
+    }
+    copy.appendChild(row);
+    cardBox.appendChild(copy);
+
+    var prize = el('div', 'prize'), figure = el('div');
+    figure.appendChild(el('span', 'prize-label', open ? 'WINNER GETS' : 'PRIZE'));
+    var amount = el('strong', 'prize-amount');
+    if (b.prize) amount.textContent = b.prize;
+    else {
+      amount.textContent = '$';
+      var blank = el('span', 'blank'); blank.setAttribute('aria-hidden', 'true'); amount.appendChild(blank);
+      amount.setAttribute('aria-label', 'A cash prize, amount coming soon');
+    }
+    figure.appendChild(amount);
+    var closes = shortDate(b.deadline);
+    var note = b.prize ? (closes ? (open ? 'Entries close ' : 'Closed ') + closes : '') : 'Amount drops soon' + (closes ? ' · closes ' + closes : '');
+    if (note) figure.appendChild(el('span', 'prize-note', note));
+    prize.appendChild(figure);
+    if (open) {
+      var enter = el('a', 'btn btn--solid', 'Enter the bounty');
+      enter.href = '#turn-in';
+      enter.insertAdjacentHTML('beforeend', '<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg>');
+      enter.addEventListener('click', function (event) { event.preventDefault(); enterBounty(b.id); });
+      prize.appendChild(enter);
+    }
+    cardBox.appendChild(prize);
+    cardBox.appendChild(rules);
+    article.appendChild(cardBox);
+
+    // its own wall: posted entries, then the invite, then open slots to finish the row
+    var list = (Array.isArray(b.videos) ? b.videos : []).filter(function (v) { return v && typeof v.src === 'string' && v.src; });
+    var head = el('div', 'bounty-wall-head');
+    head.appendChild(el('h4', '', 'Entries'));
+    head.appendChild(el('span', '', list.length ? list.length + (list.length === 1 ? ' video' : ' videos') + ' · tap one for sound' : open ? 'No entries posted yet' : 'No entries posted'));
+    article.appendChild(head);
+    var wallBox = el('ul', 'wall bounty-wall');
+    wallBox.setAttribute('aria-label', (b.title || 'Bounty') + ' entries');
+    article.appendChild(wallBox);
+    list.forEach(function (video, index) { wallBox.appendChild(videoTile(video, index, list)); });
+    if (open) wallBox.appendChild(ctaTile(!list.length, list.length, b));
+    return article;
+  }
+
+  function renderBounties() {
+    var box = $('bounty-list');
+    forget(box);
+    box.textContent = '';
+    if (!bounties.length) { box.appendChild(el('p', 'bounty-note', 'No bounties right now. Check back soon.')); return; }
+    bounties.slice().sort(function (a, b) { return isOpen(b) - isOpen(a); }).forEach(function (b) { box.appendChild(bountyBlock(b)); });
+    // walls shorter than a row finish it with open slots (sizes are known once they're in the page)
+    box.querySelectorAll('.bounty-wall').forEach(function (w) {
+      var cols = parseInt(getComputedStyle(w).getPropertyValue('--cols'), 10) || 1, n = w.children.length;
+      for (var k = n; k < cols; k++) w.appendChild(slotTile(k + 1, 'entry'));
+    });
+    syncPlayback();
+  }
+
+  function renderBountyField() {
+    var field = $('bounty-field'), open = bounties.filter(isOpen);
+    field.textContent = '';
+    field.hidden = !open.length;
+    if (!open.length) return;
+    if (open.length === 1) {
+      var label = el('label', 'check'), input = el('input'), text = el('span', '', 'Enter it in the ' + open[0].title + ' bounty');
+      input.type = 'checkbox'; input.id = 'bounty-entry'; input.value = open[0].id;
+      if (open[0].check) text.appendChild(el('small', '', open[0].check));
+      label.appendChild(input); label.appendChild(text); field.appendChild(label);
+    } else {
+      var wrap = el('div', 'field'), lab = el('label', '', 'Bounty '), select = el('select');
+      lab.setAttribute('for', 'bounty-entry'); lab.appendChild(el('span', '', 'optional'));
+      select.id = 'bounty-entry';
+      select.appendChild(new Option('Not entering a bounty', ''));
+      open.forEach(function (b) { select.appendChild(new Option(b.title, b.id)); });
+      wrap.appendChild(lab); wrap.appendChild(select); field.appendChild(wrap);
+    }
+  }
+  function chosenBounty() {
+    var input = $('bounty-entry');
+    if (!input) return '';
+    return input.type === 'checkbox' ? (input.checked ? input.value : '') : input.value;
+  }
+
+  fetch('/campus/media/bounties.json', { cache: 'no-cache' })
+    .then(function (response) { return response.ok ? response.json() : { bounties: [] }; })
+    .catch(function () { return { bounties: [] }; })
+    .then(function (data) {
+      bounties = (Array.isArray(data.bounties) ? data.bounties : []).filter(function (b) { return b && /^[a-z0-9-]{3,40}$/.test(b.id || '') && b.title; });
+      var open = bounties.filter(isOpen).length;
+      $('bounty-count').textContent = open; $('bounty-count').hidden = !open;
+      renderBounties(); renderBountyField();
+    });
 
   function renderChips() {
     var tags = [];
@@ -873,24 +1011,24 @@
     });
 
   // ---------- the player, with sound ----------
-  var dialog = $('player'), big = $('player-video'), at = 0;
-  function openPlayer(index) {
-    at = index;
-    var video = shown[at];
+  var dialog = $('player'), big = $('player-video'), at = 0, playlist = [];
+  function openPlayer(list, index) {
+    playlist = list; at = index;
+    var video = playlist[at];
     big.poster = video.poster || '';
     big.src = video.src;
     big.muted = false;
     $('player-title').textContent = video.title || video.tag || '';
     $('player-meta').textContent = meta(video);
     $('player-prev').disabled = at === 0;
-    $('player-next').disabled = at === shown.length - 1;
+    $('player-next').disabled = at === playlist.length - 1;
     if (!dialog.open) dialog.showModal();
     syncPlayback();
     var attempt = big.play();
     if (attempt && attempt.catch) attempt.catch(function () {});
   }
-  $('player-prev').addEventListener('click', function () { if (at > 0) openPlayer(at - 1); });
-  $('player-next').addEventListener('click', function () { if (at < shown.length - 1) openPlayer(at + 1); });
+  $('player-prev').addEventListener('click', function () { if (at > 0) openPlayer(playlist, at - 1); });
+  $('player-next').addEventListener('click', function () { if (at < playlist.length - 1) openPlayer(playlist, at + 1); });
   $('player-close').addEventListener('click', function () { dialog.close(); });
   dialog.addEventListener('click', function (event) { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener('keydown', function (event) {
@@ -906,21 +1044,15 @@
   function say(message, isError) { status.textContent = message || HELP; status.classList.toggle('is-error', !!isError); }
 
   $('get-started').addEventListener('click', function () { card.classList.remove('intro-mode'); $('form-title').focus(); });
-  $('rules-toggle').addEventListener('click', function () {
-    var open = this.getAttribute('aria-expanded') !== 'true';
-    this.setAttribute('aria-expanded', String(open));
-    $('challenge-rules').hidden = !open;
-  });
-  // the bar challenge: straight to the form, box ticked
-  $('enter-challenge').addEventListener('click', function (event) {
-    event.preventDefault();
-    $('challenge-entry').checked = true;
+  // a bounty's Enter button: straight to the form, that bounty ticked
+  function enterBounty(id) {
+    var input = $('bounty-entry');
+    if (input) { if (input.type === 'checkbox') input.checked = input.value === id; else input.value = id; }
     card.classList.remove('intro-mode');
     $('step-sent').hidden = true; $('step-form').hidden = false;
     if (location.hash !== '#turn-in') location.hash = 'turn-in';
     setTimeout(function () { $('form-title').focus(); }, 0);
-  });
-  $('back-to-pitch').addEventListener('click', function () { card.classList.add('intro-mode'); $('get-started').focus(); });
+  }
 
   function cleanLink(value) {
     value = value.trim();
@@ -950,7 +1082,8 @@
     var entry = { name: name, email: email, school: school, link: link, title: title, submitted_at: { '.sv': 'timestamp' } };
     if (handle) entry.handle = handle.charAt(0) === '@' ? handle : '@' + handle;
     if (notes) entry.notes = notes;
-    if ($('challenge-entry').checked) entry.challenge = 'bar-fall-2026';
+    var bounty = chosenBounty();
+    if (bounty) entry.bounty = bounty;
     return entry;
   }
   function newId() {
@@ -969,7 +1102,7 @@
     fetch(DB + '/content_submissions/' + newId() + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) })
       .then(function (response) {
         if (!response.ok) throw new Error(response.status);
-        $('sent-title').textContent = entry.challenge ? 'You\'re in the bar challenge.' : 'Sent. It\'s in the queue.';
+        $('sent-title').textContent = entry.bounty ? 'You\'re in the ' + bountyName(entry.bounty) + ' bounty.' : 'Sent. It\'s in the queue.';
         $('sent-what').textContent = entry.title;
         $('sent-where').textContent = new URL(entry.link).hostname.replace(/^www\./, '') + ' · from ' + entry.name;
         $('step-form').hidden = true; $('step-sent').hidden = false; $('sent-title').focus();

@@ -1,0 +1,28 @@
+{
+  "bounties": [
+    {
+      "id": "bar-fall-2026",
+      "title": "Bar videos",
+      "status": "open",
+      "season": "Fall 2026",
+      "prize": "",
+      "deadline": "",
+      "brief": "Make the best fomo video at a bar on your campus, with the app in hand. The best one wins.",
+      "steps": [
+        ["Film it at a bar near campus", "Vertical, real, your crowd."],
+        ["fomo in hand, on camera", "The app is part of the video."],
+        ["Turn it in", "One link, bounty box ticked."]
+      ],
+      "check": "21+ · filmed at a bar near campus, fomo app in hand",
+      "rules": [
+        "21+ only. Film where you're allowed to, with the bar's okay and the okay of everyone on camera.",
+        "Drink responsibly. Nobody has to drink to be in your video.",
+        "Show the fomo app, but never show a balance or promise returns.",
+        "No purchase or deposit needed to enter. You can enter more than one video.",
+        "The fomo team picks the winner on creativity, energy and how fomo shows up, and emails them.",
+        "Entries may be edited and posted on fomo's channels, with credit to your handle."
+      ],
+      "videos": []
+    }
+  ]
+}
