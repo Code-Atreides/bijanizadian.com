@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b091f">
 <title>fomo/media</title>
-<meta name="description" content="Every video from the fomo campus media push, in one place. Watch the drops, read the FAQ, and turn in your own footage for editing.">
+<meta name="description" content="Every video from the fomo campus media push, in one place. Watch the drops, read the FAQ, see the bounties, and turn in your own videos.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="fomo/media">
 <meta property="og:description" content="campus, on camera. Every video from the fomo campus media push, in one place.">
@@ -17,6 +17,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Bold.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <script>document.documentElement.classList.add('js');</script>
+<script src="/assets/content-schools.js?v=1" defer></script>
 <!--
   fomo/media: the home of the campus media push. Three views on one page,
   switched by the hash: the wall (default), #faq and #turn-in.
@@ -365,6 +366,17 @@
   .check input { flex: none; width: 17px; height: 17px; margin-top: 1px; accent-color: var(--blue); cursor: pointer; }
   .check small { display: block; font-size: 12px; font-weight: 500; color: var(--faint); }
   .send { width: 100%; height: 46px; }
+  /* remembered after the first send: one line instead of four fields */
+  .me { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: rgba(255,255,255,.03); font-size: 14px; color: var(--soft); }
+  .me strong { color: var(--lavender); font-weight: 700; }
+  .me small { display: block; font-size: 12.5px; color: var(--faint); }
+  .formside .me .back { display: inline-flex; }
+  .link-box { position: relative; }
+  .link-box input { padding-right: 70px; }
+  .paste { position: absolute; right: 6px; top: 50%; translate: 0 -50%; height: 30px; padding: 0 11px; border-radius: 8px; border: 1px solid var(--line); background: rgba(255,255,255,.08); color: var(--lavender); font-size: 12.5px; font-weight: 700; cursor: pointer; }
+  .paste:hover { background: rgba(255,255,255,.16); }
+  .link-hint { min-height: 16px; margin-top: 5px; font-size: 12px; color: var(--faint); }
+  .link-hint.ok { color: #8fe3b4; }
   .status { min-height: 20px; margin-top: 9px; font-size: 12.5px; text-align: center; color: var(--faint); }
   .status.is-error { color: #ff8a63; font-weight: 700; }
   .sent-mark { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--btn-fill); color: #fff; margin-bottom: 16px; }
@@ -540,7 +552,7 @@
     <div class="faq-list">
       <details name="faq" open>
         <summary>What is fomo campus media?<i aria-hidden="true"></i></summary>
-        <p class="answer">fomo's campus content push. Students film what's actually happening at their school, turn in the footage, and the fomo team edits it. Finished videos live here on the wall and on our Instagram, <a href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener">@fomo.campus</a>.</p>
+        <p class="answer">fomo's campus content push. Students film what's actually happening at their school and turn in their videos. The best ones live here on the wall and on our Instagram, <a href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener">@fomo.campus</a>.</p>
       </details>
       <details name="faq">
         <summary>What should I film?<i aria-hidden="true"></i></summary>
@@ -556,15 +568,15 @@
       </details>
       <details name="faq">
         <summary>How do I turn it in?<i aria-hidden="true"></i></summary>
-        <p class="answer">Upload your files to Google Drive, Dropbox or WeTransfer, set sharing to <b>anyone with the link</b>, and paste the link in <a href="#turn-in">Turn in</a>. One link per video. A folder works if it's several clips.</p>
+        <p class="answer">Paste a link in <a href="#turn-in">Turn in</a>: the TikTok or Instagram you posted, or a Google Drive, Dropbox or WeTransfer file with sharing set to <b>anyone with the link</b>. After your first video it remembers you, so the next one is just the link.</p>
       </details>
       <details name="faq">
         <summary>Do I need to edit it first?<i aria-hidden="true"></i></summary>
-        <p class="answer">No. Send the full, untrimmed takes and say which parts you like in the notes. The edit is on us.</p>
+        <p class="answer">Yes. Send it finished and ready to post: vertical, trimmed, with any captions or music already on it.</p>
       </details>
       <details name="faq">
         <summary>Can I add music?<i aria-hidden="true"></i></summary>
-        <p class="answer">Leave music to the editor. If you have a sound in mind, name it in the notes.</p>
+        <p class="answer">Yes. Add it before you turn the video in, the way you'd post it.</p>
       </details>
       <details name="faq">
         <summary>Do I get credit?<i aria-hidden="true"></i></summary>
@@ -579,12 +591,12 @@
       <div class="pitch">
         <span class="eyebrow">TURN IN · FALL 2026</span>
         <h2 id="turnin-title" tabindex="-1">turn it in.</h2>
-        <p>Filmed something? Share the files and it goes straight into the edit queue.</p>
+        <p>Made a video? Share the link and it goes straight to the fomo team.</p>
         <ul class="tips">
-          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 13v8M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="m8 17 4-4 4 4"/></svg><span>Upload it anywhere<small>Google Drive, Dropbox or WeTransfer.</small></span></li>
-          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Anyone with the link<small>So the editor can open it without asking.</small></span></li>
-          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Send the full takes<small>Untrimmed. Say which parts you like.</small></span></li>
-          <li><svg width="19" height="19" aria-hidden="true"><use href="#instagram"/></svg><span>Goes live on @fomo.campus<small>Finished edits post on our Instagram and the wall.</small></span></li>
+          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Paste any link<small>Your posted TikTok or Instagram, or a Drive, Dropbox or WeTransfer file.</small></span></li>
+          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Send it ready to post<small>Vertical and finished, the way you'd post it.</small></span></li>
+          <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 13v8M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="m8 17 4-4 4 4"/></svg><span>Files: anyone with the link<small>For Drive and Dropbox, so we can open it.</small></span></li>
+          <li><svg width="19" height="19" aria-hidden="true"><use href="#instagram"/></svg><span>Goes live on @fomo.campus<small>The best videos post on our Instagram and the wall.</small></span></li>
         </ul>
         <button type="button" class="btn btn--quiet get-started" id="get-started">Get started<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></button>
       </div>
@@ -592,33 +604,43 @@
       <div class="formside">
         <div id="step-form">
           <div class="form-head">
-            <h3 tabindex="-1" id="form-title">Your content</h3>
+            <h3 tabindex="-1" id="form-title">Your video</h3>
             <button type="button" class="back" id="back-to-pitch"><span aria-hidden="true">←</span> How it works</button>
           </div>
-          <p class="sub">One link per video. About a minute.</p>
+          <p class="sub">Paste a link. Under a minute.</p>
           <form id="send-form" novalidate>
-            <div class="pair">
-              <div class="field"><label for="name">Your name</label><input id="name" autocomplete="name" maxlength="100"></div>
-              <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu"></div>
-            </div>
-            <div class="pair school-row">
-              <div class="field"><label for="school">School</label><input id="school" autocomplete="organization" maxlength="120"></div>
-              <div class="field"><label for="handle">Handle <span>optional</span></label><input id="handle" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="31" placeholder="@yourname"></div>
+            <div class="me" id="me" hidden>
+              <span>Sending as <strong id="me-name"></strong><small id="me-detail"></small></span>
+              <button type="button" class="back" id="me-change">Not you?</button>
             </div>
             <div class="pair link-row">
-              <div class="field"><label for="link">Link to your files</label><input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="500" placeholder="drive.google.com/…"></div>
-              <div class="field"><label for="title">What is it?</label><input id="title" maxlength="120" placeholder="Game day street questions"></div>
+              <div class="field"><label for="link">Link to your video</label>
+                <div class="link-box"><input id="link" type="url" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="500" placeholder="tiktok.com/…, drive.google.com/…"><button type="button" class="paste" id="paste-link" hidden>Paste</button></div>
+                <p class="link-hint" id="link-hint" aria-live="polite"></p>
+              </div>
+              <div class="field"><label for="title">What is it? <span>optional</span></label><input id="title" maxlength="120" placeholder="Game day street questions"></div>
             </div>
-            <div class="field"><label for="notes">Notes for the editor <span>optional</span></label><textarea id="notes" maxlength="2000" placeholder="Best takes, music, captions…"></textarea></div>
+            <div id="about-you">
+              <div class="pair">
+                <div class="field"><label for="name">Your name</label><input id="name" autocomplete="name" maxlength="100"></div>
+                <div class="field"><label for="email">Email</label><input id="email" type="email" inputmode="email" autocomplete="email" maxlength="200" placeholder="you@school.edu"></div>
+              </div>
+              <div class="pair school-row">
+                <div class="field"><label for="school">School</label><input id="school" autocomplete="organization" maxlength="120" list="school-list"></div>
+                <div class="field"><label for="handle">Handle <span>optional</span></label><input id="handle" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="31" placeholder="@yourname"></div>
+              </div>
+              <datalist id="school-list"></datalist>
+            </div>
+            <div class="field"><label for="notes">Anything we should know? <span>optional</span></label><textarea id="notes" maxlength="2000" placeholder="Who's in it, a caption idea…"></textarea></div>
             <div id="bounty-field" hidden></div>
-            <button type="submit" class="btn btn--solid send" id="send"><span>Send for editing</span><svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></button>
+            <button type="submit" class="btn btn--solid send" id="send"><span>Send it in</span><svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></button>
             <p class="status" id="form-status" role="status" aria-live="polite">Only the fomo team sees your details.</p>
           </form>
         </div>
         <div id="step-sent" hidden>
           <div class="sent-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
-          <h3 tabindex="-1" id="sent-title">Sent. It's in the queue.</h3>
-          <p class="sub">Keep the link shared until the edit is done. The finished video posts on <a class="ig-link" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener"><svg width="14" height="14" aria-hidden="true"><use href="#instagram"/></svg>@fomo.campus</a>.</p>
+          <h3 tabindex="-1" id="sent-title">Sent. The fomo team has it.</h3>
+          <p class="sub">The best videos post on <a class="ig-link" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener"><svg width="14" height="14" aria-hidden="true"><use href="#instagram"/></svg>@fomo.campus</a> and the wall.<span id="sent-keep"> Keep the file shared so we can open it.</span></p>
           <div class="sent-row">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
             <span><strong id="sent-what"></strong><small id="sent-where"></small></span>
@@ -638,8 +660,7 @@
     <svg viewBox="0 0 352 113" aria-hidden="true" style="color:var(--mark)"><use href="#wordmark"/></svg>
   </a>
   <nav aria-label="More">
-    <a href="/campus">campus</a>
-    <a href="/campus/mic">Set up your mic</a>
+    <a href="https://fomocampus.com" target="_blank" rel="noopener">campus</a>
     <a href="#bounties">Bounties</a>
     <a href="#turn-in">Turn in</a>
     <a href="#faq">FAQ</a>
@@ -1085,6 +1106,62 @@
     setTimeout(function () { $('form-title').focus(); }, 0);
   }
 
+  // ---------- easier turn in: any link, a paste button, schools to pick, and you remembered ----------
+  var ME = 'campus-turnin-me';
+  var store = {
+    get: function () { try { return JSON.parse(localStorage.getItem(ME) || 'null'); } catch (e) { return null; } },
+    set: function (value) { try { localStorage.setItem(ME, JSON.stringify(value)); } catch (e) {} },
+    clear: function () { try { localStorage.removeItem(ME); } catch (e) {} }
+  };
+  function remembered(me) {
+    var known = me && typeof me.name === 'string' && me.name.length >= 2 && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(me.email || '') && typeof me.school === 'string' && me.school.length >= 2;
+    $('me').hidden = !known; $('about-you').hidden = !!known;
+    if (!known) return;
+    ['name', 'email', 'school', 'handle'].forEach(function (id) { fields[id].value = me[id] || ''; });
+    $('me-name').textContent = me.name;
+    $('me-detail').textContent = [me.school, me.handle, me.email].filter(Boolean).join(' · ');
+  }
+  $('me-change').addEventListener('click', function () {
+    store.clear();
+    ['name', 'email', 'school', 'handle'].forEach(function (id) { fields[id].value = ''; });
+    remembered(null);
+    fields.name.focus();
+  });
+
+  // where a link points: a posted video, or a file that has to be shared
+  var SOURCES = [
+    [/(^|\.)tiktok\.com$/, 'TikTok', true], [/(^|\.)instagram\.com$/, 'Instagram', true], [/(^|\.)(youtube\.com|youtu\.be)$/, 'YouTube', true],
+    [/(^|\.)(drive|docs)\.google\.com$/, 'Google Drive', false], [/(^|\.)dropbox\.com$/, 'Dropbox', false],
+    [/(^|\.)(wetransfer\.com|we\.tl)$/, 'WeTransfer', false], [/(^|\.)icloud\.com$/, 'iCloud', false]
+  ];
+  function sourceOf(link) {
+    try { var host = new URL(link).hostname.replace(/^www\./, ''); } catch (e) { return null; }
+    for (var i = 0; i < SOURCES.length; i++) if (SOURCES[i][0].test(host)) return { name: SOURCES[i][1], posted: SOURCES[i][2] };
+    return { name: '', posted: false };
+  }
+  function hint() {
+    var box = $('link-hint'), link = cleanLink(fields.link.value), source = link ? sourceOf(link) : null;
+    box.classList.toggle('ok', !!(source && source.posted));
+    box.textContent = !source ? '' : source.posted ? '✓ ' + source.name + ' post' : (source.name ? source.name + ' file · ' : 'File link · ') + 'set sharing to anyone with the link';
+  }
+  fields.link.addEventListener('input', hint);
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    $('paste-link').hidden = false;
+    $('paste-link').addEventListener('click', function () {
+      navigator.clipboard.readText().then(function (text) {
+        fields.link.value = String(text || '').trim();
+        fields.link.dispatchEvent(new Event('input')); fields.link.focus();
+      }).catch(function () { say('Couldn\'t read your clipboard. Paste the link in the box.', true); fields.link.focus(); });
+    });
+  }
+  function fillSchools() {
+    if (!window.contentSchools || $('school-list').options.length) return;
+    window.contentSchools.list.forEach(function (school) { $('school-list').appendChild(new Option(school.name)); });
+  }
+  fillSchools();
+  window.addEventListener('DOMContentLoaded', fillSchools);
+  remembered(store.get());
+
   function cleanLink(value) {
     value = value.trim();
     if (value && !/^[a-z][a-z0-9+.-]*:/i.test(value)) value = 'https://' + value;
@@ -1104,12 +1181,15 @@
     var link = cleanLink(fields.link.value);
     var title = fields.title.value.trim().replace(/\s+/g, ' ');
     var notes = fields.notes.value.trim();
-    if (name.length < 2) return invalid(fields.name, 'Add your name.');
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return invalid(fields.email, 'Add an email we can reach you at.');
-    if (school.length < 2) return invalid(fields.school, 'Add your school.');
-    if (handle && !/^@?[A-Za-z0-9_.]{1,30}$/.test(handle)) return invalid(fields.handle, 'Handles use letters, numbers, dots and underscores.');
-    if (!link) return invalid(fields.link, 'Paste the full link to your files, starting with https://.');
-    if (title.length < 2) return invalid(fields.title, 'Say what the video is, in a few words.');
+    if (!link) return invalid(fields.link, 'Paste the link to your video.');
+    // a remembered creator's details are already filled; a new one fills them once
+    var reopen = function (input, message) { remembered(null); return invalid(input, message); };
+    if (name.length < 2) return reopen(fields.name, 'Add your name.');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return reopen(fields.email, 'Add an email we can reach you at.');
+    if (school.length < 2) return reopen(fields.school, 'Add your school.');
+    if (handle && !/^@?[A-Za-z0-9_.]{1,30}$/.test(handle)) return reopen(fields.handle, 'Handles use letters, numbers, dots and underscores.');
+    // "What is it?" is optional: the link's source names it
+    if (title.length < 2) { var source = sourceOf(link); title = source && source.name ? source.name + (source.posted ? ' post' : ' video') : 'Video'; }
     var entry = { name: name, email: email, school: school, link: link, title: title, submitted_at: { '.sv': 'timestamp' } };
     if (handle) entry.handle = handle.charAt(0) === '@' ? handle : '@' + handle;
     if (notes) entry.notes = notes;
@@ -1133,17 +1213,21 @@
     fetch(DB + '/content_submissions/' + newId() + '.json', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(entry) })
       .then(function (response) {
         if (!response.ok) throw new Error(response.status);
-        $('sent-title').textContent = entry.bounty ? 'You\'re in the ' + bountyName(entry.bounty) + ' bounty.' : 'Sent. It\'s in the queue.';
+        $('sent-title').textContent = entry.bounty ? 'You\'re in the ' + bountyName(entry.bounty) + ' bounty.' : 'Sent. The fomo team has it.';
+        var source = sourceOf(entry.link);
+        $('sent-keep').hidden = !!(source && source.posted);
+        store.set({ name: entry.name, email: entry.email, school: entry.school, handle: entry.handle || '' });
         $('sent-what').textContent = entry.title;
         $('sent-where').textContent = new URL(entry.link).hostname.replace(/^www\./, '') + ' · from ' + entry.name;
         $('step-form').hidden = true; $('step-sent').hidden = false; $('sent-title').focus();
         say();
       })
       .catch(function () { say("That didn't send. Check your connection and try again.", true); })
-      .then(function () { send.disabled = false; send.firstChild.textContent = 'Send for editing'; });
+      .then(function () { send.disabled = false; send.firstChild.textContent = 'Send it in'; });
   });
   $('another').addEventListener('click', function () {
     ['link', 'title', 'notes'].forEach(function (id) { fields[id].value = ''; });
+    hint(); remembered(store.get());
     $('step-sent').hidden = true; $('step-form').hidden = false; fields.link.focus();
   });
 
