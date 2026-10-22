@@ -150,75 +150,79 @@
   @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(172,184,249,0); } }
 
   .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  /* where finished videos end up: the campus Instagram */
+  .ig-link { display: inline-flex; align-items: center; gap: 5px; color: var(--lavender); font-weight: 700; text-decoration: none; border-radius: 4px; }
+  .ig-link svg { flex: none; }
+  .ig-link:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+  .count .ig-link { margin-left: 2px; }
   .chips button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--soft); font-size: 13.5px; font-weight: 500; padding: 7px 14px; border-radius: 99px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
   .chips button:hover { color: var(--lavender); border-color: rgba(203,208,235,.28); }
   .chips button[aria-pressed="true"] { background: var(--lavender); border-color: var(--lavender); color: var(--ink); }
 
-  /* ---------- media bounties: each bounty is a brief, then its own wall ---------- */
-  .bounties-head { display: flex; justify-content: space-between; align-items: end; gap: 12px 40px; flex-wrap: wrap; padding: var(--view-top) 0 20px; }
-  .bounties-head h2 { margin-top: 8px; font-size: clamp(34px, 3.6vw, 54px); font-weight: 700; letter-spacing: -.045em; line-height: 1.04; color: var(--lavender); }
-  .bounties-head h2 span { background: linear-gradient(92deg, var(--glow), var(--blue) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .bounties-head p { max-width: 46ch; font-size: 15px; color: var(--soft); }
-  .bounty { margin-bottom: clamp(36px, 6vh, 64px); }
+  /* ---------- media bounties: each bounty is its entries wall, with the brief on the right ---------- */
+  #bounty-list { padding-top: var(--view-top); }
   .bounty-note { padding: 40px 0 80px; font-size: 15px; color: var(--soft); }
-  .bounty-card {
-    position: relative; overflow: hidden; isolation: isolate; margin-bottom: 20px;
-    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 48px; align-items: center;
-    padding: clamp(18px, 2.6vh, 26px) clamp(18px, 2.2vw, 30px); border-radius: 22px; border: 1px solid rgba(172,184,249,.18);
-    background: radial-gradient(520px 260px at 0% 0%, rgba(81,106,246,.34), rgba(81,106,246,0) 70%),
-                radial-gradient(420px 240px at 100% 100%, rgba(74,54,255,.22), rgba(74,54,255,0) 70%), var(--raised);
+  .bounty { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); gap: 24px clamp(24px, 2.4vw, 40px); align-items: start; margin-bottom: clamp(40px, 7vh, 72px); }
+  .bounty-entries { grid-column: 1; grid-row: 1; min-width: 0; }
+  /* the brief: what to do and the reward, nothing else */
+  .bounty-panel {
+    grid-column: 2; grid-row: 1; position: relative; overflow: hidden; isolation: isolate; padding: 24px 24px 20px;
+    border-radius: 22px; border: 1px solid rgba(172,184,249,.18);
+    background: radial-gradient(360px 240px at 0% 0%, rgba(81,106,246,.34), rgba(81,106,246,0) 70%),
+                radial-gradient(320px 220px at 100% 100%, rgba(74,54,255,.22), rgba(74,54,255,0) 70%), var(--raised);
     box-shadow: 0 30px 70px -40px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.05);
   }
-  /* the eyes, oversized and faint, behind the prize */
-  .bounty-card::after { content: ""; position: absolute; z-index: -1; right: -48px; top: 50%; translate: 0 -50%; width: 400px; aspect-ratio: 83 / 52;
-    background: linear-gradient(135deg, #acb8f9, #516af6); opacity: .09; -webkit-mask: var(--eyes-mask) center / contain no-repeat; mask: var(--eyes-mask) center / contain no-repeat; }
-  .bounty-card .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .14em; }
-  .bounty-card .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 4px rgba(172,184,249,.15); animation: pulse 2.4s ease-in-out infinite; }
+  .bounty-panel::after { content: ""; position: absolute; z-index: -1; right: -70px; bottom: -40px; width: 300px; aspect-ratio: 83 / 52;
+    background: linear-gradient(135deg, #acb8f9, #516af6); opacity: .08; -webkit-mask: var(--eyes-mask) center / contain no-repeat; mask: var(--eyes-mask) center / contain no-repeat; }
+  .bounty-panel .eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: .14em; }
+  .bounty-panel .eyebrow i { width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 4px rgba(172,184,249,.15); animation: pulse 2.4s ease-in-out infinite; }
   .bounty.closed .eyebrow i { animation: none; background: var(--faint); box-shadow: none; }
-  .bounty-card h3 { font-size: clamp(28px, 2.7vw, 42px); line-height: 1.04; font-weight: 700; letter-spacing: -.045em; margin: 8px 0 6px; color: var(--lavender); }
-  .bounty-card h3 span { color: var(--glow); }
-  .bounty-copy > p { font-size: 15px; color: var(--soft); max-width: 640px; }
-  .steps-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 26px; margin-top: 14px; }
-  .bounty-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 10px 26px; counter-reset: step; }
-  .bounty-steps li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--lavender); counter-increment: step; }
-  .bounty-steps li::before { content: counter(step); flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  .bounty-panel h3 { font-size: clamp(30px, 2.5vw, 40px); line-height: 1.04; font-weight: 700; letter-spacing: -.045em; margin: 10px 0 8px; color: var(--lavender); }
+  .bounty-panel h3 span { color: var(--glow); }
+  .bounty-panel > p { font-size: 15px; line-height: 1.5; color: var(--soft); }
+  .panel-label { display: block; margin: 20px 0 11px; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--soft); }
+  .bounty-steps { list-style: none; display: grid; gap: 12px; counter-reset: step; }
+  .bounty-steps li { display: flex; align-items: flex-start; gap: 12px; font-size: 14.5px; line-height: 1.35; color: var(--lavender); counter-increment: step; }
+  .bounty-steps li::before { content: counter(step); flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin-top: -2px; border-radius: 50%;
     background: rgba(81,106,246,.28); border: 1px solid rgba(172,184,249,.3); font-size: 12px; font-weight: 700; color: #fff; }
-  .bounty-steps small { display: block; font-size: 12.5px; font-weight: 500; color: var(--faint); line-height: 1.3; }
-  .prize { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; text-align: right; }
-  .prize-label { display: block; font-size: 12px; font-weight: 700; letter-spacing: .14em; color: var(--soft); }
-  .prize-amount { display: flex; align-items: flex-end; justify-content: flex-end; font-size: clamp(54px, 5.6vw, 84px); font-weight: 700; line-height: .9; letter-spacing: -.05em; margin-top: 2px;
+  .bounty-steps small { display: block; font-size: 12.5px; font-weight: 500; color: var(--faint); line-height: 1.35; margin-top: 2px; }
+  .prize-amount { display: flex; align-items: flex-end; font-size: clamp(50px, 4vw, 64px); font-weight: 700; line-height: .9; letter-spacing: -.05em;
     background: linear-gradient(180deg, #fff 10%, #acb8f9 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   /* an unset prize is a fill-in blank, not underscores */
   .prize-amount .blank { display: inline-block; width: 1.6em; height: .09em; margin: 0 0 .06em .06em; border-radius: 2px; background: linear-gradient(90deg, #acb8f9, #516af6); }
-  .prize-note { display: block; font-size: 12.5px; color: var(--faint); margin-top: 6px; }
-  .rules-toggle { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 99px; padding: 5px 12px; font-size: 13px; color: var(--soft); cursor: pointer; transition: color .15s, border-color .15s; }
+  .prize-note { display: block; font-size: 12.5px; color: var(--faint); margin-top: 8px; }
+  .bounty-panel > .btn { width: 100%; margin-top: 20px; }
+  .rules-toggle { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 99px; padding: 5px 12px; font-size: 13px; color: var(--soft); cursor: pointer; transition: color .15s, border-color .15s; }
   .rules-toggle::after { content: "+"; font-size: 15px; line-height: 1; color: var(--glow); }
   .rules-toggle[aria-expanded="true"]::after { content: "−"; }
   .rules-toggle:hover { color: var(--lavender); border-color: rgba(203,208,235,.28); }
-  .bounty-rules { grid-column: 1 / -1; border-top: 1px solid var(--hairline); padding-top: 12px; }
-  .bounty-rules ul { margin: 0 0 2px 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 40px; font-size: 13px; color: var(--soft); line-height: 1.5; }
+  .bounty-rules { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--hairline); }
+  .bounty-rules ul { margin: 0 0 2px 18px; display: grid; gap: 6px; font-size: 13px; color: var(--soft); line-height: 1.5; }
   .bounty-wall-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 2px 14px; }
   .bounty-wall-head h4 { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
   .bounty-wall-head span { font-size: 13px; color: var(--faint); }
   .tab-count { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--blue); color: #fff; font-size: 11px; font-weight: 700; line-height: 1; }
   .views a[aria-current="page"] .tab-count { background: rgba(255,255,255,.9); color: var(--ink); }
+  /* the entries wall sits beside the brief: its own columns, alternate ones dropped */
+  .bounty .wall.bounty-wall { --cols: 4; }
+  .bounty .wall.bounty-wall > .tile { translate: none; }
+  .bounty .wall.bounty-wall > .tile:nth-child(even) { translate: 0 var(--stagger); }
+  @media (max-width: 1280px) {
+    .bounty .wall.bounty-wall { --cols: 3; }
+    .bounty .wall.bounty-wall > .tile:nth-child(even) { translate: none; }
+    .bounty .wall.bounty-wall > .tile:nth-child(3n+2) { translate: 0 var(--stagger); }
+  }
+  /* stacked: the brief first, then the entries */
   @media (max-width: 900px) {
-    .bounty-card { grid-template-columns: 1fr; }
-    .prize { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; text-align: left; }
-    .prize-amount { font-size: 52px; justify-content: flex-start; }
-    .bounty-card::after { top: auto; bottom: -60px; translate: none; width: 300px; }
-    .bounty-rules ul { grid-template-columns: 1fr; }
+    .bounty { grid-template-columns: 1fr; }
+    .bounty-panel, .bounty-entries { grid-column: 1; grid-row: auto; }
   }
   @media (max-width: 600px) {
-    .bounty-card { border-radius: 18px; gap: 14px; }
-    .bounty-card h3 { margin-top: 6px; }
-    .bounty-copy > p { font-size: 14.5px; line-height: 1.45; }
-    .steps-row { align-items: flex-start; flex-direction: column; gap: 12px; }
-    .bounty-steps { flex-direction: column; gap: 8px; }
-    .bounty-steps small { display: none; }
-    .prize { gap: 10px 16px; }
-    .prize-amount { font-size: 44px; }
-    .prize .btn { width: 100%; }
+    .bounty .wall.bounty-wall { --cols: 2; }
+    .bounty .wall.bounty-wall > .tile:nth-child(3n+2) { translate: none; }
+    .bounty .wall.bounty-wall > .tile:nth-child(even) { translate: 0 var(--stagger); }
+    .bounty-panel { padding: 20px 18px 16px; border-radius: 18px; }
+    .prize-amount { font-size: 52px; }
   }
 
   /* columns are fixed per width so the stagger always lands on alternate columns */
@@ -483,6 +487,7 @@
       <path d="M36.97 24.36c7.13 0 12.82 3.59 15.97 9.24-4.19 4.44-7.29 10.16-8.48 16.4-1.19 6.24-.28 11.96 2.21 16.4-5.32 5.65-12.38 9.24-19.51 9.24-8.73 0-15.3-5.38-17.7-13.32h17.39c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H14.18c5.44-7.94 14.07-13.32 22.79-13.32Z" fill="currentColor"/>
       <path d="M72.33 24.36c12.75 0 20.89 11.48 18.18 25.64-2.71 14.16-15.24 25.64-27.99 25.64-8.73 0-15.3-5.38-17.7-13.32h19.34c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H49.53c5.44-7.94 14.07-13.32 22.8-13.32Z" fill="currentColor"/>
     </symbol>
+    <symbol id="instagram" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></g></symbol>
     <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   </defs>
 </svg>
@@ -511,20 +516,14 @@
     <h1 class="sr" id="watch-title" tabindex="-1">fomo/media: every video from the campus media push</h1>
     <div class="bar">
       <div class="chips" id="chips" role="group" aria-label="Filter videos" hidden></div>
-      <p class="count" id="count"><i aria-hidden="true"></i><span>First drops landing soon</span></p>
+      <p class="count" id="count"><i aria-hidden="true"></i><span id="count-text">First drops landing soon</span><span aria-hidden="true">·</span><span>posted on</span><a class="ig-link" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener"><svg width="14" height="14" aria-hidden="true"><use href="#instagram"/></svg>@fomo.campus</a></p>
     </div>
     <ul class="wall" id="wall" aria-label="Videos"></ul>
   </section>
 
   <!-- bounties: paid briefs, each with its own wall (bounties.json) -->
   <section class="view" id="bounties" data-view="bounties" aria-labelledby="bounties-title" hidden>
-    <div class="bounties-head">
-      <div>
-        <span class="eyebrow">PAID BRIEFS</span>
-        <h2 id="bounties-title" tabindex="-1">media <span>bounties.</span></h2>
-      </div>
-      <p>Paid briefs for campus creators. Film what the bounty asks, turn it in, and the best video takes the prize.</p>
-    </div>
+    <h2 class="sr" id="bounties-title" tabindex="-1">Media bounties</h2>
     <div id="bounty-list"><p class="bounty-note">Loading bounties…</p></div>
   </section>
 
@@ -541,7 +540,7 @@
     <div class="faq-list">
       <details name="faq" open>
         <summary>What is fomo campus media?<i aria-hidden="true"></i></summary>
-        <p class="answer">fomo's campus content push. Students film what's actually happening at their school, turn in the footage, and the fomo team edits it. Finished videos live here, on the wall.</p>
+        <p class="answer">fomo's campus content push. Students film what's actually happening at their school, turn in the footage, and the fomo team edits it. Finished videos live here on the wall and on our Instagram, <a href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener">@fomo.campus</a>.</p>
       </details>
       <details name="faq">
         <summary>What should I film?<i aria-hidden="true"></i></summary>
@@ -585,6 +584,7 @@
           <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 13v8M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2"/><path d="m8 17 4-4 4 4"/></svg><span>Upload it anywhere<small>Google Drive, Dropbox or WeTransfer.</small></span></li>
           <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><span>Anyone with the link<small>So the editor can open it without asking.</small></span></li>
           <li><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Send the full takes<small>Untrimmed. Say which parts you like.</small></span></li>
+          <li><svg width="19" height="19" aria-hidden="true"><use href="#instagram"/></svg><span>Goes live on @fomo.campus<small>Finished edits post on our Instagram and the wall.</small></span></li>
         </ul>
         <button type="button" class="btn btn--quiet get-started" id="get-started">Get started<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></button>
       </div>
@@ -618,7 +618,7 @@
         <div id="step-sent" hidden>
           <div class="sent-mark"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></div>
           <h3 tabindex="-1" id="sent-title">Sent. It's in the queue.</h3>
-          <p class="sub">Keep the link shared until the edit is done.</p>
+          <p class="sub">Keep the link shared until the edit is done. The finished video posts on <a class="ig-link" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener"><svg width="14" height="14" aria-hidden="true"><use href="#instagram"/></svg>@fomo.campus</a>.</p>
           <div class="sent-row">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
             <span><strong id="sent-what"></strong><small id="sent-where"></small></span>
@@ -643,6 +643,7 @@
     <a href="#bounties">Bounties</a>
     <a href="#turn-in">Turn in</a>
     <a href="#faq">FAQ</a>
+    <a href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener">@fomo.campus</a>
   </nav>
   <span>Trading involves risk, including loss of principal. A prize is not a trading return.</span>
 </footer>
@@ -861,8 +862,12 @@
       wall.appendChild(slot);
     }
   }
+  function colsOf(node) { return parseInt(getComputedStyle(node).getPropertyValue('--cols'), 10) || 1; }
+  var bountyCols = 0;
   window.addEventListener('resize', function () {
-    if ((parseInt(getComputedStyle(wall).getPropertyValue('--cols'), 10) || 1) !== wallCols) { fillRow(); renderBounties(); }
+    if (colsOf(wall) !== wallCols) fillRow();
+    var first = document.querySelector('.bounty-wall');
+    if (first && colsOf(first) !== bountyCols) renderBounties();
   });
 
   // ---------- bounties ----------
@@ -877,44 +882,33 @@
   function bountyBlock(b) {
     var open = isOpen(b), article = el('article', 'bounty' + (open ? '' : ' closed'));
     article.id = 'bounty-' + b.id;
-    var cardBox = el('div', 'bounty-card'), copy = el('div', 'bounty-copy');
+
+    // the brief, on the right: what to do and the reward
+    var panel = el('aside', 'bounty-panel');
+    panel.setAttribute('aria-label', (b.title || 'Bounty') + ' brief');
     var eyebrow = el('span', 'eyebrow');
     eyebrow.appendChild(el('i'));
     eyebrow.lastChild.setAttribute('aria-hidden', 'true');
     eyebrow.appendChild(document.createTextNode([open ? 'OPEN BOUNTY' : 'CLOSED', b.season].filter(Boolean).join(' · ').toUpperCase()));
-    copy.appendChild(eyebrow);
+    panel.appendChild(eyebrow);
     // "Bar videos" reads as "bar videos." with the last word lit
     var words = String(b.title || 'Bounty').toLowerCase().split(' '), h3 = el('h3', '', words.slice(0, -1).join(' ') + (words.length > 1 ? ' ' : ''));
     h3.appendChild(el('span', '', words[words.length - 1] + '.'));
-    copy.appendChild(h3);
-    if (b.brief) copy.appendChild(el('p', '', b.brief));
-    var row = el('div', 'steps-row'), steps = el('ol', 'bounty-steps');
-    (Array.isArray(b.steps) ? b.steps : []).forEach(function (step) {
-      var li = el('li'), span = el('span', '', step[0]);
-      if (step[1]) span.appendChild(el('small', '', step[1]));
-      li.appendChild(span); steps.appendChild(li);
-    });
-    row.appendChild(steps);
-    var rules = el('div', 'bounty-rules');
-    rules.id = 'rules-' + b.id; rules.hidden = true;
-    if (Array.isArray(b.rules) && b.rules.length) {
-      var toggle = el('button', 'rules-toggle', 'Rules');
-      toggle.type = 'button';
-      toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', rules.id);
-      toggle.addEventListener('click', function () {
-        var show = toggle.getAttribute('aria-expanded') !== 'true';
-        toggle.setAttribute('aria-expanded', String(show)); rules.hidden = !show;
+    panel.appendChild(h3);
+    if (b.brief) panel.appendChild(el('p', '', b.brief));
+    var steps = (Array.isArray(b.steps) ? b.steps : []);
+    if (steps.length) {
+      panel.appendChild(el('span', 'panel-label', 'WHAT TO DO'));
+      var ol = el('ol', 'bounty-steps');
+      // each step is one line; its detail (the second item) is the hover text
+      steps.forEach(function (step) {
+        var li = el('li'), span = el('span', '', step[0]);
+        if (step[1]) li.title = step[1];
+        li.appendChild(span); ol.appendChild(li);
       });
-      row.appendChild(toggle);
-      var ul = el('ul');
-      b.rules.forEach(function (rule) { ul.appendChild(el('li', '', rule)); });
-      rules.appendChild(ul);
+      panel.appendChild(ol);
     }
-    copy.appendChild(row);
-    cardBox.appendChild(copy);
-
-    var prize = el('div', 'prize'), figure = el('div');
-    figure.appendChild(el('span', 'prize-label', open ? 'WINNER GETS' : 'PRIZE'));
+    panel.appendChild(el('span', 'panel-label', open ? 'REWARD' : 'PRIZE'));
     var amount = el('strong', 'prize-amount');
     if (b.prize) amount.textContent = b.prize;
     else {
@@ -922,33 +916,47 @@
       var blank = el('span', 'blank'); blank.setAttribute('aria-hidden', 'true'); amount.appendChild(blank);
       amount.setAttribute('aria-label', 'A cash prize, amount coming soon');
     }
-    figure.appendChild(amount);
+    panel.appendChild(amount);
     var closes = shortDate(b.deadline);
     var note = b.prize ? (closes ? (open ? 'Entries close ' : 'Closed ') + closes : '') : 'Amount drops soon' + (closes ? ' · closes ' + closes : '');
-    if (note) figure.appendChild(el('span', 'prize-note', note));
-    prize.appendChild(figure);
+    if (note) panel.appendChild(el('span', 'prize-note', note));
     if (open) {
       var enter = el('a', 'btn btn--solid', 'Enter the bounty');
       enter.href = '#turn-in';
       enter.insertAdjacentHTML('beforeend', '<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg>');
       enter.addEventListener('click', function (event) { event.preventDefault(); enterBounty(b.id); });
-      prize.appendChild(enter);
+      panel.appendChild(enter);
     }
-    cardBox.appendChild(prize);
-    cardBox.appendChild(rules);
-    article.appendChild(cardBox);
+    if (Array.isArray(b.rules) && b.rules.length) {
+      var rules = el('div', 'bounty-rules');
+      rules.id = 'rules-' + b.id; rules.hidden = true;
+      var toggle = el('button', 'rules-toggle', 'Rules');
+      toggle.type = 'button';
+      toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', rules.id);
+      toggle.addEventListener('click', function () {
+        var show = toggle.getAttribute('aria-expanded') !== 'true';
+        toggle.setAttribute('aria-expanded', String(show)); rules.hidden = !show;
+      });
+      var ul = el('ul');
+      b.rules.forEach(function (rule) { ul.appendChild(el('li', '', rule)); });
+      rules.appendChild(ul);
+      panel.appendChild(toggle); panel.appendChild(rules);
+    }
+    article.appendChild(panel);
 
-    // its own wall: posted entries, then the invite, then open slots to finish the row
+    // its own wall, on the left: posted entries, then the invite, then open slots to finish the row
+    var entries = el('div', 'bounty-entries');
     var list = (Array.isArray(b.videos) ? b.videos : []).filter(function (v) { return v && typeof v.src === 'string' && v.src; });
     var head = el('div', 'bounty-wall-head');
     head.appendChild(el('h4', '', 'Entries'));
     head.appendChild(el('span', '', list.length ? list.length + (list.length === 1 ? ' video' : ' videos') + ' · tap one for sound' : open ? 'No entries posted yet' : 'No entries posted'));
-    article.appendChild(head);
+    entries.appendChild(head);
     var wallBox = el('ul', 'wall bounty-wall');
     wallBox.setAttribute('aria-label', (b.title || 'Bounty') + ' entries');
-    article.appendChild(wallBox);
+    entries.appendChild(wallBox);
     list.forEach(function (video, index) { wallBox.appendChild(videoTile(video, index, list)); });
     if (open) wallBox.appendChild(ctaTile(!list.length, list.length, b));
+    article.appendChild(entries);
     return article;
   }
 
@@ -960,7 +968,7 @@
     bounties.slice().sort(function (a, b) { return isOpen(b) - isOpen(a); }).forEach(function (b) { box.appendChild(bountyBlock(b)); });
     // walls shorter than a row finish it with open slots (sizes are known once they're in the page)
     box.querySelectorAll('.bounty-wall').forEach(function (w) {
-      var cols = parseInt(getComputedStyle(w).getPropertyValue('--cols'), 10) || 1, n = w.children.length;
+      var cols = bountyCols = colsOf(w), n = w.children.length;
       for (var k = n; k < cols; k++) w.appendChild(slotTile(k + 1, 'entry'));
     });
     syncPlayback();
@@ -1020,7 +1028,7 @@
   }
 
   function setCount() {
-    $('count').lastChild.textContent = videos.length
+    $('count-text').textContent = videos.length
       ? videos.length + (videos.length === 1 ? ' video' : ' videos') + ' · tap one for sound'
       : 'First drops landing soon';
   }
