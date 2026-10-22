@@ -10,7 +10,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-auth.js?v=2" defer></script>
-<script src="/assets/content-inbox.js?v=3" defer></script>
+<script src="/assets/content-inbox.js?v=4" defer></script>
 <!--
   The back of the edit queue: everything sent from /campus/submit, for the team
   account only. Sign-in is an emailed link, the same as /agencykit, and the
@@ -130,6 +130,7 @@
 
   .list { list-style: none; }
   .item { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 84px 400px; gap: 20px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .pill { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; margin-bottom: 5px; border-radius: 10px; background: var(--lavender); color: var(--blue-text); font-size: 11.5px; font-weight: 500; }
   .item h2 { font-size: 16px; font-weight: 500; line-height: 1.35; letter-spacing: -.1px; overflow-wrap: anywhere; }
   .item .notes { font-size: 13.5px; line-height: 1.5; color: #50566e; margin-top: 4px; white-space: pre-line; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .item .notes.is-open { display: block; }

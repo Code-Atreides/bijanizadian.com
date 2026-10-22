@@ -88,7 +88,7 @@
   function matches(item, query) {
     if (!query) return true;
     var entry = item.entry;
-    return [entry.title, entry.name, entry.school, entry.handle, entry.email, entry.notes].join(' ').toLowerCase().indexOf(query) > -1;
+    return [entry.title, entry.name, entry.school, entry.handle, entry.email, entry.notes, entry.challenge ? 'bar challenge' : ''].join(' ').toLowerCase().indexOf(query) > -1;
   }
 
   function icon(paths, size) {
@@ -108,6 +108,7 @@
     li.dataset.id = item.id;
 
     var what = el('div', 'what');
+    if (entry.challenge) { var tag = el('span', 'pill', 'Bar challenge'); tag.title = 'Entered in the bar challenge'; what.appendChild(tag); }
     what.appendChild(el('h2', '', entry.title || 'Untitled'));
     if (entry.notes) {
       var notes = el('p', 'notes', entry.notes);
@@ -291,10 +292,10 @@
     return '"' + text.replace(/"/g, '""') + '"';
   }
   function exportCsv() {
-    var header = ['submitted_at', 'status', 'title', 'name', 'email', 'school', 'handle', 'link', 'notes'];
+    var header = ['submitted_at', 'status', 'challenge', 'title', 'name', 'email', 'school', 'handle', 'link', 'notes'];
     var lines = [header.join(',')].concat(items.map(function (item) {
       var entry = item.entry;
-      return [entry.submitted_at ? new Date(entry.submitted_at).toISOString() : '', item.status, entry.title, entry.name, entry.email, entry.school, entry.handle, entry.link, entry.notes].map(csvCell).join(',');
+      return [entry.submitted_at ? new Date(entry.submitted_at).toISOString() : '', item.status, entry.challenge ? 'bar' : '', entry.title, entry.name, entry.email, entry.school, entry.handle, entry.link, entry.notes].map(csvCell).join(',');
     }));
     var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     var link = document.createElement('a');
