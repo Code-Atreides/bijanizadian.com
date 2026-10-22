@@ -103,18 +103,36 @@
   .btn:disabled { opacity: .6; cursor: progress; }
   .btn svg { flex: none; }
 
-  /* ---------- header: only the tabs, floating; still the one thing that sticks ---------- */
+  /* ---------- header: fomo/media, the tabs, Turn in; the one thing that sticks ---------- */
   .site-header {
     position: sticky; top: 0; z-index: 40; height: var(--header);
-    display: flex; align-items: center; justify-content: center; padding: 0 var(--gutter);
-    pointer-events: none; /* the page stays clickable beside the pill */
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; padding: 0 var(--gutter);
+    pointer-events: none; /* at the top there's no band, so nothing beside the three pieces is blocked */
+    border-bottom: 1px solid transparent; transition: background-color .2s, border-color .2s;
   }
+  .site-header > * { pointer-events: auto; }
+  /* once the page scrolls, a soft band keeps the title and button readable over the wall */
+  .site-header.scrolled { pointer-events: auto; background: rgba(11,9,31,.62); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border-bottom-color: var(--hairline); }
+  .head-lockup { justify-self: start; display: block; text-decoration: none; border-radius: 6px; }
+  .head-lockup .lockup svg { height: 28px; }
+  .head-lockup .lockup .slash { font-size: 25.5px; }
+  .head-cta { justify-self: end; padding: 9px 16px; font-size: 14px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .views { pointer-events: auto; display: flex; gap: 2px; padding: 4px; border-radius: 14px; border: 1px solid var(--hairline);
     background: rgba(18,17,30,.72); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4);
     box-shadow: 0 12px 30px -14px rgba(0,0,0,.7); }
   .views a { display: flex; align-items: center; gap: 7px; padding: 7px 16px; border-radius: 9px; font-size: 14px; font-weight: 500; color: var(--soft); text-decoration: none; transition: background .15s, color .15s; }
   .views a:hover { color: var(--lavender); background: rgba(255,255,255,.05); }
   .views a[aria-current="page"] { background: var(--btn-fill); color: #fff; }
+  /* the sliding button: one highlight glides to the open tab (without script, the tab lights itself) */
+  .views { position: relative; }
+  .views a { position: relative; z-index: 1; }
+  .js .views a[aria-current="page"] { background: transparent; }
+  .js .views a:hover { background: transparent; }
+  .tab-glider { position: absolute; z-index: 0; top: 0; left: 0; width: 0; height: 0; border-radius: 10px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(120,132,250,.78), rgba(81,106,246,.62)); box-shadow: 0 8px 20px -10px rgba(81,106,246,.9), inset 0 1px 0 rgba(255,255,255,.16); }
+  .tab-glider.ready { transition: transform .42s cubic-bezier(.32,1.28,.48,1), width .42s cubic-bezier(.32,1.28,.48,1); }
+  .views a:active { transform: scale(.97); }
   .views .live { width: 6px; height: 6px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 3px rgba(172,184,249,.18); }
 
   main { flex: 1 0 auto; }
@@ -127,9 +145,8 @@
   .lockup .slash i { font-style: normal; font-weight: 400; color: var(--electric); margin: 0 .04em 0 .02em; }
 
   /* ---------- watch: a compact intro, then the wall ---------- */
-  .intro { display: flex; justify-content: space-between; align-items: center; gap: 18px 40px; flex-wrap: wrap; padding: var(--view-top) 0 20px; }
   .intro-cta { display: flex; gap: 10px; flex-wrap: wrap; }
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; min-height: 36px; margin-bottom: 20px; }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; min-height: 36px; margin-bottom: 20px; padding-top: var(--view-top); }
   .count { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--faint); }
   .count i { width: 7px; height: 7px; border-radius: 50%; background: var(--glow); box-shadow: 0 0 0 4px rgba(172,184,249,.15); animation: pulse 2.4s ease-in-out infinite; }
   @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(172,184,249,0); } }
@@ -365,6 +382,18 @@
   .site-footer .foot-brand svg { height: 16px; width: auto; }
 
   /* ---------- smaller screens ---------- */
+  @media (max-width: 1040px) {
+    .head-cta { display: none; }
+    .head-lockup .lockup svg { height: 24px; }
+    .head-lockup .lockup .slash { font-size: 22px; }
+  }
+  @media (max-width: 760px) {
+    .site-header { display: contents; }
+    .head-lockup { align-self: flex-start; margin: 16px var(--gutter) 0; }
+    /* a full-width sliding control on the page margins, under the title */
+    .views { position: sticky; top: 8px; z-index: 40; align-self: stretch; margin: 12px var(--gutter) 0; }
+    .views a { flex: 1 1 auto; justify-content: center; }
+  }
   @media (max-width: 900px) {
     .faq { grid-template-columns: 1fr; gap: 28px; }
   }
@@ -463,29 +492,27 @@
 </svg>
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="site-header">
+<header class="site-header" id="site-header">
+  <a class="head-lockup" href="#watch" aria-label="fomo/media, the wall">
+    <span class="lockup" aria-hidden="true">
+      <svg viewBox="0 0 352 113"><use href="#wordmark"/></svg>
+      <span class="slash"><i>/</i>media</span>
+    </span>
+  </a>
   <nav class="views" aria-label="campus media">
+    <span class="tab-glider" aria-hidden="true"></span>
     <a href="#watch" data-view="watch" aria-current="page"><i class="live" aria-hidden="true"></i>Watch</a>
     <a href="#bounties" data-view="bounties">Bounties<b class="tab-count" id="bounty-count" hidden></b></a>
-    <a href="#faq" data-view="faq">FAQ</a>
     <a href="#turn-in" data-view="turn-in">Turn in</a>
+    <a href="#faq" data-view="faq">FAQ</a>
   </nav>
+  <a class="btn btn--primary head-cta" href="#turn-in">Turn in content<svg width="16" height="16" aria-hidden="true"><use href="#arrow"/></svg></a>
 </header>
 
 <main id="main">
   <!-- watch: the home of the push -->
   <section class="view" id="watch" data-view="watch" aria-labelledby="watch-title">
-    <div class="intro">
-      <div>
-        <h1 class="lockup" id="watch-title" tabindex="-1" aria-label="fomo/media">
-          <svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg>
-          <span class="slash" aria-hidden="true"><i>/</i>media</span>
-        </h1>
-      </div>
-      <div class="intro-cta">
-        <a class="btn btn--primary" href="#turn-in">Turn in content<svg width="17" height="17" aria-hidden="true"><use href="#arrow"/></svg></a>
-      </div>
-    </div>
+    <h1 class="sr" id="watch-title" tabindex="-1">fomo/media: every video from the campus media push</h1>
     <div class="bar">
       <div class="chips" id="chips" role="group" aria-label="Filter videos" hidden></div>
       <p class="count" id="count"><i aria-hidden="true"></i><span>First drops landing soon</span></p>
@@ -618,8 +645,8 @@
     <a href="/campus">campus</a>
     <a href="/campus/mic">Set up your mic</a>
     <a href="#bounties">Bounties</a>
-    <a href="#faq">FAQ</a>
     <a href="#turn-in">Turn in</a>
+    <a href="#faq">FAQ</a>
   </nav>
   <span>Trading involves risk, including loss of principal. A prize is not a trading return.</span>
 </footer>
@@ -648,6 +675,25 @@
   var TITLES = { watch: 'fomo/media', bounties: 'Bounties · fomo/media', faq: 'FAQ · fomo/media', 'turn-in': 'Turn in · fomo/media' };
   var current = null;
 
+  var glider = document.querySelector('.tab-glider');
+  // a tab change slides the highlight; a resize or the font arriving just snaps it into place
+  function glide(slide) {
+    var tab = document.querySelector('.views a[aria-current="page"]');
+    if (!tab || !glider) return;
+    var sliding = glider.classList.contains('ready');
+    if (!slide) glider.classList.remove('ready');
+    glider.style.width = tab.offsetWidth + 'px';
+    glider.style.height = tab.offsetHeight + 'px';
+    glider.style.transform = 'translate(' + tab.offsetLeft + 'px, ' + tab.offsetTop + 'px)';
+    if (!slide && sliding) { void glider.offsetWidth; glider.classList.add('ready'); }
+  }
+  window.addEventListener('resize', function () { glide(false); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { glide(false); });
+  if ('ResizeObserver' in window) {
+    var sizes = new ResizeObserver(function () { glide(false); });
+    document.querySelectorAll('.views a').forEach(function (tab) { sizes.observe(tab); });
+  }
+
   function route(focus) {
     var key = location.hash.slice(1);
     if (!TITLES[key]) key = 'watch';
@@ -655,6 +701,9 @@
     current = key;
     sections.forEach(function (section) { section.hidden = section.dataset.view !== key; });
     tabs.forEach(function (tab) { if (tab.dataset.view === key) tab.setAttribute('aria-current', 'page'); else tab.removeAttribute('aria-current'); });
+    glide(true);
+    // the first placement jumps; every later change slides
+    if (glider && !glider.classList.contains('ready')) requestAnimationFrame(function () { requestAnimationFrame(function () { glider.classList.add('ready'); }); });
     document.title = TITLES[key];
     window.scrollTo(0, 0);
     syncPlayback();
@@ -664,6 +713,10 @@
     }
   }
   window.addEventListener('hashchange', function () { route(true); });
+  var header = $('site-header');
+  function band() { header.classList.toggle('scrolled', window.scrollY > 4); }
+  window.addEventListener('scroll', band, { passive: true });
+  band();
 
   // ---------- the wall ----------
   var wall = $('wall'), chips = $('chips');
