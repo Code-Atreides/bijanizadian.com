@@ -22,7 +22,9 @@
         "The fomo team picks the winner on creativity, energy and how fomo shows up, and emails them.",
         "Entries may be posted on @fomo.campus and fomo's other channels, with credit to your handle."
       ],
-      "videos": []
+      "videos": [
+        { "src": "/campus/media/videos/bar-videos-01.mp4", "preview": "/campus/media/videos/bar-videos-01.preview.mp4", "poster": "/campus/media/videos/bar-videos-01.jpg" }
+      ]
     }
   ]
 }
