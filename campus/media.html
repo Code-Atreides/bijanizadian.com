@@ -299,17 +299,43 @@
   .reels { position: relative; height: 100%; overflow-y: auto; overscroll-behavior: contain; scroll-snap-type: y mandatory; scrollbar-width: none; }
   .reels::-webkit-scrollbar { display: none; }
   .reel { height: 100%; display: grid; place-items: center; scroll-snap-align: start; scroll-snap-stop: always; }
-  .reel-frame { position: relative; isolation: isolate; height: min(calc(100dvh - 40px), 960px); aspect-ratio: 9 / 16; max-width: calc(100vw - 32px); overflow: hidden; border-radius: 20px; background: #000; border: 1px solid var(--line); }
+  .reel-frame { position: relative; isolation: isolate; touch-action: manipulation; height: min(calc(100dvh - 40px), 960px); aspect-ratio: 9 / 16; max-width: calc(100vw - 32px); overflow: hidden; border-radius: 20px; background: #000; border: 1px solid var(--line); }
   .reel-frame > img, .reel-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .reel-stage video { z-index: 1; }
   .reel-tap { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: transparent; cursor: pointer; }
   .reel-tap:focus-visible { outline: 2px solid var(--glow); outline-offset: -4px; border-radius: inherit; }
   .reel-paused { position: absolute; inset: 0; z-index: 3; margin: auto; width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center; background: rgba(11,9,31,.42); color: #fff; pointer-events: none; opacity: 0; transform: scale(.85); transition: opacity .15s, transform .15s; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .reel-stage.paused .reel-paused { opacity: 1; transform: none; }
-  .reel-caption { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; padding: 72px 68px 22px 18px; background: linear-gradient(rgba(6,5,16,0), rgba(6,5,16,.78)); pointer-events: none; }
-  .reel-caption strong { display: block; font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.01em; }
-  .reel-caption span { display: block; margin-top: 2px; font-size: 13px; color: rgba(234,237,255,.78); }
-  .reel-mute { position: absolute; right: 12px; bottom: 16px; z-index: 4; width: 40px; height: 40px; background: rgba(11,9,31,.42); border-color: rgba(234,237,255,.16); color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .round.reel-mute { position: absolute; top: 12px; right: 12px; z-index: 4; width: 34px; height: 34px; background: rgba(0,0,0,.38); border-color: rgba(255,255,255,.14); color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  /* a pretend Instagram Reels overlay: the Reels title, the action rail, who posted it, the caption and the sound */
+  .ig { position: absolute; inset: 0; z-index: 3; pointer-events: none; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; text-shadow: 0 1px 2px rgba(0,0,0,.3);
+    background: linear-gradient(rgba(0,0,0,.32), rgba(0,0,0,0) 96px), linear-gradient(rgba(0,0,0,0) 58%, rgba(0,0,0,.6)); }
+  .ig-top { position: absolute; top: 14px; left: 16px; font-size: 22px; font-weight: 700; letter-spacing: -.01em; }
+  .ig-rail { position: absolute; right: 6px; bottom: 22px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .ig-act { width: 42px; height: 42px; display: grid; place-items: center; padding: 0; border: 0; background: none; color: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  .ig-act svg { width: 27px; height: 27px; }
+  button.ig-act { pointer-events: auto; cursor: pointer; }
+  button.ig-act:focus-visible, .ig-follow:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 8px; }
+  .ig-like[aria-pressed="true"] { color: #ff3040; }
+  .ig-like[aria-pressed="true"] svg { fill: currentColor; animation: ig-beat .35s ease-out; }
+  @keyframes ig-beat { 40% { transform: scale(1.25); } }
+  .ig-cover { width: 28px; height: 28px; margin-top: 4px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 7px; background: var(--blue); }
+  .ig-cover svg { width: 17px; height: 11px; color: #fff; }
+  .ig-info { position: absolute; left: 14px; right: 64px; bottom: 22px; }
+  .ig-info p { margin: 0; }
+  .ig-who { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .ig-who b { font-weight: 600; }
+  .ig-avatar { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
+  .ig-avatar svg { width: 20px; height: 13px; color: #fff; }
+  .ig-follow { pointer-events: auto; padding: 4px 11px; border: 1px solid rgba(255,255,255,.75); border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
+  .ig-follow:hover { background: rgba(255,255,255,.12); }
+  .ig-caption { margin-top: 10px !important; font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .ig-sound { margin-top: 8px !important; display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,.92); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ig-sound svg { width: 13px; height: 13px; flex: none; }
+  .ig-pop { position: absolute; z-index: 3; width: 96px; height: 96px; margin: -48px 0 0 -48px; color: #ff3040; pointer-events: none; filter: drop-shadow(0 4px 14px rgba(0,0,0,.3)); animation: ig-pop .85s ease-out forwards; }
+  @keyframes ig-pop { 0% { opacity: 0; transform: scale(.4) rotate(-12deg); } 18% { opacity: 1; transform: scale(1.15) rotate(-12deg); } 32% { transform: scale(.95) rotate(-12deg); } 46% { transform: scale(1) rotate(-12deg); } 75% { opacity: 1; transform: scale(1) rotate(-12deg); } 100% { opacity: 0; transform: translateY(-46px) scale(1.1) rotate(-12deg); } }
+  .ig-toast { position: absolute; z-index: 5; top: 58px; left: 50%; transform: translateX(-50%); padding: 8px 14px; border-radius: 99px; background: rgba(0,0,0,.72); color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; opacity: 0; transition: opacity .2s; pointer-events: none; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .ig-toast.show { opacity: 1; }
   .reel-mute .sound-off, .reel-mute.off .sound-on { display: none; }
   .reel-mute.off .sound-off { display: block; }
   .reel-progress { position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; height: 3px; background: rgba(255,255,255,.16); pointer-events: none; }
@@ -461,8 +487,9 @@
     /* filters swipe sideways instead of stacking */
     .bar { justify-content: flex-start; }
     .reel-frame { width: 100%; height: 100%; max-width: none; aspect-ratio: auto; border: 0; border-radius: 0; }
-    .reel-caption { padding-bottom: calc(22px + env(safe-area-inset-bottom)); }
-    .reel-mute { bottom: calc(16px + env(safe-area-inset-bottom)); }
+    .ig-top { top: calc(14px + env(safe-area-inset-top)); }
+    .ig-rail, .ig-info { bottom: calc(22px + env(safe-area-inset-bottom)); }
+    .round.reel-mute { top: calc(15px + env(safe-area-inset-top)); right: 60px; }
     .reel-progress { bottom: env(safe-area-inset-bottom); }
     .player-steps { display: none; }
     .player-close { top: calc(12px + env(safe-area-inset-top)); right: 12px; width: 40px; height: 40px; background: rgba(11,9,31,.42); border-color: rgba(234,237,255,.16); color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -507,6 +534,7 @@
       <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
     </symbol>
     <!-- the eyes mark, brand/logo/fomo-logo-blue.svg's two flat paths -->
+    <symbol id="ig-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" fill="currentColor"/></symbol>
     <symbol id="eyes" viewBox="9 24 83 52">
       <path d="M36.97 24.36c7.13 0 12.82 3.59 15.97 9.24-4.19 4.44-7.29 10.16-8.48 16.4-1.19 6.24-.28 11.96 2.21 16.4-5.32 5.65-12.38 9.24-19.51 9.24-8.73 0-15.3-5.38-17.7-13.32h17.39c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H14.18c5.44-7.94 14.07-13.32 22.79-13.32Z" fill="currentColor"/>
       <path d="M72.33 24.36c12.75 0 20.89 11.48 18.18 25.64-2.71 14.16-15.24 25.64-27.99 25.64-8.73 0-15.3-5.38-17.7-13.32h19.34c.57 0 1.16-.46 1.32-1.03l6.48-22.59c.16-.57-.17-1.03-.73-1.03H49.53c5.44-7.94 14.07-13.32 22.8-13.32Z" fill="currentColor"/>
@@ -689,7 +717,25 @@
     <span class="reel-paused" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg></span>
     <button type="button" class="round reel-mute" id="reel-mute" aria-label="Mute" aria-pressed="false"><svg class="sound-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg><svg class="sound-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path d="m16 9 6 6M22 9l-6 6"/></svg></button>
     <span class="reel-progress" aria-hidden="true"><i id="reel-progress"></i></span>
+    <span class="ig-toast" id="ig-toast" role="status"></span>
   </div>
+  <template id="ig-overlay">
+    <div class="ig">
+      <strong class="ig-top" aria-hidden="true">Reels</strong>
+      <div class="ig-rail">
+        <button type="button" class="ig-act ig-like" aria-label="Like" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></button>
+        <span class="ig-act" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>
+        <button type="button" class="ig-act ig-send" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.63l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11ZM21.85 2.15 10.91 13.09"/></svg></button>
+        <span class="ig-act" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></span>
+        <span class="ig-cover" aria-hidden="true"><svg viewBox="0 0 83 52"><use href="#eyes"/></svg></span>
+      </div>
+      <div class="ig-info">
+        <p class="ig-who"><span class="ig-avatar" aria-hidden="true"><svg viewBox="0 0 83 52"><use href="#eyes"/></svg></span><b>fomo.campus</b><a class="ig-follow" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener" aria-label="Follow @fomo.campus on Instagram">Follow</a></p>
+        <p class="ig-caption"></p>
+        <p class="ig-sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>fomo.campus · Original audio</p>
+      </div>
+    </div>
+  </template>
   <button type="button" class="round player-close" id="player-close" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   <div class="player-steps">
     <button type="button" class="round" id="player-prev" aria-label="Previous video"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
@@ -764,7 +810,7 @@
     return node;
   }
   // the outer box takes each symbol's proportions, so CSS can size it by width alone
-  var BOXES = { eyes: '0 0 83 52', arrow: '0 0 24 24' };
+  var BOXES = { eyes: '0 0 83 52', arrow: '0 0 24 24', 'ig-heart': '0 0 24 24' };
   function use(symbol, cls) {
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     var ref = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -1070,6 +1116,7 @@
   // and the sound the opening tap allowed stays allowed on phones.
   var dialog = $('player'), reels = $('reels'), stage = $('reel-stage'), big = $('player-video'), tap = $('reel-tap'), mute = $('reel-mute'), bar = $('reel-progress');
   var at = -1, playlist = [], slides = [], settle = 0;
+  var overlay = $('ig-overlay').content.firstElementChild, liked = new Set(), lastTap = 0, tapTimer = 0, toastTimer = 0;
   stage.remove();
   function openPlayer(list, index) {
     playlist = list; at = -1;
@@ -1086,10 +1133,11 @@
         if (Math.abs(i - index) > 1) still.loading = 'lazy';
         frame.appendChild(still);
       }
-      var caption = el('div', 'reel-caption');
-      if (video.title || video.tag) caption.appendChild(el('strong', '', video.title || video.tag));
-      if (meta(video)) caption.appendChild(el('span', '', meta(video)));
-      frame.appendChild(caption);
+      // the pretend Reels overlay, captioned with this video
+      var ig = overlay.cloneNode(true);
+      ig.querySelector('.ig-caption').textContent = [video.title || video.tag, meta(video)].filter(Boolean).join(' · ');
+      setLiked(ig.querySelector('.ig-like'), liked.has(video.src));
+      frame.appendChild(ig);
       slide.appendChild(frame);
       reels.appendChild(slide);
       return slide;
@@ -1104,6 +1152,7 @@
   // put the stage on slide i and play its video
   function show(i) {
     if (i === at || !slides[i]) return;
+    clearTimeout(tapTimer); lastTap = 0;
     var focused = stage.contains(document.activeElement);
     at = i;
     var video = playlist[at];
@@ -1143,36 +1192,87 @@
     clearTimeout(settle);
     settle = setTimeout(function () { show(Math.round(reels.scrollTop / reels.clientHeight)); }, 80);
   }, { passive: true });
-  // one wheel or trackpad flick is one video, however long its momentum runs
-  var wheelLock = false, wheelQuiet = 0;
+  // one wheel or trackpad flick is one video, however long its momentum runs:
+  // a new flick is one that starts after a pause (timed by the events themselves,
+  // so a busy page can't fake a pause)
+  var wheelLast = -1e9, wheelStep = -1e9;
   reels.addEventListener('wheel', function (event) {
     if (event.ctrlKey) return;
     event.preventDefault();
-    clearTimeout(wheelQuiet);
-    wheelQuiet = setTimeout(function () { wheelLock = false; }, 180);
-    if (wheelLock || Math.abs(event.deltaY) < 6) return;
-    wheelLock = true;
+    var t = event.timeStamp, fresh = t - wheelLast > 200 && t - wheelStep > 450;
+    wheelLast = t;
+    if (!fresh || Math.abs(event.deltaY) < 6) return;
+    wheelStep = t;
     step(event.deltaY > 0 ? 1 : -1);
   }, { passive: false });
   // clicking a control keeps focus on the video, so Space still pauses
   [$('player-prev'), $('player-next'), mute].forEach(function (button) {
     button.addEventListener('mousedown', function (event) { event.preventDefault(); });
   });
-  tap.addEventListener('click', function () { if (big.paused) play(); else big.pause(); });
+  function togglePlay() { if (big.paused) play(); else big.pause(); }
+  // a tap pauses; a double tap likes, with the heart, the way Instagram does
+  tap.addEventListener('click', function (event) {
+    if (!event.detail) return togglePlay();
+    var now = Date.now();
+    if (now - lastTap < 300) {
+      clearTimeout(tapTimer); lastTap = 0;
+      like(at, true);
+      var frame = slides[at].firstChild, box = frame.getBoundingClientRect(), heart = use('ig-heart', 'ig-pop');
+      heart.style.left = (event.clientX - box.left) + 'px';
+      heart.style.top = (event.clientY - box.top) + 'px';
+      frame.appendChild(heart);
+      setTimeout(function () { heart.remove(); }, 900);
+      return;
+    }
+    lastTap = now;
+    tapTimer = setTimeout(togglePlay, 260);
+  });
+  function setLiked(button, on) {
+    button.setAttribute('aria-pressed', String(on));
+    button.setAttribute('aria-label', on ? 'Unlike' : 'Like');
+  }
+  function like(i, on) {
+    if (!slides[i]) return;
+    if (on) liked.add(playlist[i].src); else liked.delete(playlist[i].src);
+    setLiked(slides[i].querySelector('.ig-like'), on);
+  }
+  function toast(text) {
+    var note = $('ig-toast');
+    note.textContent = text;
+    note.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { note.classList.remove('show'); }, 1600);
+  }
+  // share sends the wall: the phone's share sheet, or a copied link on a computer
+  function share() {
+    var url = location.origin + '/campus/media';
+    if (navigator.share && window.matchMedia('(pointer: coarse)').matches) {
+      navigator.share({ title: 'fomo/media', url: url }).catch(function () {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(function () { toast('Link copied'); }, function () {});
+    }
+  }
+  reels.addEventListener('mousedown', function (event) { if (event.target.closest('button')) event.preventDefault(); });
   big.addEventListener('play', function () { stage.classList.remove('paused'); tap.setAttribute('aria-label', 'Pause'); });
   big.addEventListener('pause', function () { stage.classList.add('paused'); tap.setAttribute('aria-label', 'Play'); });
   mute.addEventListener('click', function () { setMuted(!big.muted); });
   $('player-prev').addEventListener('click', function () { step(-1); });
   $('player-next').addEventListener('click', function () { step(1); });
   $('player-close').addEventListener('click', function () { dialog.close(); });
-  // a click beside the video closes it
-  reels.addEventListener('click', function (event) { if (event.target.classList.contains('reel')) dialog.close(); });
+  reels.addEventListener('click', function (event) {
+    var slide = event.target.closest('.reel');
+    if (event.target.closest('.ig-like')) like(slides.indexOf(slide), !liked.has(playlist[slides.indexOf(slide)].src));
+    else if (event.target.closest('.ig-send')) share();
+    // a click beside the video closes it
+    else if (event.target === slide) dialog.close();
+  });
   document.addEventListener('keydown', function (event) {
     if (!dialog.open || event.altKey || event.ctrlKey || event.metaKey) return;
     var key = event.key;
     if (key === 'ArrowDown' || key === 'ArrowRight' || key === 'PageDown' || key === 'j') { event.preventDefault(); step(1); }
     else if (key === 'ArrowUp' || key === 'ArrowLeft' || key === 'PageUp' || key === 'k') { event.preventDefault(); step(-1); }
     else if (key === 'm') setMuted(!big.muted);
+    else if (key === 'l') like(at, !liked.has(playlist[at].src));
     else if (key === ' ' && !(event.target.closest && event.target.closest('button'))) { event.preventDefault(); tap.click(); }
   });
   dialog.addEventListener('close', function () {
