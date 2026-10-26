@@ -28,7 +28,7 @@
     <slug>.mp4          the player: H.264, 720p max, 30fps max, AAC 128k, +faststart
     <slug>.preview.mp4  the tile: 360p, first 12s, no audio, so the wall stays light
     <slug>.jpg          the poster frame, 540px wide
-  and an entry, in wall order:
+  and an entry (the wall shuffles them on every load, so the order in the file doesn't matter):
     { "src": "/campus/media/videos/clip.mp4", "preview": "/campus/media/videos/clip.preview.mp4",
       "poster": "/campus/media/videos/clip.jpg", "title": "...", "handle": "@name", "school": "USC", "tag": "Creators" }
   Only src is required. Tiles play the preview muted while on screen; tapping one
@@ -145,18 +145,15 @@
 
   /* ---------- watch: a compact intro, then the wall ---------- */
   .intro-cta { display: flex; gap: 10px; flex-wrap: wrap; }
-  .bar { display: flex; align-items: center; justify-content: space-between; gap: 12px 20px; flex-wrap: wrap; min-height: 36px; margin-bottom: 20px; padding-top: var(--view-top); }
+  /* one slim line over the wall: where the videos are posted */
+  .bar { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 14px; padding-top: var(--view-top); }
   .count { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 13px; color: var(--faint); }
   @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(172,184,249,0); } }
 
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
   /* where finished videos end up: the campus Instagram */
   .ig-link { display: inline-flex; align-items: center; gap: 5px; color: var(--lavender); font-weight: 700; text-decoration: none; border-radius: 4px; }
   .ig-link svg { flex: none; }
   .ig-link:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-  .chips button { border: 1px solid var(--line); background: rgba(255,255,255,.03); color: var(--soft); font-size: 13.5px; font-weight: 500; padding: 7px 14px; border-radius: 99px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
-  .chips button:hover { color: var(--lavender); border-color: rgba(203,208,235,.28); }
-  .chips button[aria-pressed="true"] { background: var(--lavender); border-color: var(--lavender); color: var(--ink); }
 
   /* ---------- media bounties: each bounty is its entries wall, with the brief on the right ---------- */
   #bounty-list { padding-top: var(--view-top); }
@@ -447,10 +444,7 @@
     .cta-card .cta-go { white-space: nowrap; font-size: 12.5px; padding: 8px 10px; gap: 5px; }
     .count { margin-left: 0; }
     /* filters swipe sideways instead of stacking */
-    .bar { flex-wrap: nowrap; flex-direction: column; align-items: stretch; gap: 10px; }
-    .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); }
-    .chips::-webkit-scrollbar { display: none; }
-    .chips button { flex: none; }
+    .bar { justify-content: flex-start; }
     .player-inner { gap: 0; }
     .player .round.prev, .player .round.next { position: fixed; bottom: 18px; }
     .player .round.prev { left: 18px; }
@@ -529,7 +523,6 @@
   <section class="view" id="watch" data-view="watch" aria-labelledby="watch-title">
     <h1 class="sr" id="watch-title" tabindex="-1">fomo/media: every video from the campus media push</h1>
     <div class="bar">
-      <div class="chips" id="chips" role="group" aria-label="Filter videos" hidden></div>
       <p class="count" id="count"><a class="ig-link" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener"><svg width="14" height="14" aria-hidden="true"><use href="#instagram"/></svg>@fomo.campus</a></p>
     </div>
     <ul class="wall" id="wall" aria-label="Videos"></ul>
@@ -739,8 +732,8 @@
   band();
 
   // ---------- the wall ----------
-  var wall = $('wall'), chips = $('chips');
-  var videos = [], shown = [], filter = 'All';
+  var wall = $('wall');
+  var videos = [], shown = [];
   var visible = new Set();
 
   function el(tag, className, text) {
@@ -852,7 +845,7 @@
   function render() {
     forget(wall);
     wall.textContent = '';
-    shown = filter === 'All' ? videos.slice() : videos.filter(function (video) { return video.tag === filter; });
+    shown = videos.slice();
     if (!videos.length) {
       wall.appendChild(ctaTile(true, 0));
       for (var n = 1; n <= 11; n++) wall.appendChild(slotTile(n));
@@ -1032,31 +1025,21 @@
       renderBounties(); renderBountyField();
     });
 
-  function renderChips() {
-    var tags = [];
-    videos.forEach(function (video) { if (video.tag && tags.indexOf(video.tag) < 0) tags.push(video.tag); });
-    chips.textContent = '';
-    chips.hidden = tags.length < 2;
-    ['All'].concat(tags).forEach(function (tag) {
-      var chip = el('button', '', tag);
-      chip.type = 'button';
-      chip.setAttribute('aria-pressed', String(tag === filter));
-      chip.addEventListener('click', function () {
-        filter = tag;
-        chips.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === chip)); });
-        render();
-      });
-      chips.appendChild(chip);
-    });
+  // a different order on every visit (Fisher-Yates)
+  function shuffle(list) {
+    for (var i = list.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), held = list[i];
+      list[i] = list[j]; list[j] = held;
+    }
+    return list;
   }
-
 
   fetch('/campus/media/videos.json', { cache: 'no-cache' })
     .then(function (response) { return response.ok ? response.json() : { videos: [] }; })
     .catch(function () { return { videos: [] }; })
     .then(function (data) {
-      videos = (Array.isArray(data.videos) ? data.videos : []).filter(function (video) { return video && typeof video.src === 'string' && video.src; });
-      renderChips(); render();
+      videos = shuffle((Array.isArray(data.videos) ? data.videos : []).filter(function (video) { return video && typeof video.src === 'string' && video.src; }));
+      render();
     });
 
   // ---------- the player, with sound ----------

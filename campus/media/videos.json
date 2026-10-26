@@ -1,5 +1,6 @@
 {
   "videos": [
+    { "src": "/campus/media/videos/bar-videos-01.mp4", "preview": "/campus/media/videos/bar-videos-01.preview.mp4", "poster": "/campus/media/videos/bar-videos-01.jpg", "tag": "Bar videos" },
     { "src": "/campus/media/videos/creator-burger-night.mp4", "preview": "/campus/media/videos/creator-burger-night.preview.mp4", "poster": "/campus/media/videos/creator-burger-night.jpg", "tag": "Creators" },
     { "src": "/campus/media/videos/street-stocks-interview.mp4", "preview": "/campus/media/videos/street-stocks-interview.preview.mp4", "poster": "/campus/media/videos/street-stocks-interview.jpg", "tag": "Street questions" },
     { "src": "/campus/media/videos/greek-wars-reel.mp4", "preview": "/campus/media/videos/greek-wars-reel.preview.mp4", "poster": "/campus/media/videos/greek-wars-reel.jpg", "title": "Your chapter vs every chapter", "tag": "Greek Wars" },
