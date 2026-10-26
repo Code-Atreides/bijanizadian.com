@@ -12,7 +12,7 @@
 <script src="/assets/content-auth.js?v=2" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
 <script src="/assets/content-schools.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=8" defer></script>
+<script src="/assets/content-analytics.js?v=9" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -176,6 +176,20 @@
   .table td a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .table .up { color: var(--ink); font-weight: 500; }
   .table .actions { white-space: nowrap; text-align: right; padding-right: 0; }
+
+  /* top performers: a leaderboard of posts, creators or schools, ranked by what each gained in the range */
+  .leaders .card-head { flex-wrap: wrap; align-items: center; }
+  .leaders-table .who { width: 40%; }
+  .leaders-table .lead { width: 24%; }
+  .leader { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+  .leader > div { min-width: 0; }
+  .rank { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--muted-2); background: var(--tint); }
+  .rank.first { background: var(--blue); color: #fff; }
+  .leaders-table .track { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .leaders-table .bar { height: 12px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--blue); }
+  .leaders-table .val { font-weight: 500; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .leaders-table .sub { display: inline; color: var(--faint); font-weight: 400; margin-left: 4px; }
+  .leaders-more { margin-top: 8px; margin-left: -10px; }
   .pill { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: .3px; color: var(--blue-text); background: var(--lavender); border-radius: 99px; padding: 2px 8px; margin-right: 6px; vertical-align: 1px; }
   .muted { color: var(--faint); }
   .posts-tools { display: flex; gap: 8px; align-items: center; }
@@ -260,6 +274,13 @@
     .posts td:nth-child(1), .posts td:nth-child(2) { grid-column: 1 / -1; }
     .posts td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
     .posts td.actions { grid-column: 1 / -1; margin-top: 4px; }
+    /* and so does the leaderboard: the name and the bar across, the rest in threes */
+    .leaders-table thead { display: none; }
+    .leaders-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .leaders-table tr:last-child { border-bottom: 0; }
+    .leaders-table td { width: auto !important; border: 0; padding: 0; text-align: left !important; }
+    .leaders-table td.who, .leaders-table td.lead { grid-column: 1 / -1; }
+    .leaders-table td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
     .tracked td:nth-child(3), .tracked td.status { grid-column: 1 / -1; }
     .tracked td.no-account { display: none; }
     .quad { grid-template-columns: 1fr 1fr; }
@@ -392,6 +413,25 @@
           <div class="stat"><span>Followers</span><strong id="k-followers">—</strong><small id="k-followers-sub">tracked accounts</small></div>
         </div>
 
+        <section class="card leaders" aria-labelledby="c-leaders" style="margin-bottom:14px">
+          <div class="card-head">
+            <div>
+              <h2 id="c-leaders">Top performers</h2>
+              <p class="sub" id="leaders-sub">&nbsp;</p>
+            </div>
+            <div class="segmented" id="leader-tabs" role="group" aria-label="Rank">
+              <button type="button" data-leader="posts" aria-pressed="true">Posts</button>
+              <button type="button" data-leader="creators" aria-pressed="false">Creators</button>
+              <button type="button" data-leader="schools" aria-pressed="false">Schools</button>
+            </div>
+          </div>
+          <table class="table leaders-table" id="leaders-table">
+            <thead><tr id="leaders-head"></tr></thead>
+            <tbody id="leader-rows"></tbody>
+          </table>
+          <button type="button" class="text-button leaders-more" id="leaders-more" aria-controls="leader-rows" hidden></button>
+        </section>
+
         <div class="row">
           <section class="card" aria-labelledby="c-time">
             <div class="card-head">
@@ -430,17 +470,6 @@
           </div>
           <div id="map-table-wrap" hidden></div>
         </section>
-
-        <div class="row even">
-          <section class="card" aria-labelledby="c-creators">
-            <div class="card-head"><h2 id="c-creators">Top creators</h2><p id="c-creators-sub">by views</p></div>
-            <table class="table"><thead><tr><th scope="col">Creator</th><th scope="col" class="num">Posts</th><th scope="col" class="num" id="creators-metric-head">Views</th><th scope="col" class="num" id="creators-gained-head">Gained</th></tr></thead><tbody id="creator-rows"></tbody></table>
-          </section>
-          <section class="card" aria-labelledby="c-schools">
-            <div class="card-head"><h2 id="c-schools">Top schools</h2><p id="c-schools-sub">by views</p></div>
-            <table class="table"><thead><tr><th scope="col">School</th><th scope="col" class="num">Posts</th><th scope="col" class="num" id="schools-metric-head">Views</th><th scope="col" class="num" id="schools-gained-head">Gained</th></tr></thead><tbody id="school-rows"></tbody></table>
-          </section>
-        </div>
 
         <section class="card" aria-labelledby="c-tracked" style="margin-bottom:14px">
           <div class="card-head">
