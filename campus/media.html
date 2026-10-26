@@ -318,14 +318,12 @@
   .ig-like[aria-pressed="true"] { color: #ff3040; }
   .ig-like[aria-pressed="true"] svg { fill: currentColor; animation: ig-beat .35s ease-out; }
   @keyframes ig-beat { 40% { transform: scale(1.25); } }
-  .ig-cover { width: 28px; height: 28px; margin-top: 4px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 7px; background: var(--blue); }
-  .ig-cover svg { width: 17px; height: 11px; color: #fff; }
+  .ig-cover { display: block; width: 28px; height: 28px; margin-top: 4px; border: 2px solid #fff; border-radius: 7px; background: #0b091f; }
   .ig-info { position: absolute; left: 14px; right: 64px; bottom: 22px; }
   .ig-info p { margin: 0; }
   .ig-who { display: flex; align-items: center; gap: 10px; font-size: 14px; }
   .ig-who b { font-weight: 600; }
-  .ig-avatar { width: 32px; height: 32px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
-  .ig-avatar svg { width: 20px; height: 13px; color: #fff; }
+  .ig-avatar { display: block; width: 32px; height: 32px; flex: none; border-radius: 50%; background: #0b091f; box-shadow: 0 0 0 1px rgba(255,255,255,.18); }
   .ig-follow { pointer-events: auto; padding: 4px 11px; border: 1px solid rgba(255,255,255,.75); border-radius: 8px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
   .ig-follow:hover { background: rgba(255,255,255,.12); }
   .ig-caption { margin-top: 10px !important; font-size: 14px; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -724,10 +722,10 @@
         <span class="ig-act" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg></span>
         <button type="button" class="ig-act ig-send" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.63l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11ZM21.85 2.15 10.91 13.09"/></svg></button>
         <span class="ig-act" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></span>
-        <span class="ig-cover" aria-hidden="true"><svg viewBox="0 0 83 52"><use href="#eyes"/></svg></span>
+        <img class="ig-cover" src="/campus/media/fomo-campus-pfp.svg" alt="" width="28" height="28" decoding="async">
       </div>
       <div class="ig-info">
-        <p class="ig-who"><span class="ig-avatar" aria-hidden="true"><svg viewBox="0 0 83 52"><use href="#eyes"/></svg></span><b>fomo.campus</b><a class="ig-follow" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener" aria-label="Follow @fomo.campus on Instagram">Follow</a></p>
+        <p class="ig-who"><img class="ig-avatar" src="/campus/media/fomo-campus-pfp.svg" alt="" width="32" height="32" decoding="async"><b>fomo.campus</b><a class="ig-follow" href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener" aria-label="Follow @fomo.campus on Instagram">Follow</a></p>
         <p class="ig-caption"></p>
         <p class="ig-sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>fomo.campus · Original audio</p>
       </div>
