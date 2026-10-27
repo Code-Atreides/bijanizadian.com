@@ -9,11 +9,11 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=4">
-<script src="/fomocampustracker/tracker.js?v=4" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=5">
+<script src="/fomocampustracker/tracker.js?v=5" defer></script>
 <!--
-  /data, the fomo campus tracker: daily members and chapters added, the weekly
-  rhythm of joins (weekday by hour), and a backdrop for every chapter (its
+  /data, the fomo campus tracker: daily members and chapters added, member
+  joins by day of the week, and a backdrop for every chapter (its
   progress and timeline over a mesh of the fomo colors and its school's colors).
   Backdrops are live SVG for screen recordings (hover readouts, an entrance
   animation) and save as a PNG to share.
@@ -104,20 +104,17 @@
         <div class="section-head">
           <div>
             <h2 id="weekly-title">Weekly rhythm</h2>
-            <p class="lede">When members join, by weekday and hour, New York time. Bigger, darker dots mean more joins. <span id="weekly-range"></span></p>
+            <p class="lede">Member joins on each day of the week, New York time. Follows the date range above.</p>
           </div>
         </div>
         <div class="stats weekly-stats" id="weekly-stats"></div>
-        <div class="rhythm-scroll">
-          <div class="rhythm" id="rhythm" tabindex="0" role="grid" aria-label="Member joins by weekday and hour. Use the arrow keys to read each slot."></div>
-        </div>
-        <div class="rhythm-foot">
-          <span class="legend" aria-hidden="true">Fewer <i></i><i></i><i></i><i></i><i></i> More</span>
-          <span>Hover any dot for its count. The right column is each weekday’s total.</span>
-        </div>
+        <figure class="chart-card" id="chart-weekly">
+          <figcaption><strong>Joins by day of the week</strong><span id="weekly-sub"></span></figcaption>
+          <div class="chart" data-chart></div>
+        </figure>
         <details class="table-view">
           <summary>View as a table</summary>
-          <div class="table-scroll"><table id="rhythm-table"></table></div>
+          <div class="table-scroll"><table id="weekly-table"></table></div>
         </details>
       </section>
 

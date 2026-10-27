@@ -104,6 +104,7 @@ for (const r of registrations) {
   for (const [, row] of page.slice(start, page.indexOf('</tbody>', start)).matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/g)) {
     const [day, joined] = [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)].map(m => text(m[1]));
     const [mon, date] = day.split(' ');
+    if (!(Number(joined) > 0)) continue; // rows with tracker visits but no joins
     r.days.set(isoDay(`${mon} ${date}, ${MONTHS[mon] < month ? year + 1 : year}`), Number(joined));
   }
 }
@@ -163,10 +164,7 @@ for (const { date, counts } of feed.memberHistory?.timeOfDay?.days || []) bump(d
 for (const c of chapters) bump(c.registered, 'c', 1);
 const days = [...daily.values()].sort((a, b) => a.d.localeCompare(b.d));
 
-// Member joins per New York hour for each day, for the weekly rhythm view.
-const hours = (feed.memberHistory?.timeOfDay?.days || []).filter(d => Array.isArray(d.counts) && d.counts.length === 24).map(d => [d.date, d.counts]);
-
-const payload = { v: 1, updatedAt: new Date().toISOString(), feedAt: feed.updatedAt, tz: TZ, days, hours, chapters };
+const payload = { v: 1, updatedAt: new Date().toISOString(), feedAt: feed.updatedAt, tz: TZ, days, chapters };
 
 // ---------- report ----------
 const sum = (xs, f) => xs.reduce((s, x) => s + f(x), 0);
