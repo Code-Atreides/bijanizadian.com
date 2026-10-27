@@ -855,12 +855,14 @@
     if (c.target) root.append(svg('rect', { class: 'bd-tick', x: M + colW * 0.8 - 1.5, y: P.bar - 9, width: 3, height: barH + 18, rx: 1.5, fill: c.joined >= c.target ? 'rgba(11,9,31,.6)' : 'rgba(234,237,255,.92)' }));
     var status = !c.target ? '' : c.reachedOn ? '80% reached ' + dayLabel(c.reachedOn) : num(c.target - c.joined) + ' to go to 80% (' + num(c.target) + ')';
     text(root, M, P.status, status, 28, 500, WHITE, { track: -0.3 });
-    if (c.active) text(root, colR, P.status, Math.round(c.joined / c.active * 100) + '% of roster', 26, 400, SOFT, { anchor: 'end' });
+    // Post has no facts card, so its pay remaining takes the status line's right side.
+    var statusRight = factsH ? (c.active ? Math.round(c.joined / c.active * 100) + '% of roster' : '') : c.owed ? money(c.owed) + ' pay remaining' : 'Roster paid';
+    if (statusRight) text(root, colR, P.status, statusRight, 26, 400, SOFT, { anchor: 'end' });
 
     // facts card (web, story): three cells divided by hairlines
     if (factsH) {
       var facts = [
-        ['Registered', dayLabel(c.registered)],
+        ['Pay remaining', c.owed ? money(c.owed) : 'Roster paid'], // registered is on the chart's axis
         ['Last join', !lastJoin ? '—' : lastJoin === today ? 'Today' : dayLabel(lastJoin)],
         ['Rank nationally', '#' + num(1 + chapters.filter(function (x) { return x.joined > c.joined; }).length) + ' of ' + num(chapters.length)]
       ];
@@ -869,7 +871,9 @@
         var fx = M + i * colW / 3;
         if (i) root.append(svg('rect', { x: fx, y: factsY + 30, width: 1.5, height: factsH - 60, fill: 'rgba(234,237,255,.14)' }));
         eyebrow(root, fx + 32, factsY + 52, f[0], 16, colW / 3 - 48);
-        text(root, fx + 32, factsY + 100, f[1], 36, 500, WHITE, { track: -0.6 });
+        var vs = 36;
+        while (vs > 24 && textWidth(f[1], 500, vs, -0.6) > colW / 3 - 56) vs -= 2;
+        text(root, fx + 32, factsY + 100, f[1], vs, 500, WHITE, { track: -0.6 });
       });
     }
 
