@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Campus tracker | fomo campus</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=1">
+<script src="/fomocampustracker/tracker.js?v=1" defer></script>
+<!--
+  /data, the fomo campus tracker: daily members and chapters added, and a
+  backdrop for every chapter (its progress and timeline over a mesh of the fomo
+  colors and its school's colors) that saves as an image to share.
+  The numbers come from the eyes feed (milomessina.com) and the Greek Wars admin
+  (fomocampus.com/admin), collected by scripts/refresh-campus-tracker.mjs as
+  per-chapter counts and dates only, and encrypted into data.enc.json, so they
+  are readable only after the password is typed. Served at /data (firebase.json
+  rewrite) with a script-src 'self' policy, so there is no inline script.
+-->
+</head>
+<body>
+<svg width="0" height="0" class="defs" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <div class="header-meta" id="header-meta" hidden>
+      <span id="updated"></span>
+      <button type="button" class="text-button" id="lock">Lock</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ---------- lock ---------- -->
+    <section class="lock" id="lock-view" aria-labelledby="lock-title">
+      <form class="lock-card" id="unlock" autocomplete="off">
+        <p class="eyebrow">Team only</p>
+        <h1 id="lock-title">Campus tracker</h1>
+        <p class="lock-sub">Daily members and chapters, and a backdrop for every chapter.</p>
+        <label class="field" for="password">
+          <span>Password</span>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="button primary" type="submit" id="unlock-button">Unlock</button>
+        <p class="lock-error" id="lock-error" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <!-- ---------- dashboard ---------- -->
+    <div id="app" hidden>
+      <section class="section growth" aria-labelledby="growth-title">
+        <div class="section-head">
+          <h1 id="growth-title">Campus tracker</h1>
+          <div class="filters" role="group" aria-label="Filters">
+            <div class="segmented" id="range" role="group" aria-label="Date range">
+              <button type="button" data-range="7" aria-pressed="true">7 days</button>
+              <button type="button" data-range="30" aria-pressed="false">30 days</button>
+              <button type="button" data-range="all" aria-pressed="false">All time</button>
+            </div>
+            <div class="segmented" id="mode" role="group" aria-label="Chart values">
+              <button type="button" data-mode="daily" aria-pressed="true">Per day</button>
+              <button type="button" data-mode="total" aria-pressed="false">Running total</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="charts">
+          <figure class="chart-card" id="chart-members">
+            <figcaption><strong>Members added</strong><span data-sub></span></figcaption>
+            <div class="chart" data-chart></div>
+          </figure>
+          <figure class="chart-card" id="chart-chapters">
+            <figcaption><strong>Chapters added</strong><span data-sub></span></figcaption>
+            <div class="chart" data-chart></div>
+          </figure>
+        </div>
+        <details class="table-view">
+          <summary>View as a table</summary>
+          <div class="table-scroll"><table id="day-table"></table></div>
+        </details>
+      </section>
+
+      <section class="section chapters" aria-labelledby="chapters-title">
+        <div class="section-head">
+          <div>
+            <h2 id="chapters-title">Chapters</h2>
+            <p class="lede">Open a chapter to see its backdrop, then save it as an image to share.</p>
+          </div>
+          <div class="filters">
+            <label class="search">
+              <span class="visually-hidden">Search chapters or schools</span>
+              <input id="search" type="search" placeholder="Search chapter or school" autocomplete="off" spellcheck="false">
+            </label>
+            <label class="select">
+              <span class="visually-hidden">Sort</span>
+              <select id="sort">
+                <option value="members">Most members</option>
+                <option value="week">Most this week</option>
+                <option value="progress">Furthest to 80%</option>
+                <option value="newest">Newest</option>
+                <option value="school">School A–Z</option>
+              </select>
+            </label>
+            <div class="segmented" id="type" role="group" aria-label="Chapter type">
+              <button type="button" data-type="all" aria-pressed="true">All</button>
+              <button type="button" data-type="Fraternity" aria-pressed="false">Fraternities</button>
+              <button type="button" data-type="Sorority" aria-pressed="false">Sororities</button>
+              <button type="button" data-type="other" aria-pressed="false">Other</button>
+            </div>
+          </div>
+        </div>
+        <p class="count" id="chapter-count" aria-live="polite"></p>
+        <ul class="grid" id="grid"></ul>
+        <button type="button" class="button secondary more" id="more" hidden>Show more</button>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">fomo campus · team only · counts and dates only, no member details</footer>
+</div>
+
+<!-- ---------- chapter backdrop ---------- -->
+<dialog class="viewer" id="viewer" aria-labelledby="viewer-name">
+  <div class="viewer-mesh" id="viewer-mesh" aria-hidden="true"></div>
+  <div class="viewer-top">
+    <div class="viewer-nav">
+      <button type="button" class="icon-button" id="prev" aria-label="Previous chapter">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span id="viewer-position"></span>
+      <button type="button" class="icon-button" id="next" aria-label="Next chapter">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <button type="button" class="icon-button" id="close" aria-label="Close backdrop">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="viewer-stage">
+    <canvas id="poster" width="1080" height="1350" role="img"></canvas>
+  </div>
+  <aside class="viewer-panel">
+    <h2 id="viewer-name"></h2>
+    <p class="viewer-school" id="viewer-school"></p>
+    <dl class="facts" id="facts"></dl>
+    <div class="viewer-actions">
+      <div class="segmented dark" id="format" role="group" aria-label="Image size">
+        <button type="button" data-format="post" aria-pressed="true">Post 4:5</button>
+        <button type="button" data-format="story" aria-pressed="false">Story 9:16</button>
+      </div>
+      <button type="button" class="button primary" id="save">Save image</button>
+      <p class="save-note" id="save-note" aria-live="polite"></p>
+    </div>
+    <details class="days">
+      <summary>Day by day</summary>
+      <table id="chapter-days"></table>
+    </details>
+  </aside>
+</dialog>
+<div class="tooltip" id="chart-tooltip" role="status" hidden></div>
+</body>
+</html>

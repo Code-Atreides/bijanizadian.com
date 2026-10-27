@@ -1,0 +1,288 @@
+{
+  "note": "Primary and secondary school colors for schools missing from 2dgreekvillage/shared/village-school-identities.js, read from each school's Wikipedia infobox on 2026-10-26 and reviewed by hand. Used by scripts/refresh-campus-tracker.mjs.",
+  "schools": {
+    "Duke University": [
+      "#012169",
+      "#FFFFFF"
+    ],
+    "Sacred Heart University": [
+      "#DC143C",
+      "#FFFFFF"
+    ],
+    "Texas A&M University - College Station": [
+      "#500000",
+      "#FFFFFF"
+    ],
+    "Bradley University": [
+      "#A50000",
+      "#FFFFFF"
+    ],
+    "Indiana University": [
+      "#990000",
+      "#EDEBEB"
+    ],
+    "University of Oklahoma": [
+      "#841617",
+      "#F0EBC4"
+    ],
+    "University of Texas at Arlington": [
+      "#0064B1",
+      "#F58025"
+    ],
+    "College of Charleston": [
+      "#660000",
+      "#FFFFFF"
+    ],
+    "University of Illinois Springfield": [
+      "#003366",
+      "#FFFFFF"
+    ],
+    "The College of New Jersey": [
+      "#293F6F",
+      "#A67A00"
+    ],
+    "Queen's University": [
+      "#002452",
+      "#FABD0F"
+    ],
+    "New Mexico State University": [
+      "#8C0B42",
+      "#FFFFFF"
+    ],
+    "Dartmouth College": [
+      "#00693E",
+      "#FFFFFF"
+    ],
+    "Saint Leo University": [
+      "#008000",
+      "#FFCC00"
+    ],
+    "Western University": [
+      "#4F2683",
+      "#FFFFFF"
+    ],
+    "University of San Diego": [
+      "#003B70",
+      "#FFFFFF"
+    ],
+    "Saint Joseph's University": [
+      "#9E1B32",
+      "#6C6F70"
+    ],
+    "Rowan College": [
+      "#57150B",
+      "#FFCC00"
+    ],
+    "University of Wisconsin - Milwaukee": [
+      "#000000",
+      "#FFBD00"
+    ],
+    "University of Pittsburgh": [
+      "#003594",
+      "#FFB81C"
+    ],
+    "State University of New York at Farmingdale": [
+      "#00493F",
+      "#FFFFFF"
+    ],
+    "University of California, Davis": [
+      "#002851",
+      "#FFBF00"
+    ],
+    "DePauw University": [
+      "#111C24",
+      "#FFCF01"
+    ],
+    "Lehigh University": [
+      "#663700",
+      "#FFFFFF"
+    ],
+    "University of California, Berkeley": [
+      "#002676",
+      "#FDB515"
+    ],
+    "Washington & Lee University": [
+      "#003087",
+      "#707372"
+    ],
+    "Texas State University": [
+      "#501214",
+      "#6A5638"
+    ],
+    "University of Washington": [
+      "#4B2E83",
+      "#B7A57A"
+    ],
+    "George Washington University": [
+      "#033C5A",
+      "#AA9868"
+    ],
+    "CUNY City College of NY": [
+      "#7D5CC6",
+      "#565A5C"
+    ],
+    "University of California, Santa Cruz": [
+      "#003C6C",
+      "#FDC700"
+    ],
+    "High Point University": [
+      "#330072",
+      "#FFFFFF"
+    ],
+    "University of Kansas": [
+      "#E8000D",
+      "#0051BA"
+    ],
+    "Princeton University": [
+      "#000000",
+      "#FF6000"
+    ],
+    "University of Rhode Island": [
+      "#002147",
+      "#75B2DD"
+    ],
+    "Indiana University of Pennsylvania": [
+      "#9E1B32",
+      "#A2A5A4"
+    ],
+    "Loyola University Chicago": [
+      "#8D0034",
+      "#FEBC18"
+    ],
+    "University of Virginia, Charlottesville": [
+      "#E57200",
+      "#232D4B"
+    ],
+    "University of Wisconsin - Madison": [
+      "#C5050C",
+      "#FFFFFF"
+    ],
+    "Towson University": [
+      "#000000",
+      "#FFCC00"
+    ],
+    "University of Chicago": [
+      "#800000"
+    ],
+    "Kenyon College": [
+      "#492F92",
+      "#FFFFFF"
+    ],
+    "University of California, Riverside": [
+      "#003DA5",
+      "#FFB81C"
+    ],
+    "Babson College": [
+      "#008000",
+      "#FFFFFF"
+    ],
+    "Boise State University": [
+      "#0033A0",
+      "#D64309"
+    ],
+    "Western Michigan University": [
+      "#532E1F",
+      "#F1C500"
+    ],
+    "Louisiana State University": [
+      "#461D7C",
+      "#FDD023"
+    ],
+    "University of South Florida": [
+      "#006747",
+      "#CFC493"
+    ],
+    "Southeastern Louisiana University": [
+      "#1B5633",
+      "#FFC629"
+    ],
+    "Alabama State University": [
+      "#000000",
+      "#F0A40F"
+    ],
+    "University of Akron": [
+      "#041E42",
+      "#A89968"
+    ],
+    "Florida Atlantic University": [
+      "#003366",
+      "#CC0000"
+    ],
+    "Kennesaw State University": [
+      "#2D2926",
+      "#FFC629"
+    ],
+    "California Polytechnic State University, San Luis Obispo": [
+      "#154734",
+      "#BD8B13"
+    ],
+    "University of Kentucky": [
+      "#0033A0",
+      "#FFFFFF"
+    ],
+    "University of Arkansas - Fayetteville": [
+      "#9D2235",
+      "#FFFFFF"
+    ],
+    "California State University, San Marcos": [
+      "#1E2A5B",
+      "#222021"
+    ],
+    "University of Georgia": [
+      "#BA0C2F",
+      "#000000"
+    ],
+    "University of Texas at El Paso": [
+      "#041E42",
+      "#FF8200"
+    ],
+    "Washington University, Saint Louis": [
+      "#BA0C2F",
+      "#215732"
+    ],
+    "Vanderbilt University": [
+      "#000000",
+      "#CFAE70"
+    ],
+    "The University of Texas at San Antonio": [
+      "#0C2340",
+      "#F15A22"
+    ],
+    "Monmouth University": [
+      "#002245",
+      "#FFFFFF"
+    ],
+    "Iowa State University": [
+      "#C8102E",
+      "#F1BE48"
+    ],
+    "Indiana Institute of Technology": [
+      "#FA4616",
+      "#000000"
+    ],
+    "Fordham University": [
+      "#900028",
+      "#FFFFFF"
+    ],
+    "Santa Clara University": [
+      "#862633",
+      "#FFFFFF"
+    ],
+    "Loyola Marymount University": [
+      "#AB0C2F",
+      "#0076A5"
+    ],
+    "Skidmore College": [
+      "#1F6855",
+      "#FFCC00"
+    ],
+    "University of Iowa": [
+      "#000000",
+      "#FFCD00"
+    ],
+    "Baylor University": [
+      "#154734",
+      "#FFB81C"
+    ]
+  }
+}
