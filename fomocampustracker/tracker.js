@@ -151,26 +151,40 @@
     document.querySelectorAll('[data-sub]').forEach(function (s) { s.textContent = sub; });
     drawCharts();
     renderTable(rows);
-    renderWeekly(rows, since);
+    renderWeekly(rows);
   }
 
   // ---------- weekly rhythm ----------
-  // Member joins on each day of the week over the selected range, Monday to
-  // Sunday, as one line. Days come from the same New York day series as the
-  // charts above, so the numbers agree.
-  var WEEK = [1, 2, 3, 4, 5, 6, 0], weekly = null;
-  function renderWeekly(rows, since) {
+  // One line per calendar week (Monday to Sunday, New York days), overlaid so
+  // the strong weekdays line up. Weeks are ordered in time, so they share one
+  // blue ramp: older weeks lighter, the current week darkest. Every week that
+  // touches the selected range is shown, from the same day series as above.
+  var weekly = null;
+  var weekStart = function (d) { return addDays(d, -((weekdayOf(d) + 6) % 7)); };
+  var DAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday first
+  function weekColor(t) {
+    var a = [158, 172, 249], b = [43, 51, 168]; // #9eacf9 → #2b33a8, validated ordinal
+    return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * t); }).join(',') + ')';
+  }
+  function renderWeekly(rows) {
+    var byDay = new Map(series.map(function (r) { return [r.d, r.m]; }));
+    var weeks = [];
+    for (var ws = weekStart(rows[0].d); ws <= today; ws = addDays(ws, 7)) {
+      var vals = [0, 1, 2, 3, 4, 5, 6].map(function (k) { var d = addDays(ws, k); return d <= today && byDay.has(d) ? byDay.get(d) : null; });
+      weeks.push({ start: ws, vals: vals, current: addDays(ws, 7) > today });
+    }
+    weeks.forEach(function (w, i) { w.color = weekColor(weeks.length === 1 ? 1 : i / (weeks.length - 1)); w.label = w.current ? 'This week' : 'Week of ' + dayLabel(w.start); });
     var sums = new Array(7).fill(0), seen = new Array(7).fill(0), all = 0;
-    rows.forEach(function (r) { var wd = weekdayOf(r.d); sums[wd] += r.m; seen[wd]++; all += r.m; });
-    var pts = WEEK.map(function (wd) { return { wd: wd, n: sums[wd], days: seen[wd] }; });
+    weeks.forEach(function (w) { w.vals.forEach(function (v, k) { if (v != null) { sums[k] += v; seen[k]++; all += v; } }); });
     var share = function (n) { return all ? (n / all * 100).toFixed(1).replace(/\.0$/, '') + '%' : '0%'; };
-    var busy = pts.reduce(function (a, b) { return b.n > a.n ? b : a; });
-    var quiet = pts.filter(function (p) { return p.days; }).reduce(function (a, b) { return b.n < a.n ? b : a; });
+    var busy = sums.indexOf(Math.max.apply(null, sums));
+    var quiet = sums.reduce(function (q, v, k) { return seen[k] && (q < 0 || v < sums[q]) ? k : q; }, -1);
+    var firstDay = series.find(function (r) { return r.d >= weeks[0].start; }).d;
     var tiles = [
-      ['Busiest weekday', all ? WEEKDAYS[busy.wd] : '—', all ? num(busy.n) + ' joins · ' + share(busy.n) + ' of joins' : 'No joins yet', true],
-      ['Quietest weekday', all ? WEEKDAYS[quiet.wd] : '—', all ? num(quiet.n) + ' joins · ' + share(quiet.n) + ' of joins' : ''],
-      ['Weekend share', share(sums[0] + sums[6]), 'Two days of seven would be 29%'],
-      ['Member joins', num(all), since]
+      ['Busiest weekday', all ? WEEKDAYS[DAY_ORDER[busy]] : '—', all ? num(sums[busy]) + ' joins · ' + share(sums[busy]) + ' of joins' : 'No joins yet', true],
+      ['Quietest weekday', all && quiet >= 0 ? WEEKDAYS[DAY_ORDER[quiet]] : '—', all && quiet >= 0 ? num(sums[quiet]) + ' joins · ' + share(sums[quiet]) + ' of joins' : ''],
+      ['Weekend share', share(sums[5] + sums[6]), 'Two days of seven would be 29%'],
+      ['Member joins', num(all), plural(weeks.length, 'week') + ' · ' + dayLabel(firstDay) + ' to ' + dayLabel(today)]
     ];
     var stats = $('weekly-stats');
     stats.replaceChildren.apply(stats, tiles.map(function (t) {
@@ -178,87 +192,123 @@
       tile.append(el('span', null, t[0]), el('strong', null, t[1]), el('small', null, t[2]));
       return tile;
     }));
-    $('weekly-sub').textContent = 'total per weekday, ' + since;
-    weekly = { pts: pts, all: all, share: share };
+    $('weekly-sub').textContent = plural(weeks.length, 'week') + ' overlaid, Monday to Sunday';
+    weekly = { weeks: weeks, sums: sums, seen: seen, share: share, focus: -1 };
+
+    // legend: one chip per week, newest first; hovering one picks out its line
+    var legend = $('week-legend');
+    legend.replaceChildren.apply(legend, weeks.slice().reverse().map(function (w) {
+      var chip = el('span', 'wk-chip'), key = el('i');
+      key.style.background = w.color;
+      chip.append(key, document.createTextNode(w.current ? 'This week' : dayLabel(w.start)));
+      chip.onpointerenter = function () { weekly.focus = weeks.indexOf(w); paintWeeks(); };
+      chip.onpointerleave = function () { weekly.focus = -1; paintWeeks(); };
+      return chip;
+    }));
     drawWeekly();
 
     var table = $('weekly-table'), head = el('tr'), body = el('tbody');
-    ['Weekday', 'Joins', 'Share', 'Days in range', 'Average a day'].forEach(function (h) { var th = el('th', null, h); th.scope = 'col'; head.append(th); });
-    pts.forEach(function (p) {
+    ['Week of'].concat(DAY_ORDER.map(function (wd) { return WEEKDAYS[wd].slice(0, 3); }), ['Total']).forEach(function (h) { var th = el('th', null, h); th.scope = 'col'; head.append(th); });
+    weeks.slice().reverse().forEach(function (w) {
       var tr = el('tr');
-      tr.append(el('td', null, WEEKDAYS[p.wd]), el('td', null, num(p.n)), el('td', null, share(p.n)), el('td', null, num(p.days)), el('td', null, p.days ? num(Math.round(p.n / p.days)) : '—'));
+      tr.append(el('td', null, dayLabel(w.start, true) + (w.current ? ' (this week)' : '')));
+      w.vals.forEach(function (v) { tr.append(el('td', null, v == null ? '—' : num(v))); });
+      tr.append(el('td', null, num(w.vals.reduce(function (s, v) { return s + (v || 0); }, 0))));
       body.append(tr);
     });
+    var foot = el('tr');
+    foot.append(el('td', null, 'All weeks'));
+    sums.forEach(function (v) { foot.append(el('td', null, num(v))); });
+    foot.append(el('td', null, num(all)));
+    body.append(foot);
     var thead = el('thead'); thead.append(head);
     table.replaceChildren(thead, body);
+  }
+  // Line emphasis: the focused week stands out, the others step back.
+  function paintWeeks() {
+    var svgEl = $('chart-weekly').querySelector('svg');
+    if (!svgEl || !weekly) return;
+    svgEl.classList.toggle('focusing', weekly.focus >= 0);
+    svgEl.querySelectorAll('.wk-line').forEach(function (p) { p.classList.toggle('on', Number(p.dataset.i) === weekly.focus); });
+    $('week-legend').querySelectorAll('.wk-chip').forEach(function (chip, j) { chip.classList.toggle('on', weekly.weeks.length - 1 - j === weekly.focus); });
   }
   function drawWeekly() {
     if (!weekly) return;
     var box = $('chart-weekly').querySelector('[data-chart]'), W = box.clientWidth, H = box.clientHeight;
     if (!W || !H) return;
-    var pts = weekly.pts, m = { l: 38, r: 26, t: 22, b: 26 }, pw = W - m.l - m.r, ph = H - m.t - m.b, base = m.t + ph, inset = 24;
-    var max = Math.max.apply(null, pts.map(function (p) { return p.n; }).concat([1]));
+    var weeks = weekly.weeks, m = { l: 38, r: 26, t: 22, b: 26 }, pw = W - m.l - m.r, ph = H - m.t - m.b, base = m.t + ph, inset = 24;
+    var max = 1;
+    weeks.forEach(function (w) { w.vals.forEach(function (v) { if (v > max) max = v; }); });
     var step = nice(max / 4), top = Math.ceil(max / step) * step;
-    var x = function (i) { return m.l + inset + (pw - inset * 2) * i / 6; }, y = function (v) { return m.t + ph - v / top * ph; };
+    var x = function (k) { return m.l + inset + (pw - inset * 2) * k / 6; }, y = function (v) { return m.t + ph - v / top * ph; };
     var s = svg('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
-    s.setAttribute('aria-label', 'Member joins by day of the week, Monday to Sunday. Values are in the table below.');
+    s.setAttribute('aria-label', 'Member joins on each weekday, one line per week, Monday to Sunday. Values are in the table below.');
     for (var t = 0; t <= top + 1e-9; t += step) {
       if (t > 0) s.append(svg('line', { class: 'gridline', x1: m.l, x2: W - m.r, y1: y(t), y2: y(t) }));
       var tick = svg('text', { class: 'tick', x: m.l - 8, y: y(t) + 4, 'text-anchor': 'end' });
       tick.textContent = compact(t);
       s.append(tick);
     }
-    var line = pts.map(function (p, i) { return x(i) + ',' + y(p.n); });
-    s.append(svg('path', { class: 'area', d: 'M' + x(0) + ',' + base + 'L' + line.join('L') + 'L' + x(6) + ',' + base + 'Z' }));
-    s.append(svg('path', { class: 'line', d: 'M' + line.join('L') }));
     s.append(svg('line', { class: 'baseline', x1: m.l, x2: W - m.r, y1: base, y2: base }));
-    var cross = svg('line', { class: 'cross', y1: m.t, y2: base, visibility: 'hidden' });
-    s.append(cross);
-    var dots = pts.map(function (p, i) { var d = svg('circle', { class: 'dot', cx: x(i), cy: y(p.n), r: 4.5 }); s.append(d); return d; });
-    var peak = pts.reduce(function (a, b, i) { return b.n > pts[a].n ? i : a; }, 0);
-    if (pts[peak].n) {
-      var pl = svg('text', { class: 'label', x: x(peak), y: y(pts[peak].n) - 12, 'text-anchor': peak === 0 ? 'start' : peak === 6 ? 'end' : 'middle' });
-      pl.textContent = num(pts[peak].n);
-      s.append(pl);
-    }
-    pts.forEach(function (p, i) {
-      var label = svg('text', { class: 'tick', x: x(i), y: H - 6, 'text-anchor': 'middle' });
-      label.textContent = WEEKDAYS[p.wd].slice(0, 3);
+    weeks.forEach(function (w, i) {
+      var d = '', pen = 'M';
+      w.vals.forEach(function (v, k) { if (v == null) { pen = 'M'; return; } d += pen + x(k) + ',' + y(v); pen = 'L'; });
+      if (!d) return;
+      var p = svg('path', { class: 'wk-line' + (w.current ? ' current' : ''), d: d, stroke: w.color });
+      p.dataset.i = i;
+      s.append(p);
+      if (w.current) {
+        var k = w.vals.reduce(function (last, v, j) { return v == null ? last : j; }, -1);
+        if (k >= 0) s.append(svg('circle', { class: 'dot', cx: x(k), cy: y(w.vals[k]), r: 4.5, fill: w.color, style: 'fill:' + w.color }));
+      }
+    });
+    DAY_ORDER.forEach(function (wd, k) {
+      var label = svg('text', { class: 'tick', x: x(k), y: H - 6, 'text-anchor': 'middle' });
+      label.textContent = WEEKDAYS[wd].slice(0, 3);
       s.append(label);
     });
+    var cross = svg('line', { class: 'cross', y1: m.t, y2: base, visibility: 'hidden' });
+    s.append(cross);
     var hit = svg('rect', { class: 'hit', x: 0, y: m.t, width: W, height: ph });
     s.append(hit);
     box.replaceChildren(s);
+    paintWeeks();
 
+    // One readout per weekday listing every week; the line nearest the pointer leads.
     var active = -1, tip = $('chart-tooltip');
-    function show(i) {
-      if (active >= 0) dots[active].setAttribute('r', 4.5);
-      active = i;
-      var p = pts[i];
-      dots[i].setAttribute('r', 6.5);
-      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
-      var strong = el('strong'), key = el('i');
-      strong.append(key, document.createTextNode(plural(p.n, 'join')));
-      tip.replaceChildren(strong, el('span', null, WEEKDAYS[p.wd] + ' · ' + weekly.share(p.n) + ' of joins'),
-        el('span', null, p.days > 1 ? num(Math.round(p.n / p.days)) + ' a day on average over ' + num(p.days) + ' ' + WEEKDAYS[p.wd] + 's' : p.days ? 'One ' + WEEKDAYS[p.wd] + ' in this range' : 'Not in this range'));
+    function show(k, pointerY) {
+      active = k;
+      var withValue = weeks.map(function (w, i) { return { w: w, i: i, v: w.vals[k] }; }).filter(function (r) { return r.v != null; });
+      if (pointerY != null && withValue.length) {
+        weekly.focus = withValue.reduce(function (a, b) { return Math.abs(y(b.v) - pointerY) < Math.abs(y(a.v) - pointerY) ? b : a; }).i;
+      }
+      paintWeeks();
+      cross.setAttribute('x1', x(k)); cross.setAttribute('x2', x(k)); cross.setAttribute('visibility', 'visible');
+      var wd = DAY_ORDER[k], head = el('span', 'tt-head', WEEKDAYS[wd] + ' · ' + plural(weekly.sums[k], 'join') + (weekly.seen[k] > 1 ? ' · ' + num(Math.round(weekly.sums[k] / weekly.seen[k])) + ' a week on average' : ''));
+      var lines = withValue.slice().reverse().map(function (r) {
+        var row = el('span', 'tt-row' + (r.i === weekly.focus ? ' on' : '')), key = el('i');
+        key.style.background = r.w.color;
+        row.append(key, el('b', null, num(r.v)), el('em', null, r.w.label));
+        return row;
+      });
+      tip.replaceChildren.apply(tip, [head].concat(lines.length ? lines : [el('span', 'tt-row', 'No days in range')]));
       tip.hidden = false;
       var rect = box.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
-      tip.style.left = Math.max(8, Math.min(innerWidth - tw - 8, rect.left + x(i) - tw / 2)) + 'px';
-      tip.style.top = Math.max(8, rect.top + y(p.n) - th - 16) + 'px';
+      var left = rect.left + x(k) + 18;
+      tip.style.left = (left + tw > innerWidth - 8 ? rect.left + x(k) - tw - 18 : left) + 'px';
+      tip.style.top = Math.max(8, Math.min(innerHeight - th - 8, rect.top + m.t)) + 'px';
     }
-    function hide() {
-      if (active >= 0) dots[active].setAttribute('r', 4.5);
-      cross.setAttribute('visibility', 'hidden'); tip.hidden = true; active = -1;
-    }
-    hit.addEventListener('pointermove', function (e) { show(Math.max(0, Math.min(6, Math.round((e.clientX - box.getBoundingClientRect().left - m.l - inset) / (pw - inset * 2) * 6)))); });
+    function hide() { cross.setAttribute('visibility', 'hidden'); tip.hidden = true; active = -1; weekly.focus = -1; paintWeeks(); }
+    var index = function (e) { return Math.max(0, Math.min(6, Math.round((e.clientX - box.getBoundingClientRect().left - m.l - inset) / (pw - inset * 2) * 6))); };
+    hit.addEventListener('pointermove', function (e) { show(index(e), e.clientY - box.getBoundingClientRect().top); });
     hit.addEventListener('pointerleave', hide);
     box.tabIndex = 0;
-    box.onfocus = function () { show(peak); };
+    box.onfocus = function () { weekly.focus = weeks.length - 1; show(0); };
     box.onblur = hide;
     box.onkeydown = function (e) {
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-      e.preventDefault();
-      show(Math.max(0, Math.min(6, (active < 0 ? peak : active) + (e.key === 'ArrowLeft' ? -1 : 1))));
+      var k = active < 0 ? 0 : active;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); show(Math.max(0, Math.min(6, k + (e.key === 'ArrowLeft' ? -1 : 1)))); }
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); weekly.focus = (Math.max(0, weekly.focus) + (e.key === 'ArrowUp' ? 1 : -1) + weeks.length) % weeks.length; show(k); }
     };
   }
 
@@ -560,10 +610,6 @@
     return t;
   }
   var rgbText = function (c) { return 'rgb(' + c.map(Math.round).join(',') + ')'; };
-  function niceTop(v) {
-    var raw = Math.max(5, v * 1.18), e = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / e;
-    return (f <= 1 ? 1 : f <= 1.5 ? 1.5 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 3 ? 3 : f <= 4 ? 4 : f <= 5 ? 5 : f <= 6 ? 6 : f <= 8 ? 8 : 10) * e;
-  }
   var weekdayDay = function (d) { return new Date(utc(d)).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }); };
 
   // logo: { href, w, h } or null. inline: { fonts } for the exported copy.
@@ -638,23 +684,35 @@
     text(root, PAD, y, status, 30, 500, WHITE);
     if (c.active) text(root, BW - PAD, y, Math.round(c.joined / c.active * 100) + '% of roster', 28, 400, SOFT, { anchor: 'end' });
 
-    // timeline, scaled to the chapter's own numbers
+    // timeline, scaled to the active roster: the line's height is the share of
+    // the roster that has joined (members beyond the roster raise the top)
     var foot = H - L.bottom, axisY = foot - 58;
     var chartTop = y + L.gap + 40, chartBottom = axisY - 40, ch = chartBottom - chartTop;
     var first = c.days.length && c.days[0][0] < c.registered ? c.days[0][0] : c.registered;
     var byDay = new Map(c.days), pts = [{ i: 0, d: null, v: 0, add: 0 }], total = 0, n = 0;
     var lastJoin = c.days.length ? c.days[c.days.length - 1][0] : null, lastLabelled = false;
     for (var d = first; d <= today; d = addDays(d, 1)) { var add = byDay.get(d) || 0; total += add; n++; pts.push({ i: n, d: d, v: total, add: add }); }
-    var topV = niceTop(Math.max(total, 1));
-    var showTarget = c.target && c.target <= topV;
+    var topV = Math.max(c.active || 0, total, 1);
     var X = function (i) { return PAD + i / n * INNER; }, Y = function (v) { return chartBottom - v / topV * ch; };
     text(root, PAD, chartTop - 30, 'Members since registering', 26, 500, SOFT);
-    if (showTarget) {
-      var key = '80% mark · ' + num(c.target);
-      text(root, BW - PAD, chartTop - 30, key, 25, 400, SOFT, { anchor: 'end' });
-      root.append(svg('rect', { x: BW - PAD - textWidth(key, 400, 25) - 44, y: chartTop - 39, width: 30, height: 2, fill: 'rgba(234,237,255,.55)' }));
-      root.append(svg('rect', { x: PAD, y: Math.round(Y(c.target)) - 1, width: INNER, height: 2, fill: 'rgba(234,237,255,.45)' }));
-    }
+    // Roster and 80% lines, keyed in the title row so their labels never meet the data.
+    var refs = [], keyX = BW - PAD;
+    var reference = function (label, alpha, value) {
+      var w = textWidth(label, 400, 25), ly = Math.round(Y(value));
+      text(root, keyX, chartTop - 30, label, 25, 400, SOFT, { anchor: 'end' });
+      root.append(svg('rect', { x: keyX - w - 44, y: chartTop - 39, width: 30, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
+      root.append(svg('rect', { x: PAD, y: ly - 1, width: INNER, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
+      refs.push(ly);
+      keyX -= w + 44 + 34;
+    };
+    if (c.active) reference('Roster · ' + num(c.active), 0.3, c.active);
+    if (c.target) reference('80% · ' + num(c.target), 0.55, c.target);
+    // A label sits above its point unless that crosses a line or leaves the chart.
+    var labelY = function (v, cap) {
+      var y = Y(v), top = y - 26 - cap;
+      var blocked = top < chartTop - 6 || refs.some(function (r) { return r > top - 6 && r < y - 10; });
+      return blocked ? y + 26 + cap : y - 26;
+    };
     root.append(svg('rect', { x: PAD, y: chartBottom, width: INNER, height: 2, fill: 'rgba(234,237,255,.25)' }));
     if (!total) {
       text(root, BW / 2, chartTop + ch / 2, 'First members coming soon', 30, 400, SOFT, { anchor: 'middle' });
@@ -673,17 +731,15 @@
       var reached = c.reachedOn ? pts.find(function (p) { return p.d === c.reachedOn; }) : null;
       if (reached && reached.i < n) marker(reached);
       marker(pts[n]);
-      var gap = showTarget ? Y(total) - Y(c.target) : 0; // the 80% line's height above the end dot
-      var endY = gap > 18 && gap < 64 ? Y(total) + 58 : Y(total) - 26;
-      text(root, X(n) - 4, endY, num(total), 40, 700, WHITE, { anchor: 'end', cls: 'bd-end', to: total });
+      text(root, X(n) - 4, labelY(total, 30), num(total), 40, 700, WHITE, { anchor: 'end', cls: 'bd-end', to: total });
       // The last join is marked on the line, labelled where it clears the total.
       var lastPt = lastJoin ? pts.find(function (p) { return p.d === lastJoin; }) : null;
       if (lastPt && lastPt.i < n) {
         if (lastPt !== reached) marker(lastPt);
         var label = 'Last join ' + dayLabel(lastJoin), lw = textWidth(label, 500, 26), lx = X(lastPt.i);
-        var left = Math.max(PAD, lx - lw / 2), clear = X(n) - textWidth(num(total), 700, 40) - 34;
-        if (left + lw < clear || endY > Y(total)) {
-          text(root, left, Y(lastPt.v) - 28, label, 26, 500, WHITE, { cls: 'bd-end' });
+        var left = Math.max(PAD, lx - lw / 2), clear = X(n) - textWidth(num(total), 700, 40) - 60;
+        if (left + lw < clear) {
+          text(root, left, labelY(lastPt.v, 19), label, 26, 500, WHITE, { cls: 'bd-end' });
           lastLabelled = true;
         }
       }
@@ -858,18 +914,41 @@
     school.replaceChildren(document.createTextNode(c.school + ' · ' + c.type));
     var i = list.indexOf(c);
     $('viewer-position').textContent = num(i + 1) + ' of ' + num(list.length);
-    var facts = [
-      ['Members joined', num(c.joined)],
-      ['Active roster', num(c.active)],
-      ['80% mark', c.target ? num(c.target) : '—'],
-      [c.reachedOn ? 'Reached 80%' : 'To go to 80%', c.reachedOn ? dayLabel(c.reachedOn) : c.target ? num(Math.max(0, c.target - c.joined)) : '—'],
-      ['Registered', dayLabel(c.registered, true)],
-      ['Last 7 days', '+' + num(c.week)],
-      ['Best day', c.best ? dayLabel(c.best[0]) + ' · ' + num(c.best[1]) : '—'],
-      ['Last join', lastJoinText(c)]
+    var rank = function (pool) { return 1 + pool.filter(function (x) { return x.joined > c.joined; }).length; };
+    var mates = chapters.filter(function (x) { return x.school === c.school; });
+    var schoolMembers = mates.reduce(function (s, x) { return s + x.joined; }, 0);
+    var age = Math.max(1, Math.round((utc(today) - utc(c.registered)) / 864e5) + 1);
+    var groups = [
+      ['Progress', [
+        ['Members joined', num(c.joined)],
+        ['Active roster', num(c.active)],
+        ['Roster joined', c.active ? Math.round(c.joined / c.active * 100) + '%' : '—'],
+        ['80% mark', c.target ? num(c.target) : '—'],
+        [c.reachedOn ? 'Reached 80%' : 'To go to 80%', c.reachedOn ? dayLabel(c.reachedOn) : c.target ? num(Math.max(0, c.target - c.joined)) : '—'],
+        ['Rank nationally', '#' + num(rank(chapters)) + ' of ' + num(chapters.length)]
+      ]],
+      ['Timeline', [
+        ['Registered', dayLabel(c.registered, true)],
+        ['Days since registering', num(age)],
+        ['First join', c.days.length ? dayLabel(c.days[0][0]) : '—'],
+        ['Last join', lastJoinText(c)],
+        ['Best day', c.best ? dayLabel(c.best[0]) + ' · ' + num(c.best[1]) : '—'],
+        ['Days with joins', num(c.days.length)],
+        ['Average a day', (c.joined / age).toFixed(1).replace(/\.0$/, '')],
+        ['Last 7 days', '+' + num(c.week)]
+      ]],
+      [c.short || c.school, [
+        ['Rank at school', '#' + num(rank(mates)) + ' of ' + num(mates.length)],
+        ['Share of school', schoolMembers ? Math.round(c.joined / schoolMembers * 100) + '%' : '—'],
+        ['School chapters', num(mates.length)],
+        ['School members', num(schoolMembers)]
+      ]]
     ];
-    $('facts').replaceChildren.apply($('facts'), facts.map(function (f) {
-      var d = el('div'); d.append(el('dt', null, f[0]), el('dd', null, f[1])); return d;
+    $('facts').replaceChildren.apply($('facts'), groups.map(function (g) {
+      var group = el('section', 'fact-group'), list = el('dl', 'facts');
+      g[1].forEach(function (f) { var d = el('div'); d.append(el('dt', null, f[0]), el('dd', null, f[1])); list.append(d); });
+      group.append(el('h3', null, g[0]), list);
+      return group;
     }));
     var table = $('chapter-days'), head = el('tr'), body = el('tbody'), running = 0;
     ['Day', 'Joined', 'Total'].forEach(function (h) { var th = el('th', null, h); th.scope = 'col'; head.append(th); });
@@ -878,7 +957,7 @@
     if (!rows.length) { var tr = el('tr'), td = el('td', null, 'No members yet'); td.colSpan = 3; tr.append(td); body.append(tr); }
     var thead = el('thead'); thead.append(head);
     table.replaceChildren(thead, body);
-    $('save-note').textContent = SAVE_HINT;
+    $('save-note').textContent = '';
     if (!viewer.open) viewer.showModal();
     history.replaceState(null, '', '#chapter=' + encodeURIComponent(c.id));
     drawBackdrop();
@@ -888,7 +967,6 @@
     var d = c.days[c.days.length - 1][0], ago = Math.round((utc(today) - utc(d)) / 864e5);
     return ago === 0 ? 'Today' : dayLabel(d) + ' · ' + (ago === 1 ? 'yesterday' : ago + 'd ago');
   }
-  var SAVE_HINT ='Hover the timeline, the bar or the 80% mark to see the numbers.';
   var fontsReady, drawn = 0;
   async function drawBackdrop() {
     if (!current) return;

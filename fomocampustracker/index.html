@@ -9,8 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=5">
-<script src="/fomocampustracker/tracker.js?v=5" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=7">
+<script src="/fomocampustracker/tracker.js?v=7" defer></script>
 <!--
   /data, the fomo campus tracker: daily members and chapters added, member
   joins by day of the week, and a backdrop for every chapter (its
@@ -104,13 +104,14 @@
         <div class="section-head">
           <div>
             <h2 id="weekly-title">Weekly rhythm</h2>
-            <p class="lede">Member joins on each day of the week, New York time. Follows the date range above.</p>
+            <p class="lede">Member joins on each day of the week, one line per week, New York time. Every week that touches the date range above is shown.</p>
           </div>
         </div>
         <div class="stats weekly-stats" id="weekly-stats"></div>
         <figure class="chart-card" id="chart-weekly">
           <figcaption><strong>Joins by day of the week</strong><span id="weekly-sub"></span></figcaption>
           <div class="chart" data-chart></div>
+          <div class="week-legend" id="week-legend" aria-label="Weeks, newest first"></div>
         </figure>
         <details class="table-view">
           <summary>View as a table</summary>
@@ -180,18 +181,16 @@
   <aside class="viewer-panel">
     <h2 id="viewer-name"></h2>
     <p class="viewer-school" id="viewer-school"></p>
-    <dl class="facts" id="facts"></dl>
     <div class="viewer-actions">
       <div class="segmented dark" id="format" role="group" aria-label="Image size">
         <button type="button" data-format="post" aria-pressed="true">Post 4:5</button>
         <button type="button" data-format="story" aria-pressed="false">Story 9:16</button>
       </div>
-      <div class="viewer-buttons">
-        <button type="button" class="button primary" id="save">Save image</button>
-        <button type="button" class="button ghost" id="replay">Replay</button>
-      </div>
-      <p class="save-note" id="save-note" aria-live="polite">Hover the timeline, the bar or the 80% mark to see the numbers.</p>
+      <button type="button" class="button primary small" id="save">Save image</button>
+      <button type="button" class="button ghost small" id="replay">Replay</button>
     </div>
+    <p class="save-note" id="save-note" aria-live="polite"></p>
+    <div class="fact-groups" id="facts"></div>
     <details class="days">
       <summary>Day by day</summary>
       <table id="chapter-days"></table>
