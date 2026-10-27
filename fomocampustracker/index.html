@@ -9,8 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=16">
-<script src="/fomocampustracker/tracker.js?v=14" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=17">
+<script src="/fomocampustracker/tracker.js?v=15" defer></script>
 <!--
   /data, the fomo campus tracker: daily members and chapters added, member
   joins by day of the week, and a backdrop for every chapter (its
@@ -137,26 +137,54 @@
           </div>
           <div class="filters">
             <label class="search">
-              <span class="visually-hidden">Search chapters or schools</span>
-              <input id="search" type="search" placeholder="Search chapter or school" autocomplete="off" spellcheck="false">
+              <span class="visually-hidden">Search chapters, letters or schools</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m13.2 13.2 3.3 3.3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+              <input id="search" type="search" placeholder="Search chapter, letters or school" autocomplete="off" spellcheck="false">
+              <kbd aria-hidden="true">/</kbd>
             </label>
             <label class="select">
               <span class="visually-hidden">Sort</span>
               <select id="sort">
-                <option value="members">Most members</option>
-                <option value="week">Most this week</option>
-                <option value="progress">Furthest to 80%</option>
-                <option value="newest">Newest</option>
-                <option value="school">School A–Z</option>
+                <optgroup label="Members">
+                  <option value="members">Most members</option>
+                  <option value="week">Most this week</option>
+                  <option value="recent">Most recently active</option>
+                  <option value="dormant">Most dormant</option>
+                </optgroup>
+                <optgroup label="Progress">
+                  <option value="closest">Closest to 80%</option>
+                  <option value="progress">Highest % of roster</option>
+                  <option value="least">Lowest % of roster</option>
+                  <option value="roster">Biggest roster</option>
+                </optgroup>
+                <optgroup label="Registered">
+                  <option value="newest">Newest</option>
+                  <option value="oldest">Oldest</option>
+                </optgroup>
+                <optgroup label="Name">
+                  <option value="school">School A–Z</option>
+                  <option value="name">Chapter A–Z</option>
+                </optgroup>
               </select>
             </label>
-            <div class="segmented" id="type" role="group" aria-label="Chapter type">
-              <button type="button" data-type="all" aria-pressed="true">All</button>
-              <button type="button" data-type="Fraternity" aria-pressed="false">Fraternities</button>
-              <button type="button" data-type="Sorority" aria-pressed="false">Sororities</button>
-              <button type="button" data-type="other" aria-pressed="false">Other</button>
-            </div>
           </div>
+        </div>
+        <div class="filter-row">
+          <div class="segmented" id="type" role="group" aria-label="Chapter type">
+            <button type="button" data-type="all" aria-pressed="true">All types</button>
+            <button type="button" data-type="Fraternity" aria-pressed="false">Fraternities</button>
+            <button type="button" data-type="Sorority" aria-pressed="false">Sororities</button>
+            <button type="button" data-type="other" aria-pressed="false">Other</button>
+          </div>
+          <div class="segmented" id="status" role="group" aria-label="Status">
+            <button type="button" data-status="any" aria-pressed="true">Any status</button>
+            <button type="button" data-status="active" aria-pressed="false">Active this week <span class="n"></span></button>
+            <button type="button" data-status="quiet" aria-pressed="false">Quiet 7+ days <span class="n"></span></button>
+            <button type="button" data-status="none" aria-pressed="false">No members yet <span class="n"></span></button>
+            <button type="button" data-status="near" aria-pressed="false">Near 80% <span class="n"></span></button>
+            <button type="button" data-status="reached" aria-pressed="false">Reached 80% <span class="n"></span></button>
+          </div>
+          <button type="button" class="text-button clear-filters" id="clear-filters" hidden>Clear filters</button>
         </div>
         <div class="count-row">
           <p class="count" id="chapter-count" aria-live="polite"></p>

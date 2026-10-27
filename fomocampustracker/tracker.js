@@ -30,6 +30,8 @@
   var dayLabel = function (d, year) { return new Date(utc(d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: year ? 'numeric' : undefined, timeZone: 'UTC' }); };
   var nyDay = function (ms) { return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)); };
   var plural = function (n, one, many) { return num(n) + ' ' + (n === 1 ? one : many || one + 's'); };
+  // lower case, no accents or punctuation: "Washington & Lee" → "washington lee"
+  var searchText = function (s) { return String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
   var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   var weekdayOf = function (d) { return new Date(utc(d)).getUTCDay(); };
   var weekdayShort = function (d) { return WEEKDAYS[weekdayOf(d)].slice(0, 3); };
@@ -63,7 +65,7 @@
   // ---------- state ----------
   var data, today, series, chapters, list = [], shown = PAGE;
   // day: a day picked on the network chart, which filters the chapter grid
-  var state = { range: '7', mode: 'daily', metric: 'm', day: null, type: 'all', sort: 'members', query: '', format: 'post' };
+  var state = { range: '7', mode: 'daily', metric: 'm', day: null, type: 'all', status: 'any', sort: 'members', query: '', format: 'post' };
   // Backdrops open wide (16:9) on computers; phones keep the 4:5 post.
   if (matchMedia('(min-width: 901px)').matches) {
     state.format = 'web';
@@ -92,7 +94,14 @@
         if (x[0] >= weekStart) week += x[1];
         if (!best || x[1] > best[1]) best = x;
       });
-      return Object.assign({}, ch, { target: target, reachedOn: reachedOn, week: week, best: best, byDay: new Map(ch.days), search: (ch.name + ' ' + ch.letters + ' ' + ch.school + ' ' + ch.short).toLowerCase() });
+      // quiet: days since the last join (or since registering, with none yet)
+      var lastJoin = ch.days.length ? ch.days[ch.days.length - 1][0] : null;
+      return Object.assign({}, ch, {
+        target: target, reachedOn: reachedOn, week: week, best: best, byDay: new Map(ch.days),
+        lastJoin: lastJoin, quiet: Math.round((utc(today) - utc(lastJoin || ch.registered)) / 864e5),
+        pct: ch.active ? ch.joined / ch.active : 0, toGo: target ? Math.max(0, target - ch.joined) : Infinity,
+        search: ' ' + searchText(ch.name + ' ' + ch.letters + ' ' + ch.school + ' ' + ch.short + ' ' + ch.type) + ' '
+      });
     });
 
     $('lock-view').hidden = true;
@@ -133,7 +142,20 @@
   segmented('type', 'type', function () { shown = PAGE; renderGrid(); });
   segmented('format', 'format', function () { drawBackdrop(); });
   $('sort').addEventListener('change', function () { state.sort = this.value; shown = PAGE; renderGrid(); });
-  $('search').addEventListener('input', function () { state.query = this.value.trim().toLowerCase(); shown = PAGE; renderGrid(); });
+  segmented('status', 'status', function () { shown = PAGE; renderGrid(); });
+  $('search').addEventListener('input', function () { state.query = searchText(this.value); shown = PAGE; renderGrid(); });
+  $('clear-filters').addEventListener('click', function () {
+    state.query = ''; state.type = 'all'; state.status = 'any'; state.day = null; shown = PAGE;
+    $('search').value = '';
+    [['type', 'all'], ['status', 'any']].forEach(function (g) { $(g[0]).querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset[g[0]] === g[1])); }); });
+    renderGrid();
+  });
+  // "/" jumps to the chapter search
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || !data || $('viewer').open || e.target.closest('input, textarea, select')) return;
+    e.preventDefault();
+    $('search').focus();
+  });
   $('more').addEventListener('click', function () { shown += PAGE; renderGrid(); });
 
   // ---------- growth: stats ----------
@@ -481,26 +503,65 @@
   var SORTS = {
     members: function (a, b) { return b.joined - a.joined || a.name.localeCompare(b.name); },
     week: function (a, b) { return b.week - a.week || b.joined - a.joined; },
-    progress: function (a, b) { return (b.target ? b.joined / b.target : 0) - (a.target ? a.joined / a.target : 0) || b.joined - a.joined; },
+    recent: function (a, b) { return a.quiet - b.quiet || b.week - a.week || b.joined - a.joined; },
+    dormant: function (a, b) { return b.quiet - a.quiet || a.joined - b.joined; },
+    closest: function (a, b) { return (a.reachedOn ? 1 : 0) - (b.reachedOn ? 1 : 0) || a.toGo - b.toGo || b.joined - a.joined; },
+    progress: function (a, b) { return b.pct - a.pct || b.joined - a.joined; },
+    least: function (a, b) { return a.pct - b.pct || b.active - a.active; },
+    roster: function (a, b) { return b.active - a.active || b.joined - a.joined; },
     newest: function (a, b) { return b.registered.localeCompare(a.registered) || b.joined - a.joined; },
-    school: function (a, b) { return a.school.localeCompare(b.school) || b.joined - a.joined; }
+    oldest: function (a, b) { return a.registered.localeCompare(b.registered) || b.joined - a.joined; },
+    school: function (a, b) { return a.school.localeCompare(b.school) || b.joined - a.joined; },
+    name: function (a, b) { return a.name.localeCompare(b.name) || a.school.localeCompare(b.school); }
+  };
+  // Quiet = no joins in the last 7 days, the complement of "active this week".
+  var STATUS = {
+    any: function () { return true; },
+    active: function (c) { return c.week > 0; },
+    quiet: function (c) { return c.joined > 0 && c.quiet >= 7; },
+    none: function (c) { return c.joined === 0; },
+    near: function (c) { return !c.reachedOn && c.target > 0 && c.joined >= c.target * 0.75; },
+    reached: function (c) { return !!c.reachedOn; }
   };
   function renderGrid() {
-    var day = state.day;
+    var day = state.day, words = state.query ? state.query.split(' ') : [];
     var onDay = function (c) { return day.metric === 'c' ? c.registered === day.d : c.byDay.has(day.d); };
-    list = chapters.filter(function (c) {
+    // Type, day and search narrow the set; the status chips count within it.
+    var pool = chapters.filter(function (c) {
       if (state.type === 'other' ? c.type === 'Fraternity' || c.type === 'Sorority' : state.type !== 'all' && c.type !== state.type) return false;
       if (day && !onDay(c)) return false;
-      return !state.query || c.search.indexOf(state.query) >= 0;
-    }).sort(day && day.metric === 'm' ? function (a, b) { return b.byDay.get(day.d) - a.byDay.get(day.d) || SORTS[state.sort](a, b); } : SORTS[state.sort]);
+      return words.every(function (w) { return c.search.indexOf(w) >= 0; });
+    });
+    $('status').querySelectorAll('button').forEach(function (b) {
+      var n = b.querySelector('.n');
+      if (n) n.textContent = num(pool.filter(STATUS[b.dataset.status]).length);
+    });
+    list = pool.filter(STATUS[state.status]).sort(day && day.metric === 'm' ? function (a, b) { return b.byDay.get(day.d) - a.byDay.get(day.d) || SORTS[state.sort](a, b); } : SORTS[state.sort]);
     $('day-filter').hidden = !day;
     if (day) $('day-filter-text').textContent = (day.metric === 'c' ? 'Registered ' : 'Members joined ') + weekdayShort(day.d) + ', ' + dayLabel(day.d);
+    $('clear-filters').hidden = !(state.query || state.type !== 'all' || state.status !== 'any' || day);
     var grid = $('grid');
     $('chapter-count').textContent = list.length === chapters.length ? plural(chapters.length, 'chapter') : num(list.length) + ' of ' + plural(chapters.length, 'chapter') + ' match';
-    if (!list.length) { grid.replaceChildren(el('li', 'empty', 'No chapters match that search.')); $('more').hidden = true; return; }
+    if (!list.length) { grid.replaceChildren(el('li', 'empty', 'No chapters match these filters.')); $('more').hidden = true; return; }
     grid.replaceChildren.apply(grid, list.slice(0, shown).map(card));
     $('more').hidden = shown >= list.length;
     $('more').textContent = 'Show more (' + num(list.length - shown) + ' left)';
+  }
+  // The card's badge says what the current filter or sort is about.
+  function badgeFor(c) {
+    var dayJoins = state.day && state.day.metric === 'm' ? c.byDay.get(state.day.d) : 0;
+    if (dayJoins) return '+' + num(dayJoins) + ' on ' + dayLabel(state.day.d);
+    var ago = c.quiet === 0 ? 'today' : c.quiet === 1 ? 'yesterday' : c.quiet + 'd ago';
+    switch (state.status !== 'any' ? state.status : state.sort) {
+      case 'dormant': case 'quiet': return c.joined ? (c.quiet ? 'Quiet ' + c.quiet + 'd' : 'Joined today') : 'No members · ' + c.quiet + 'd';
+      case 'recent': case 'active': return c.lastJoin ? 'Joined ' + ago : 'No members yet';
+      case 'week': return c.week ? '+' + num(c.week) + ' this week' : 'None this week';
+      case 'closest': case 'near': return c.reachedOn ? '80% reached' : c.target ? num(c.toGo) + ' to go' : null;
+      case 'progress': case 'least': return c.active ? Math.round(c.pct * 100) + '% of roster' : null;
+      case 'roster': return num(c.active) + ' actives';
+      case 'none': case 'newest': case 'oldest': return 'Registered ' + dayLabel(c.registered);
+      default: return c.reachedOn ? '80% reached' : null;
+    }
   }
   function card(c) {
     var li = el('li'), b = el('button', 'card');
@@ -525,9 +586,8 @@
       top.append(logo);
     }
     b.append(top);
-    var dayJoins = state.day && state.day.metric === 'm' ? c.byDay.get(state.day.d) : 0;
-    if (dayJoins) b.append(el('span', 'badge', '+' + num(dayJoins) + ' on ' + dayLabel(state.day.d)));
-    else if (c.reachedOn) b.append(el('span', 'badge', '80% reached'));
+    var badge = badgeFor(c);
+    if (badge) b.append(el('span', 'badge', badge));
     b.append(meta);
     b.addEventListener('click', function () { openViewer(c.id); });
     li.append(b);
@@ -990,7 +1050,7 @@
     var c = chapters.find(function (x) { return x.id === id; });
     if (!c) return;
     current = c;
-    if (list.indexOf(c) < 0) { state.query = ''; $('search').value = ''; state.type = 'all'; state.day = null; renderGrid(); }
+    if (list.indexOf(c) < 0) $('clear-filters').click(); // a linked chapter hidden by filters
     var viewer = $('viewer');
     $('viewer-name').textContent = c.name;
     var school = $('viewer-school');
