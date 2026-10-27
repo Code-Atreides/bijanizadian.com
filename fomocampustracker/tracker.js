@@ -565,9 +565,9 @@
   // serializes the same SVG, with the fonts and the logo inlined, to a PNG.
   var LOGO_V = 2; // bump when the logo files change; images are cached a day
   var LAYOUT = {
-    web: { W: 1920, H: 1080, pad: 96, top: 80, bottom: 80, mark: 40, letters: 230, name: 60, school: 34, big: 140, gap: 60, wide: true, col: 790, chartGap: 110 },
-    post: { W: 1080, H: 1350, pad: 84, top: 84, bottom: 84, mark: 36, lead: 92, letters: 220, name: 58, school: 32, big: 132, gap: 70 },
-    story: { W: 1080, H: 1920, pad: 84, top: 210, bottom: 230, mark: 36, lead: 130, letters: 270, name: 70, school: 38, big: 160, gap: 100 }
+    web: { W: 1920, H: 1080, m: 112, top: 92, bottom: 92, mark: 40, wide: true, col: 740, gutter: 96, letters: 210, name: 60, big: 140, pad: 44 },
+    post: { W: 1080, H: 1350, m: 84, top: 84, bottom: 84, mark: 36, letters: 200, name: 56, big: 128, pad: 36 },
+    story: { W: 1080, H: 1920, m: 84, top: 210, bottom: 230, mark: 36, letters: 250, name: 66, big: 156, pad: 40, facts: true }
   };
   var WHITE = '#ffffff', SOFT = 'rgba(234,237,255,.78)', FAINT = 'rgba(234,237,255,.6)';
   var FONT = 'Aeonik, "Schibsted Grotesk", Arial, sans-serif';
@@ -617,10 +617,25 @@
   var rgbText = function (c) { return 'rgb(' + c.map(Math.round).join(',') + ')'; };
   var weekdayDay = function (d) { return new Date(utc(d)).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' }); };
 
+  // Small tracked capitals in light blue label everything; values are white.
+  var LIGHT = '#acb8f9';
+  function clip(value, weight, size, track, maxW) {
+    var t = value;
+    if (textWidth(t, weight, size, track) <= maxW) return t;
+    while (t && textWidth(t + '…', weight, size, track) > maxW) t = t.slice(0, -1);
+    return t.replace(/[\s·-]+$/, '') + '…';
+  }
+  function eyebrow(parent, x, y, value, size, maxW, anchor) {
+    return text(parent, x, y, clip(value.toUpperCase(), 500, size, size * 0.14, maxW), size, 500, LIGHT, { track: size * 0.14, anchor: anchor });
+  }
+  function glass(parent, x, y, w, h, r) {
+    parent.append(svg('rect', { x: x, y: y, width: w, height: h, rx: r, fill: 'rgba(255,255,255,.045)', stroke: 'rgba(234,237,255,.14)', 'stroke-width': 1.5 }));
+  }
+
   // logo: { href, w, h } or null. inline: { fonts } for the exported copy.
   function buildBackdrop(c, format, logo, inline) {
-    var L = LAYOUT[format], W = L.W, H = L.H, PAD = L.pad;
-    var colW = L.wide ? L.col : W - PAD * 2, colR = PAD + colW; // the text column
+    var L = LAYOUT[format], W = L.W, H = L.H, M = L.m;
+    var colW = L.wide ? L.col : W - M * 2, colR = M + colW; // the text column
     var root = svg('svg', { xmlns: SVG, viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, class: 'bd' });
     var defs = svg('defs', {});
     root.append(defs);
@@ -642,149 +657,151 @@
     defs.append(pattern);
     root.append(svg('rect', { width: W, height: H, fill: 'url(#bd-grain)' }));
 
-    // lockup + season
-    var markH = L.mark, s = markH / 113, top = L.top, headerBottom = top + markH, foot = H - L.bottom;
-    var mark = svg('g', { transform: 'translate(' + PAD + ' ' + top + ') scale(' + s + ')', fill: WHITE });
+    // header: lockup, and the season as a pill
+    var markH = L.mark, s = markH / 113, top = L.top, headerBottom = top + markH;
+    var mark = svg('g', { transform: 'translate(' + M + ' ' + top + ') scale(' + s + ')', fill: WHITE });
     WORDMARK.forEach(function (d) { mark.append(svg('path', { d: d })); });
     root.append(mark);
-    text(root, PAD + 352 * s + 10, top + markH - 1, '/campus', markH + 2, 400, FAINT, { track: -1 });
-    text(root, W - PAD, top + markH - 4, 'Greek Wars · Fall 2026', L.wide ? 30 : 27, 500, SOFT, { anchor: 'end' });
+    text(root, M + 352 * s + 10, top + markH - 1, '/campus', markH + 2, 400, FAINT, { track: -1 });
+    var season = 'GREEK WARS · FALL 2026', ss = L.wide ? 19 : 17, pillH = markH + 6;
+    var pillW = textWidth(season, 500, ss, ss * 0.14) + 48, pillX = W - M - pillW;
+    root.append(svg('rect', { x: pillX, y: top + markH / 2 - pillH / 2, width: pillW, height: pillH, rx: pillH / 2, fill: 'rgba(255,255,255,.06)', stroke: 'rgba(234,237,255,.22)', 'stroke-width': 1.5 }));
+    text(root, pillX + 24, top + markH / 2 + ss * 0.36, season, ss, 500, SOFT, { track: ss * 0.14 });
 
-    // The text column is built from y = 0, then moved into place: below the
-    // header on post and story, centred between header and footer on web.
-    var col = svg('g', {});
-    root.append(col);
-    var y = 0;
-    var logoW = logo ? Math.round(colW * 0.34) : 0;
-    var ls = fit(c.letters, 700, L.letters, colW - (logo ? logoW + 44 : 0), 80);
-    var capH = ascent('H', 700, ls);
-    y += ascent(c.letters, 700, ls);
-    text(col, PAD - ls * 0.03, y, c.letters, ls, 700, WHITE, { track: -ls * 0.03 });
-    if (logo) {
-      var k = Math.min(logoW / logo.w, capH * 1.4 / logo.h), lw = logo.w * k, lh = logo.h * k;
-      var img = svg('image', { x: colR - lw, y: y - capH / 2 - lh / 2, width: lw, height: lh, class: 'bd-logo' });
-      img.setAttribute('href', logo.href);
-      col.append(img);
-    }
-
-    // name and school
-    y += L.name * 0.72 + 42;
-    wrap(c.name, 500, L.name, colW, 2).forEach(function (line, i) {
-      if (i) y += L.name * 1.12;
-      text(col, PAD, y, line, L.name, 500, WHITE, { track: -1.5 });
-    });
-    y += L.school * 1.45;
-    text(col, PAD, y, wrap(c.school, 400, L.school, colW, 1)[0], L.school, 400, SOFT, { track: -0.4 });
-
-    // progress
-    y += L.gap + ascent('0', 700, L.big);
-    var bigW = textWidth(num(c.joined), 700, L.big, -L.big * 0.03);
-    text(col, PAD - L.big * 0.02, y, num(c.joined), L.big, 700, WHITE, { track: -L.big * 0.03, cls: 'bd-count', to: c.joined });
-    text(col, PAD + bigW + 26, y - L.big * 0.36, c.joined === 1 ? 'member joined' : 'members joined', L.school + 2, 500, WHITE);
-    text(col, PAD + bigW + 26, y - 2, 'of ' + num(c.active) + ' actives', L.school, 400, SOFT);
-    y += 36;
-    var barH = 14, pct = c.active ? Math.min(1, c.joined / c.active) : 0, barY = y;
-    col.append(svg('rect', { x: PAD, y: barY, width: colW, height: barH, rx: barH / 2, fill: 'rgba(234,237,255,.2)' }));
-    if (pct > 0) col.append(svg('rect', { class: 'bd-fill', x: PAD, y: barY, width: Math.max(barH, colW * pct), height: barH, rx: barH / 2, fill: WHITE }));
-    if (c.target) col.append(svg('rect', { class: 'bd-tick', x: PAD + colW * 0.8 - 1.5, y: barY - 9, width: 3, height: barH + 18, rx: 1.5, fill: c.joined >= c.target ? 'rgba(11,9,31,.6)' : 'rgba(234,237,255,.92)' }));
-    y += barH + 46;
-    var status = !c.target ? '' : c.reachedOn ? '80% reached ' + dayLabel(c.reachedOn) : num(c.target - c.joined) + ' to go to 80% (' + num(c.target) + ')';
-    text(col, PAD, y, status, 30, 500, WHITE);
-    if (c.active) text(col, colR, y, Math.round(c.joined / c.active * 100) + '% of roster', 28, 400, SOFT, { anchor: 'end' });
-
-    // web only: three facts under the progress, using the column's width
+    var foot = H - L.bottom, bodyTop = headerBottom + (L.wide ? 80 : 72), bodyBottom = foot - 56;
     var lastJoin = c.days.length ? c.days[c.days.length - 1][0] : null, lastLabelled = false;
-    if (L.wide) {
+    var factsH = L.wide || L.facts ? 132 : 0;
+
+    // The column: school, letters with the logo, name, then the count and
+    // progress. On web the letters shrink if a long name would crowd the facts.
+    var nameLines = wrap(c.name, 500, L.name, colW, 2), bigCap = ascent('0', 700, L.big);
+    var plan = function (ls) {
+      var p = { eyebrow: bodyTop + 15 };
+      p.letters = p.eyebrow + 46 + ascent(c.letters, 700, ls);
+      p.name = p.letters + 36 + L.name * 0.72;
+      p.big = p.name + (nameLines.length - 1) * L.name * 1.12 + 64 + bigCap;
+      p.bar = p.big + 40;
+      p.status = p.bar + 12 + 50;
+      return p;
+    };
+    var logoW = logo ? Math.round(colW * 0.32) : 0;
+    var ls = fit(c.letters, 700, L.letters, colW - (logo ? logoW + 48 : 0), 80), P = plan(ls);
+    var factsY = L.wide ? bodyBottom - factsH : P.status + 56;
+    while (L.wide && P.status > factsY - 48 && ls > 120) { ls -= 8; P = plan(ls); }
+
+    eyebrow(root, M, P.eyebrow, c.school + (c.type ? ' · ' + c.type : ''), L.wide ? 20 : 18, colW);
+    text(root, M - ls * 0.03, P.letters, c.letters, ls, 700, WHITE, { track: -ls * 0.035 });
+    if (logo) {
+      var capH = ascent('H', 700, ls), k = Math.min(logoW / logo.w, capH * 1.35 / logo.h), lw = logo.w * k, lh = logo.h * k;
+      var img = svg('image', { x: colR - lw, y: P.letters - capH / 2 - lh / 2, width: lw, height: lh, class: 'bd-logo' });
+      img.setAttribute('href', logo.href);
+      root.append(img);
+    }
+    nameLines.forEach(function (line, i) { text(root, M, P.name + i * L.name * 1.12, line, L.name, 500, WHITE, { track: -L.name * 0.025 }); });
+
+    var bigW = textWidth(num(c.joined), 700, L.big, -L.big * 0.035);
+    text(root, M - L.big * 0.02, P.big, num(c.joined), L.big, 700, WHITE, { track: -L.big * 0.035, cls: 'bd-count', to: c.joined });
+    text(root, M + bigW + 28, P.big - bigCap * 0.52, c.joined === 1 ? 'member joined' : 'members joined', L.wide ? 34 : 32, 500, WHITE, { track: -0.5 });
+    text(root, M + bigW + 28, P.big - 2, 'of ' + num(c.active) + ' actives', L.wide ? 30 : 28, 400, SOFT, { track: -0.3 });
+    var barH = 12, pct = c.active ? Math.min(1, c.joined / c.active) : 0;
+    root.append(svg('rect', { x: M, y: P.bar, width: colW, height: barH, rx: barH / 2, fill: 'rgba(234,237,255,.16)' }));
+    if (pct > 0) root.append(svg('rect', { class: 'bd-fill', x: M, y: P.bar, width: Math.max(barH, colW * pct), height: barH, rx: barH / 2, fill: WHITE }));
+    if (c.target) root.append(svg('rect', { class: 'bd-tick', x: M + colW * 0.8 - 1.5, y: P.bar - 9, width: 3, height: barH + 18, rx: 1.5, fill: c.joined >= c.target ? 'rgba(11,9,31,.6)' : 'rgba(234,237,255,.92)' }));
+    var status = !c.target ? '' : c.reachedOn ? '80% reached ' + dayLabel(c.reachedOn) : num(c.target - c.joined) + ' to go to 80% (' + num(c.target) + ')';
+    text(root, M, P.status, status, 28, 500, WHITE, { track: -0.3 });
+    if (c.active) text(root, colR, P.status, Math.round(c.joined / c.active * 100) + '% of roster', 26, 400, SOFT, { anchor: 'end' });
+
+    // facts card (web, story): three cells divided by hairlines
+    if (factsH) {
       var facts = [
         ['Registered', dayLabel(c.registered)],
         ['Last join', !lastJoin ? '—' : lastJoin === today ? 'Today' : dayLabel(lastJoin)],
         ['Rank nationally', '#' + num(1 + chapters.filter(function (x) { return x.joined > c.joined; }).length) + ' of ' + num(chapters.length)]
       ];
-      y += 54;
-      col.append(svg('rect', { x: PAD, y: y, width: colW, height: 2, fill: 'rgba(234,237,255,.18)' }));
-      y += 50;
+      glass(root, M, factsY, colW, factsH, 24);
       facts.forEach(function (f, i) {
-        var fx = PAD + i * colW / 3;
-        text(col, fx, y, f[0], 24, 400, SOFT);
-        text(col, fx, y + 48, f[1], 38, 500, WHITE, { track: -0.6 });
+        var fx = M + i * colW / 3;
+        if (i) root.append(svg('rect', { x: fx, y: factsY + 30, width: 1.5, height: factsH - 60, fill: 'rgba(234,237,255,.14)' }));
+        eyebrow(root, fx + 32, factsY + 52, f[0], 16, colW / 3 - 48);
+        text(root, fx + 32, factsY + 100, f[1], 36, 500, WHITE, { track: -0.6 });
       });
-      y += 48;
     }
-    var offset = L.wide ? Math.round(headerBottom + (foot - 30 - headerBottom - y) / 2) : headerBottom + L.lead;
-    col.setAttribute('transform', 'translate(0 ' + offset + ')');
 
-    // timeline, scaled to the active roster: the line's height is the share of
-    // the roster that has joined (members beyond the roster raise the top)
-    var axisY = foot - 58;
-    var cx = L.wide ? colR + L.chartGap : PAD, cw = W - PAD - cx, cr = cx + cw;
-    var chartTop = L.wide ? headerBottom + 132 : offset + y + L.gap + 40, chartBottom = axisY - 40, ch = chartBottom - chartTop;
+    // timeline card, scaled to the active roster: the line's height is the
+    // share of the roster that has joined (members beyond it raise the top)
+    var cardX = L.wide ? colR + L.gutter : M, cardY = L.wide ? bodyTop - 15 : (factsH ? factsY + factsH : P.status) + 44;
+    var cardW = W - M - cardX, cardH = bodyBottom - cardY, pad = L.pad;
+    glass(root, cardX, cardY, cardW, cardH, 28);
+    var cx = cardX + pad, cw = cardW - pad * 2, cr = cx + cw;
+    var titleY = cardY + pad + 14, axisY = cardY + cardH - pad + 4;
+    var chartTop = titleY + 52, chartBottom = axisY - 42, ch = chartBottom - chartTop;
     var first = c.days.length && c.days[0][0] < c.registered ? c.days[0][0] : c.registered;
     var byDay = new Map(c.days), pts = [{ i: 0, d: null, v: 0, add: 0 }], total = 0, n = 0;
     for (var d = first; d <= today; d = addDays(d, 1)) { var add = byDay.get(d) || 0; total += add; n++; pts.push({ i: n, d: d, v: total, add: add }); }
     var topV = Math.max(c.active || 0, total, 1);
     var X = function (i) { return cx + i / n * cw; }, Y = function (v) { return chartBottom - v / topV * ch; };
-    text(root, cx, chartTop - 30, 'Members since registering', 26, 500, SOFT);
+    eyebrow(root, cx, titleY, 'Members since registering', L.wide ? 18 : 16, cw * 0.48);
     // Roster and 80% lines, keyed in the title row so their labels never meet the data.
     var refs = [], keyX = cr;
     var reference = function (label, alpha, value) {
-      var w = textWidth(label, 400, 25), ly = Math.round(Y(value));
-      text(root, keyX, chartTop - 30, label, 25, 400, SOFT, { anchor: 'end' });
-      root.append(svg('rect', { x: keyX - w - 44, y: chartTop - 39, width: 30, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
+      var w = textWidth(label, 400, 22), ly = Math.round(Y(value));
+      text(root, keyX, titleY, label, 22, 400, SOFT, { anchor: 'end' });
+      root.append(svg('rect', { x: keyX - w - 40, y: titleY - 8, width: 26, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
       root.append(svg('rect', { x: cx, y: ly - 1, width: cw, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
       refs.push(ly);
-      keyX -= w + 44 + 34;
+      keyX -= w + 40 + 30;
     };
-    if (c.active) reference('Roster · ' + num(c.active), 0.3, c.active);
-    if (c.target) reference('80% · ' + num(c.target), 0.55, c.target);
+    if (c.active) reference('Roster · ' + num(c.active), 0.26, c.active);
+    if (c.target) reference('80% · ' + num(c.target), 0.5, c.target);
     // A label sits above its point unless that crosses a line or leaves the chart.
     var labelY = function (v, cap) {
       var y = Y(v), top = y - 26 - cap;
       var blocked = top < chartTop - 6 || refs.some(function (r) { return r > top - 6 && r < y - 10; });
       return blocked ? y + 26 + cap : y - 26;
     };
-    root.append(svg('rect', { x: cx, y: chartBottom, width: cw, height: 2, fill: 'rgba(234,237,255,.25)' }));
+    root.append(svg('rect', { x: cx, y: chartBottom, width: cw, height: 2, fill: 'rgba(234,237,255,.22)' }));
     if (!total) {
-      text(root, cx + cw / 2, chartTop + ch / 2, 'First members coming soon', 30, 400, SOFT, { anchor: 'middle' });
+      text(root, cx + cw / 2, chartTop + ch / 2, 'First members coming soon', 28, 400, SOFT, { anchor: 'middle' });
     } else {
       var area = svg('linearGradient', { id: 'bd-area', x1: 0, y1: 0, x2: 0, y2: 1 });
-      area.append(svg('stop', { offset: 0, 'stop-color': WHITE, 'stop-opacity': 0.26 }), svg('stop', { offset: 1, 'stop-color': WHITE, 'stop-opacity': 0 }));
+      area.append(svg('stop', { offset: 0, 'stop-color': WHITE, 'stop-opacity': 0.24 }), svg('stop', { offset: 1, 'stop-color': WHITE, 'stop-opacity': 0 }));
       defs.append(area);
       var line = pts.map(function (p) { return X(p.i).toFixed(1) + ',' + Y(p.v).toFixed(1); }).join(' L');
       root.append(svg('path', { class: 'bd-area', d: 'M' + line + ' L' + X(n) + ',' + chartBottom + ' L' + X(0) + ',' + chartBottom + 'Z', fill: 'url(#bd-area)' }));
-      root.append(svg('path', { class: 'bd-line', d: 'M' + line, fill: 'none', stroke: WHITE, 'stroke-width': 5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      root.append(svg('path', { class: 'bd-line', d: 'M' + line, fill: 'none', stroke: WHITE, 'stroke-width': 4.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
       var marker = function (p) {
         var g = svg('g', { class: 'bd-end' });
-        g.append(svg('circle', { cx: X(p.i), cy: Y(p.v), r: 11, fill: rgbText(INK) }), svg('circle', { cx: X(p.i), cy: Y(p.v), r: 7, fill: WHITE }));
+        g.append(svg('circle', { cx: X(p.i), cy: Y(p.v), r: 10, fill: rgbText(INK) }), svg('circle', { cx: X(p.i), cy: Y(p.v), r: 6.5, fill: WHITE }));
         root.append(g);
       };
       var reached = c.reachedOn ? pts.find(function (p) { return p.d === c.reachedOn; }) : null;
       if (reached && reached.i < n) marker(reached);
       marker(pts[n]);
-      text(root, X(n) - 4, labelY(total, 30), num(total), 40, 700, WHITE, { anchor: 'end', cls: 'bd-end', to: total });
+      text(root, X(n) - 2, labelY(total, 31), num(total), 44, 700, WHITE, { anchor: 'end', cls: 'bd-end', to: total, track: -1 });
       // The last join is marked on the line, labelled where it clears the total.
       var lastPt = lastJoin ? pts.find(function (p) { return p.d === lastJoin; }) : null;
       if (lastPt && lastPt.i < n) {
         if (lastPt !== reached) marker(lastPt);
-        var label = 'Last join ' + dayLabel(lastJoin), lw2 = textWidth(label, 500, 26), lx = X(lastPt.i);
-        var left = Math.max(cx, lx - lw2 / 2), clear = X(n) - textWidth(num(total), 700, 40) - 60;
+        var label = 'Last join ' + dayLabel(lastJoin), lw2 = textWidth(label, 500, 24), lx = X(lastPt.i);
+        var left = Math.max(cx, lx - lw2 / 2), clear = X(n) - textWidth(num(total), 700, 44) - 60;
         if (left + lw2 < clear) {
-          text(root, left, labelY(lastPt.v, 19), label, 26, 500, WHITE, { cls: 'bd-end' });
+          text(root, left, labelY(lastPt.v, 18), label, 24, 500, WHITE, { cls: 'bd-end' });
           lastLabelled = true;
         }
       }
     }
-    text(root, cx, axisY, 'Registered ' + dayLabel(c.registered), 26, 400, SOFT);
+    text(root, cx, axisY, 'Registered ' + dayLabel(c.registered), 22, 400, SOFT);
     var axisRight = lastJoin === today ? 'Last join today' : lastJoin && !lastLabelled ? 'Last join ' + dayLabel(lastJoin) : 'Today';
-    text(root, cr, axisY, axisRight + (n > 1 ? ' · day ' + num(n) : ''), 26, 400, SOFT, { anchor: 'end' });
+    text(root, cr, axisY, axisRight + (n > 1 ? ' · day ' + num(n) : ''), 22, 400, SOFT, { anchor: 'end' });
 
     // footer
-    text(root, PAD, foot, 'fomocampus.com', 26, 400, FAINT);
-    text(root, W - PAD, foot, 'Updated ' + dayLabel(today, true), 26, 400, FAINT, { anchor: 'end' });
+    text(root, M, foot, 'fomocampus.com', 22, 400, FAINT, { track: 0.2 });
+    text(root, W - M, foot, 'Updated ' + dayLabel(today, true), 22, 400, FAINT, { anchor: 'end', track: 0.2 });
 
     return {
       root: root, c: c, total: total, pts: pts, n: n, X: X, Y: Y,
       chart: { x: cx, y: chartTop, w: cw, h: ch, bottom: chartBottom },
-      bar: { x: PAD, y: offset + barY, w: colW, h: barH }
+      bar: { x: M, y: P.bar, w: colW, h: barH }
     };
   }
 
@@ -801,9 +818,10 @@
       lines.slice(2).forEach(function (l) { if (l) tip.append(el('span', null, l)); });
       tip.hidden = false;
       var w = tip.offsetWidth, h = tip.offsetHeight;
-      if (side) {
-        tip.style.left = (x + 24 + w > innerWidth - 10 ? x - w - 24 : x + 24) + 'px';
-        tip.style.top = Math.max(10, Math.min(innerHeight - h - 10, y - h / 2)) + 'px';
+      if (side) { // beside the point, flipped so it stays on the backdrop
+        var box = root.getBoundingClientRect();
+        tip.style.left = (x + 24 + w > box.right - 12 ? x - w - 24 : x + 24) + 'px';
+        tip.style.top = Math.max(box.top + 12, Math.min(box.bottom - h - 12, y - h / 2)) + 'px';
         return;
       }
       tip.style.left = Math.max(10, Math.min(innerWidth - w - 10, x - w / 2)) + 'px';
@@ -814,9 +832,10 @@
 
     // timeline: a crosshair snaps to each day
     var hover = svg('g', { class: 'bd-hover', visibility: 'hidden' });
-    var cross = svg('line', { y1: meta.chart.y - 8, y2: meta.chart.bottom, stroke: 'rgba(255,255,255,.55)', 'stroke-width': 2 });
-    var ring = svg('circle', { r: 15, fill: rgbText(INK), stroke: WHITE, 'stroke-width': 5 });
-    hover.append(cross, ring);
+    var cross = svg('line', { y1: meta.chart.y - 8, y2: meta.chart.bottom, stroke: 'rgba(255,255,255,.45)', 'stroke-width': 1.5 });
+    var halo = svg('circle', { r: 26, fill: WHITE, 'fill-opacity': 0.14 });
+    var ring = svg('circle', { r: 12, fill: rgbText(INK), stroke: WHITE, 'stroke-width': 4 });
+    hover.append(cross, halo, ring);
     root.append(hover);
     var active = meta.n;
     function showDay(i) {
@@ -824,6 +843,7 @@
       var p = meta.pts[i], x = meta.X(i), y = meta.Y(p.v);
       cross.setAttribute('x1', x); cross.setAttribute('x2', x);
       ring.setAttribute('cx', x); ring.setAttribute('cy', y);
+      halo.setAttribute('cx', x); halo.setAttribute('cy', y);
       hover.setAttribute('visibility', 'visible');
       var at = toScreen(x, y);
       show([weekdayDay(p.d) + (p.d === today ? ' · today so far' : ''), '+' + num(p.add) + ' joined',
