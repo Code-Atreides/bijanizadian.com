@@ -121,7 +121,11 @@ td { color: var(--ink); font-weight: 400; }
 .grid { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
 .card { position: relative; display: flex; flex-direction: column; justify-content: space-between; width: 100%; aspect-ratio: 4 / 3; padding: 14px 16px 15px; border: 0; border-radius: 14px; color: #fff; text-align: left; overflow: hidden; background-color: #0b091f; isolation: isolate; transition: transform .18s ease, box-shadow .18s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -18px rgba(11,9,31,.6); }
-.card .letters { font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+.card .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.card .letters { font-size: 44px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card .letters.long { font-size: 32px; letter-spacing: -1px; padding-top: 6px; }
+.card .logo { flex: none; width: 44px; height: 44px; border-radius: 11px; overflow: hidden; background: rgba(255,255,255,.9); box-shadow: 0 8px 18px -10px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.22); }
+.card .logo img { display: block; width: 100%; height: 100%; }
 .card .meta { display: grid; gap: 2px; min-width: 0; }
 .card .name { font-size: 16px; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .card .school { font-size: 12.5px; color: rgba(234,237,255,.78); font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -129,7 +133,7 @@ td { color: var(--ink); font-weight: 400; }
 .card .track { flex: 1; height: 4px; border-radius: 2px; background: rgba(234,237,255,.22); position: relative; }
 .card .track b { position: absolute; inset: 0 auto 0 0; border-radius: 2px; background: #fff; }
 .card .track i { position: absolute; top: -3px; bottom: -3px; left: 80%; width: 1px; background: rgba(234,237,255,.7); }
-.card .badge { position: absolute; top: 14px; right: 14px; font-size: 11.5px; padding: 3px 8px; border-radius: 999px; background: rgba(11,9,31,.4); border: 1px solid rgba(234,237,255,.35); color: #fff; backdrop-filter: blur(6px); }
+.card .badge { align-self: flex-start; margin: 8px 0 auto; font-size: 11.5px; padding: 3px 8px; border-radius: 999px; background: rgba(11,9,31,.4); border: 1px solid rgba(234,237,255,.35); color: #fff; backdrop-filter: blur(6px); }
 .more { display: flex; margin: 18px auto 0; }
 .empty { grid-column: 1 / -1; padding: 40px 0; text-align: center; color: var(--muted); font-weight: 400; }
 
@@ -198,7 +202,9 @@ td { color: var(--ink); font-weight: 400; }
   .card { aspect-ratio: 4 / 5; padding: 12px; }
   .card .letters { font-size: 34px; }
   .card .name { font-size: 14px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .card .badge { position: static; align-self: flex-start; margin: 8px 0 auto; font-size: 11px; }
+  .card .letters.long { font-size: 24px; }
+  .card .logo { width: 36px; height: 36px; border-radius: 9px; }
+  .card .badge { font-size: 11px; }
   .lock-card { padding: 24px; }
 }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }

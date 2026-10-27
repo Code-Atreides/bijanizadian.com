@@ -117,6 +117,13 @@ const colorOf = new Map();
 for (const i of identities) for (const n of [i.name, ...(i.aliases || [])]) colorOf.set(norm(n), [i.primary, i.secondary]);
 for (const [n, c] of Object.entries(JSON.parse(fs.readFileSync(path.join(root, 'scripts/campus-tracker-school-colors.json'), 'utf8')).schools)) if (!colorOf.has(norm(n))) colorOf.set(norm(n), c);
 
+// School logo chips (128px WebP, background baked in) live in
+// fomocampustracker/logos/<school slug>.webp; schools without one show none.
+// They were made from Greek Village's school logos, then each remaining
+// school's Wikipedia infobox logo (athletics mark first), rendered in Chrome.
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const hasLogo = school => fs.existsSync(path.join(root, 'fomocampustracker/logos', `${slug(school)}.webp`));
+
 // ---------- merge ----------
 // Greek letters become Latin initials, as Greek Village shows them.
 const LATIN = 'ABGDEZHTIKLMNXOPR STUPCPO';
@@ -130,17 +137,18 @@ const dayGap = (c, r) => Math.abs(Date.parse(c.registered) - Date.parse(nyDay(r.
 const nearest = (c, rs) => rs.length ? rs.reduce((a, b) => dayGap(c, a) <= dayGap(c, b) ? a : b) : null;
 for (const c of feed.chapters) claim(c, rs => rs.length === 1 ? rs[0] : nearest(c, rs.filter(r => r.members === c.joined)));
 for (const c of feed.chapters) if (!pairs.has(c)) claim(c, rs => nearest(c, rs));
-const noColor = new Set(), notInAdmin = [], mismatched = [];
+const noColor = new Set(), noLogo = new Set(), notInAdmin = [], mismatched = [];
 const chapters = feed.chapters.map(c => {
   const r = pairs.get(c), days = r ? r.days : new Map();
   if (!r) notInAdmin.push(`${c.name} · ${c.school}`);
   else if (r.members !== c.joined) mismatched.push(`${c.name} · ${c.school}: eyes ${c.joined}, admin ${r.members}`);
   const colors = colorOf.get(norm(c.school)); if (!colors) noColor.add(c.school);
+  const logo = hasLogo(c.school) ? slug(c.school) : null; if (!logo) noLogo.add(c.school);
   return {
     id: c.id, name: c.name, letters: latin(c.letters), school: c.school, short: c.shortSchool, type: c.type,
     joined: c.joined, active: c.active, registered: r ? nyDay(r.created) : c.registered,
     days: [...days].sort(([a], [b]) => a.localeCompare(b)),
-    colors: colors || null
+    colors: colors || null, logo
   };
 });
 const adminOnly = [...unclaimed.values()].flat();
@@ -162,6 +170,7 @@ if (notInAdmin.length) console.log(`In eyes but not the admin (${notInAdmin.leng
 if (adminOnly.length) console.log(`In the admin but not eyes (${adminOnly.length}): ${adminOnly.map(r => `${r.name} · ${r.school}`).join('; ')}`);
 if (mismatched.length) console.log(`Member counts differ (${mismatched.length}): ${mismatched.slice(0, 12).join('; ')}`);
 if (noColor.size) console.log(`No school colors yet (fomo colors only): ${[...noColor].join('; ')}`);
+if (noLogo.size) console.log(`No school logo yet: ${[...noLogo].join('; ')}`);
 
 // ---------- encrypt ----------
 const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));

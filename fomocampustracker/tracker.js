@@ -312,7 +312,16 @@
     progress.append(track, el('span', null, num(c.joined) + ' / ' + num(c.active)));
     var meta = el('span', 'meta');
     meta.append(el('span', 'name', c.name), el('span', 'school', c.short || c.school), progress);
-    b.append(el('span', 'letters', c.letters));
+    var top = el('span', 'top');
+    top.append(el('span', 'letters' + (c.letters.length > 4 ? ' long' : ''), c.letters));
+    if (c.logo) {
+      var logo = el('span', 'logo'), img = el('img');
+      img.src = '/fomocampustracker/logos/' + c.logo + '.webp';
+      img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+      logo.append(img);
+      top.append(logo);
+    }
+    b.append(top);
     if (c.reachedOn) b.append(el('span', 'badge', '80% reached'));
     b.append(meta);
     b.addEventListener('click', function () { openViewer(c.id); });
