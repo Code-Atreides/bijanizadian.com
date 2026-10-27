@@ -120,6 +120,15 @@
   segmented('range', 'range', renderGrowth);
   segmented('mode', 'mode', renderGrowth);
   segmented('metric', 'metric', renderGrowth);
+  // The chart sections start closed; Show opens one and draws it at its real size.
+  document.querySelectorAll('[data-reveal]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var body = $(b.getAttribute('aria-controls')), open = body.hidden;
+      body.hidden = !open;
+      b.setAttribute('aria-expanded', String(open));
+      if (open) drawCharts();
+    });
+  });
   $('day-filter-clear').addEventListener('click', function () { state.day = null; shown = PAGE; renderGrid(); });
   segmented('type', 'type', function () { shown = PAGE; renderGrid(); });
   segmented('format', 'format', function () { drawBackdrop(); });

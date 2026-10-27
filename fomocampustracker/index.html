@@ -9,8 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=13">
-<script src="/fomocampustracker/tracker.js?v=12" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=16">
+<script src="/fomocampustracker/tracker.js?v=14" defer></script>
 <!--
   /data, the fomo campus tracker: daily members and chapters added, member
   joins by day of the week, and a backdrop for every chapter (its
@@ -80,47 +80,53 @@
 
         <div class="stats" id="stats"></div>
 
-        <figure class="chart-card network" id="chart-network">
-          <div class="network-head">
-            <div class="filters">
-              <div class="segmented" id="metric" role="group" aria-label="Chart data">
-                <button type="button" data-metric="m" aria-pressed="true">Members</button>
-                <button type="button" data-metric="c" aria-pressed="false">Chapters</button>
-              </div>
-              <div class="segmented" id="mode" role="group" aria-label="Chart values">
-                <button type="button" data-mode="daily" aria-pressed="true">Daily additions</button>
-                <button type="button" data-mode="total" aria-pressed="false">Network growth</button>
-              </div>
-            </div>
-            <span class="network-hint">Hover to inspect · click a day to filter chapters</span>
-          </div>
-          <p class="network-total"><strong id="network-total"></strong><span id="network-label"></span></p>
-          <div class="chart" data-chart></div>
-          <div class="network-foot"><span id="network-from"></span><span id="network-caption"></span><span id="network-to"></span></div>
-        </figure>
-        <details class="table-view">
-          <summary>View as a table</summary>
-          <div class="table-scroll"><table id="day-table"></table></div>
-        </details>
-      </section>
-
-      <section class="section weekly" aria-labelledby="weekly-title">
-        <div class="section-head">
-          <div>
-            <h2 id="weekly-title">Weekly rhythm</h2>
-            <p class="lede">Member joins on each day of the week, one line per week, New York time. Every week that touches the date range above is shown.</p>
-          </div>
+        <!-- The page leads with the chapter cards: the charts start closed and
+             open from this bar, in place, above the cards. -->
+        <div class="chart-bar" role="group" aria-label="Charts">
+          <span>Charts</span>
+          <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="network-body">Daily signups<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="weekly-body">Weekly rhythm<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
-        <div class="stats weekly-stats" id="weekly-stats"></div>
-        <figure class="chart-card" id="chart-weekly">
-          <figcaption><strong>Joins by day of the week</strong><span id="weekly-sub"></span></figcaption>
-          <div class="chart" data-chart></div>
-          <div class="week-legend" id="week-legend" aria-label="Weeks, newest first"></div>
-        </figure>
-        <details class="table-view">
-          <summary>View as a table</summary>
-          <div class="table-scroll"><table id="weekly-table"></table></div>
-        </details>
+
+        <div class="reveal-body" id="network-body" hidden>
+          <figure class="chart-card network" id="chart-network">
+            <div class="network-head">
+              <div class="filters">
+                <div class="segmented" id="metric" role="group" aria-label="Chart data">
+                  <button type="button" data-metric="m" aria-pressed="true">Members</button>
+                  <button type="button" data-metric="c" aria-pressed="false">Chapters</button>
+                </div>
+                <div class="segmented" id="mode" role="group" aria-label="Chart values">
+                  <button type="button" data-mode="daily" aria-pressed="true">Daily additions</button>
+                  <button type="button" data-mode="total" aria-pressed="false">Network growth</button>
+                </div>
+              </div>
+              <span class="network-hint">Hover to inspect · click a day to filter chapters</span>
+            </div>
+            <p class="network-total"><strong id="network-total"></strong><span id="network-label"></span></p>
+            <div class="chart" data-chart></div>
+            <div class="network-foot"><span id="network-from"></span><span id="network-caption"></span><span id="network-to"></span></div>
+          </figure>
+          <details class="table-view">
+            <summary>View as a table</summary>
+            <div class="table-scroll"><table id="day-table"></table></div>
+          </details>
+        </div>
+
+        <div class="reveal-body weekly" id="weekly-body" hidden>
+          <h2 id="weekly-title" class="sub-title">Weekly rhythm</h2>
+          <p class="lede">Member joins on each day of the week, one line per week, New York time.</p>
+          <div class="stats weekly-stats" id="weekly-stats"></div>
+          <figure class="chart-card" id="chart-weekly">
+            <figcaption><strong>Joins by day of the week</strong><span id="weekly-sub"></span></figcaption>
+            <div class="chart" data-chart></div>
+            <div class="week-legend" id="week-legend" aria-label="Weeks, newest first"></div>
+          </figure>
+          <details class="table-view">
+            <summary>View as a table</summary>
+            <div class="table-scroll"><table id="weekly-table"></table></div>
+          </details>
+        </div>
       </section>
 
       <section class="section chapters" aria-labelledby="chapters-title">
