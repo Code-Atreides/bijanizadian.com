@@ -283,6 +283,18 @@
     "Baylor University": [
       "#154734",
       "#FFB81C"
+    ],
+    "University of Nebraska, Lincoln": [
+      "#D00000",
+      "#F5F1E7"
+    ],
+    "University of Connecticut": [
+      "#000E2F",
+      "#FFFFFF"
+    ],
+    "West Virginia University": [
+      "#002855",
+      "#EAAA00"
     ]
   }
 }

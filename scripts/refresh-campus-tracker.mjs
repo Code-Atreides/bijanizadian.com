@@ -117,10 +117,12 @@ const colorOf = new Map();
 for (const i of identities) for (const n of [i.name, ...(i.aliases || [])]) colorOf.set(norm(n), [i.primary, i.secondary]);
 for (const [n, c] of Object.entries(JSON.parse(fs.readFileSync(path.join(root, 'scripts/campus-tracker-school-colors.json'), 'utf8')).schools)) if (!colorOf.has(norm(n))) colorOf.set(norm(n), c);
 
-// School logo chips (128px WebP, background baked in) live in
-// fomocampustracker/logos/<school slug>.webp; schools without one show none.
-// They were made from Greek Village's school logos, then each remaining
-// school's Wikipedia infobox logo (athletics mark first), rendered in Chrome.
+// School logos are transparent, trimmed WebP cut-outs: fomocampustracker/
+// logos/<school slug>.webp for the cards and logos/lg/ for the backdrops.
+// Schools without one show none. They were made from Greek Village's school
+// logos, then each remaining school's Wikipedia infobox logo (athletics mark
+// first), rendered in Chrome: light backgrounds removed, dark marks given a
+// soft light glow, thin dark wordmarks drawn in white.
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const hasLogo = school => fs.existsSync(path.join(root, 'fomocampustracker/logos', `${slug(school)}.webp`));
 

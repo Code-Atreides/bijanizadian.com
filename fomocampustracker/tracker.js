@@ -332,18 +332,19 @@
   // ---------- mesh ----------
   // fomo ink with a soft fomo blue spotlight (the brand gradient), plus the
   // school's colors as large diffuse glows. Each glow's strength is capped so
-  // the blend over ink stays dark enough for white type (luminance <= 0.19,
-  // about fomo blue's own), and near-black or near-white school colors become
-  // the deep indigo halo or a pale haze instead of a flat block.
+  // the blend over ink stays dark and calm under white type (luminance <= 0.1,
+  // about 7:1 against white), and near-black or near-white school colors
+  // become the deep indigo halo or a pale haze instead of a flat block.
+  var LIMIT = 0.1;
   var INK = [11, 9, 31], BLUE = [81, 106, 246], ELECTRIC = [74, 54, 255], GLOW = [172, 184, 249], HALO = [34, 29, 75];
   var rgb = function (hex) { var m = /^#?([0-9a-f]{6})$/i.exec(hex || ''); return m ? [0, 2, 4].map(function (i) { return parseInt(m[1].slice(i, i + 2), 16); }) : null; };
   var lin = function (v) { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
   var lum = function (c) { return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]); };
   var mix = function (a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); };
   function cap(color, want) {
-    if (lum(mix(INK, color, want)) <= 0.19) return want;
+    if (lum(mix(INK, color, want)) <= LIMIT) return want;
     var lo = 0, hi = want;
-    for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2; if (lum(mix(INK, color, mid)) <= 0.19) lo = mid; else hi = mid; }
+    for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2; if (lum(mix(INK, color, mid)) <= LIMIT) lo = mid; else hi = mid; }
     return lo;
   }
   function seeded(text) {
@@ -360,7 +361,7 @@
       return { color: color, want: 0.92 };
     });
     var blobs = [
-      { color: ELECTRIC, x: 0.9 + j(0.1), y: 0.06 + j(0.08), r: 0.5, a: 0.5 },
+      { color: ELECTRIC, x: 0.9 + j(0.1), y: 0.06 + j(0.08), r: 0.5, a: 0.4 },
       { color: BLUE, x: 0.5 + j(0.3), y: 1.02, r: 0.78, a: cap(BLUE, 0.9) }
     ];
     if (school[0]) blobs.push({ color: school[0].color, x: 0.16 + j(0.16), y: 0.12 + j(0.14), r: 0.86, a: cap(school[0].color, school[0].want) });
@@ -430,7 +431,7 @@
   }
   function spacing(ctx, px) { if ('letterSpacing' in ctx) ctx.letterSpacing = px + 'px'; }
 
-  function renderPoster(canvas, c, format) {
+  function renderPoster(canvas, c, format, logo) {
     var L = LAYOUT[format], W = 1080, H = L.H, pad = 88, inner = W - pad * 2;
     canvas.width = W; canvas.height = H;
     var ctx = canvas.getContext('2d');
@@ -451,13 +452,20 @@
     ctx.fillText('Greek Wars · Fall 2026', W - pad, L.top + markH - 4);
     ctx.textAlign = 'left';
 
-    // letters, name, school
+    // letters with the school logo beside them, then name and school
     var y = L.top + markH + (format === 'story' ? 130 : 96);
-    var ls = fit(ctx, c.letters, 700, L.letters, inner, 90);
+    var logoW = logo ? Math.round(inner * 0.3) : 0, reserve = logo ? logoW + 40 : 0;
+    var ls = fit(ctx, c.letters, 700, L.letters, inner - reserve, 90);
     spacing(ctx, -ls * 0.03);
     ctx.font = font(700, ls); ctx.fillStyle = white;
     var asc = ctx.measureText(c.letters).actualBoundingBoxAscent;
     y += asc; ctx.fillText(c.letters, pad - ls * 0.03, y);
+    if (logo) {
+      var capH = ctx.measureText('H').actualBoundingBoxAscent;
+      var ls2 = Math.min(logoW / logo.naturalWidth, capH * 1.15 / logo.naturalHeight);
+      var lw = logo.naturalWidth * ls2, lh = logo.naturalHeight * ls2;
+      ctx.drawImage(logo, W - pad - lw, y - capH / 2 - lh / 2, lw, lh);
+    }
     y += format === 'story' ? 70 : 48;
     spacing(ctx, -1.5);
     ctx.font = font(500, L.name);
@@ -576,6 +584,20 @@
     ctx.textAlign = 'left';
   }
 
+  // The backdrop draws the large cut-out (logos/lg); same origin, so the
+  // canvas stays exportable. A missing logo just leaves the space out.
+  var logoImages = new Map();
+  function logoImage(slug) {
+    if (!slug) return Promise.resolve(null);
+    if (!logoImages.has(slug)) logoImages.set(slug, new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { resolve(null); };
+      img.src = '/fomocampustracker/logos/lg/' + slug + '.webp';
+    }));
+    return logoImages.get(slug);
+  }
+
   // ---------- viewer ----------
   var current = null;
   function openViewer(id) {
@@ -620,8 +642,9 @@
     var c = current, canvas = $('poster');
     if (!fontsReady) fontsReady = Promise.all(['400', '500', '700'].map(function (w) { return document.fonts.load(w + ' 100px Aeonik'); })).catch(function () {});
     await fontsReady;
+    var logo = await logoImage(c.logo);
     if (c !== current) return;
-    renderPoster(canvas, c, state.format);
+    renderPoster(canvas, c, state.format, logo);
     canvas.setAttribute('aria-label', 'Backdrop for ' + c.name + ', ' + c.school + ': ' + plural(c.joined, 'member') + ' joined of ' + num(c.active) + ' actives' + (c.reachedOn ? ', 80% reached ' + dayLabel(c.reachedOn) : '') + '.');
   }
   function step(by) {
