@@ -150,6 +150,7 @@ const chapters = feed.chapters.map(c => {
   return {
     id: c.id, name: c.name, letters: latin(c.letters), school: c.school, short: c.shortSchool, type: c.type,
     joined: c.joined, active: c.active, registered: r ? nyDay(r.created) : c.registered,
+    rate: Number(c.memberRate) || 6.25, // dollars per member onboarded (eyes memberRate)
     days: [...days].sort(([a], [b]) => a.localeCompare(b)),
     colors: colors || null, logo
   };

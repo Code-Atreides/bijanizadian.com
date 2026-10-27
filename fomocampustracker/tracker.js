@@ -30,6 +30,8 @@
   var dayLabel = function (d, year) { return new Date(utc(d)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: year ? 'numeric' : undefined, timeZone: 'UTC' }); };
   var nyDay = function (ms) { return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms)); };
   var plural = function (n, one, many) { return num(n) + ' ' + (n === 1 ? one : many || one + 's'); };
+  var money = function (v) { return '$' + v.toLocaleString('en-US', { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 }); };
+  var rateText = function (v) { return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 3 }); }; // $3.125 stays exact
   // lower case, no accents or punctuation: "Washington & Lee" → "washington lee"
   var searchText = function (s) { return String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, ' ').trim(); };
   var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -100,6 +102,9 @@
         target: target, reachedOn: reachedOn, week: week, best: best, byDay: new Map(ch.days),
         lastJoin: lastJoin, quiet: Math.round((utc(today) - utc(lastJoin || ch.registered)) / 864e5),
         pct: ch.active ? ch.joined / ch.active : 0, toGo: target ? Math.max(0, target - ch.joined) : Infinity,
+        // payouts: the chapter's rate per member onboarded (from eyes), spent
+        // on members so far, and what's left if the rest of the roster joins
+        rate: ch.rate || 6.25, paid: ch.joined * (ch.rate || 6.25), owed: Math.max(0, ch.active - ch.joined) * (ch.rate || 6.25),
         search: ' ' + searchText(ch.name + ' ' + ch.letters + ' ' + ch.school + ' ' + ch.short + ' ' + ch.type) + ' '
       });
     });
@@ -187,8 +192,46 @@
       return tile;
     }));
     drawCharts();
+    renderPayouts(from, since);
     renderTable(rows);
     renderWeekly(rows);
+  }
+
+  // ---------- payouts ----------
+  // Every member onboarded is paid at the chapter's rate (eyes memberRate):
+  // spent so far, left to spend if every active member joins, and what was
+  // spent in the selected range (each chapter's joins by day × its rate).
+  function renderPayouts(from, since) {
+    var spent = 0, left = 0, inRange = 0, rates = new Map();
+    chapters.forEach(function (c) {
+      spent += c.paid; left += c.owed;
+      c.days.forEach(function (x) { if (x[0] >= from) inRange += x[1] * c.rate; });
+      var r = rates.get(c.rate) || { n: 0, types: new Set() };
+      r.n++; r.types.add(c.type); rates.set(c.rate, r);
+    });
+    var byUse = Array.from(rates).sort(function (a, b) { return b[1].n - a[1].n; });
+    var note = byUse.map(function (r, i) {
+      if (!i) return rateText(r[0]) + ' per member onboarded';
+      var kind = r[1].types.size === 1 ? Array.from(r[1].types)[0].toLowerCase().replace(/y$/, 'ie') + 's' : 'chapters';
+      return rateText(r[0]) + ' for ' + num(r[1].n) + ' ' + kind;
+    }).join(' · ');
+    var total = spent + left;
+    var fig = function (label, value, small) {
+      var d = el('div', 'pay-fig');
+      d.append(el('span', null, label), el('strong', null, value), el('small', null, small));
+      return d;
+    };
+    var head = el('div', 'pay-head');
+    head.append(el('strong', null, 'Payouts'), el('span', null, note));
+    var bar = el('span', 'pay-bar'), fill = el('b');
+    fill.style.width = (total ? spent / total * 100 : 0) + '%';
+    bar.append(fill);
+    bar.title = (total ? Math.round(spent / total * 100) : 0) + '% of the full-roster total spent';
+    $('payouts').replaceChildren(head,
+      fig('Spent', money(spent), '+' + money(inRange) + ' ' + since),
+      fig('Left to spend', money(left), 'if every active member joins'),
+      fig('Total', money(total), (total ? Math.round(spent / total * 100) : 0) + '% spent so far'),
+      bar);
   }
 
   // ---------- weekly rhythm ----------
@@ -509,6 +552,8 @@
     progress: function (a, b) { return b.pct - a.pct || b.joined - a.joined; },
     least: function (a, b) { return a.pct - b.pct || b.active - a.active; },
     roster: function (a, b) { return b.active - a.active || b.joined - a.joined; },
+    owed: function (a, b) { return b.owed - a.owed || b.active - a.active; },
+    paid: function (a, b) { return b.paid - a.paid || b.joined - a.joined; },
     newest: function (a, b) { return b.registered.localeCompare(a.registered) || b.joined - a.joined; },
     oldest: function (a, b) { return a.registered.localeCompare(b.registered) || b.joined - a.joined; },
     school: function (a, b) { return a.school.localeCompare(b.school) || b.joined - a.joined; },
@@ -541,7 +586,8 @@
     if (day) $('day-filter-text').textContent = (day.metric === 'c' ? 'Registered ' : 'Members joined ') + weekdayShort(day.d) + ', ' + dayLabel(day.d);
     $('clear-filters').hidden = !(state.query || state.type !== 'all' || state.status !== 'any' || day);
     var grid = $('grid');
-    $('chapter-count').textContent = list.length === chapters.length ? plural(chapters.length, 'chapter') : num(list.length) + ' of ' + plural(chapters.length, 'chapter') + ' match';
+    $('chapter-count').textContent = list.length === chapters.length ? plural(chapters.length, 'chapter') : num(list.length) + ' of ' + plural(chapters.length, 'chapter') + ' match · ' +
+      money(list.reduce(function (s, c) { return s + c.paid; }, 0)) + ' paid · ' + money(list.reduce(function (s, c) { return s + c.owed; }, 0)) + ' remaining';
     if (!list.length) { grid.replaceChildren(el('li', 'empty', 'No chapters match these filters.')); $('more').hidden = true; return; }
     grid.replaceChildren.apply(grid, list.slice(0, shown).map(card));
     $('more').hidden = shown >= list.length;
@@ -559,6 +605,8 @@
       case 'closest': case 'near': return c.reachedOn ? '80% reached' : c.target ? num(c.toGo) + ' to go' : null;
       case 'progress': case 'least': return c.active ? Math.round(c.pct * 100) + '% of roster' : null;
       case 'roster': return num(c.active) + ' actives';
+      case 'owed': return c.owed ? money(c.owed) + ' remaining' : 'Roster paid';
+      case 'paid': return money(c.paid) + ' paid';
       case 'none': case 'newest': case 'oldest': return 'Registered ' + dayLabel(c.registered);
       default: return c.reachedOn ? '80% reached' : null;
     }
@@ -574,8 +622,11 @@
     track.append(fill, el('i'));
     var progress = el('span', 'progress');
     progress.append(track, el('span', null, num(c.joined) + ' / ' + num(c.active)));
+    var pay = el('span', 'pay');
+    pay.append(el('span', null, money(c.paid) + ' paid'), el('span', 'left', c.owed ? money(c.owed) + ' remaining' : 'Roster paid'));
+    pay.title = rateText(c.rate) + ' per member onboarded';
     var meta = el('span', 'meta');
-    meta.append(el('span', 'name', c.name), el('span', 'school', c.short || c.school), progress);
+    meta.append(el('span', 'name', c.name), el('span', 'school', c.short || c.school), progress, pay);
     var top = el('span', 'top');
     top.append(el('span', 'letters' + (c.letters.length > 4 ? ' long' : ''), c.letters));
     if (c.logo) {
@@ -1068,7 +1119,9 @@
         ['Roster joined', c.active ? Math.round(c.joined / c.active * 100) + '%' : '—'],
         ['80% mark', c.target ? num(c.target) : '—'],
         [c.reachedOn ? 'Reached 80%' : 'To go to 80%', c.reachedOn ? dayLabel(c.reachedOn) : c.target ? num(Math.max(0, c.target - c.joined)) : '—'],
-        ['Rank nationally', '#' + num(rank(chapters)) + ' of ' + num(chapters.length)]
+        ['Rank nationally', '#' + num(rank(chapters)) + ' of ' + num(chapters.length)],
+        ['Paid · ' + rateText(c.rate) + ' each', money(c.paid)],
+        ['Pay remaining', c.owed ? money(c.owed) : 'Roster paid']
       ]],
       ['Timeline', [
         ['Registered', dayLabel(c.registered, true)],

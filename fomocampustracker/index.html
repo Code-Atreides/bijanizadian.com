@@ -9,8 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=17">
-<script src="/fomocampustracker/tracker.js?v=15" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=20">
+<script src="/fomocampustracker/tracker.js?v=17" defer></script>
 <!--
   /data, the fomo campus tracker: daily members and chapters added, member
   joins by day of the week, and a backdrop for every chapter (its
@@ -69,7 +69,11 @@
       <section class="section growth" aria-labelledby="growth-title">
         <div class="section-head">
           <h1 id="growth-title">Campus tracker</h1>
-          <div class="filters" role="group" aria-label="Filters">
+          <div class="filters">
+            <!-- The page leads with the chapter cards: the charts start closed
+                 and open from these, in place, above the cards. -->
+            <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="network-body">Daily signups<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="weekly-body">Weekly rhythm<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <div class="segmented" id="range" role="group" aria-label="Date range">
               <button type="button" data-range="7" aria-pressed="true">7 days</button>
               <button type="button" data-range="30" aria-pressed="false">30 days</button>
@@ -79,14 +83,7 @@
         </div>
 
         <div class="stats" id="stats"></div>
-
-        <!-- The page leads with the chapter cards: the charts start closed and
-             open from this bar, in place, above the cards. -->
-        <div class="chart-bar" role="group" aria-label="Charts">
-          <span>Charts</span>
-          <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="network-body">Daily signups<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <button type="button" class="chart-toggle" data-reveal aria-expanded="false" aria-controls="weekly-body">Weekly rhythm<svg viewBox="0 0 20 20" aria-hidden="true"><path d="m6 8 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        </div>
+        <div class="payouts" id="payouts" aria-label="Payouts"></div>
 
         <div class="reveal-body" id="network-body" hidden>
           <figure class="chart-card network" id="chart-network">
@@ -156,6 +153,10 @@
                   <option value="progress">Highest % of roster</option>
                   <option value="least">Lowest % of roster</option>
                   <option value="roster">Biggest roster</option>
+                </optgroup>
+                <optgroup label="Payouts">
+                  <option value="owed">Most pay remaining</option>
+                  <option value="paid">Most paid</option>
                 </optgroup>
                 <optgroup label="Registered">
                   <option value="newest">Newest</option>
