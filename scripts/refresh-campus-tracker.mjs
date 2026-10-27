@@ -163,7 +163,10 @@ for (const { date, counts } of feed.memberHistory?.timeOfDay?.days || []) bump(d
 for (const c of chapters) bump(c.registered, 'c', 1);
 const days = [...daily.values()].sort((a, b) => a.d.localeCompare(b.d));
 
-const payload = { v: 1, updatedAt: new Date().toISOString(), feedAt: feed.updatedAt, tz: TZ, days, chapters };
+// Member joins per New York hour for each day, for the weekly rhythm view.
+const hours = (feed.memberHistory?.timeOfDay?.days || []).filter(d => Array.isArray(d.counts) && d.counts.length === 24).map(d => [d.date, d.counts]);
+
+const payload = { v: 1, updatedAt: new Date().toISOString(), feedAt: feed.updatedAt, tz: TZ, days, hours, chapters };
 
 // ---------- report ----------
 const sum = (xs, f) => xs.reduce((s, x) => s + f(x), 0);

@@ -9,12 +9,14 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=3">
-<script src="/fomocampustracker/tracker.js?v=3" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=4">
+<script src="/fomocampustracker/tracker.js?v=4" defer></script>
 <!--
-  /data, the fomo campus tracker: daily members and chapters added, and a
-  backdrop for every chapter (its progress and timeline over a mesh of the fomo
-  colors and its school's colors) that saves as an image to share.
+  /data, the fomo campus tracker: daily members and chapters added, the weekly
+  rhythm of joins (weekday by hour), and a backdrop for every chapter (its
+  progress and timeline over a mesh of the fomo colors and its school's colors).
+  Backdrops are live SVG for screen recordings (hover readouts, an entrance
+  animation) and save as a PNG to share.
   The numbers come from the eyes feed (milomessina.com) and the Greek Wars admin
   (fomocampus.com/admin), collected by scripts/refresh-campus-tracker.mjs as
   per-chapter counts and dates only, and encrypted into data.enc.json, so they
@@ -98,6 +100,27 @@
         </details>
       </section>
 
+      <section class="section weekly" aria-labelledby="weekly-title">
+        <div class="section-head">
+          <div>
+            <h2 id="weekly-title">Weekly rhythm</h2>
+            <p class="lede">When members join, by weekday and hour, New York time. Bigger, darker dots mean more joins. <span id="weekly-range"></span></p>
+          </div>
+        </div>
+        <div class="stats weekly-stats" id="weekly-stats"></div>
+        <div class="rhythm-scroll">
+          <div class="rhythm" id="rhythm" tabindex="0" role="grid" aria-label="Member joins by weekday and hour. Use the arrow keys to read each slot."></div>
+        </div>
+        <div class="rhythm-foot">
+          <span class="legend" aria-hidden="true">Fewer <i></i><i></i><i></i><i></i><i></i> More</span>
+          <span>Hover any dot for its count. The right column is each weekday’s total.</span>
+        </div>
+        <details class="table-view">
+          <summary>View as a table</summary>
+          <div class="table-scroll"><table id="rhythm-table"></table></div>
+        </details>
+      </section>
+
       <section class="section chapters" aria-labelledby="chapters-title">
         <div class="section-head">
           <div>
@@ -155,7 +178,7 @@
     </button>
   </div>
   <div class="viewer-stage">
-    <canvas id="poster" width="1080" height="1350" role="img"></canvas>
+    <div class="backdrop" id="backdrop"></div>
   </div>
   <aside class="viewer-panel">
     <h2 id="viewer-name"></h2>
@@ -166,14 +189,18 @@
         <button type="button" data-format="post" aria-pressed="true">Post 4:5</button>
         <button type="button" data-format="story" aria-pressed="false">Story 9:16</button>
       </div>
-      <button type="button" class="button primary" id="save">Save image</button>
-      <p class="save-note" id="save-note" aria-live="polite"></p>
+      <div class="viewer-buttons">
+        <button type="button" class="button primary" id="save">Save image</button>
+        <button type="button" class="button ghost" id="replay">Replay</button>
+      </div>
+      <p class="save-note" id="save-note" aria-live="polite">Hover the timeline, the bar or the 80% mark to see the numbers.</p>
     </div>
     <details class="days">
       <summary>Day by day</summary>
       <table id="chapter-days"></table>
     </details>
   </aside>
+  <div class="bd-tip" id="bd-tip" role="status" hidden></div>
 </dialog>
 <div class="tooltip" id="chart-tooltip" role="status" hidden></div>
 </body>
