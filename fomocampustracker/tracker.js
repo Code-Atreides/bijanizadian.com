@@ -62,7 +62,8 @@
 
   // ---------- state ----------
   var data, today, series, chapters, list = [], shown = PAGE;
-  var state = { range: '7', mode: 'daily', type: 'all', sort: 'members', query: '', format: 'post' };
+  // day: a day picked on the network chart, which filters the chapter grid
+  var state = { range: '7', mode: 'daily', metric: 'm', day: null, type: 'all', sort: 'members', query: '', format: 'post' };
   // Backdrops open wide (16:9) on computers; phones keep the 4:5 post.
   if (matchMedia('(min-width: 901px)').matches) {
     state.format = 'web';
@@ -91,7 +92,7 @@
         if (x[0] >= weekStart) week += x[1];
         if (!best || x[1] > best[1]) best = x;
       });
-      return Object.assign({}, ch, { target: target, reachedOn: reachedOn, week: week, best: best, search: (ch.name + ' ' + ch.letters + ' ' + ch.school + ' ' + ch.short).toLowerCase() });
+      return Object.assign({}, ch, { target: target, reachedOn: reachedOn, week: week, best: best, byDay: new Map(ch.days), search: (ch.name + ' ' + ch.letters + ' ' + ch.school + ' ' + ch.short).toLowerCase() });
     });
 
     $('lock-view').hidden = true;
@@ -100,7 +101,7 @@
     $('updated').textContent = 'Updated ' + new Date(data.updatedAt).toLocaleString('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) + ' ET';
     renderGrowth();
     renderGrid();
-    new ResizeObserver(function () { drawCharts(); }).observe(document.querySelector('.charts'));
+    new ResizeObserver(function () { drawCharts(); }).observe($('chart-network'));
     route();
   }
 
@@ -118,6 +119,8 @@
   }
   segmented('range', 'range', renderGrowth);
   segmented('mode', 'mode', renderGrowth);
+  segmented('metric', 'metric', renderGrowth);
+  $('day-filter-clear').addEventListener('click', function () { state.day = null; shown = PAGE; renderGrid(); });
   segmented('type', 'type', function () { shown = PAGE; renderGrid(); });
   segmented('format', 'format', function () { drawBackdrop(); });
   $('sort').addEventListener('change', function () { state.sort = this.value; shown = PAGE; renderGrid(); });
@@ -152,8 +155,6 @@
       tile.append(el('span', null, t[0]), el('strong', null, t[1]), el('small', null, t[2]));
       return tile;
     }));
-    var sub = state.mode === 'total' ? 'running total' : 'per day, New York time';
-    document.querySelectorAll('[data-sub]').forEach(function (s) { s.textContent = sub; });
     drawCharts();
     renderTable(rows);
     renderWeekly(rows);
@@ -338,9 +339,7 @@
   }
   function drawCharts() {
     if (!series) return;
-    var rows = windowRows();
-    drawChart($('chart-members'), rows, state.mode === 'total' ? 'mt' : 'm', 'members', 'mt');
-    drawChart($('chart-chapters'), rows, state.mode === 'total' ? 'ct' : 'c', 'chapters', 'ct');
+    drawNetwork(windowRows());
     drawWeekly();
   }
   function columnPath(x, y, w, base) {
@@ -348,12 +347,23 @@
     if (base - y < 0.5) return '';
     return 'M' + x + ',' + base + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + w - r) + 'Q' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) + 'V' + base + 'Z';
   }
-  function drawChart(card, rows, field, noun, totalField) {
-    var box = card.querySelector('[data-chart]');
+  // The network chart (eyes' "the network takes shape"): members or chapters,
+  // added per day or as a running total, a weekday under every bar. Clicking
+  // a day filters the chapter grid to that day.
+  function drawNetwork(rows) {
+    var box = $('chart-network').querySelector('[data-chart]');
     var W = box.clientWidth, H = box.clientHeight;
     if (!W || !H) return;
-    var total = state.mode === 'total';
-    var m = { l: 38, r: 12, t: 18, b: 26 }, pw = W - m.l - m.r, ph = H - m.t - m.b, base = m.t + ph;
+    var members = state.metric === 'm', growth = state.mode === 'total';
+    var daily = state.metric, field = growth ? daily + 't' : daily, noun = members ? 'member' : 'chapter';
+    var inView = rows.reduce(function (s, r) { return s + r[daily]; }, 0);
+    $('network-total').textContent = num(growth ? rows[rows.length - 1][field] : inView);
+    $('network-label').textContent = growth ? (members ? 'members in total' : 'chapters in total') : (members ? 'member signups in view' : 'chapter registrations in view');
+    $('network-from').textContent = dayLabel(rows[0].d);
+    $('network-to').textContent = rows[rows.length - 1].d === today ? 'Today' : dayLabel(rows[rows.length - 1].d);
+    $('network-caption').textContent = (members ? 'Member signups' : 'Chapter registrations') + (growth ? ', running total' : ', per day') + ' · New York days';
+
+    var m = { l: 40, r: 12, t: 22, b: 28 }, pw = W - m.l - m.r, ph = H - m.t - m.b, base = m.t + ph;
     var values = rows.map(function (r) { return r[field]; });
     var max = Math.max.apply(null, values.concat([1]));
     var step = nice(max / 4), top = Math.ceil(max / step) * step;
@@ -361,7 +371,7 @@
     var n = rows.length, slot = pw / n;
     var x = function (i) { return m.l + slot * (i + 0.5); };
     var s = svg('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img' });
-    s.setAttribute('aria-label', (noun === 'members' ? 'Members' : 'Chapters') + (total ? ' running total' : ' added per day') + ', ' + dayLabel(rows[0].d) + ' to today. Values are in the table below.');
+    s.setAttribute('aria-label', (members ? 'Member signups' : 'Chapter registrations') + (growth ? ', running total' : ' per day') + ', ' + dayLabel(rows[0].d) + ' to today. Values are in the table below.');
     for (var t = 0; t <= top + 1e-9; t += step) {
       if (t > 0) s.append(svg('line', { class: 'gridline', x1: m.l, x2: W - m.r, y1: y(t), y2: y(t) }));
       var tick = svg('text', { class: 'tick', x: m.l - 8, y: y(t) + 4, 'text-anchor': 'end' });
@@ -369,7 +379,7 @@
       s.append(tick);
     }
     var bars = [], cross, dot;
-    if (total) {
+    if (growth) {
       var pts = rows.map(function (r, i) { return x(i) + ',' + y(r[field]); });
       s.append(svg('path', { class: 'area', d: 'M' + x(0) + ',' + base + 'L' + pts.join('L') + 'L' + x(n - 1) + ',' + base + 'Z' }));
       s.append(svg('path', { class: 'line', d: 'M' + pts.join('L') }));
@@ -380,10 +390,10 @@
       dot = svg('circle', { class: 'dot', r: 4.5, visibility: 'hidden' });
       s.append(cross, dot);
     } else {
-      var bw = Math.max(1, Math.min(24, slot * 0.72, slot - 2));
+      var bw = Math.max(1, Math.min(40, slot * 0.8, slot - 2));
       var peak = values.indexOf(max);
       rows.forEach(function (r, i) {
-        var p = svg('path', { class: 'bar' + (r.d === today ? ' today' : ''), d: columnPath(x(i) - bw / 2, y(r[field]), bw, base) });
+        var p = svg('path', { class: 'bar' + (r.d === today ? ' today' : '') + (state.day && state.day.d === r.d && state.day.metric === daily ? ' picked' : ''), d: columnPath(x(i) - bw / 2, y(r[field]), bw, base) });
         bars.push(p);
         s.append(p);
       });
@@ -394,16 +404,14 @@
       }
     }
     s.append(svg('line', { class: 'baseline', x1: m.l, x2: W - m.r, y1: base, y2: base }));
-    var labels = n <= 8 && pw / n >= 44 ? n : Math.min(n, W < 520 ? 4 : 6);
-    var picks = new Set();
-    for (var k = 0; k < labels; k++) picks.add(Math.round(k * (n - 1) / Math.max(1, labels - 1)));
-    picks.forEach(function (i) {
-      var lx = x(i), anchor = i === 0 ? 'start' : i === n - 1 ? 'end' : 'middle';
-      var label = svg('text', { class: 'tick', x: i === 0 ? Math.max(m.l, lx - slot / 2) : i === n - 1 ? Math.min(W - m.r, lx + slot / 2) : lx, y: H - 6, 'text-anchor': anchor });
-      label.textContent = rows[i].d === today ? 'Today' : labels === n && n <= 8 ? weekdayShort(rows[i].d) + ' ' + Number(rows[i].d.slice(8)) : dayLabel(rows[i].d);
+    // a weekday under every day: the name when it fits, else its first letter
+    var short = slot >= 30;
+    if (slot >= 11) rows.forEach(function (r, i) {
+      var wd = weekdayOf(r.d), label = svg('text', { class: 'tick weekday' + (wd === 0 || wd === 6 ? ' weekend' : ''), x: x(i), y: H - 8, 'text-anchor': 'middle' });
+      label.textContent = short ? weekdayShort(r.d) : weekdayShort(r.d).charAt(0);
       s.append(label);
     });
-    var hit = svg('rect', { class: 'hit', x: m.l, y: m.t, width: pw, height: ph });
+    var hit = svg('rect', { class: 'hit pick', x: m.l, y: m.t, width: pw, height: ph + m.b });
     s.append(hit);
     box.replaceChildren(s);
 
@@ -419,10 +427,11 @@
         dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(r[field])); dot.setAttribute('visibility', 'visible');
       }
       var strong = el('strong'), key = el('i');
-      strong.append(key, document.createTextNode(total ? num(r[field]) + ' ' + noun : '+' + num(r[field]) + ' ' + noun));
+      strong.append(key, document.createTextNode((growth ? num(r[field]) : '+' + num(r[daily])) + ' ' + noun + (growth || r[daily] !== 1 ? 's' : '')));
       var when = el('span', null, weekdayShort(r.d) + ', ' + dayLabel(r.d, true) + (r.d === today ? ' · today so far' : ''));
-      var extra = el('span', null, total ? '+' + num(r[noun === 'members' ? 'm' : 'c']) + ' that day' : 'Running total ' + num(r[totalField]));
-      tip.replaceChildren(strong, when, extra);
+      var extra = el('span', null, growth ? '+' + num(r[daily]) + ' that day' : 'Running total ' + num(r[daily + 't']));
+      var hint = el('span', 'tip-hint', r[daily] ? 'Click to see these chapters' : '');
+      tip.replaceChildren(strong, when, extra, hint);
       tip.hidden = false;
       var rect = box.getBoundingClientRect();
       var px = clientX != null ? clientX : rect.left + x(i);
@@ -439,14 +448,24 @@
     var index = function (clientX) { return Math.max(0, Math.min(n - 1, Math.floor((clientX - box.getBoundingClientRect().left - m.l) / slot))); };
     hit.addEventListener('pointermove', function (e) { show(index(e.clientX), e.clientX, e.clientY); });
     hit.addEventListener('pointerleave', hide);
+    hit.addEventListener('click', function (e) { var r = rows[index(e.clientX)]; if (r[daily]) { hide(); filterDay(r.d); } });
     box.tabIndex = 0;
     box.onfocus = function () { show(n - 1); };
     box.onblur = hide;
     box.onkeydown = function (e) {
+      if (e.key === 'Enter' && active >= 0 && rows[active][daily]) { e.preventDefault(); filterDay(rows[active].d); return; }
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
       show(Math.max(0, Math.min(n - 1, (active < 0 ? n - 1 : active) + (e.key === 'ArrowLeft' ? -1 : 1))));
     };
+  }
+  // Show the chapters behind a day: registered that day, or with joins that day.
+  function filterDay(d) {
+    state.day = { d: d, metric: state.metric };
+    shown = PAGE;
+    renderGrid();
+    drawCharts();
+    $('chapters-title').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
   }
 
   // ---------- chapter grid ----------
@@ -458,10 +477,15 @@
     school: function (a, b) { return a.school.localeCompare(b.school) || b.joined - a.joined; }
   };
   function renderGrid() {
+    var day = state.day;
+    var onDay = function (c) { return day.metric === 'c' ? c.registered === day.d : c.byDay.has(day.d); };
     list = chapters.filter(function (c) {
       if (state.type === 'other' ? c.type === 'Fraternity' || c.type === 'Sorority' : state.type !== 'all' && c.type !== state.type) return false;
+      if (day && !onDay(c)) return false;
       return !state.query || c.search.indexOf(state.query) >= 0;
-    }).sort(SORTS[state.sort]);
+    }).sort(day && day.metric === 'm' ? function (a, b) { return b.byDay.get(day.d) - a.byDay.get(day.d) || SORTS[state.sort](a, b); } : SORTS[state.sort]);
+    $('day-filter').hidden = !day;
+    if (day) $('day-filter-text').textContent = (day.metric === 'c' ? 'Registered ' : 'Members joined ') + weekdayShort(day.d) + ', ' + dayLabel(day.d);
     var grid = $('grid');
     $('chapter-count').textContent = list.length === chapters.length ? plural(chapters.length, 'chapter') : num(list.length) + ' of ' + plural(chapters.length, 'chapter') + ' match';
     if (!list.length) { grid.replaceChildren(el('li', 'empty', 'No chapters match that search.')); $('more').hidden = true; return; }
@@ -492,7 +516,9 @@
       top.append(logo);
     }
     b.append(top);
-    if (c.reachedOn) b.append(el('span', 'badge', '80% reached'));
+    var dayJoins = state.day && state.day.metric === 'm' ? c.byDay.get(state.day.d) : 0;
+    if (dayJoins) b.append(el('span', 'badge', '+' + num(dayJoins) + ' on ' + dayLabel(state.day.d)));
+    else if (c.reachedOn) b.append(el('span', 'badge', '80% reached'));
     b.append(meta);
     b.addEventListener('click', function () { openViewer(c.id); });
     li.append(b);
@@ -689,7 +715,7 @@
     var factsY = L.wide ? bodyBottom - factsH : P.status + 56;
     while (L.wide && P.status > factsY - 48 && ls > 120) { ls -= 8; P = plan(ls); }
 
-    eyebrow(root, M, P.eyebrow, c.school + (c.type ? ' · ' + c.type : ''), L.wide ? 20 : 18, colW);
+    eyebrow(root, M, P.eyebrow, c.school, L.wide ? 20 : 18, colW);
     text(root, M - ls * 0.03, P.letters, c.letters, ls, 700, WHITE, { track: -ls * 0.035 });
     if (logo) {
       var capH = ascent('H', 700, ls), k = Math.min(logoW / logo.w, capH * 1.35 / logo.h), lw = logo.w * k, lh = logo.h * k;
@@ -955,7 +981,7 @@
     var c = chapters.find(function (x) { return x.id === id; });
     if (!c) return;
     current = c;
-    if (list.indexOf(c) < 0) { state.query = ''; $('search').value = ''; state.type = 'all'; renderGrid(); }
+    if (list.indexOf(c) < 0) { state.query = ''; $('search').value = ''; state.type = 'all'; state.day = null; renderGrid(); }
     var viewer = $('viewer');
     $('viewer-mesh').style.backgroundImage = meshCSS(mesh(c));
     $('viewer-name').textContent = c.name;
@@ -1007,6 +1033,7 @@
     var thead = el('thead'); thead.append(head);
     table.replaceChildren(thead, body);
     $('save-note').textContent = '';
+    viewer.classList.toggle('panel-hidden', panelHidden);
     if (!viewer.open) viewer.showModal();
     history.replaceState(null, '', '#chapter=' + encodeURIComponent(c.id));
     drawBackdrop();
@@ -1042,6 +1069,19 @@
   $('prev').addEventListener('click', function () { step(-1); });
   $('next').addEventListener('click', function () { step(1); });
   $('close').addEventListener('click', function () { $('viewer').close(); });
+  $('close-float').addEventListener('click', function () { $('viewer').close(); });
+  // The details panel can be hidden (button or H) so the backdrop has the
+  // whole screen for recordings; the choice is remembered on this browser.
+  var panelHidden = false;
+  try { panelHidden = localStorage.getItem('tracker-panel-hidden') === '1'; } catch (e) {}
+  function setPanel(hidden) {
+    panelHidden = hidden;
+    $('viewer').classList.toggle('panel-hidden', hidden);
+    try { localStorage.setItem('tracker-panel-hidden', hidden ? '1' : '0'); } catch (e) {}
+    if (document.activeElement && document.activeElement.offsetParent === null) $(hidden ? 'show-panel' : 'hide-panel').focus({ preventScroll: true });
+  }
+  $('hide-panel').addEventListener('click', function () { setPanel(true); });
+  $('show-panel').addEventListener('click', function () { setPanel(false); });
   $('viewer').addEventListener('close', function () {
     current = null;
     history.replaceState(null, '', location.pathname + location.search);
@@ -1049,6 +1089,7 @@
   $('replay').addEventListener('click', function () { drawBackdrop(); });
   $('viewer').addEventListener('keydown', function (e) {
     if (e.target.closest('input, select, textarea, summary, .bd-hit')) return;
+    if ((e.key === 'h' || e.key === 'H') && !e.metaKey && !e.ctrlKey && !e.altKey) { e.preventDefault(); setPanel(!panelHidden); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
   });
