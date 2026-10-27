@@ -983,7 +983,6 @@
     current = c;
     if (list.indexOf(c) < 0) { state.query = ''; $('search').value = ''; state.type = 'all'; state.day = null; renderGrid(); }
     var viewer = $('viewer');
-    $('viewer-mesh').style.backgroundImage = meshCSS(mesh(c));
     $('viewer-name').textContent = c.name;
     var school = $('viewer-school');
     school.replaceChildren(document.createTextNode(c.school + ' · ' + c.type));

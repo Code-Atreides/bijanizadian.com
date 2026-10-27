@@ -177,8 +177,9 @@ td { color: var(--ink); font-weight: 400; }
 /* ---------- backdrop viewer ---------- */
 .viewer { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; border: 0; padding: 0; background: #0b091f; color: #fff; overflow: hidden; }
 .viewer[open] { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto minmax(0, 1fr); grid-template-areas: "stage top" "stage panel"; }
-.viewer::backdrop { background: #0b091f; }
-.viewer-mesh { position: fixed; inset: -10%; z-index: 0; filter: blur(40px) saturate(1.05); }
+.viewer::backdrop { background: #516af6; }
+/* Behind the backdrop: the fomo brand gradient (brand kit token --fomo-gradient-brand). */
+.viewer-mesh { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse at 50% 12%, rgba(172,184,249,.45) 0%, rgba(172,184,249,0) 70%), #516af6; }
 .viewer-stage { grid-area: stage; position: relative; z-index: 1; display: grid; place-items: center; padding: 24px; min-height: 0; }
 .backdrop { display: grid; place-items: center; width: 100%; min-height: 0; }
 .backdrop svg { display: block; width: min(100%, calc((100dvh - 48px) * var(--ratio, .8))); height: auto; aspect-ratio: var(--ratio, .8); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 80px -30px rgba(0,0,0,.7), 0 0 0 1px rgba(234,237,255,.08); }
@@ -234,6 +235,9 @@ td { color: var(--ink); font-weight: 400; }
 .segmented.dark button:hover { color: #fff; }
 .segmented.dark button[aria-pressed="true"] { background: #eaedff; color: var(--ink); }
 .button.small { height: 34px; padding: 0 12px; font-size: 13px; border-radius: 8px; }
+/* On the fomo blue around the backdrop, the main button is white with blue type. */
+.viewer .button.primary { background: #fff; color: var(--blue-text); }
+.viewer .button.primary:hover { background: #eaedff; }
 .button.ghost { background: rgba(234,237,255,.08); border-color: rgba(234,237,255,.22); color: #fff; }
 .button.ghost:hover { background: rgba(234,237,255,.16); }
 .viewer .button.primary:focus-visible, .viewer button:focus-visible, .viewer summary:focus-visible { outline-color: #acb8f9; }
