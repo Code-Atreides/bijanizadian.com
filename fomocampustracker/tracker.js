@@ -63,6 +63,11 @@
   // ---------- state ----------
   var data, today, series, chapters, list = [], shown = PAGE;
   var state = { range: '7', mode: 'daily', type: 'all', sort: 'members', query: '', format: 'post' };
+  // Backdrops open wide (16:9) on computers; phones keep the 4:5 post.
+  if (matchMedia('(min-width: 901px)').matches) {
+    state.format = 'web';
+    document.querySelectorAll('#format button').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.format === 'web')); });
+  }
 
   function start(payload) {
     data = payload;
@@ -554,15 +559,15 @@
   }
 
   // ---------- backdrop ----------
-  // One SVG per chapter (1080 wide, 4:5 post or 9:16 story). On screen it is
+  // One SVG per chapter (16:9 web, 4:5 post or 9:16 story). On screen it is
   // live, made for screen recordings: it animates in, and hovering the
   // timeline, the progress bar or the 80% mark shows the numbers. Save image
   // serializes the same SVG, with the fonts and the logo inlined, to a PNG.
   var LOGO_V = 2; // bump when the logo files change; images are cached a day
-  var BW = 1080, PAD = 84, INNER = BW - PAD * 2;
   var LAYOUT = {
-    post: { H: 1350, top: 84, bottom: 84, lead: 92, letters: 220, name: 58, school: 32, big: 132, gap: 70 },
-    story: { H: 1920, top: 210, bottom: 230, lead: 130, letters: 270, name: 70, school: 38, big: 160, gap: 100 }
+    web: { W: 1920, H: 1080, pad: 96, top: 80, bottom: 80, mark: 40, letters: 230, name: 60, school: 34, big: 140, gap: 60, wide: true, col: 790, chartGap: 110 },
+    post: { W: 1080, H: 1350, pad: 84, top: 84, bottom: 84, mark: 36, lead: 92, letters: 220, name: 58, school: 32, big: 132, gap: 70 },
+    story: { W: 1080, H: 1920, pad: 84, top: 210, bottom: 230, mark: 36, lead: 130, letters: 270, name: 70, school: 38, big: 160, gap: 100 }
   };
   var WHITE = '#ffffff', SOFT = 'rgba(234,237,255,.78)', FAINT = 'rgba(234,237,255,.6)';
   var FONT = 'Aeonik, "Schibsted Grotesk", Arial, sans-serif';
@@ -614,94 +619,118 @@
 
   // logo: { href, w, h } or null. inline: { fonts } for the exported copy.
   function buildBackdrop(c, format, logo, inline) {
-    var L = LAYOUT[format], H = L.H;
-    var root = svg('svg', { xmlns: SVG, viewBox: '0 0 ' + BW + ' ' + H, width: BW, height: H, class: 'bd' });
+    var L = LAYOUT[format], W = L.W, H = L.H, PAD = L.pad;
+    var colW = L.wide ? L.col : W - PAD * 2, colR = PAD + colW; // the text column
+    var root = svg('svg', { xmlns: SVG, viewBox: '0 0 ' + W + ' ' + H, width: W, height: H, class: 'bd' });
     var defs = svg('defs', {});
     root.append(defs);
     if (inline) { var style = svg('style', {}); style.textContent = inline.fonts; defs.append(style); }
 
     // mesh, then grain
-    root.append(svg('rect', { width: BW, height: H, fill: rgbText(INK) }));
-    var R = Math.max(BW, H);
+    root.append(svg('rect', { width: W, height: H, fill: rgbText(INK) }));
+    var R = Math.max(W, H);
     mesh(c).forEach(function (b, i) {
-      var g = svg('radialGradient', { id: 'bd-m' + i, gradientUnits: 'userSpaceOnUse', cx: b.x * BW, cy: b.y * H, r: b.r * R });
+      var g = svg('radialGradient', { id: 'bd-m' + i, gradientUnits: 'userSpaceOnUse', cx: b.x * W, cy: b.y * H, r: b.r * R });
       STOPS.forEach(function (s) { g.append(svg('stop', { offset: s[0], 'stop-color': rgbText(b.color), 'stop-opacity': (b.a * s[1]).toFixed(3) })); });
       defs.append(g);
-      root.append(svg('rect', { width: BW, height: H, fill: 'url(#bd-m' + i + ')' }));
+      root.append(svg('rect', { width: W, height: H, fill: 'url(#bd-m' + i + ')' }));
     });
     var pattern = svg('pattern', { id: 'bd-grain', width: 180, height: 180, patternUnits: 'userSpaceOnUse' });
     var tile = svg('image', { width: 180, height: 180 });
     tile.setAttribute('href', grainTile());
     pattern.append(tile);
     defs.append(pattern);
-    root.append(svg('rect', { width: BW, height: H, fill: 'url(#bd-grain)' }));
+    root.append(svg('rect', { width: W, height: H, fill: 'url(#bd-grain)' }));
 
     // lockup + season
-    var markH = 36, s = markH / 113, top = L.top;
+    var markH = L.mark, s = markH / 113, top = L.top, headerBottom = top + markH, foot = H - L.bottom;
     var mark = svg('g', { transform: 'translate(' + PAD + ' ' + top + ') scale(' + s + ')', fill: WHITE });
     WORDMARK.forEach(function (d) { mark.append(svg('path', { d: d })); });
     root.append(mark);
-    text(root, PAD + 352 * s + 10, top + markH - 1, '/campus', 38, 400, FAINT, { track: -1 });
-    text(root, BW - PAD, top + markH - 4, 'Greek Wars · Fall 2026', 27, 500, SOFT, { anchor: 'end' });
+    text(root, PAD + 352 * s + 10, top + markH - 1, '/campus', markH + 2, 400, FAINT, { track: -1 });
+    text(root, W - PAD, top + markH - 4, 'Greek Wars · Fall 2026', L.wide ? 30 : 27, 500, SOFT, { anchor: 'end' });
 
-    // letters with the school logo beside them
-    var y = top + markH + L.lead;
-    var logoW = logo ? Math.round(INNER * 0.34) : 0;
-    var ls = fit(c.letters, 700, L.letters, INNER - (logo ? logoW + 44 : 0), 80);
+    // The text column is built from y = 0, then moved into place: below the
+    // header on post and story, centred between header and footer on web.
+    var col = svg('g', {});
+    root.append(col);
+    var y = 0;
+    var logoW = logo ? Math.round(colW * 0.34) : 0;
+    var ls = fit(c.letters, 700, L.letters, colW - (logo ? logoW + 44 : 0), 80);
     var capH = ascent('H', 700, ls);
     y += ascent(c.letters, 700, ls);
-    text(root, PAD - ls * 0.03, y, c.letters, ls, 700, WHITE, { track: -ls * 0.03 });
+    text(col, PAD - ls * 0.03, y, c.letters, ls, 700, WHITE, { track: -ls * 0.03 });
     if (logo) {
       var k = Math.min(logoW / logo.w, capH * 1.4 / logo.h), lw = logo.w * k, lh = logo.h * k;
-      var img = svg('image', { x: BW - PAD - lw, y: y - capH / 2 - lh / 2, width: lw, height: lh, class: 'bd-logo' });
+      var img = svg('image', { x: colR - lw, y: y - capH / 2 - lh / 2, width: lw, height: lh, class: 'bd-logo' });
       img.setAttribute('href', logo.href);
-      root.append(img);
+      col.append(img);
     }
 
     // name and school
     y += L.name * 0.72 + 42;
-    wrap(c.name, 500, L.name, INNER, 2).forEach(function (line, i) {
+    wrap(c.name, 500, L.name, colW, 2).forEach(function (line, i) {
       if (i) y += L.name * 1.12;
-      text(root, PAD, y, line, L.name, 500, WHITE, { track: -1.5 });
+      text(col, PAD, y, line, L.name, 500, WHITE, { track: -1.5 });
     });
     y += L.school * 1.45;
-    text(root, PAD, y, wrap(c.school, 400, L.school, INNER, 1)[0], L.school, 400, SOFT, { track: -0.4 });
+    text(col, PAD, y, wrap(c.school, 400, L.school, colW, 1)[0], L.school, 400, SOFT, { track: -0.4 });
 
     // progress
     y += L.gap + ascent('0', 700, L.big);
     var bigW = textWidth(num(c.joined), 700, L.big, -L.big * 0.03);
-    text(root, PAD - L.big * 0.02, y, num(c.joined), L.big, 700, WHITE, { track: -L.big * 0.03, cls: 'bd-count', to: c.joined });
-    text(root, PAD + bigW + 26, y - L.big * 0.36, c.joined === 1 ? 'member joined' : 'members joined', L.school + 2, 500, WHITE);
-    text(root, PAD + bigW + 26, y - 2, 'of ' + num(c.active) + ' actives', L.school, 400, SOFT);
+    text(col, PAD - L.big * 0.02, y, num(c.joined), L.big, 700, WHITE, { track: -L.big * 0.03, cls: 'bd-count', to: c.joined });
+    text(col, PAD + bigW + 26, y - L.big * 0.36, c.joined === 1 ? 'member joined' : 'members joined', L.school + 2, 500, WHITE);
+    text(col, PAD + bigW + 26, y - 2, 'of ' + num(c.active) + ' actives', L.school, 400, SOFT);
     y += 36;
-    var barH = 14, pct = c.active ? Math.min(1, c.joined / c.active) : 0;
-    var barY = y;
-    root.append(svg('rect', { x: PAD, y: barY, width: INNER, height: barH, rx: barH / 2, fill: 'rgba(234,237,255,.2)' }));
-    if (pct > 0) root.append(svg('rect', { class: 'bd-fill', x: PAD, y: barY, width: Math.max(barH, INNER * pct), height: barH, rx: barH / 2, fill: WHITE }));
-    if (c.target) root.append(svg('rect', { class: 'bd-tick', x: PAD + INNER * 0.8 - 1.5, y: barY - 9, width: 3, height: barH + 18, rx: 1.5, fill: c.joined >= c.target ? 'rgba(11,9,31,.6)' : 'rgba(234,237,255,.92)' }));
+    var barH = 14, pct = c.active ? Math.min(1, c.joined / c.active) : 0, barY = y;
+    col.append(svg('rect', { x: PAD, y: barY, width: colW, height: barH, rx: barH / 2, fill: 'rgba(234,237,255,.2)' }));
+    if (pct > 0) col.append(svg('rect', { class: 'bd-fill', x: PAD, y: barY, width: Math.max(barH, colW * pct), height: barH, rx: barH / 2, fill: WHITE }));
+    if (c.target) col.append(svg('rect', { class: 'bd-tick', x: PAD + colW * 0.8 - 1.5, y: barY - 9, width: 3, height: barH + 18, rx: 1.5, fill: c.joined >= c.target ? 'rgba(11,9,31,.6)' : 'rgba(234,237,255,.92)' }));
     y += barH + 46;
     var status = !c.target ? '' : c.reachedOn ? '80% reached ' + dayLabel(c.reachedOn) : num(c.target - c.joined) + ' to go to 80% (' + num(c.target) + ')';
-    text(root, PAD, y, status, 30, 500, WHITE);
-    if (c.active) text(root, BW - PAD, y, Math.round(c.joined / c.active * 100) + '% of roster', 28, 400, SOFT, { anchor: 'end' });
+    text(col, PAD, y, status, 30, 500, WHITE);
+    if (c.active) text(col, colR, y, Math.round(c.joined / c.active * 100) + '% of roster', 28, 400, SOFT, { anchor: 'end' });
+
+    // web only: three facts under the progress, using the column's width
+    var lastJoin = c.days.length ? c.days[c.days.length - 1][0] : null, lastLabelled = false;
+    if (L.wide) {
+      var facts = [
+        ['Registered', dayLabel(c.registered)],
+        ['Last join', !lastJoin ? '—' : lastJoin === today ? 'Today' : dayLabel(lastJoin)],
+        ['Rank nationally', '#' + num(1 + chapters.filter(function (x) { return x.joined > c.joined; }).length) + ' of ' + num(chapters.length)]
+      ];
+      y += 54;
+      col.append(svg('rect', { x: PAD, y: y, width: colW, height: 2, fill: 'rgba(234,237,255,.18)' }));
+      y += 50;
+      facts.forEach(function (f, i) {
+        var fx = PAD + i * colW / 3;
+        text(col, fx, y, f[0], 24, 400, SOFT);
+        text(col, fx, y + 48, f[1], 38, 500, WHITE, { track: -0.6 });
+      });
+      y += 48;
+    }
+    var offset = L.wide ? Math.round(headerBottom + (foot - 30 - headerBottom - y) / 2) : headerBottom + L.lead;
+    col.setAttribute('transform', 'translate(0 ' + offset + ')');
 
     // timeline, scaled to the active roster: the line's height is the share of
     // the roster that has joined (members beyond the roster raise the top)
-    var foot = H - L.bottom, axisY = foot - 58;
-    var chartTop = y + L.gap + 40, chartBottom = axisY - 40, ch = chartBottom - chartTop;
+    var axisY = foot - 58;
+    var cx = L.wide ? colR + L.chartGap : PAD, cw = W - PAD - cx, cr = cx + cw;
+    var chartTop = L.wide ? headerBottom + 132 : offset + y + L.gap + 40, chartBottom = axisY - 40, ch = chartBottom - chartTop;
     var first = c.days.length && c.days[0][0] < c.registered ? c.days[0][0] : c.registered;
     var byDay = new Map(c.days), pts = [{ i: 0, d: null, v: 0, add: 0 }], total = 0, n = 0;
-    var lastJoin = c.days.length ? c.days[c.days.length - 1][0] : null, lastLabelled = false;
     for (var d = first; d <= today; d = addDays(d, 1)) { var add = byDay.get(d) || 0; total += add; n++; pts.push({ i: n, d: d, v: total, add: add }); }
     var topV = Math.max(c.active || 0, total, 1);
-    var X = function (i) { return PAD + i / n * INNER; }, Y = function (v) { return chartBottom - v / topV * ch; };
-    text(root, PAD, chartTop - 30, 'Members since registering', 26, 500, SOFT);
+    var X = function (i) { return cx + i / n * cw; }, Y = function (v) { return chartBottom - v / topV * ch; };
+    text(root, cx, chartTop - 30, 'Members since registering', 26, 500, SOFT);
     // Roster and 80% lines, keyed in the title row so their labels never meet the data.
-    var refs = [], keyX = BW - PAD;
+    var refs = [], keyX = cr;
     var reference = function (label, alpha, value) {
       var w = textWidth(label, 400, 25), ly = Math.round(Y(value));
       text(root, keyX, chartTop - 30, label, 25, 400, SOFT, { anchor: 'end' });
       root.append(svg('rect', { x: keyX - w - 44, y: chartTop - 39, width: 30, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
-      root.append(svg('rect', { x: PAD, y: ly - 1, width: INNER, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
+      root.append(svg('rect', { x: cx, y: ly - 1, width: cw, height: 2, fill: 'rgba(234,237,255,' + alpha + ')' }));
       refs.push(ly);
       keyX -= w + 44 + 34;
     };
@@ -713,9 +742,9 @@
       var blocked = top < chartTop - 6 || refs.some(function (r) { return r > top - 6 && r < y - 10; });
       return blocked ? y + 26 + cap : y - 26;
     };
-    root.append(svg('rect', { x: PAD, y: chartBottom, width: INNER, height: 2, fill: 'rgba(234,237,255,.25)' }));
+    root.append(svg('rect', { x: cx, y: chartBottom, width: cw, height: 2, fill: 'rgba(234,237,255,.25)' }));
     if (!total) {
-      text(root, BW / 2, chartTop + ch / 2, 'First members coming soon', 30, 400, SOFT, { anchor: 'middle' });
+      text(root, cx + cw / 2, chartTop + ch / 2, 'First members coming soon', 30, 400, SOFT, { anchor: 'middle' });
     } else {
       var area = svg('linearGradient', { id: 'bd-area', x1: 0, y1: 0, x2: 0, y2: 1 });
       area.append(svg('stop', { offset: 0, 'stop-color': WHITE, 'stop-opacity': 0.26 }), svg('stop', { offset: 1, 'stop-color': WHITE, 'stop-opacity': 0 }));
@@ -736,26 +765,26 @@
       var lastPt = lastJoin ? pts.find(function (p) { return p.d === lastJoin; }) : null;
       if (lastPt && lastPt.i < n) {
         if (lastPt !== reached) marker(lastPt);
-        var label = 'Last join ' + dayLabel(lastJoin), lw = textWidth(label, 500, 26), lx = X(lastPt.i);
-        var left = Math.max(PAD, lx - lw / 2), clear = X(n) - textWidth(num(total), 700, 40) - 60;
-        if (left + lw < clear) {
+        var label = 'Last join ' + dayLabel(lastJoin), lw2 = textWidth(label, 500, 26), lx = X(lastPt.i);
+        var left = Math.max(cx, lx - lw2 / 2), clear = X(n) - textWidth(num(total), 700, 40) - 60;
+        if (left + lw2 < clear) {
           text(root, left, labelY(lastPt.v, 19), label, 26, 500, WHITE, { cls: 'bd-end' });
           lastLabelled = true;
         }
       }
     }
-    text(root, PAD, axisY, 'Registered ' + dayLabel(c.registered), 26, 400, SOFT);
+    text(root, cx, axisY, 'Registered ' + dayLabel(c.registered), 26, 400, SOFT);
     var axisRight = lastJoin === today ? 'Last join today' : lastJoin && !lastLabelled ? 'Last join ' + dayLabel(lastJoin) : 'Today';
-    text(root, BW - PAD, axisY, axisRight + (n > 1 ? ' · day ' + num(n) : ''), 26, 400, SOFT, { anchor: 'end' });
+    text(root, cr, axisY, axisRight + (n > 1 ? ' · day ' + num(n) : ''), 26, 400, SOFT, { anchor: 'end' });
 
     // footer
     text(root, PAD, foot, 'fomocampus.com', 26, 400, FAINT);
-    text(root, BW - PAD, foot, 'Updated ' + dayLabel(today, true), 26, 400, FAINT, { anchor: 'end' });
+    text(root, W - PAD, foot, 'Updated ' + dayLabel(today, true), 26, 400, FAINT, { anchor: 'end' });
 
     return {
       root: root, c: c, total: total, pts: pts, n: n, X: X, Y: Y,
-      chart: { x: PAD, y: chartTop, w: INNER, h: ch, bottom: chartBottom },
-      bar: { x: PAD, y: barY, w: INNER, h: barH }
+      chart: { x: cx, y: chartTop, w: cw, h: ch, bottom: chartBottom },
+      bar: { x: PAD, y: offset + barY, w: colW, h: barH }
     };
   }
 
@@ -894,7 +923,7 @@
       await img.decode();
       await new Promise(function (r) { setTimeout(r, 150); }); // let the inlined fonts settle
       var canvas = document.createElement('canvas');
-      canvas.width = BW; canvas.height = LAYOUT[format].H;
+      canvas.width = LAYOUT[format].W; canvas.height = LAYOUT[format].H;
       canvas.getContext('2d').drawImage(img, 0, 0);
       return await new Promise(function (resolve) { canvas.toBlob(resolve, 'image/png'); });
     } finally { URL.revokeObjectURL(url); }
@@ -979,7 +1008,7 @@
     meta.root.setAttribute('role', 'group');
     meta.root.setAttribute('aria-label', 'Backdrop for ' + c.name + ', ' + c.school + ': ' + plural(c.joined, 'member') + ' joined of ' + num(c.active) + ' actives' + (c.reachedOn ? ', 80% reached ' + dayLabel(c.reachedOn) : '') + '.');
     var stage = $('backdrop');
-    stage.style.setProperty('--ratio', BW / LAYOUT[state.format].H);
+    stage.style.setProperty('--ratio', LAYOUT[state.format].W / LAYOUT[state.format].H);
     $('bd-tip').hidden = true;
     stage.replaceChildren(meta.root);
     interact(meta);

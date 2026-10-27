@@ -9,8 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=7">
-<script src="/fomocampustracker/tracker.js?v=7" defer></script>
+<link rel="stylesheet" href="/fomocampustracker/tracker.css?v=8">
+<script src="/fomocampustracker/tracker.js?v=8" defer></script>
 <!--
   /data, the fomo campus tracker: daily members and chapters added, member
   joins by day of the week, and a backdrop for every chapter (its
@@ -183,8 +183,9 @@
     <p class="viewer-school" id="viewer-school"></p>
     <div class="viewer-actions">
       <div class="segmented dark" id="format" role="group" aria-label="Image size">
-        <button type="button" data-format="post" aria-pressed="true">Post 4:5</button>
-        <button type="button" data-format="story" aria-pressed="false">Story 9:16</button>
+        <button type="button" data-format="web" aria-pressed="false" title="Wide 16:9, for the web and screen recordings">Web</button>
+        <button type="button" data-format="post" aria-pressed="true" title="Instagram post, 4:5">Post</button>
+        <button type="button" data-format="story" aria-pressed="false" title="Instagram story, 9:16">Story</button>
       </div>
       <button type="button" class="button primary small" id="save">Save image</button>
       <button type="button" class="button ghost small" id="replay">Replay</button>
