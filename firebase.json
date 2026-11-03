@@ -37,7 +37,9 @@
       "fomocontent/**",
       "functions-content/**",
       "greekwars-onboarding/**",
-      "greekwars-onboarding.zip"
+      "greekwars-onboarding.zip",
+      "body.html",
+      "8481346c-06e9-40ec-8c19-a600b4e55ce1.txt"
     ],
     "cleanUrls": true,
     "trailingSlash": false,
@@ -71,6 +73,20 @@
         "source": "/slice/**",
         "run": {
           "serviceId": "slice",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/ranch",
+        "run": {
+          "serviceId": "ranch",
+          "region": "us-central1"
+        }
+      },
+      {
+        "source": "/ranch/**",
+        "run": {
+          "serviceId": "ranch",
           "region": "us-central1"
         }
       },
