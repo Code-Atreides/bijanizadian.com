@@ -17,6 +17,8 @@
       var dark = root.dataset.theme === 'dark';
       toggle.setAttribute('aria-label', dark ? 'Switch to light' : 'Switch to dark');
       toggle.title = toggle.getAttribute('aria-label');
+      var chrome = document.querySelector('meta[name="theme-color"]');
+      if (chrome) chrome.content = dark ? '#0b091f' : '#ffffff';
     }
     if (toggle) {
       label();

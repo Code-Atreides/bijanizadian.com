@@ -1,13 +1,17 @@
 /* The campus CRM's look (/campus/submissions, analytics, captions, accounts): a white
    or ink canvas, colour only when it means something, everything on a 4px grid,
    small quiet type under a large page title, pills and 24px cards with hairline
-   edges. The colours are fomo's: ink, the fomo blue and its light blues. It loads
-   after each page's own styles, so it sets their tokens and restyles the shared
-   pieces; page-specific layout stays with the page. */
+   edges. The colours and pairings are fomo's brand kit (brand/README.md), which wins
+   wherever the two disagree: ink, fomo blue, light blue, pale lavender and white,
+   action blue for links and solid buttons on light surfaces, the kit's two gradients
+   for the one card a page leads with, and electric blue only as the lockup's slash.
+   It loads after each page's own styles, so it sets their tokens and restyles the
+   shared pieces; page-specific layout stays with the page. */
 
 :root, [data-theme="light"] {
   color-scheme: light;
-  --bg: #ffffff; --surface: #ffffff; --surface-2: #f5f6fc; --surface-3: #eceef8;
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f4f6ff; --surface-3: #eaedff;
+  --side: #eaedff; --side-fg: #2c2e4a; --side-fg-2: #4d5070; --lockup: #516af6; --slash: #4a36ff;
   --fg: #0b091f; --fg-2: #565870; --fg-3: #686b82;
   --hairline: rgba(11,9,31,.08); --hairline-strong: rgba(11,9,31,.16);
   --hover: rgba(11,9,31,.04); --skeleton: #e8eaf4; --shimmer: rgba(255,255,255,.9);
@@ -17,7 +21,9 @@
 
   /* the names the pages already use */
   --ink: var(--fg); --muted: var(--fg-2); --muted-2: var(--fg-3); --faint: var(--fg-3);
-  --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+  --blue: #516af6; --blue-hover: #3548c4; --blue-text: #4057df; --glow: #acb8f9; --action: #4057df; --action-fg: #ffffff; --action-line: transparent;
+  /* the kit's technical & premium gradient: ink with a #221d4b halo at the top centre */
+  --feature: radial-gradient(90% 70% at 50% 0%, #221d4b 0%, rgba(34,29,75,0) 100%), #0b091f; --feature-fg: #ffffff; --feature-fg-2: #cbd0eb;
   --lavender: #eaedff; --tint: var(--surface-2); --tint-line: var(--hairline); --chip: var(--surface-3);
   --line: var(--hairline); --input: var(--hairline-strong); --option-line: var(--hairline-strong);
   --panel-rule: var(--hairline-strong); --grid: #eef0f7;
@@ -25,40 +31,50 @@
 }
 [data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0b091f; --surface: #110f2a; --surface-2: #181635; --surface-3: #221f45;
-  --fg: #ffffff; --fg-2: #b4b8d4; --fg-3: #989cbc;
-  --hairline: rgba(234,237,255,.1); --hairline-strong: rgba(234,237,255,.2);
-  --hover: rgba(234,237,255,.06); --skeleton: #1d1b3c; --shimmer: rgba(234,237,255,.14);
-  --glass: rgba(24,22,53,.64); --glass-strong: rgba(24,22,53,.92);
+  /* ink as the one dominant background, with the kit's supporting dark UI set on it */
+  --bg: #0b091f; --surface: #12111a; --surface-2: #161522; --surface-3: #22213a;
+  --side: #12111a; --side-fg: #eaedff; --side-fg-2: #9899a3; --lockup: #eaedff; --slash: #acb8f9;
+  --fg: #ffffff; --fg-2: #cbd0eb; --fg-3: #9899a3;
+  --hairline: rgba(203,208,235,.1); --hairline-strong: rgba(203,208,235,.2);
+  --hover: rgba(255,255,255,.06); --skeleton: #1a1930; --shimmer: rgba(234,237,255,.14);
+  --glass: rgba(18,17,26,.64); --glass-strong: rgba(18,17,26,.92);
   --shadow-card: inset 0 1px 0 rgba(234,237,255,.04); --shadow-float: 0 16px 48px -8px rgba(0,0,0,.7);
-  --danger: #fcc1b6; --danger-tint: #2c1a17; --good: #addfbd; --good-tint: #132419;
-  --blue-text: #acb8f9; --lavender: rgba(81,106,246,.22); --grid: #1d1b3c;
+  --danger: #ff622e; --danger-tint: rgba(255,98,46,.12); --good: #21c95e; --good-tint: rgba(33,201,94,.12);
+  --blue-text: #acb8f9; --lavender: rgba(96,106,247,.24); --grid: #1f1e33;
+  /* fomo.family's button: #606af7 at 50% behind a blur, a #cbd0eb hairline at 10% */
+  --action: rgba(96,106,247,.5); --blue-hover: rgba(96,106,247,.8); --action-line: rgba(203,208,235,.1);
+  /* the kit's brand gradient: fomo blue with a light-blue glow in the upper third */
+  --feature: radial-gradient(100% 46% at 50% 0%, rgba(172,184,249,.55) 0%, rgba(172,184,249,0) 100%), #516af6; --feature-fg: #ffffff; --feature-fg-2: #ffffff;
 }
 
 html { scrollbar-gutter: stable; background: var(--bg); }
-body { background: var(--bg); color: var(--fg); font-size: 14px; line-height: 20px; }
+/* fomo sets web body copy in Medium: Regular reads too light in Aeonik */
+body { background: var(--bg); color: var(--fg); font-size: 14px; line-height: 20px; font-weight: 500; }
+html[data-theme="dark"] { background: radial-gradient(1200px 640px at 50% -120px, #221d4b 0%, rgba(34,29,75,0) 100%) no-repeat, #0b091f; }
+[data-theme="dark"] body { background: none; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
 /* ---------- the shell: a floating sidebar and the page ---------- */
 .site-shell { display: grid; grid-template-columns: 216px minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 32px; max-width: 1480px; margin: 0; padding: 16px 32px 0 16px; }
-.site-header { grid-row: 1 / 3; position: sticky; top: 16px; height: calc(100dvh - 32px); display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 24px; padding: 20px 12px 12px; border: 1px solid var(--hairline); border-radius: 28px; background: var(--surface-2); }
-.brand { padding: 0 8px; gap: 8px; color: var(--blue); }
+.site-header { grid-row: 1 / 3; position: sticky; top: 16px; height: calc(100dvh - 32px); display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 24px; padding: 20px 12px 12px; border: 1px solid var(--hairline); border-radius: 28px; background: var(--side); }
+.brand { padding: 0 8px; gap: 8px; color: var(--lockup); }
 .brand svg { width: 64px; height: 21px; }
-.brand > span { font-size: 18px; letter-spacing: -.4px; color: var(--fg-3); }
+.brand > span { font-size: 18px; letter-spacing: -.4px; color: var(--lockup); }
+.brand > span i { margin-right: 1px; font-style: normal; color: var(--slash); }
 .pages { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 0; margin: 0; border-radius: 0; background: none; min-height: 0; overflow-y: auto; }
-.nav-label { font-size: 12px; line-height: 16px; color: var(--fg-3); padding: 0 12px; margin: 16px 0 4px; }
+.nav-label { font-size: 12px; line-height: 16px; color: var(--side-fg-2); padding: 0 12px; margin: 16px 0 4px; }
 .nav-label:first-child { margin-top: 0; }
-.pages a { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 400; color: var(--fg-2); transition: background .16s, color .16s; }
+.pages a { display: flex; align-items: center; gap: 8px; height: 40px; padding: 0 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--side-fg); transition: background .16s, color .16s; }
 .pages a svg { flex: none; width: 16px; height: 16px; }
-.pages a:hover { background: var(--hover); color: var(--fg); }
+.pages a:hover { background: var(--hover); color: var(--side-fg); }
 .pages a[aria-current="page"] { background: var(--surface); color: var(--blue-text); font-weight: 500; box-shadow: 0 0 0 1px var(--hairline); }
 .side-foot { display: flex; align-items: center; gap: 4px; min-width: 0; }
-.account { flex: 1; display: block; min-width: 0; padding: 0 0 0 8px; font-size: 12px; line-height: 16px; color: var(--fg-3); }
+.account { flex: 1; display: block; min-width: 0; padding: 0 0 0 8px; font-size: 12px; line-height: 16px; color: var(--side-fg-2); }
 .account[hidden] { display: none; }
 .account span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .account .text-button { height: auto; padding: 0; color: var(--blue-text); font-size: 12px; line-height: 16px; border-radius: 4px; }
 .account .text-button:hover { background: none; text-decoration: underline; text-underline-offset: 2px; }
-.theme-toggle { flex: none; margin-left: auto; width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: var(--fg-2); transition: background .16s; }
+.theme-toggle { flex: none; margin-left: auto; width: 32px; height: 32px; padding: 0; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: var(--side-fg); transition: background .16s; }
 .theme-toggle:hover { background: var(--hover); color: var(--fg); }
 .theme-toggle svg { width: 16px; height: 16px; }
 .theme-toggle .to-light, [data-theme="dark"] .theme-toggle .to-dark { display: none; }
@@ -73,8 +89,8 @@ main { grid-column: 2; min-width: 0; padding-top: 16px; }
 [data-nav="collapsed"] .nav-fold svg { transform: rotate(180deg); }
 [data-nav="collapsed"] .site-shell { grid-template-columns: 72px minmax(0, 1fr); }
 [data-nav="collapsed"] .brand { justify-content: center; padding: 0; }
-[data-nav="collapsed"] .brand svg { width: 40px; height: 13px; }
-[data-nav="collapsed"] .brand > span, [data-nav="collapsed"] .account { display: none; }
+[data-nav="collapsed"] .brand svg, [data-nav="collapsed"] .brand > span, [data-nav="collapsed"] .account { display: none; }
+[data-nav="collapsed"] .brand::after { content: ""; width: 40px; aspect-ratio: 620 / 426; background: var(--lockup); -webkit-mask: url("/assets/campus-mark.svg") center / contain no-repeat; mask: url("/assets/campus-mark.svg") center / contain no-repeat; }
 [data-nav="collapsed"] .nav-label { height: 1px; margin: 8px 12px; padding: 0; overflow: hidden; font-size: 0; background: var(--hairline); }
 [data-nav="collapsed"] .nav-label:first-child { display: none; }
 [data-nav="collapsed"] .pages { overflow: hidden; }
@@ -93,7 +109,8 @@ main { grid-column: 2; min-width: 0; padding-top: 16px; }
 .filters { margin-bottom: 16px; }
 
 /* ---------- controls ---------- */
-.primary-action { height: 40px; border-radius: 999px; font-size: 13px; }
+.primary-action { height: 40px; border: 1px solid var(--action-line); border-radius: 999px; background: var(--action); color: var(--action-fg); font-size: 13px; }
+[data-theme="dark"] .primary-action, [data-theme="dark"] .open { -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .primary-action.small { height: 40px; padding: 0 16px; font-size: 13px; gap: 8px; }
 .option { height: 40px; padding: 0 16px; border-radius: 999px; border-color: var(--hairline-strong); background: none; color: var(--fg); font-size: 13px; transition: background .16s; }
 .option:hover { background: var(--hover); }
@@ -140,9 +157,9 @@ div.status button[data-status="done"][aria-pressed="true"] { background: var(--g
 .stat strong { font-size: 32px; line-height: 36px; letter-spacing: -.032em; margin-top: 8px; }
 .stat small { font-size: 12px; line-height: 16px; color: var(--fg-3); margin-top: 4px; }
 /* one inverted card per page, for the number that matters most */
-.stat.hero { background: var(--fg); border-color: var(--fg); }
-.stat.hero span, .stat.hero small { color: var(--bg); opacity: .7; }
-.stat.hero strong { color: var(--bg); }
+.stat.hero { background: var(--feature); border-color: transparent; }
+.stat.hero span, .stat.hero small { color: var(--feature-fg-2); }
+.stat.hero strong { color: var(--feature-fg); }
 
 /* ---------- cards and tables ---------- */
 .row { gap: 16px; margin-bottom: 16px; }
@@ -152,9 +169,12 @@ div.status button[data-status="done"][aria-pressed="true"] { background: var(--g
 .card-head { align-items: center; margin-bottom: 16px; }
 .card h2 { font-size: 15px; line-height: 20px; letter-spacing: -.006em; }
 .card-head p, .card-head .sub { font-size: 13px; line-height: 20px; color: var(--fg-3); }
+.legend-title { font-size: 12px; line-height: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--fg-3); }
 .card-note { font-size: 12px; line-height: 16px; color: var(--fg-3); margin-top: 16px; }
 .signin { overflow: hidden; }
-.signin-head { background: var(--surface-2); padding: 24px; }
+.signin-head { background: radial-gradient(100% 90% at 50% 0%, rgba(172,184,249,.7) 0%, rgba(172,184,249,0) 100%), #516af6; color: #fff; padding: 24px; }
+.signin-head .eyebrow { color: #fff; }
+.signin .signin-head h1 span { color: #eaedff; }
 .signin-body { padding: 24px; }
 .signin h1 { letter-spacing: -.032em; }
 .eyebrow { font-size: 12px; line-height: 16px; letter-spacing: 0; font-weight: 400; color: var(--fg-3); }
@@ -172,7 +192,7 @@ div.status button[data-status="done"][aria-pressed="true"] { background: var(--g
 .item h2 { font-size: 15px; line-height: 20px; letter-spacing: -.006em; }
 .item .notes, .who { color: var(--fg-2); font-size: 13px; line-height: 20px; }
 .when { font-size: 12px; line-height: 16px; color: var(--fg-3); }
-.open { background: var(--blue); border-color: var(--blue); color: #fff; }
+.open { background: var(--action); border-color: var(--action-line); color: #fff; }
 .open:hover { background: var(--blue-hover); }
 .missing:hover { background: none; }
 .remove:hover { background: var(--danger-tint); color: var(--danger); }
@@ -213,8 +233,9 @@ html:not(.crm-loaded) .stat small { visibility: hidden; }
   /* no sidebar to fold here: it's a bar along the top, whatever was chosen on a wider screen */
   .nav-fold { display: none; }
   [data-nav="collapsed"] .brand { padding: 0 4px; }
-  [data-nav="collapsed"] .brand svg { width: 64px; height: 21px; }
+  [data-nav="collapsed"] .brand svg { display: block; width: 64px; height: 21px; }
   [data-nav="collapsed"] .brand > span { display: inline; }
+  [data-nav="collapsed"] .brand::after { display: none; }
   [data-nav="collapsed"] .account { display: block; }
   [data-nav="collapsed"] .nav-label { display: none; }
   [data-nav="collapsed"] .pages { overflow-x: auto; }
