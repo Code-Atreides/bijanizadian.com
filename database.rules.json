@@ -264,8 +264,8 @@
       }
     },
     "content_account_logins": {
-      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
-      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'admin@crm.bijanizadian.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'admin@crm.bijanizadian.com')",
       "$account": {
         ".validate": "$account.matches(/^[a-z0-9-]{2,60}$/) && newData.hasChildren(['password'])",
         "password": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200" },

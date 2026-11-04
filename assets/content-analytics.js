@@ -1,4 +1,4 @@
-// Campus media analytics at /campus/analytics: how posted videos perform.
+// Campus media analytics at /mediadata/analytics: how posted videos perform.
 // Each post in RTDB content_posts has a link, a platform, who made it (typed in,
 // or taken from the content_submissions entry it came from) and dated snapshots
 // of its views, likes, comments and shares; latest mirrors the newest snapshot.
@@ -21,7 +21,7 @@
 // over the date range.
 // Each post can also carry the state it's for (the map, via content-geo.js),
 // the time it went up and its caption (hashtags are read from it), which the
-// caption archive at /campus/captions collects.
+// caption archive at /mediadata/captions collects.
 // Everything typed in is untrusted: it goes into the page as text, and a post
 // link becomes an <a> only if it is https. Sign-in comes from content-auth.js.
 (function () {

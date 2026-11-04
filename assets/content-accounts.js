@@ -1,10 +1,10 @@
-// The accounts list at /campus/accounts: every Instagram account in the campus
+// The accounts list at /mediadata/accounts: every Instagram account in the campus
 // network, whether we own it (we hold the login) or just have it (someone else runs
 // it), and the logins set up for accounts that aren't linked to a page yet.
 // Accounts live in RTDB content_accounts, readable by the team. Passwords live
-// apart in content_account_logins, which the database lets only the admin email
-// read or write, so a teammate never receives them. The page asks for keys alone
-// (shallow) to learn whether this person is the admin, and fetches one password
+// apart in content_account_logins, which only the admin account can read or write.
+// The page asks for the admin password when someone first tries to see, copy or
+// change one, and that unlock lasts until the page closes. It fetches one password
 // only when it's revealed or copied. Followers, posts and last post come from the
 // import unless the account is tracked daily (content_creators), when followers
 // come from there and likes and engagement are added up from its posts
@@ -16,7 +16,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var db = function (method, path, body) { return window.contentAuth.db(method, path, body); };
   var whole = new Intl.NumberFormat('en-US');
-  var accounts = {}, tracked = {}, stats = {}, loginIds = {}, isAdmin = false, tab = 'all', loading = false, first = true, editing = null, hideTimer = 0, shown = null;
+  var accounts = {}, tracked = {}, stats = {}, tab = 'all', loading = false, first = true, editing = null, hideTimer = 0, shown = null;
   var DAY = 86400000, PERIOD = 30, SORT_KEY = 'campus-accounts-sort', sort = 'top';
   try { sort = localStorage.getItem(SORT_KEY) || 'top'; } catch (e) {}
 
@@ -56,9 +56,6 @@
       var results = await Promise.all([db('GET', '/content_accounts'), db('GET', '/content_creators'), db('GET', '/content_posts')]);
       accounts = results[0] || {};
       readTracked(results[1] || {}, results[2] || {});
-      // only the admin may ask for this; anyone else is refused and sees no passwords
-      try { loginIds = (await window.contentAuth.db('GET', '/content_account_logins', undefined, 'shallow=true')) || {}; isAdmin = true; }
-      catch (error) { if (error.message !== 'no-access') throw error; loginIds = {}; isAdmin = false; }
       $('acc-error').hidden = true;
       render();
       if (first) { first = false; $('acc-stats').classList.add('settle'); $('acc-rows').classList.add('settle'); }
@@ -216,7 +213,7 @@
     var login = el('td', 'acc-login');
     login.dataset.label = 'Login';
     login.appendChild(el('span', 'acc-email', a.login_email || '—'));
-    if (isAdmin && loginIds[a.id]) {
+    if (a.login_email) {
       var pw = el('div', 'acc-password'), value = el('span', 'pw-value', '••••••••••');
       var show = el('button', 'text-button', 'Show'), copy = el('button', 'text-button', 'Copy');
       show.type = copy.type = 'button';
@@ -244,36 +241,50 @@
     clearTimeout(hideTimer);
     if (shown) { shown.value.textContent = '••••••••••'; shown.value.classList.remove('is-shown'); shown.button.textContent = 'Show'; shown = null; }
   }
-  function refused(error) {
-    if (error.message === 'no-access') { isAdmin = false; render(); return; }
+  function passwordError(error) {
+    if (error.message === 'no-access') { $('acc-error').textContent = 'The admin login was refused. Try again.'; $('acc-error').hidden = false; return; }
     if (window.contentAuth.handle(error)) return;
     $('acc-error').textContent = 'That password couldn\'t load. Try again.';
     $('acc-error').hidden = false;
   }
+  // resolves true once the admin login is unlocked, false if the person cancels
+  var adminWait = null;
+  function settleAdmin(unlocked) { var done = adminWait; adminWait = null; if (done) done(unlocked); }
+  function requestAdmin() {
+    if (window.contentAuth.adminUnlocked()) return Promise.resolve(true);
+    $('admin-password').value = '';
+    $('admin-error').textContent = '';
+    $('admin-dialog').showModal();
+    $('admin-password').focus();
+    return new Promise(function (resolve) { adminWait = resolve; });
+  }
+  function savedPassword(a) { return window.contentAuth.adminDb('GET', '/content_account_logins/' + a.id + '/password'); }
   async function togglePassword(a, value, button) {
     if (shown && shown.value === value) return hidePassword();
     hidePassword();
+    if (!(await requestAdmin())) return;
     button.disabled = true;
     try {
-      var password = await db('GET', '/content_account_logins/' + a.id + '/password');
-      value.textContent = password || '(none)';
+      value.textContent = (await savedPassword(a)) || 'None saved';
       value.classList.add('is-shown');
       button.textContent = 'Hide';
       shown = { value: value, button: button };
       hideTimer = setTimeout(hidePassword, 30000);
-    } catch (error) { refused(error); }
+    } catch (error) { passwordError(error); }
     finally { button.disabled = false; }
   }
   async function copyPassword(a, button) {
+    if (!(await requestAdmin())) return;
     button.disabled = true;
     try {
-      var password = await db('GET', '/content_account_logins/' + a.id + '/password');
-      await navigator.clipboard.writeText(password || '');
+      var password = await savedPassword(a);
+      if (!password) { button.textContent = 'None saved'; setTimeout(function () { button.textContent = 'Copy'; }, 1600); return; }
+      await navigator.clipboard.writeText(password);
       button.textContent = 'Copied';
       setTimeout(function () { button.textContent = 'Copy'; }, 1600);
     } catch (error) {
       if (error.name === 'NotAllowedError') { $('acc-error').textContent = 'The browser blocked copying. Use Show instead.'; $('acc-error').hidden = false; }
-      else refused(error);
+      else passwordError(error);
     } finally { button.disabled = false; }
   }
 
@@ -287,7 +298,6 @@
     $('a-email').value = a ? a.login_email || '' : '';
     $('a-note').value = a ? a.note || '' : '';
     $('a-password').value = '';
-    $('a-password-field').hidden = !isAdmin;
     $('a-remove').hidden = !a;
     $('a-error').textContent = '';
     $('acc-dialog').showModal();
@@ -302,6 +312,7 @@
     if (!handle && !email) { $('a-error').textContent = 'Add an Instagram handle or a login email.'; return; }
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $('a-error').textContent = 'Enter a valid login email.'; return; }
     var button = $('a-save');
+    if (password && !(await requestAdmin())) { $('a-error').textContent = 'A new password needs the admin password.'; return; }
     button.disabled = true; $('a-error').textContent = '';
     var id = editing ? editing.id : slug(handle || email.split('@')[0]);
     if (!editing && accounts[id]) id = (id + '-' + Date.now().toString(36)).slice(0, 60);
@@ -311,7 +322,7 @@
     if (editing && (editing.handle || '') !== handle) { changes.followers = null; changes.posts = null; changes.last_post_at = null; changes.checked_at = null; changes.name = null; }
     try {
       await db('PATCH', '/content_accounts/' + id, changes);
-      if (password && isAdmin) await db('PUT', '/content_account_logins/' + id, { password: password });
+      if (password) await window.contentAuth.adminDb('PUT', '/content_account_logins/' + id, { password: password });
       $('acc-dialog').close();
       await load();
     } catch (error) {
@@ -323,9 +334,10 @@
   async function remove() {
     if (!editing) return;
     var name = editing.handle || editing.login_email || 'this account';
-    if (!window.confirm('Remove ' + name + ' from the list' + (isAdmin ? ', along with its saved password?' : '?'))) return;
+    if (!window.confirm('Remove ' + name + ' from the list' + (editing.login_email ? ', along with its saved password?' : '?'))) return;
+    if (editing.login_email && !(await requestAdmin())) { $('a-error').textContent = 'Removing a saved password needs the admin password.'; return; }
     try {
-      if (isAdmin) await db('DELETE', '/content_account_logins/' + editing.id);
+      if (editing.login_email) await window.contentAuth.adminDb('DELETE', '/content_account_logins/' + editing.id);
       await db('DELETE', '/content_accounts/' + editing.id);
       $('acc-dialog').close();
       await load();
@@ -351,6 +363,22 @@
     try { localStorage.setItem(SORT_KEY, sort); } catch (e) {}
     render();
   });
+  $('admin-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var password = $('admin-password').value, button = $('admin-send');
+    if (!password) { $('admin-password').focus(); $('admin-error').textContent = 'Type the admin password.'; return; }
+    button.disabled = true; $('admin-error').textContent = '';
+    try {
+      await window.contentAuth.unlockAdmin(password);
+      $('admin-password').value = '';
+      settleAdmin(true);
+      $('admin-dialog').close();
+    } catch (error) {
+      $('admin-error').textContent = error.name === 'TimeoutError' ? 'That couldn\'t finish. Check your connection and try again.' : error.message;
+      $('admin-password').select();
+    } finally { button.disabled = false; }
+  });
+  $('admin-dialog').addEventListener('close', function () { $('admin-password').value = ''; settleAdmin(false); });
   var searchWait = 0;
   $('search').addEventListener('input', function () { clearTimeout(searchWait); searchWait = setTimeout(render, 220); });
   $('refresh').addEventListener('click', load);
@@ -363,7 +391,7 @@
 
   window.contentAuth.init({
     main: 'accounts', onOpen: load,
-    onSignOut: function () { hidePassword(); accounts = {}; loginIds = {}; isAdmin = false; first = true; },
+    onSignOut: function () { hidePassword(); accounts = {}; first = true; },
     denied: 'This account can\'t open the accounts list.'
   });
 })();

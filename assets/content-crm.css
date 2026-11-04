@@ -1,4 +1,4 @@
-/* The campus CRM's look (/campus/submissions, analytics, captions, accounts): a white
+/* The campus CRM's look (/mediadata/queue, analytics, captions, accounts): a white
    or ink canvas, colour only when it means something, everything on a 4px grid,
    small quiet type under a large page title, pills and 24px cards with hairline
    edges. The colours and pairings are fomo's brand kit (brand/README.md), which wins
@@ -178,8 +178,7 @@ div.status button[data-status="done"][aria-pressed="true"] { background: var(--g
 .signin-body { padding: 24px; }
 .signin h1 { letter-spacing: -.032em; }
 .signin-team { margin-bottom: 16px !important; font-size: 15px !important; line-height: 20px; color: var(--fg) !important; }
-.signin-switch { margin: 8px 0 0 -12px; }
-.signin .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); padding: 0; border: 0; }
+.signin .sr, dialog .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); padding: 0; border: 0; }
 .eyebrow { font-size: 12px; line-height: 16px; letter-spacing: 0; font-weight: 400; color: var(--fg-3); }
 .cap { padding: 24px; }
 .table, .people { font-size: 13px; line-height: 20px; }

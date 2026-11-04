@@ -10,13 +10,13 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-crm.js?v=5"></script>
-<script src="/assets/content-auth.js?v=5" defer></script>
-<script src="/assets/content-accounts.js?v=3" defer></script>
+<script src="/assets/content-auth.js?v=6" defer></script>
+<script src="/assets/content-accounts.js?v=4" defer></script>
 <!--
   Campus accounts, the network side of the CRM: every Instagram account, whether
   we own it or just have it, and logins not linked to a page yet. The list is in
   RTDB content_accounts. Passwords are in content_account_logins, which only the
-  admin email can read, so they never reach anyone else's browser.
+  admin account can read, so this page asks for its password before showing one.
 -->
 <style>
   @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
@@ -222,7 +222,7 @@
   }
   @media (max-width: 600px) { .acc-stats { grid-template-columns: 1fr 1fr; } .acc-stats .stat:first-child { grid-column: 1 / -1; } }
 </style>
-<link rel="stylesheet" href="/assets/content-crm.css?v=7">
+<link rel="stylesheet" href="/assets/content-crm.css?v=8">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -238,19 +238,19 @@
 
 <div class="site-shell">
   <header class="site-header">
-    <a class="brand" href="/campus/dashboard" aria-label="Campus CRM dashboard">
+    <a class="brand" href="/mediadata" aria-label="Campus CRM dashboard">
       <svg aria-hidden="true"><use href="#wordmark"/></svg>
       <span><i>/</i>campus</span>
     </a>
     <nav class="pages" aria-label="Campus CRM">
-      <a href="/campus/dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>Dashboard</a>
+      <a href="/mediadata"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>Dashboard</a>
       <p class="nav-label">Content</p>
-      <a href="/campus/submissions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5l2-8Z"/></svg>Queue</a>
-      <a href="/campus/captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Captions</a>
+      <a href="/mediadata/queue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5l2-8Z"/></svg>Queue</a>
+      <a href="/mediadata/captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Captions</a>
       <p class="nav-label">Performance</p>
-      <a href="/campus/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Analytics</a>
+      <a href="/mediadata/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Analytics</a>
       <p class="nav-label">Network</p>
-      <a href="/campus/accounts" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.5a4 4 0 0 1 0 7M18 14.5a7 7 0 0 1 4 6.5"/></svg>Accounts</a>
+      <a href="/mediadata/accounts" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.5a4 4 0 0 1 0 7M18 14.5a7 7 0 0 1 4 6.5"/></svg>Accounts</a>
     </nav>
     <div class="side-foot">
       <div class="account" id="account" hidden>
@@ -262,7 +262,7 @@
   </header>
 
   <main>
-    <!-- signed out: the campus team password, or an admin's emailed link -->
+    <!-- signed out: the campus team password -->
     <section class="signin" id="signin" hidden aria-labelledby="signin-title">
       <div class="signin-head">
         <span class="eyebrow">TEAM ONLY</span>
@@ -275,18 +275,7 @@
           <label class="field">Password<input id="signin-password" type="password" autocomplete="current-password" maxlength="200"></label>
           <button type="submit" class="primary-action" id="signin-send">Sign in</button>
         </form>
-        <form id="link-form" novalidate hidden>
-          <p>Admins sign in with a link sent to their email.</p>
-          <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
-          <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
-        </form>
-        <form id="finish-form" novalidate hidden>
-          <p>Confirm the email address that got the sign-in link.</p>
-          <label class="field">Email<input id="finish-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
-          <button type="submit" class="primary-action" id="finish-send">Finish signing in</button>
-        </form>
         <p class="notice" id="signin-notice" role="status" aria-live="polite"></p>
-        <button type="button" class="text-button signin-switch" id="signin-switch">Admin sign-in</button>
       </div>
     </section>
 
@@ -354,13 +343,27 @@
     <label class="field">School<input id="a-school" type="text" autocomplete="off" maxlength="120"></label>
     <label class="field">Status<select id="a-status"><option value="own">We own it</option><option value="have">We have it, someone else runs it</option></select></label>
     <label class="field">Login email<input id="a-email" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="200"></label>
-    <label class="field" id="a-password-field">New password, blank keeps the saved one<input id="a-password" type="password" autocomplete="new-password" maxlength="200"></label>
+    <label class="field">New password, blank keeps the saved one<input id="a-password" type="password" autocomplete="new-password" maxlength="200"></label>
     <label class="field">Note<input id="a-note" type="text" autocomplete="off" maxlength="300"></label>
     <p class="dlg-error" id="a-error" role="alert"></p>
     <div class="dlg-actions">
       <button type="button" class="text-button danger" id="a-remove" style="margin-right:auto" hidden>Remove</button>
       <button type="button" class="option" data-close>Cancel</button>
       <button type="submit" class="primary-action" id="a-save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="admin-dialog" aria-labelledby="admin-title">
+  <form class="dlg" id="admin-form" novalidate>
+    <h2 id="admin-title">Admin password</h2>
+    <p class="lede">Saved Instagram passwords are for admins only.</p>
+    <input class="sr" type="text" value="admin@crm.bijanizadian.com" autocomplete="username" tabindex="-1" aria-hidden="true" readonly>
+    <label class="field">Password<input id="admin-password" type="password" autocomplete="current-password" maxlength="200"></label>
+    <p class="dlg-error" id="admin-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="admin-send">Unlock</button>
     </div>
   </form>
 </dialog>

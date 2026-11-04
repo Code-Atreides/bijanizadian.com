@@ -142,7 +142,7 @@
         ]
       },
       {
-        "source": "/campus/captions",
+        "source": "/mediadata/captions",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -159,7 +159,7 @@
         ]
       },
       {
-        "source": "/campus/accounts",
+        "source": "/mediadata/accounts",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -176,7 +176,7 @@
         ]
       },
       {
-        "source": "/campus/dashboard",
+        "source": "/mediadata",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -193,7 +193,7 @@
         ]
       },
       {
-        "source": "/campus/analytics",
+        "source": "/mediadata/analytics",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -227,7 +227,7 @@
         ]
       },
       {
-        "source": "/campus/submissions",
+        "source": "/mediadata/queue",
         "headers": [
           {
             "key": "Content-Security-Policy",
@@ -316,8 +316,33 @@
     ],
     "redirects": [
       {
+        "source": "/campus/dashboard",
+        "destination": "/mediadata",
+        "type": 301
+      },
+      {
+        "source": "/campus/submissions",
+        "destination": "/mediadata/queue",
+        "type": 301
+      },
+      {
+        "source": "/campus/analytics",
+        "destination": "/mediadata/analytics",
+        "type": 301
+      },
+      {
+        "source": "/campus/captions",
+        "destination": "/mediadata/captions",
+        "type": 301
+      },
+      {
+        "source": "/campus/accounts",
+        "destination": "/mediadata/accounts",
+        "type": 301
+      },
+      {
         "source": "/campus/studio",
-        "destination": "/campus/captions",
+        "destination": "/mediadata/captions",
         "type": 301
       },
       {

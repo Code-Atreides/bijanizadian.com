@@ -1,4 +1,4 @@
-// The campus media CRM at /campus/submissions: every entry in RTDB
+// The campus media CRM at /mediadata/queue: every entry in RTDB
 // content_submissions (turned in from /campus/media or /campus/submit) with its
 // status from content_status, plus a creators view rolled up by email and a CSV
 // export. Sign-in and database calls come from assets/content-auth.js.

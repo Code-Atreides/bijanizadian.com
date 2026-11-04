@@ -1,8 +1,8 @@
-// Caption archive at /campus/captions: every caption the campus program has posted
+// Caption archive at /mediadata/captions: every caption the campus program has posted
 // with, in one place to search and copy from. Captions live on the posts in RTDB
 // content_posts/<id>/caption: the content backend (functions-content) saves each
 // tracked creator's caption as their posts come in, and the team adds or fixes one
-// here, or pastes it when logging a post on /campus/analytics. Each caption shows
+// here, or pastes it when logging a post on /mediadata/analytics. Each caption shows
 // its post's newest likes, comments and views (Instagram hides views, so those
 // show only once the team logs them).
 // Everything typed in is untrusted: it goes into the page as text, and a post link

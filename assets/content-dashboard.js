@@ -1,4 +1,4 @@
-// The campus CRM's dashboard at /campus/dashboard: one screen for how the network is
+// The campus CRM's dashboard at /mediadata: one screen for how the network is
 // doing and what needs doing next. It only reads what the other team pages write:
 // content_posts and content_creators (analytics), content_submissions and
 // content_status (the queue), content_accounts (accounts). It never asks for
@@ -203,20 +203,20 @@
     });
     if (fresh.length) {
       var oldest = Math.min.apply(null, fresh.map(function (id) { return Number((submissions[id] || {}).submitted_at) || now; }));
-      rows.push({ text: 'Review ' + plural(fresh.length, 'new video'), sub: 'Oldest turned in ' + ago(oldest), n: fresh.length, href: '/campus/submissions' });
+      rows.push({ text: 'Review ' + plural(fresh.length, 'new video'), sub: 'Oldest turned in ' + ago(oldest), n: fresh.length, href: '/mediadata/queue' });
     }
     var unlinked = accounts.filter(function (a) { return !a.handle; });
-    if (unlinked.length) rows.push({ text: 'Set up ' + plural(unlinked.length, 'login') , sub: names(unlinked.map(function (a) { return a.school || a.login_email; }).sort()) + ' have no page yet', n: unlinked.length, href: '/campus/accounts#unlinked' });
+    if (unlinked.length) rows.push({ text: 'Set up ' + plural(unlinked.length, 'login') , sub: names(unlinked.map(function (a) { return a.school || a.login_email; }).sort()) + ' have no page yet', n: unlinked.length, href: '/mediadata/accounts#unlinked' });
     var newest = {};
     posts.forEach(function (p) { if (p.handle) newest[p.handle] = Math.max(newest[p.handle] || 0, p.posted); });
     var lastOf = function (a) { return Math.max(Number(a.last_post_at) || 0, newest[a.handle] || 0); };
     var live = accounts.filter(function (a) { return a.handle; });
     var empty = live.filter(function (a) { return !lastOf(a) && !known(a.posts); });
-    if (empty.length) rows.push({ text: 'Get first posts on ' + plural(empty.length, 'account'), sub: names(empty.map(function (a) { return '@' + a.handle; })), n: empty.length, href: '/campus/accounts' });
+    if (empty.length) rows.push({ text: 'Get first posts on ' + plural(empty.length, 'account'), sub: names(empty.map(function (a) { return '@' + a.handle; })), n: empty.length, href: '/mediadata/accounts' });
     var quiet = live.filter(function (a) { return lastOf(a) && now - lastOf(a) > 7 * DAY; }).sort(function (a, b) { return lastOf(a) - lastOf(b); });
-    if (quiet.length) rows.push({ text: 'Wake ' + plural(quiet.length, 'quiet account'), sub: '@' + quiet[0].handle + ' last posted ' + day(lastOf(quiet[0])), n: quiet.length, href: '/campus/accounts' });
+    if (quiet.length) rows.push({ text: 'Wake ' + plural(quiet.length, 'quiet account'), sub: '@' + quiet[0].handle + ' last posted ' + day(lastOf(quiet[0])), n: quiet.length, href: '/mediadata/accounts' });
     var uncaptioned = posts.filter(function (p) { return !p.data.caption; }).length;
-    if (uncaptioned) rows.push({ text: 'Add ' + plural(uncaptioned, 'missing caption'), sub: 'Posts with no caption saved', n: uncaptioned, href: '/campus/captions' });
+    if (uncaptioned) rows.push({ text: 'Add ' + plural(uncaptioned, 'missing caption'), sub: 'Posts with no caption saved', n: uncaptioned, href: '/mediadata/captions' });
 
     var total = rows.reduce(function (sum, r) { return sum + r.n; }, 0);
     setFigure($('needs-total'), total, whole.format(total));
