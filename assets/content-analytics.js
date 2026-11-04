@@ -1193,6 +1193,6 @@
 
   window.contentAuth.init({
     main: 'analytics', onOpen: load, onSignOut: function () { posts = []; creators = {}; pending = {}; },
-    denied: 'This email can\'t open media analytics.'
+    denied: 'This account can\'t open media analytics.'
   });
 })();

@@ -27,7 +27,7 @@ initializeApp();
 setGlobalOptions({ region: 'us-central1', maxInstances: 2 });
 
 const BRIGHTDATA_TOKEN = defineSecret('BRIGHTDATA_TOKEN');
-const ADMIN_EMAIL = 'izadianbijan@gmail.com';
+const TEAM_EMAILS = new Set(['izadianbijan@gmail.com', 'arya@crm.bijanizadian.com', 'bijan@crm.bijanizadian.com', 'milo@crm.bijanizadian.com', 'jesse@crm.bijanizadian.com']);
 const PENDING_TTL = 24 * 3600 * 1000;
 
 async function brightData(method, path, body) {
@@ -187,7 +187,7 @@ export const contentTrackNow = onRequest({ ...options, timeoutSeconds: 120 }, as
   const match = /^Bearer (.+)$/.exec(req.get('Authorization') || '');
   let user = null;
   try { user = match ? await getAuth().verifyIdToken(match[1]) : null; } catch { user = null; }
-  if (!user || !user.email_verified || user.email !== ADMIN_EMAIL) { res.status(403).json({ error: 'Team only' }); return; }
+  if (!user || !user.email_verified || !TEAM_EMAILS.has(user.email)) { res.status(403).json({ error: 'Team only' }); return; }
   const only = req.body && typeof req.body.creator === 'string' && /^[a-z0-9]{8,10}-[a-z0-9]{6}$/.test(req.body.creator) ? req.body.creator : null;
   try {
     const started = await startChecks(only);

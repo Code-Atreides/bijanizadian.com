@@ -101,8 +101,8 @@
 
   function greet() {
     var hour = new Date().getHours(), part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
-    var email = $('account-email').textContent.split('@')[0];
-    $('dash-title').textContent = 'Good ' + part + (email === 'izadianbijan' ? ', Bijan' : '');
+    var name = window.contentAuth.name();
+    $('dash-title').textContent = 'Good ' + part + (name ? ', ' + name : '');
   }
 
   // ---------- load ----------
@@ -436,6 +436,6 @@
   window.contentAuth.init({
     main: 'dashboard', onOpen: load,
     onSignOut: function () { posts = []; creators = {}; accounts = []; submissions = {}; statuses = {}; first = true; drawn = false; },
-    denied: 'This email can\'t open the dashboard.'
+    denied: 'This account can\'t open the dashboard.'
   });
 })();

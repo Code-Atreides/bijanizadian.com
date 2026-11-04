@@ -338,6 +338,6 @@
 
   window.contentAuth.init({
     main: 'queue', onOpen: load, onSignOut: function () { items = []; },
-    denied: 'This email can\'t open the media CRM.'
+    denied: 'This account can\'t open the media CRM.'
   });
 })();

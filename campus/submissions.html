@@ -10,7 +10,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-crm.js?v=5"></script>
-<script src="/assets/content-auth.js?v=3" defer></script>
+<script src="/assets/content-auth.js?v=4" defer></script>
 <script src="/assets/content-inbox.js?v=5" defer></script>
 <!--
   The back of the edit queue: everything sent from /campus/submit, for the team
@@ -217,7 +217,7 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
-<link rel="stylesheet" href="/assets/content-crm.css?v=5">
+<link rel="stylesheet" href="/assets/content-crm.css?v=6">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -257,22 +257,24 @@
   </header>
 
   <main>
-    <!-- signed out: an emailed sign-in link, as on /agencykit -->
+    <!-- signed out: pick your name, type the password -->
     <section class="signin" id="signin" hidden aria-labelledby="signin-title">
       <div class="signin-head">
         <span class="eyebrow">TEAM ONLY</span>
         <h1 id="signin-title" tabindex="-1">Campus <span>media.</span></h1>
       </div>
       <div class="signin-body">
-        <form id="link-form" novalidate>
-          <p>Sign in with the team email to see everything turned in from <a href="/campus/media#turn-in">/campus/media</a> and <a href="/campus/submit">/campus/submit</a>.</p>
-          <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
-          <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
-        </form>
-        <form id="finish-form" novalidate hidden>
-          <p>Confirm the email address that got the sign-in link.</p>
-          <label class="field">Email<input id="finish-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
-          <button type="submit" class="primary-action" id="finish-send">Finish signing in</button>
+        <form id="signin-form" novalidate>
+          <fieldset class="who-pick">
+            <legend>Who's signing in?</legend>
+            <label><input type="radio" name="signin-who" value="arya"><span>Arya</span></label>
+            <label><input type="radio" name="signin-who" value="bijan"><span>Bijan</span></label>
+            <label><input type="radio" name="signin-who" value="milo"><span>Milo</span></label>
+            <label><input type="radio" name="signin-who" value="jesse"><span>Jesse</span></label>
+          </fieldset>
+          <input class="sr" id="signin-user" type="text" autocomplete="username" tabindex="-1" aria-hidden="true">
+          <label class="field" id="signin-password-field" hidden>Password<input id="signin-password" type="password" autocomplete="current-password" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="signin-send">Sign in</button>
         </form>
         <p class="notice" id="signin-notice" role="status" aria-live="polite"></p>
       </div>

@@ -364,6 +364,6 @@
   window.contentAuth.init({
     main: 'accounts', onOpen: load,
     onSignOut: function () { hidePassword(); accounts = {}; loginIds = {}; isAdmin = false; first = true; },
-    denied: 'This email can\'t open the accounts list.'
+    denied: 'This account can\'t open the accounts list.'
   });
 })();

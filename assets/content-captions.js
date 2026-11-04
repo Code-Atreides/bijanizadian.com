@@ -316,6 +316,6 @@
 
   window.contentAuth.init({
     main: 'captions', onOpen: load, onSignOut: function () { posts = []; creators = {}; },
-    denied: 'This email can\'t open the caption archive.'
+    denied: 'This account can\'t open the caption archive.'
   });
 })();

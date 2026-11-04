@@ -1,15 +1,18 @@
-// Team sign-in for the campus media CRM pages (/campus/submissions and
-// /campus/analytics): an emailed sign-in link, as on /agencykit, a session kept
-// in localStorage and shared by both pages, and authenticated RTDB calls.
-// The database rules let only the team's verified email read or write these
-// nodes, so a signed-in stranger is turned away by the database itself.
+// Team sign-in for the campus CRM pages: pick your name, type the password. Each name
+// is a real Firebase account, so the password lives hashed in Firebase and never in
+// this file or the repo. The session is kept in localStorage and shared by the pages,
+// and RTDB calls carry its token. The database rules decide what each account may read,
+// so a stranger is turned away by the database itself, and only the Bijan account can
+// read saved Instagram passwords (content_account_logins).
 // Each page has the same #signin markup and calls contentAuth.init() once.
 (function () {
   'use strict';
 
   var API_KEY = 'AIzaSyCEVPrJm9r_zP3pWBQV0XrCz6_68cnjySw';
   var DB = 'https://bijanizadian-84e48-default-rtdb.firebaseio.com';
-  var SESSION = 'content-inbox-session-v1', EMAIL = 'content-inbox-email';
+  var SESSION = 'campus-crm-session-v1', LAST = 'campus-crm-last-person';
+  var PEOPLE = { arya: 'Arya', bijan: 'Bijan', milo: 'Milo', jesse: 'Jesse' };
+  function emailOf(person) { return person + '@crm.bijanizadian.com'; }
 
   var saved = {
     get: function (key) { try { return localStorage.getItem(key); } catch (e) { return null; } },
@@ -22,32 +25,17 @@
   try { auth = JSON.parse(saved.get(SESSION) || 'null'); } catch (e) { auth = null; }
   if (!auth || !auth.refreshToken) auth = null;
 
-  function emailLinkCode(href) {
-    try {
-      var url = new URL(href);
-      for (var i = 0; i < 4; i++) {
-        if (url.searchParams.get('mode') === 'signIn' && url.searchParams.get('oobCode')) return url.searchParams.get('oobCode');
-        var nested = url.searchParams.get('link') || url.searchParams.get('deep_link_id');
-        if (!nested) break;
-        url = new URL(nested);
-      }
-    } catch (e) {}
-    return '';
-  }
-  var code = emailLinkCode(location.href);
-
-  function cleanEmail(value) { return String(value || '').trim().toLowerCase(); }
-
-  async function identity(action, body) {
-    var response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:' + action + '?key=' + API_KEY, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000)
+  async function signIn(person, password) {
+    var response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + API_KEY, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailOf(person), password: password, returnSecureToken: true }), signal: AbortSignal.timeout(15000)
     });
     var result = await response.json();
     if (!response.ok) {
       var reason = (result.error && result.error.message) || '';
-      if (/EXPIRED_OOB_CODE|INVALID_OOB_CODE/.test(reason)) throw Error('This sign-in link has expired or was already used. Request a new one.');
-      if (/TOO_MANY|QUOTA/.test(reason)) throw Error('Too many attempts. Try again later.');
-      throw Error('Sign-in could not finish. Check the email address and try a new link.');
+      if (/TOO_MANY|QUOTA/.test(reason)) throw Error('Too many attempts. Try again in a few minutes.');
+      if (/INVALID|EMAIL_NOT_FOUND|USER_DISABLED/.test(reason)) throw Error('That password isn\'t right.');
+      throw Error('Sign-in couldn\'t finish. Check your connection and try again.');
     }
     return result;
   }
@@ -67,27 +55,33 @@
     return auth.idToken;
   }
 
-  function continueUrl() {
-    // the link must come back to an authorised domain; local previews use the live page
-    return /(^|\.)bijanizadian\.com$|\.web\.app$|\.firebaseapp\.com$/.test(location.hostname)
-      ? location.origin + location.pathname : 'https://bijanizadian.com' + location.pathname;
-  }
-
   function notice(message, isError) {
     $('signin-notice').textContent = message || '';
     $('signin-notice').classList.toggle('is-error', !!isError);
   }
 
+  function chosen() {
+    var pick = document.querySelector('input[name="signin-who"]:checked');
+    return pick ? pick.value : '';
+  }
+  // the name shows the password field; a saved login in the browser fills it for that name
+  function choose(person, focus) {
+    $('signin-user').value = person ? emailOf(person) : '';
+    $('signin-password-field').hidden = !person;
+    if (person && focus) $('signin-password').focus();
+  }
+
   function showSignIn(message, isError) {
     $(app.main).hidden = true; $('account').hidden = true; $('signin').hidden = false;
-    $('link-form').hidden = !!code; $('finish-form').hidden = !code;
-    if (code) $('finish-email').value = saved.get(EMAIL) || '';
+    $('signin-password').value = '';
+    var last = saved.get(LAST), box = PEOPLE[last] && document.querySelector('input[name="signin-who"][value="' + last + '"]');
+    if (box) { box.checked = true; choose(last, false); }
     notice(message, isError);
   }
 
   function open() {
     $('signin').hidden = true; $(app.main).hidden = false; $('account').hidden = false;
-    $('account-email').textContent = auth.email || '';
+    $('account-email').textContent = auth.name || '';
     app.onOpen();
   }
 
@@ -109,47 +103,42 @@
     return response.json();
   }
 
-  // a lost session or a refused email ends in the sign-in card; anything else is the page's to show
+  // a lost session or a refused account ends in the sign-in card; anything else is the page's to show
   function handle(error) {
     if (error.message === 'signed-out') { signOut('Your session ended. Sign in again.', true); return true; }
-    if (error.message === 'no-access') { signOut(app.denied || 'This email doesn\'t have access.', true); return true; }
+    if (error.message === 'no-access') { signOut(app.denied || 'This account doesn\'t have access.', true); return true; }
     return false;
   }
 
   function init(options) {
     app = options;
-    $('link-form').addEventListener('submit', async function (event) {
-      event.preventDefault();
-      var email = cleanEmail($('link-email').value), button = $('link-send');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return notice('Enter a valid email address.', true);
-      button.disabled = true; notice('Sending…');
-      try {
-        await identity('sendOobCode', { requestType: 'EMAIL_SIGNIN', email: email, continueUrl: continueUrl(), canHandleCodeInApp: true });
-        saved.set(EMAIL, email);
-        notice('Check your email and open the sign-in link on this device.');
-      } catch (error) { notice(error.message, true); }
-      finally { button.disabled = false; }
+    document.querySelectorAll('input[name="signin-who"]').forEach(function (box) {
+      box.addEventListener('change', function () { notice(''); choose(box.value, true); });
     });
-    $('finish-form').addEventListener('submit', async function (event) {
+    $('signin-form').addEventListener('submit', async function (event) {
       event.preventDefault();
-      var button = $('finish-send');
+      var person = chosen(), password = $('signin-password').value, button = $('signin-send');
+      if (!PEOPLE[person]) return notice('Pick your name.', true);
+      if (!password) { $('signin-password').focus(); return notice('Type the password.', true); }
       button.disabled = true; notice('Signing in…');
       try {
-        var result = await identity('signInWithEmailLink', { email: cleanEmail($('finish-email').value), oobCode: code });
-        auth = { uid: result.localId, email: result.email, idToken: result.idToken, refreshToken: result.refreshToken, expiresAt: Date.now() + Number(result.expiresIn) * 1000 };
+        var result = await signIn(person, password);
+        auth = { uid: result.localId, email: result.email, name: PEOPLE[person], idToken: result.idToken, refreshToken: result.refreshToken, expiresAt: Date.now() + Number(result.expiresIn) * 1000 };
         saved.set(SESSION, JSON.stringify(auth));
-        code = ''; history.replaceState(null, '', location.pathname);
+        saved.set(LAST, person);
+        $('signin-password').value = '';
         notice('');
         open();
-      } catch (error) { notice(error.message, true); }
-      finally { button.disabled = false; }
+      } catch (error) {
+        notice(error.name === 'TimeoutError' ? 'Sign-in couldn\'t finish. Check your connection and try again.' : error.message, true);
+        $('signin-password').select();
+      } finally { button.disabled = false; }
     });
     $('sign-out').addEventListener('click', function () { signOut('Signed out.'); });
 
-    if (code) showSignIn('Confirm your email to finish signing in.');
-    else if (auth) open();
+    if (auth) open();
     else showSignIn('');
   }
 
-  window.contentAuth = { init: init, db: db, handle: handle, idToken: token, signedIn: function () { return !!auth; } };
+  window.contentAuth = { init: init, db: db, handle: handle, idToken: token, signedIn: function () { return !!auth; }, name: function () { return auth ? auth.name || '' : ''; } };
 })();
