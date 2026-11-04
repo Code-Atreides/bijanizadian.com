@@ -64,6 +64,23 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .theme-toggle .to-light, [data-theme="dark"] .theme-toggle .to-dark { display: none; }
 [data-theme="dark"] .theme-toggle .to-light { display: block; }
 main { grid-column: 2; min-width: 0; padding-top: 16px; }
+
+/* the small arrow on the sidebar's edge, and the sidebar folded down to its icons */
+.site-shell { transition: grid-template-columns .28s var(--ease-out); }
+.nav-fold { position: absolute; top: 50%; right: -12px; z-index: 5; width: 24px; height: 24px; margin-top: -12px; padding: 0; display: grid; place-items: center; border: 1px solid var(--hairline-strong); border-radius: 50%; background: var(--surface); color: var(--fg-2); transition: background .16s, color .16s; }
+.nav-fold:hover { background: var(--surface-3); color: var(--fg); }
+.nav-fold svg { width: 12px; height: 12px; transition: transform .28s var(--ease-out); }
+[data-nav="collapsed"] .nav-fold svg { transform: rotate(180deg); }
+[data-nav="collapsed"] .site-shell { grid-template-columns: 72px minmax(0, 1fr); }
+[data-nav="collapsed"] .brand { justify-content: center; padding: 0; }
+[data-nav="collapsed"] .brand svg { width: 40px; height: 13px; }
+[data-nav="collapsed"] .brand > span, [data-nav="collapsed"] .account { display: none; }
+[data-nav="collapsed"] .nav-label { height: 1px; margin: 8px 12px; padding: 0; overflow: hidden; font-size: 0; background: var(--hairline); }
+[data-nav="collapsed"] .nav-label:first-child { display: none; }
+[data-nav="collapsed"] .pages { overflow: hidden; }
+[data-nav="collapsed"] .pages a { justify-content: center; gap: 0; padding: 0; font-size: 0; }
+[data-nav="collapsed"] .side-foot { justify-content: center; }
+[data-nav="collapsed"] .theme-toggle { margin-left: 0; }
 .site-footer { grid-column: 2; text-align: left; font-size: 12px; line-height: 16px; color: var(--fg-3); padding: 32px 0 16px; }
 
 /* ---------- page head ---------- */
@@ -193,6 +210,16 @@ html:not(.crm-loaded) .stat small { visibility: hidden; }
 /* ---------- smaller screens: the sidebar becomes a bar along the top ---------- */
 @media (max-width: 960px) {
   .site-shell { display: flex; flex-direction: column; padding: 8px 16px 0; }
+  /* no sidebar to fold here: it's a bar along the top, whatever was chosen on a wider screen */
+  .nav-fold { display: none; }
+  [data-nav="collapsed"] .brand { padding: 0 4px; }
+  [data-nav="collapsed"] .brand svg { width: 64px; height: 21px; }
+  [data-nav="collapsed"] .brand > span { display: inline; }
+  [data-nav="collapsed"] .account { display: block; }
+  [data-nav="collapsed"] .nav-label { display: none; }
+  [data-nav="collapsed"] .pages { overflow-x: auto; }
+  [data-nav="collapsed"] .pages a { padding: 0 12px; font-size: 12px; }
+  [data-nav="collapsed"] .side-foot { justify-content: flex-end; }
   .site-header { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 12px 12px 8px; border-radius: 24px; }
   .brand { padding: 0 4px; }
   .side-foot { flex: 1; min-width: 0; justify-content: flex-end; }
@@ -226,4 +253,5 @@ html:not(.crm-loaded) .stat small { visibility: hidden; }
 }
 @media (prefers-reduced-motion: reduce) {
   .settle > *, .settle-one, .skeleton, html:not(.crm-loaded) .stat strong { animation: none !important; }
+  .site-shell, .nav-fold svg { transition: none; }
 }

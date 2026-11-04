@@ -1,5 +1,6 @@
-// The campus CRM shell, shared by its four pages: the light/dark switch (set before
-// the first paint, so this script isn't deferred), sections within a page
+// The campus CRM shell, shared by its four pages: the light/dark switch and the
+// collapsed sidebar (both set before the first paint, so this script isn't
+// deferred), sections within a page
 // (a [data-sections] tab row shows the [data-in] blocks for the picked tab and
 // keeps it in the URL hash), and the moment the first data lands.
 (function () {
@@ -7,6 +8,8 @@
   var KEY = 'campus-crm-theme', root = document.documentElement;
   function saved() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
   root.dataset.theme = saved() === 'dark' ? 'dark' : 'light';
+  var NAV = 'campus-crm-nav';
+  try { if (localStorage.getItem(NAV) === 'collapsed') root.dataset.nav = 'collapsed'; } catch (e) {}
 
   document.addEventListener('DOMContentLoaded', function () {
     var toggle = document.getElementById('theme-toggle');
@@ -22,6 +25,29 @@
         try { localStorage.setItem(KEY, root.dataset.theme); } catch (e) {}
         label();
       });
+    }
+
+    // the arrow on the sidebar's edge folds it down to its icons; the choice is remembered
+    var header = document.querySelector('.site-header');
+    if (header) {
+      header.querySelectorAll('.pages a').forEach(function (link) { link.title = link.textContent.trim(); });
+      var fold = document.createElement('button');
+      fold.type = 'button';
+      fold.className = 'nav-fold';
+      fold.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
+      var foldLabel = function () {
+        var collapsed = root.dataset.nav === 'collapsed';
+        fold.setAttribute('aria-label', collapsed ? 'Expand the sidebar' : 'Collapse the sidebar');
+        fold.title = fold.getAttribute('aria-label');
+        fold.setAttribute('aria-expanded', String(!collapsed));
+      };
+      foldLabel();
+      fold.addEventListener('click', function () {
+        if (root.dataset.nav === 'collapsed') delete root.dataset.nav; else root.dataset.nav = 'collapsed';
+        try { localStorage.setItem(NAV, root.dataset.nav || 'open'); } catch (e) {}
+        foldLabel();
+      });
+      header.appendChild(fold);
     }
 
     // figures keep their skeleton until the page's "Loading…" line is replaced
