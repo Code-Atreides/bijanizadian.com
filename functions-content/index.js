@@ -27,7 +27,7 @@ initializeApp();
 setGlobalOptions({ region: 'us-central1', maxInstances: 2 });
 
 const BRIGHTDATA_TOKEN = defineSecret('BRIGHTDATA_TOKEN');
-const TEAM_EMAILS = new Set(['izadianbijan@gmail.com', 'arya@crm.bijanizadian.com', 'bijan@crm.bijanizadian.com', 'milo@crm.bijanizadian.com', 'jesse@crm.bijanizadian.com']);
+const TEAM_EMAILS = new Set(['izadianbijan@gmail.com', 'team@crm.bijanizadian.com']);
 const PENDING_TTL = 24 * 3600 * 1000;
 
 async function brightData(method, path, body) {

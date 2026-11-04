@@ -101,8 +101,7 @@
 
   function greet() {
     var hour = new Date().getHours(), part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
-    var name = window.contentAuth.name();
-    $('dash-title').textContent = 'Good ' + part + (name ? ', ' + name : '');
+    $('dash-title').textContent = 'Good ' + part + (window.contentAuth.isTeam() ? ', team' : '');
   }
 
   // ---------- load ----------
@@ -110,6 +109,7 @@
   async function load() {
     if (loading) return;
     loading = true; $('dash-retry').hidden = true;
+    greet();
     if (!first) $('dash-board').classList.add('refetching');
     try {
       var db = window.contentAuth.db;

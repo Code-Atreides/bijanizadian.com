@@ -122,9 +122,9 @@
       }
     },
     "content_submissions": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$id": {
-        ".write": "(!data.exists() && newData.exists()) || (!newData.exists() && auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com'))",
+        ".write": "(!data.exists() && newData.exists()) || (!newData.exists() && auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com'))",
         ".validate": "$id.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['name','email','school','link','title','submitted_at'])",
         "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 100" },
         "email": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[^@ ]+@[^@ ]+[.][^@ ]+$/)" },
@@ -139,9 +139,9 @@
       }
     },
     "content_status": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$id": {
-        ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+        ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
         ".validate": "newData.hasChildren(['status','updated_at']) && root.child('content_submissions').child($id).exists()",
         "status": { ".validate": "newData.isString() && newData.val().matches(/^(editing|done)$/)" },
         "updated_at": { ".validate": "newData.val() == now" },
@@ -149,8 +149,8 @@
       }
     },
     "content_posts": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
-      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$post": {
         ".validate": "$post.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['url','platform','title','posted_at','latest'])",
         "url": {
@@ -245,8 +245,8 @@
       }
     },
     "content_accounts": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
-      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$account": {
         ".validate": "$account.matches(/^[a-z0-9-]{2,60}$/) && newData.hasChildren(['status','created_at'])",
         "handle": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9._]{1,30}$/)" },
@@ -264,8 +264,8 @@
       }
     },
     "content_account_logins": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'bijan@crm.bijanizadian.com')",
-      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'bijan@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
+      ".write": "auth != null && auth.token.email_verified == true && auth.token.email == 'izadianbijan@gmail.com'",
       "$account": {
         ".validate": "$account.matches(/^[a-z0-9-]{2,60}$/) && newData.hasChildren(['password'])",
         "password": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 200" },
@@ -273,8 +273,8 @@
       }
     },
     "content_creators": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
-      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$creator": {
         ".validate": "$creator.matches(/^[a-z0-9]{8,10}-[a-z0-9]{6}$/) && newData.hasChildren(['name','created_at'])",
         "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 100" },
@@ -306,12 +306,12 @@
       }
     },
     "content_sync": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       ".write": false
     },
     "content_tags": {
-      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
-      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'arya@crm.bijanizadian.com' || auth.token.email == 'bijan@crm.bijanizadian.com' || auth.token.email == 'milo@crm.bijanizadian.com' || auth.token.email == 'jesse@crm.bijanizadian.com')",
+      ".read": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'izadianbijan@gmail.com' || auth.token.email == 'team@crm.bijanizadian.com')",
       "$scope": {
         ".validate": "$scope.matches(/^(all|region-(west|midwest|south|northeast)|topic-[a-z0-9-]{2,30})$/) && newData.isString() && newData.val().length <= 1000"
       }

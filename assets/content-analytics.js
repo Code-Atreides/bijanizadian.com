@@ -1090,7 +1090,8 @@
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
         body: JSON.stringify(id ? { creator: id } : {}), signal: AbortSignal.timeout(130000)
       });
-      if (response.status === 403) { window.contentAuth.handle(new Error('no-access')); return; }
+      // the tracker has its own list of who may start a check; being off it isn't a reason to sign out
+      if (response.status === 403) { note.textContent = 'This login can't start a check yet. The daily check still runs every morning.'; return; }
       var result = await response.json().catch(function () { return {}; });
       if (!response.ok) throw new Error(result.error || 'failed');
       note.textContent = (result.started || []).length
