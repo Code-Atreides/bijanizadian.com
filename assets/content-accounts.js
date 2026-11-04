@@ -7,14 +7,18 @@
 // (shallow) to learn whether this person is the admin, and fetches one password
 // only when it's revealed or copied. Followers, posts and last post come from the
 // import unless the account is tracked daily (content_creators), when followers
-// come from there. Everything goes in as text; profile links are built from a
-// checked handle. No account data or password belongs in this file or the repo.
+// come from there and likes and engagement are added up from its posts
+// (content_posts), so an untracked account has none and sorts last by them. Everything
+// goes in as text; profile links are built from a checked handle. No account data
+// or password belongs in this file or the repo.
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var db = function (method, path, body) { return window.contentAuth.db(method, path, body); };
   var whole = new Intl.NumberFormat('en-US');
-  var accounts = {}, tracked = {}, loginIds = {}, isAdmin = false, tab = 'all', loading = false, first = true, editing = null, hideTimer = 0, shown = null;
+  var accounts = {}, tracked = {}, stats = {}, loginIds = {}, isAdmin = false, tab = 'all', loading = false, first = true, editing = null, hideTimer = 0, shown = null;
+  var DAY = 86400000, PERIOD = 30, SORT_KEY = 'campus-accounts-sort', sort = 'top';
+  try { sort = localStorage.getItem(SORT_KEY) || 'top'; } catch (e) {}
 
   function el(tag, className, text) {
     var node = document.createElement(tag);
@@ -39,7 +43,7 @@
     body.textContent = '';
     for (var i = 0; i < 8; i++) {
       var tr = el('tr');
-      for (var c = 0; c < 7; c++) { var td = el('td'); td.appendChild(el('span', 'skeleton')); tr.appendChild(td); }
+      for (var c = 0; c < 9; c++) { var td = el('td'); td.appendChild(el('span', 'skeleton')); tr.appendChild(td); }
       body.appendChild(tr);
     }
   }
@@ -49,15 +53,9 @@
     loading = true; $('refresh').disabled = true;
     if (first) skeleton(); else $('acc-board').classList.add('refetching');
     try {
-      var results = await Promise.all([db('GET', '/content_accounts'), db('GET', '/content_creators')]);
+      var results = await Promise.all([db('GET', '/content_accounts'), db('GET', '/content_creators'), db('GET', '/content_posts')]);
       accounts = results[0] || {};
-      tracked = {};
-      var creators = results[1] || {};
-      Object.keys(creators).forEach(function (id) {
-        var match = String((creators[id] || {}).instagram || '').match(/instagram\.com\/([^/]+)/);
-        var f = creators[id] && creators[id].followers && creators[id].followers.instagram;
-        if (match) tracked[match[1].toLowerCase()] = { count: f && typeof f.count === 'number' ? f.count : null };
-      });
+      readTracked(results[1] || {}, results[2] || {});
       // only the admin may ask for this; anyone else is refused and sees no passwords
       try { loginIds = (await window.contentAuth.db('GET', '/content_account_logins', undefined, 'shallow=true')) || {}; isAdmin = true; }
       catch (error) { if (error.message !== 'no-access') throw error; loginIds = {}; isAdmin = false; }
@@ -73,6 +71,80 @@
     } finally {
       loading = false; $('acc-board').classList.remove('refetching'); $('refresh').disabled = false;
     }
+  }
+
+  // ---------- how each tracked account is performing ----------
+  function num(v) { v = Number(v); return isFinite(v) && v >= 0 ? v : 0; }
+  // a post's likes at moment t: 0 before posting, straight lines between daily checks
+  function likesAt(snaps, posted, t) {
+    if (t < posted) return 0;
+    var prevT = posted, prevV = 0;
+    for (var i = 0; i < snaps.length; i++) {
+      if (snaps[i].at >= t) return snaps[i].at <= prevT ? snaps[i].likes : prevV + (snaps[i].likes - prevV) * (t - prevT) / (snaps[i].at - prevT);
+      if (snaps[i].at > prevT) prevT = snaps[i].at;
+      prevV = snaps[i].likes;
+    }
+    return prevV;
+  }
+  function readTracked(creators, posts) {
+    var now = Date.now(), start = now - PERIOD * DAY, handles = {};
+    tracked = {}; stats = {};
+    Object.keys(creators).forEach(function (id) {
+      var c = creators[id] || {}, match = String(c.instagram || '').match(/instagram\.com\/([^/]+)/);
+      if (!match) return;
+      var handle = match[1].toLowerCase(), f = c.followers && c.followers.instagram, count = f && typeof f.count === 'number' ? f.count : null, change = null;
+      var log = (c.followers_log && c.followers_log.instagram) || {}, days = Object.keys(log).filter(function (d) { return /^\d{4}-\d{2}-\d{2}$/.test(d) && typeof log[d] === 'number'; }).sort(), base = null;
+      days.forEach(function (d) { if (new Date(d + 'T12:00').getTime() <= start) base = d; });
+      if (!base) base = days[0];
+      // a first count taken today has nothing to compare with yet
+      if (base && count !== null && new Date(base + 'T12:00').toDateString() !== new Date(now).toDateString()) change = count - log[base];
+      handles[id] = handle;
+      tracked[handle] = { count: count, change: change };
+    });
+    Object.keys(posts).forEach(function (id) {
+      var p = posts[id] || {}, handle = handles[p.creator_id];
+      if (!handle) return;
+      var snaps = Object.keys(p.snapshots || {}).map(function (k) { var v = p.snapshots[k] || {}; return { at: num(v.at), likes: v.likes === null || v.likes === undefined ? null : num(v.likes) }; })
+        .filter(function (v) { return v.likes !== null; }).sort(function (x, y) { return x.at - y.at; });
+      var posted = num(p.posted_at) || (snaps[0] ? snaps[0].at : 0), latest = p.latest || {}, s = stats[handle] = stats[handle] || { posts: 0, likes: 0, gained: 0, interactions: 0, last: 0 };
+      s.posts++;
+      s.likes += num(latest.likes);
+      s.gained += likesAt(snaps, posted, now) - likesAt(snaps, posted, start);
+      s.interactions += num(latest.likes) + num(latest.comments) + num(latest.shares);
+      s.last = Math.max(s.last, posted);
+    });
+  }
+  // what the columns and every sort read: null means not known, not zero
+  function measures(a) {
+    var s = (a.handle && stats[a.handle]) || null, f = followersOf(a), live = a.handle && tracked[a.handle];
+    var posts = a.handle ? Math.max(s ? s.posts : 0, typeof a.posts === 'number' ? a.posts : 0) : null;
+    return {
+      followers: f, growth: live ? live.change : null, posts: a.handle && (s || typeof a.posts === 'number') ? posts : null,
+      likes: s ? s.likes : null, gained: s ? Math.round(s.gained) : null,
+      rate: s && f ? s.interactions / s.posts / f : null,
+      last: a.handle ? Math.max(s ? s.last : 0, num(a.last_post_at)) || null : null
+    };
+  }
+  var BY = {
+    top: function (m) { return m.gained; }, likes: function (m) { return m.likes; }, engagement: function (m) { return m.rate; }, followers: function (m) { return m.followers; },
+    growth: function (m) { return m.growth; }, posts: function (m) { return m.posts; }, recent: function (m) { return m.last; }
+  };
+  function nameOf(a) { return String(a.school || a.handle || a.login_email || '').toLowerCase(); }
+  function compare(a, b) {
+    if (sort === 'name') return nameOf(a).localeCompare(nameOf(b));
+    // logins with no page never outrank a live account
+    var linked = (b.handle ? 1 : 0) - (a.handle ? 1 : 0);
+    if (linked) return linked;
+    var ma = measures(a), mb = measures(b), va, vb;
+    if (sort === 'quiet') { va = ma.last; vb = mb.last; if ((va === null) !== (vb === null)) return va === null ? 1 : -1; if (va !== vb) return (va || 0) - (vb || 0); }
+    else {
+      var read = BY[sort] || BY.top;
+      va = read(ma); vb = read(mb);
+      if ((va === null) !== (vb === null)) return va === null ? 1 : -1;
+      if (va !== vb) return (vb || 0) - (va || 0);
+    }
+    // ties, and every account with no number yet, fall back to size and then name
+    return (mb.followers || 0) - (ma.followers || 0) || nameOf(a).localeCompare(nameOf(b));
   }
 
   function list() {
@@ -91,15 +163,11 @@
     var checked = all.map(function (a) { return a.checked_at || 0; }).reduce(function (x, y) { return Math.max(x, y); }, 0);
     $('acc-summary').textContent = all.length ? live + ' on Instagram, ' + counts.unlinked + ' logins not linked' + (checked ? ' · numbers from ' + day(checked) : '') : 'No accounts yet.';
 
-    document.querySelectorAll('.col-password').forEach(function (th) { th.hidden = !isAdmin; });
     var query = $('search').value.trim().toLowerCase(), body = $('acc-rows');
     var rows = all.filter(function (a) { return tab === 'all' || kind(a) === tab; }).filter(function (a) {
       return !query || [a.handle, a.school, a.name, a.login_email, a.note].join(' ').toLowerCase().indexOf(query) > -1;
     });
-    var order = { own: 0, have: 1, unlinked: 2 };
-    rows.sort(function (a, b) {
-      return order[kind(a)] - order[kind(b)] || (followersOf(b) || 0) - (followersOf(a) || 0) || String(a.school || a.login_email).localeCompare(String(b.school || b.login_email));
-    });
+    rows.sort(compare);
     body.textContent = '';
     $('acc-table').hidden = !rows.length;
     $('acc-empty').hidden = rows.length > 0;
@@ -133,28 +201,34 @@
     if (a.handle && tracked[a.handle]) kindCell.appendChild(el('span', 'pill', 'Daily'));
     tr.appendChild(kindCell);
 
-    var f = followersOf(a);
-    cell(tr, 'num', 'Followers', f === null ? '—' : whole.format(f));
-    cell(tr, 'num', 'Posts', typeof a.posts === 'number' ? whole.format(a.posts) : '—');
-    cell(tr, 'num', 'Last post', a.last_post_at ? day(a.last_post_at) : a.handle && a.checked_at ? 'None' : '—');
-    cell(tr, 'acc-email', 'Login', a.login_email || '—');
+    var m = measures(a), withChange = function (label, value, change, unit) {
+      var td = cell(tr, 'num', label, value === null ? '—' : whole.format(value));
+      if (value !== null && change) td.appendChild(el('span', change < 0 ? 'sub fall' : 'sub', (change < 0 ? '−' : '+') + whole.format(Math.abs(change))));
+      td.title = value === null ? 'Not tracked yet' : whole.format(value) + ' ' + unit + (change === null ? '' : ', ' + (change < 0 ? '' : '+') + whole.format(change) + ' in ' + PERIOD + ' days');
+    };
+    withChange('Followers', m.followers, m.growth, 'followers');
+    cell(tr, 'num', 'Posts', m.posts === null ? '—' : whole.format(m.posts));
+    withChange('Likes', m.likes, m.gained, 'likes across tracked posts');
+    var rate = cell(tr, 'num', 'Per follower', m.rate === null ? '—' : (m.rate * 100).toFixed(1) + '%');
+    rate.title = 'Likes, comments and shares per post ÷ followers';
+    cell(tr, 'num', 'Last post', m.last ? day(m.last) : a.handle && a.checked_at ? 'None' : '—');
 
-    if (isAdmin) {
-      var pw = el('td', 'acc-password');
-      pw.dataset.label = 'Password';
-      if (loginIds[a.id]) {
-        var value = el('span', 'pw-value', '••••••••••');
-        var show = el('button', 'text-button', 'Show'), copy = el('button', 'text-button', 'Copy');
-        show.type = copy.type = 'button';
-        var name = a.handle || a.login_email || 'this account';
-        show.setAttribute('aria-label', 'Show the password for ' + name);
-        copy.setAttribute('aria-label', 'Copy the password for ' + name);
-        show.addEventListener('click', function () { togglePassword(a, value, show); });
-        copy.addEventListener('click', function () { copyPassword(a, copy); });
-        pw.appendChild(value); pw.appendChild(show); pw.appendChild(copy);
-      } else pw.textContent = '—';
-      tr.appendChild(pw);
+    var login = el('td', 'acc-login');
+    login.dataset.label = 'Login';
+    login.appendChild(el('span', 'acc-email', a.login_email || '—'));
+    if (isAdmin && loginIds[a.id]) {
+      var pw = el('div', 'acc-password'), value = el('span', 'pw-value', '••••••••••');
+      var show = el('button', 'text-button', 'Show'), copy = el('button', 'text-button', 'Copy');
+      show.type = copy.type = 'button';
+      var name = a.handle || a.login_email || 'this account';
+      show.setAttribute('aria-label', 'Show the password for ' + name);
+      copy.setAttribute('aria-label', 'Copy the password for ' + name);
+      show.addEventListener('click', function () { togglePassword(a, value, show); });
+      copy.addEventListener('click', function () { copyPassword(a, copy); });
+      pw.appendChild(value); pw.appendChild(show); pw.appendChild(copy);
+      login.appendChild(pw);
     }
+    tr.appendChild(login);
 
     var actions = el('td', 'actions'), edit = el('button', 'text-button', 'Edit');
     edit.type = 'button';
@@ -270,6 +344,13 @@
     button.addEventListener('click', function () { pickTab(button.dataset.tab); render(); });
   });
   if (document.querySelector('#acc-tabs [data-tab="' + location.hash.slice(1).replace(/[^a-z]/g, '') + '"]')) pickTab(location.hash.slice(1));
+  $('acc-sort').value = BY[sort] || sort === 'quiet' || sort === 'name' ? sort : 'top';
+  sort = $('acc-sort').value;
+  $('acc-sort').addEventListener('change', function () {
+    sort = this.value;
+    try { localStorage.setItem(SORT_KEY, sort); } catch (e) {}
+    render();
+  });
   var searchWait = 0;
   $('search').addEventListener('input', function () { clearTimeout(searchWait); searchWait = setTimeout(render, 220); });
   $('refresh').addEventListener('click', load);

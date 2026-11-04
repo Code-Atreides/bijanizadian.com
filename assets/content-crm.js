@@ -29,7 +29,7 @@
       });
     }
 
-    // the arrow on the sidebar's edge folds it down to its icons; the choice is remembered
+    // the arrow floating on the sidebar folds it down to its icons; the choice is remembered
     var header = document.querySelector('.site-header');
     if (header) {
       header.querySelectorAll('.pages a').forEach(function (link) { link.title = link.textContent.trim(); });
