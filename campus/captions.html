@@ -9,7 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<script src="/assets/content-auth.js?v=2" defer></script>
+<script src="/assets/content-crm.js?v=1"></script>
+<script src="/assets/content-auth.js?v=3" defer></script>
 <script src="/assets/content-captions.js?v=1" defer></script>
 <!--
   Caption archive, the words side of the media CRM: every caption the campus
@@ -34,7 +35,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   [hidden] { display: none !important; }
-  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body { background: var(--surface); color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
   button, a, input, select { touch-action: manipulation; }
   button:not(:disabled), a[href] { cursor: pointer; }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
@@ -52,20 +53,20 @@
   .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
   .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
   .pages a:hover { color: var(--ink); }
-  .pages a[aria-current="page"] { background: #fff; color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
+  .pages a[aria-current="page"] { background: var(--surface); color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
   .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
   .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
   .text-button:hover { background: var(--lavender); }
-  .text-button.danger { color: #9b362e; }
-  .text-button.danger:hover { background: #fff1ef; }
+  .text-button.danger { color: var(--danger); }
+  .text-button.danger:hover { background: var(--surface)1ef; }
 
   main { flex: 1 0 auto; }
 
   /* ---------- sign in ---------- */
   .signin { max-width: 420px; margin: 9vh auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
   .signin-head { background: var(--lavender); padding: 24px 28px 22px; }
-  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: var(--muted); }
   .signin h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; margin-top: 12px; }
   .signin h1 span { color: var(--blue); }
   .signin-body { padding: 22px 28px 24px; }
@@ -74,11 +75,11 @@
   .field span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 4px; }
   .field input, .field select, .search input {
     display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
-    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--surface);
     border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
   }
   .field input:focus, .field select:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
-  .field input[aria-invalid="true"] { border-color: #d0574b; }
+  .field input[aria-invalid="true"] { border-color: var(--danger); }
   .primary-action {
     display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 8px;
     border: 0; border-radius: 7px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
@@ -88,7 +89,7 @@
   .primary-action.small { width: auto; height: 38px; padding: 0 14px; font-size: 13.5px; white-space: nowrap; }
   .posts-tools .option { white-space: nowrap; }
   .notice { font-size: 13px; line-height: 1.5; margin-top: 12px; color: var(--blue-text); min-height: 20px; }
-  .notice.is-error { color: #9b362e; }
+  .notice.is-error { color: var(--danger); }
 
   /* ---------- head, tools and the one filter row ---------- */
   .queue-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px 0 16px; flex-wrap: wrap; }
@@ -98,23 +99,23 @@
   .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .option {
     display: flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 13px;
-    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    border: 1px solid var(--option-line); border-radius: 7px; background: var(--surface); color: var(--blue-text);
     font: inherit; font-size: 13.5px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background .15s;
   }
   .option:hover { background: var(--lavender); }
   .option.icon { width: 38px; padding: 0; }
   .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
   .segmented { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; }
-  .segmented button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 34px; padding: 0 12px; }
+  .segmented button { border: 0; background: var(--surface); font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 34px; padding: 0 12px; }
   .segmented button + button { border-left: 1px solid var(--option-line); }
   .segmented button:hover { color: var(--ink); background: var(--tint); }
   .segmented button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
-  .filters select { height: 36px; border: 1px solid var(--option-line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); padding: 0 10px; }
-  .queue-error { font-size: 13.5px; line-height: 1.5; background: #fff1ef; padding: 10px 12px; border-radius: 6px; color: #9b362e; margin: 0 0 12px; }
+  .filters select { height: 36px; border: 1px solid var(--option-line); border-radius: 8px; background: var(--surface); font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); padding: 0 10px; }
+  .queue-error { font-size: 13.5px; line-height: 1.5; background: var(--surface)1ef; padding: 10px 12px; border-radius: 6px; color: var(--danger); margin: 0 0 12px; }
   .refetching { opacity: .55; transition: opacity .2s; }
 
   /* ---------- the archive ---------- */
-  .search { display: flex; align-items: center; gap: 8px; height: 38px; width: 260px; padding: 0 12px; border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--faint); }
+  .search { display: flex; align-items: center; gap: 8px; height: 38px; width: 260px; padding: 0 12px; border: 1px solid var(--option-line); border-radius: 7px; background: var(--surface); color: var(--faint); }
   .search input { border: 0; min-height: 0; height: 100%; margin: 0; padding: 0; font-size: 14px; box-shadow: none !important; }
   .views { display: flex; gap: 6px; }
   .views button { border: 0; background: none; font: inherit; font-size: 14px; color: var(--muted-2); padding: 7px 4px 9px; margin-right: 12px; border-bottom: 2px solid transparent; display: flex; gap: 7px; align-items: center; }
@@ -126,19 +127,19 @@
   .switch-row .filters { margin-bottom: 8px; }
   .tag-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
   .tag-row > span { font-size: 11.5px; letter-spacing: 1.2px; font-weight: 500; color: var(--faint); margin-right: 4px; }
-  .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid var(--option-line); border-radius: 15px; background: #fff; font: inherit; font-size: 13px; color: var(--blue-text); }
+  .chip { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border: 1px solid var(--option-line); border-radius: 15px; background: var(--surface); font: inherit; font-size: 13px; color: var(--blue-text); }
   .chip b { font-weight: 500; font-size: 11.5px; color: var(--faint); }
   .chip:hover { background: var(--tint); }
   .chip[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
   .chip[aria-pressed="true"] b { color: rgba(255,255,255,.8); }
 
   .caption-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .cap { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 10px; display: flex; flex-direction: column; min-width: 0; background: #fff; }
+  .cap { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px 10px; display: flex; flex-direction: column; min-width: 0; background: var(--surface); }
   .cap-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 13px; min-width: 0; }
   .cap-meta strong { font-weight: 500; margin-left: 2px; }
   .cap-meta .muted { color: var(--muted-2); }
   .pill { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 10px; background: var(--lavender); color: var(--blue-text); font-size: 11.5px; font-weight: 500; }
-  .cap-text { margin-top: 10px; font-size: 14.5px; line-height: 1.55; color: #2b2d3f; white-space: pre-line; overflow-wrap: anywhere;
+  .cap-text { margin-top: 10px; font-size: 14.5px; line-height: 1.55; color: var(--ink); white-space: pre-line; overflow-wrap: anywhere;
     display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
   .cap.is-open .cap-text { display: block; }
   .cap-text .tag { color: var(--blue-text); }
@@ -166,16 +167,16 @@
   .dlg .lede { font-size: 13.5px; color: var(--muted); margin: 4px 0 16px; overflow-wrap: anywhere; }
   .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .quad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-  .fieldset-title { font-size: 11.5px; letter-spacing: 1.4px; font-weight: 500; color: #4a558b; margin: 6px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .fieldset-title { font-size: 11.5px; letter-spacing: 1.4px; font-weight: 500; color: var(--muted); margin: 6px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }
   .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
   .dlg-actions .primary-action { width: auto; padding: 0 18px; }
-  .dlg-error { font-size: 13px; color: #9b362e; min-height: 18px; margin-top: 4px; }
-  .field textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: #fff; border: 1px solid var(--input); border-radius: 7px; outline: none; resize: vertical; min-height: 190px; }
+  .dlg-error { font-size: 13px; color: var(--danger); min-height: 18px; margin-top: 4px; }
+  .field textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: var(--surface); border: 1px solid var(--input); border-radius: 7px; outline: none; resize: vertical; min-height: 190px; }
   .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
   .count { font-size: 12px; color: var(--muted-2); text-align: right; margin-top: -6px; font-variant-numeric: tabular-nums; }
-  .count.over { color: #9b362e; }
+  .count.over { color: var(--danger); }
   .history { list-style: none; margin-top: 4px; max-height: 190px; overflow-y: auto; border-top: 1px solid var(--line); }
-  .history li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: #50566e; font-variant-numeric: tabular-nums; }
+  .history li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .history li b { font-weight: 500; color: var(--ink); }
 
   .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 28px 0 16px; line-height: 1.6; }
@@ -219,6 +220,7 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<link rel="stylesheet" href="/assets/content-crm.css?v=1">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -238,14 +240,21 @@
       <svg aria-hidden="true"><use href="#wordmark"/></svg>
       <span>/campus</span>
     </a>
-    <nav class="pages" aria-label="Media CRM">
-      <a href="/campus/submissions">Queue</a>
-      <a href="/campus/analytics">Analytics</a>
-      <a href="/campus/captions" aria-current="page">Captions</a>
+    <nav class="pages" aria-label="Campus CRM">
+      <p class="nav-label">Content</p>
+      <a href="/campus/submissions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5l2-8Z"/></svg>Queue</a>
+      <a href="/campus/captions" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Captions</a>
+      <p class="nav-label">Performance</p>
+      <a href="/campus/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Analytics</a>
+      <p class="nav-label">Network</p>
+      <a href="/campus/accounts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.5a4 4 0 0 1 0 7M18 14.5a7 7 0 0 1 4 6.5"/></svg>Accounts</a>
     </nav>
-    <div class="account" id="account" hidden>
-      <span id="account-email"></span>
-      <button type="button" class="text-button" id="sign-out">Sign out</button>
+    <div class="side-foot">
+      <div class="account" id="account" hidden>
+        <span id="account-email"></span>
+        <button type="button" class="text-button" id="sign-out">Sign out</button>
+      </div>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark"><svg class="to-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><svg class="to-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg></button>
     </div>
   </header>
 
@@ -276,7 +285,7 @@
       <div class="queue-head">
         <div>
           <span class="eyebrow">CAMPUS MEDIA · TEAM ONLY</span>
-          <h1 id="cap-title" tabindex="-1">Caption archive</h1>
+          <h1 id="cap-title" tabindex="-1">Captions</h1>
           <p id="cap-summary">Loading…</p>
         </div>
         <div class="tools">
@@ -321,7 +330,7 @@
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/submissions">Queue</a> · <a href="/campus/analytics">Analytics</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · Team only
   </footer>
 </div>
 

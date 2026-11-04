@@ -98,9 +98,9 @@
     $('signin-title').focus();
   }
 
-  async function db(method, path, body) {
+  async function db(method, path, body, query) {
     var access = await token();
-    var response = await fetch(DB + path + '.json?auth=' + encodeURIComponent(access), {
+    var response = await fetch(DB + path + '.json?auth=' + encodeURIComponent(access) + (query ? '&' + query : ''), {
       method: method, headers: { 'Content-Type': 'application/json' },
       body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(15000)
     });

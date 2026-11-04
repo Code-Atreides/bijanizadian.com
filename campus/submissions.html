@@ -9,7 +9,8 @@
 <link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
-<script src="/assets/content-auth.js?v=2" defer></script>
+<script src="/assets/content-crm.js?v=1"></script>
+<script src="/assets/content-auth.js?v=3" defer></script>
 <script src="/assets/content-inbox.js?v=5" defer></script>
 <!--
   The back of the edit queue: everything sent from /campus/submit, for the team
@@ -31,7 +32,7 @@
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   [hidden] { display: none !important; }
-  body { background: #fff; color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body { background: var(--surface); color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
   button, a, input { touch-action: manipulation; }
   button:not(:disabled), a[href] { cursor: pointer; }
   button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
@@ -49,7 +50,7 @@
   .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
   .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
   .pages a:hover { color: var(--ink); }
-  .pages a[aria-current="page"] { background: #fff; color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
+  .pages a[aria-current="page"] { background: var(--surface); color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
   .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
   .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
@@ -60,7 +61,7 @@
   /* ---------- sign in ---------- */
   .signin { max-width: 420px; margin: 9vh auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
   .signin-head { background: var(--lavender); padding: 24px 28px 22px; }
-  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: #4a558b; }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: var(--muted); }
   .signin h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; margin-top: 12px; }
   .signin h1 span { color: var(--blue); }
   .signin-body { padding: 22px 28px 24px; }
@@ -69,7 +70,7 @@
   .field { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 12px; }
   .field input, .search input {
     display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
-    font: inherit; font-size: 16px; color: var(--ink); background: #fff;
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--surface);
     border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
   }
   .field input:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
@@ -80,7 +81,7 @@
   .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
   .primary-action:disabled { opacity: .7; cursor: progress; }
   .notice { font-size: 13px; line-height: 1.5; margin-top: 12px; color: var(--blue-text); min-height: 20px; }
-  .notice.is-error { color: #9b362e; }
+  .notice.is-error { color: var(--danger); }
 
   /* ---------- the queue ---------- */
   .queue-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px 0 16px; flex-wrap: wrap; }
@@ -92,7 +93,7 @@
   .search svg { position: absolute; left: 11px; top: 11px; color: var(--faint); }
   .option {
     display: flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 13px;
-    border: 1px solid var(--option-line); border-radius: 7px; background: #fff; color: var(--blue-text);
+    border: 1px solid var(--option-line); border-radius: 7px; background: var(--surface); color: var(--blue-text);
     font: inherit; font-size: 13.5px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background .15s;
   }
   .option:hover { background: var(--lavender); }
@@ -106,13 +107,13 @@
   .stat small { display: block; font-size: 12px; color: var(--muted-2); margin-top: 2px; }
   .switch-row { display: flex; align-items: end; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
   .modes { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; margin-bottom: 8px; flex: none; }
-  .modes button { border: 0; background: #fff; font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 32px; padding: 0 12px; }
+  .modes button { border: 0; background: var(--surface); font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 32px; padding: 0 12px; }
   .modes button + button { border-left: 1px solid var(--option-line); }
   .modes button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
   .people-count { font-size: 14px; color: var(--muted-2); padding: 9px 0 11px; }
   .people { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   .people th { text-align: left; font-size: 11.5px; letter-spacing: 1.2px; font-weight: 500; color: var(--faint); text-transform: uppercase; padding: 12px 12px 8px 0; border-bottom: 1px solid var(--line); }
-  .people td { padding: 13px 12px 13px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: #50566e; line-height: 1.45; }
+  .people td { padding: 13px 12px 13px 0; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--muted); line-height: 1.45; }
   .people td strong { display: block; font-weight: 500; color: var(--ink); }
   .people td a { color: var(--blue-text); text-decoration: none; overflow-wrap: anywhere; }
   .people td a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -126,17 +127,17 @@
   .tabs b { font-weight: 500; font-size: 11.5px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: var(--chip); color: var(--muted); display: inline-flex; align-items: center; justify-content: center; }
   .tabs [aria-pressed="true"] b { background: var(--lavender); color: var(--blue-text); }
 
-  .queue-error { font-size: 13.5px; line-height: 1.5; background: #fff1ef; padding: 10px 12px; border-radius: 6px; color: #9b362e; margin: 12px 0 0; }
+  .queue-error { font-size: 13.5px; line-height: 1.5; background: var(--surface)1ef; padding: 10px 12px; border-radius: 6px; color: var(--danger); margin: 12px 0 0; }
 
   .list { list-style: none; }
   .item { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) 84px 400px; gap: 20px; align-items: start; padding: 16px 0; border-bottom: 1px solid var(--line); }
   .pill { display: inline-flex; align-items: center; height: 20px; padding: 0 8px; margin-bottom: 5px; border-radius: 10px; background: var(--lavender); color: var(--blue-text); font-size: 11.5px; font-weight: 500; }
   .item h2 { font-size: 16px; font-weight: 500; line-height: 1.35; letter-spacing: -.1px; overflow-wrap: anywhere; }
-  .item .notes { font-size: 13.5px; line-height: 1.5; color: #50566e; margin-top: 4px; white-space: pre-line; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .item .notes { font-size: 13.5px; line-height: 1.5; color: var(--muted); margin-top: 4px; white-space: pre-line; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .item .notes.is-open { display: block; }
   .more { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 2px 0; margin-top: 2px; }
   .more:hover { text-decoration: underline; text-underline-offset: 3px; }
-  .who { font-size: 13.5px; line-height: 1.5; color: #50566e; min-width: 0; }
+  .who { font-size: 13.5px; line-height: 1.5; color: var(--muted); min-width: 0; }
   .who strong { display: block; font-weight: 500; color: var(--ink); }
   .who a { color: var(--blue-text); text-decoration: none; overflow-wrap: anywhere; }
   .who a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -145,17 +146,17 @@
   .open { flex: 1; min-width: 0; background: var(--blue); border-color: var(--blue); color: #fff; }
   .open small { overflow: hidden; text-overflow: ellipsis; }
   .missing { flex: 1; min-width: 0; color: var(--muted-2); border-style: dashed; cursor: default; }
-  .missing:hover { background: #fff; }
+  .missing:hover { background: var(--surface); }
   .open:hover { background: var(--blue-hover); }
   .open small { font-size: 11.5px; font-weight: 400; opacity: .8; }
   .status { display: flex; border: 1px solid var(--option-line); border-radius: 7px; overflow: hidden; }
-  .status button { border: 0; background: #fff; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--muted-2); height: 36px; padding: 0 10px; }
+  .status button { border: 0; background: var(--surface); font: inherit; font-size: 12.5px; font-weight: 500; color: var(--muted-2); height: 36px; padding: 0 10px; }
   .status button + button { border-left: 1px solid var(--option-line); }
   .status button:hover { background: var(--tint); color: var(--ink); }
   .status button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
   .status button[data-status="done"][aria-pressed="true"] { background: #e8f5ee; color: #24734e; }
   .remove { border: 0; background: none; color: var(--faint); width: 32px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-  .remove:hover { background: #fff1ef; color: #9b362e; }
+  .remove:hover { background: var(--surface)1ef; color: var(--danger); }
 
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .empty { text-align: center; padding: 56px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
@@ -216,6 +217,7 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<link rel="stylesheet" href="/assets/content-crm.css?v=1">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -235,14 +237,21 @@
       <svg aria-hidden="true"><use href="#wordmark"/></svg>
       <span>/campus</span>
     </a>
-    <nav class="pages" aria-label="Media CRM">
-      <a href="/campus/submissions" aria-current="page">Queue</a>
-      <a href="/campus/analytics">Analytics</a>
-      <a href="/campus/captions">Captions</a>
+    <nav class="pages" aria-label="Campus CRM">
+      <p class="nav-label">Content</p>
+      <a href="/campus/submissions" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5l2-8Z"/></svg>Queue</a>
+      <a href="/campus/captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Captions</a>
+      <p class="nav-label">Performance</p>
+      <a href="/campus/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Analytics</a>
+      <p class="nav-label">Network</p>
+      <a href="/campus/accounts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.5a4 4 0 0 1 0 7M18 14.5a7 7 0 0 1 4 6.5"/></svg>Accounts</a>
     </nav>
-    <div class="account" id="account" hidden>
-      <span id="account-email"></span>
-      <button type="button" class="text-button" id="sign-out">Sign out</button>
+    <div class="side-foot">
+      <div class="account" id="account" hidden>
+        <span id="account-email"></span>
+        <button type="button" class="text-button" id="sign-out">Sign out</button>
+      </div>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark"><svg class="to-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><svg class="to-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg></button>
     </div>
   </header>
 
@@ -273,7 +282,7 @@
       <div class="queue-head">
         <div>
           <span class="eyebrow">CAMPUS MEDIA · TEAM ONLY</span>
-          <h1 id="queue-title" tabindex="-1">Media CRM</h1>
+          <h1 id="queue-title" tabindex="-1">Queue</h1>
           <p id="queue-summary">Loading…</p>
         </div>
         <div class="tools">
@@ -316,7 +325,7 @@
   </main>
 
   <footer class="site-footer">
-    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · <a href="/campus/analytics">Analytics</a> · <a href="/campus/captions">Captions</a> · Team only
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · Team only
   </footer>
 </div>
 </body>

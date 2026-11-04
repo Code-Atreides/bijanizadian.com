@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Accounts | fomo campus</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="/fomo-favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
+<script src="/assets/content-crm.js?v=1"></script>
+<script src="/assets/content-auth.js?v=3" defer></script>
+<script src="/assets/content-accounts.js?v=1" defer></script>
+<!--
+  Campus accounts, the network side of the CRM: every Instagram account, whether
+  we own it or just have it, and logins not linked to a page yet. The list is in
+  RTDB content_accounts. Passwords are in content_account_logins, which only the
+  admin email can read, so they never reach anyone else's browser.
+-->
+<style>
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: Aeonik; src: url("/campus/fonts/Aeonik-Medium.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+  :root {
+    color-scheme: light;
+    --ink: #0b091f; --blue: #516af6; --blue-hover: #4058e6; --blue-text: #354ac1; --glow: #acb8f9;
+    --lavender: #eaedff; --tint: #f4f6ff; --tint-line: #e5e9fc; --chip: #f1f3fa;
+    --muted: #656779; --muted-2: #74788c; --faint: #8a8ea0;
+    --line: #e3e6f1; --input: #d9ddea; --option-line: #d7dffb; --panel-rule: #cfd5f1;
+    --grid: #eef0f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
+  body { background: var(--surface); color: var(--ink); font-family: Aeonik, Arial, sans-serif; font-size: 16px; -webkit-font-smoothing: antialiased; }
+  button, a, input, select { touch-action: manipulation; }
+  button:not(:disabled), a[href] { cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+  h1:focus, h2:focus { outline: none; }
+  ::selection { background: var(--blue); color: #fff; }
+  svg { display: block; }
+
+  .site-shell { max-width: 1160px; margin: 0 auto; padding: 0 40px; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+
+  /* ---------- header ---------- */
+  .site-header { flex: none; height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--blue); }
+  .brand svg { width: 80px; height: 26px; }
+  .brand > span { font-size: 24px; letter-spacing: -.7px; color: var(--muted); }
+  .pages { display: flex; gap: 2px; padding: 3px; border-radius: 9px; background: var(--chip); margin-right: auto; margin-left: 12px; }
+  .pages a { font-size: 13.5px; font-weight: 500; color: var(--muted-2); text-decoration: none; padding: 6px 12px; border-radius: 7px; }
+  .pages a:hover { color: var(--ink); }
+  .pages a[aria-current="page"] { background: var(--surface); color: var(--blue-text); box-shadow: 0 1px 2px rgba(11,9,31,.08); }
+  .account { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; }
+  .account span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .text-button { border: 0; background: none; font: inherit; font-size: 13px; font-weight: 500; color: var(--blue-text); padding: 6px 10px; border-radius: 6px; white-space: nowrap; text-decoration: none; }
+  .text-button:hover { background: var(--lavender); }
+  .text-button.danger { color: var(--danger); }
+  .text-button.danger:hover { background: var(--surface)1ef; }
+
+  main { flex: 1 0 auto; }
+
+  /* ---------- sign in ---------- */
+  .signin { max-width: 420px; margin: 9vh auto 0; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .signin-head { background: var(--lavender); padding: 24px 28px 22px; }
+  .eyebrow { display: block; font-size: 11.5px; letter-spacing: 1.7px; font-weight: 500; color: var(--muted); }
+  .signin h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; margin-top: 12px; }
+  .signin h1 span { color: var(--blue); }
+  .signin-body { padding: 22px 28px 24px; }
+  .signin-body p { font-size: 14px; line-height: 1.55; color: var(--muted); margin-bottom: 14px; }
+  .field { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 12px; min-width: 0; }
+  .field span { color: var(--muted-2); font-size: 12px; font-weight: 400; margin-left: 4px; }
+  .field input, .field select, .search input {
+    display: block; width: 100%; min-height: 42px; margin-top: 6px; padding: 9px 12px;
+    font: inherit; font-size: 16px; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--input); border-radius: 7px; outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field select:focus, .search input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+  .field input[aria-invalid="true"] { border-color: var(--danger); }
+  .primary-action {
+    display: flex; width: 100%; height: 44px; align-items: center; justify-content: center; gap: 8px;
+    border: 0; border-radius: 7px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 500; transition: background .15s;
+  }
+  .primary-action:hover:not(:disabled) { background: var(--blue-hover); }
+  .primary-action:disabled { opacity: .7; cursor: progress; }
+  .primary-action.small { width: auto; height: 38px; padding: 0 14px; font-size: 13.5px; white-space: nowrap; }
+  .posts-tools .option { white-space: nowrap; }
+  .notice { font-size: 13px; line-height: 1.5; margin-top: 12px; color: var(--blue-text); min-height: 20px; }
+  .notice.is-error { color: var(--danger); }
+
+  /* ---------- head, tools and the one filter row ---------- */
+  .queue-head { display: flex; align-items: end; justify-content: space-between; gap: 20px; padding: 18px 0 16px; flex-wrap: wrap; }
+  .queue-head .eyebrow { margin-bottom: 8px; }
+  .queue-head h1 { font-size: 34px; line-height: 1.1; font-weight: 500; letter-spacing: -1.2px; }
+  .queue-head p { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .option {
+    display: flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 13px;
+    border: 1px solid var(--option-line); border-radius: 7px; background: var(--surface); color: var(--blue-text);
+    font: inherit; font-size: 13.5px; font-weight: 500; white-space: nowrap; text-decoration: none; transition: background .15s;
+  }
+  .option:hover { background: var(--lavender); }
+  .option.icon { width: 38px; padding: 0; }
+  .filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .segmented { display: flex; border: 1px solid var(--option-line); border-radius: 8px; overflow: hidden; }
+  .segmented button { border: 0; background: var(--surface); font: inherit; font-size: 13px; font-weight: 500; color: var(--muted-2); height: 34px; padding: 0 12px; }
+  .segmented button + button { border-left: 1px solid var(--option-line); }
+  .segmented button:hover { color: var(--ink); background: var(--tint); }
+  .segmented button[aria-pressed="true"] { background: var(--lavender); color: var(--blue-text); }
+  .filters select { height: 36px; border: 1px solid var(--option-line); border-radius: 8px; background: var(--surface); font: inherit; font-size: 13px; font-weight: 500; color: var(--ink); padding: 0 10px; }
+  .queue-error { font-size: 13.5px; line-height: 1.5; background: var(--surface)1ef; padding: 10px 12px; border-radius: 6px; color: var(--danger); margin: 0 0 12px; }
+  .refetching { opacity: .55; transition: opacity .2s; }
+
+  /* ---------- the archive ---------- */
+  .search { display: flex; align-items: center; gap: 8px; height: 38px; width: 260px; padding: 0 12px; border: 1px solid var(--option-line); border-radius: 7px; background: var(--surface); color: var(--faint); }
+  .search input { border: 0; min-height: 0; height: 100%; margin: 0; padding: 0; font-size: 14px; box-shadow: none !important; }
+  .switch-row { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .switch-row .filters { margin-bottom: 8px; }
+
+  .caption-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .pill { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 10px; background: var(--lavender); color: var(--blue-text); font-size: 11.5px; font-weight: 500; }
+    display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+  .more { align-self: flex-start; border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 500; color: var(--blue-text); padding: 4px 0 0; }
+  .more:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .missing-list { list-style: none; }
+  .miss { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .miss strong { display: block; font-size: 15px; font-weight: 500; margin-bottom: 5px; overflow-wrap: anywhere; }
+  .miss strong a { color: inherit; text-decoration: none; }
+  .miss strong a:hover { color: var(--blue-text); text-decoration: underline; text-underline-offset: 3px; }
+
+  .empty { text-align: center; padding: 56px 20px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+  .empty strong { display: block; font-size: 17px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .offscreen { position: fixed; left: -9999px; top: 0; opacity: 0; }
+
+  /* ---------- dialogs ---------- */
+  dialog { margin: auto; border: 0; border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 28px)); max-height: calc(100dvh - 28px); color: var(--ink); box-shadow: 0 30px 80px -30px rgba(11,9,31,.45); }
+  dialog::backdrop { background: rgba(11,9,31,.42); }
+  .dlg { padding: 22px 24px 20px; }
+  .dlg h2 { font-size: 22px; font-weight: 500; letter-spacing: -.5px; }
+  .dlg .lede { font-size: 13.5px; color: var(--muted); margin: 4px 0 16px; overflow-wrap: anywhere; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .fieldset-title { font-size: 11.5px; letter-spacing: 1.4px; font-weight: 500; color: var(--muted); margin: 6px 0 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+  .dlg-actions .primary-action { width: auto; padding: 0 18px; }
+  .dlg-error { font-size: 13px; color: var(--danger); min-height: 18px; margin-top: 4px; }
+  .field textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; font-size: 15px; line-height: 1.5; color: var(--ink); background: var(--surface); border: 1px solid var(--input); border-radius: 7px; outline: none; resize: vertical; min-height: 190px; }
+  .field textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(81,106,246,.18); }
+
+  .site-footer { flex: none; text-align: center; font-size: 11.5px; color: var(--faint); padding: 28px 0 16px; line-height: 1.6; }
+  .site-footer a { color: inherit; text-underline-offset: 3px; }
+
+  @media (max-width: 1050px) {
+    .site-shell { padding: 0 24px; }
+  }
+  @media (max-width: 760px) {
+    .queue-head { align-items: start; }
+    .tools { width: 100%; }
+    .search { flex: 1; width: auto; }
+    .caption-list { grid-template-columns: 1fr; }
+    .switch-row { flex-direction: column-reverse; align-items: stretch; gap: 0; }
+  }
+  @media (max-width: 600px) {
+    .site-shell { padding: 0 14px; }
+    .site-header { height: 54px; gap: 10px; }
+    .brand svg { width: 64px; height: 21px; }
+    .brand > span { display: none; }
+    .pages { margin-left: 0; }
+    .pages a { padding: 6px 8px; font-size: 12.5px; }
+    .account .text-button { padding: 6px 4px; }
+    .account span { display: none; }
+    .signin { margin-top: 4vh; }
+    .signin-head, .signin-body { padding-left: 20px; padding-right: 20px; }
+    .queue-head h1 { font-size: 28px; }
+    .tool-label { display: none; }
+    .miss { align-items: start; flex-direction: column; gap: 8px; }
+    /* the hashtags swipe on one row */
+    #tags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 -14px; padding: 0 14px 2px; width: calc(100% + 28px); }
+    #tags::-webkit-scrollbar { display: none; }
+    .dlg { padding: 18px 16px 16px; }
+  }
+  @media (max-width: 359px) {
+    .site-header { gap: 6px; }
+    .brand svg { width: 52px; height: 17px; }
+    .pages a { padding: 6px 6px; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  .table { width: 100%; border-collapse: collapse; }
+  .table th { text-align: left; white-space: nowrap; }
+  .table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .table tr:last-child td { border-bottom: 0; }
+  .table td { vertical-align: top; }
+  .table td strong { display: block; font-weight: 500; }
+  .table td a { text-decoration: none; }
+  .table td a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .table .actions { text-align: right; padding-right: 0; white-space: nowrap; }
+  .muted { color: var(--muted-2); }
+  .stats { display: grid; }
+  .acc-who { min-width: 180px; }
+  .acc-detail { display: block; font-size: 12px; line-height: 16px; margin-top: 4px; }
+  .pill.pill-own { background: var(--lavender); color: var(--blue-text); }
+  .acc-email { overflow-wrap: anywhere; }
+  .acc-password { white-space: nowrap; }
+  .pw-value { display: inline-block; min-width: 96px; margin-right: 4px; color: var(--fg-3); font-variant-numeric: tabular-nums; vertical-align: middle; }
+  .pw-value.is-shown { color: var(--fg); user-select: all; }
+  .acc-password .text-button { padding: 0 8px; }
+  .acc-stats { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .acc-filter { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding-bottom: 16px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+  @media (max-width: 1240px) {
+    .acc-table thead { display: none; }
+    .acc-table tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 12px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .table.acc-table td { border: 0; padding: 0; text-align: left; }
+    .table.acc-table td .text-button { margin-block: 0; }
+    .table.acc-table td.acc-who, .table.acc-table td.acc-email, .table.acc-table td.acc-password, .table.acc-table td.actions { grid-column: 1 / -1; }
+    .acc-table td[data-label]::before { content: attr(data-label); display: block; font-size: 12px; line-height: 16px; color: var(--muted-2); }
+  }
+  @media (max-width: 600px) { .acc-stats { grid-template-columns: 1fr 1fr; } .acc-stats .stat:first-child { grid-column: 1 / -1; } }
+</style>
+<link rel="stylesheet" href="/assets/content-crm.css?v=1">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="wordmark" viewBox="0 0 352 113">
+      <path d="M0.00343295 23.3247C0.00343295 8.4677 7.99097 0 24.9229 0H42.1053C42.6746 0 43.1341 0.459567 43.1341 1.02888V18.4616C43.1341 19.0309 42.6746 19.4904 42.1053 19.4904H28.7572C24.4428 19.4904 22.5256 21.4076 22.5256 25.5608V28.6852C22.5256 29.2545 22.9852 29.7141 23.5545 29.7141H41.0764C41.6457 29.7141 42.1053 30.1737 42.1053 30.743V48.0145C42.1053 48.5838 41.6457 49.0434 41.0764 49.0434H23.5545C22.9852 49.0434 22.5256 49.5029 22.5256 50.0722V110.797C22.5256 111.366 22.0661 111.826 21.4968 111.826H1.02888C0.459567 111.826 0 111.366 0 110.797V23.3247H0.00343295Z" fill="currentColor"/>
+      <path d="M41.3813 70.7694C41.3813 45.5275 58.6357 28.7567 84.6733 28.7567C110.711 28.7567 127.965 45.5309 127.965 70.7694C127.965 96.0078 110.711 112.782 84.6733 112.782C58.6357 112.782 41.3813 96.0078 41.3813 70.7694ZM104.959 70.7694C104.959 57.1916 97.2908 47.6058 84.6698 47.6058C72.0489 47.6058 64.3837 57.1916 64.3837 70.7694C64.3837 84.3472 72.0523 93.9329 84.6698 93.9329C97.2873 93.9329 104.959 84.3472 104.959 70.7694Z" fill="currentColor"/>
+      <path d="M260.369 65.9782V110.796C260.369 111.366 259.909 111.825 259.34 111.825H238.872C238.302 111.825 237.843 111.366 237.843 110.796V65.817C237.843 53.9952 233.371 47.767 223.785 47.767C214.199 47.767 207.491 54.7943 207.81 67.4152V110.796C207.81 111.366 207.35 111.825 206.781 111.825H186.313C185.744 111.825 185.284 111.366 185.284 110.796V65.817C185.284 53.9952 180.812 47.767 171.065 47.767C161.318 47.767 155.251 55.1167 155.251 66.6161V110.796C155.251 111.366 154.792 111.825 154.222 111.825H133.754C133.185 111.825 132.725 111.366 132.725 110.796V30.7459C132.725 30.1766 133.185 29.717 133.754 29.717H151.571C152.044 29.717 152.456 30.0394 152.569 30.4955L154.088 36.5796C154.246 37.2107 155.028 37.4473 155.501 37.0015C160.183 32.615 166.476 28.7567 177.451 28.7567C186.961 28.7567 195.882 31.7027 201.246 40.2836C201.565 40.7912 202.281 40.8358 202.652 40.3625C208.307 33.1363 217.317 28.7567 229.687 28.7567C245.662 28.7567 260.358 37.0632 260.358 65.9782H260.369Z" fill="currentColor"/>
+      <path d="M265.029 70.7694C265.029 45.5275 282.284 28.7567 308.321 28.7567C334.359 28.7567 351.613 45.5309 351.613 70.7694C351.613 96.0078 334.359 112.782 308.321 112.782C282.284 112.782 265.029 96.0078 265.029 70.7694ZM328.607 70.7694C328.607 57.1916 320.939 47.6058 308.318 47.6058C295.697 47.6058 288.032 57.1916 288.032 70.7694C288.032 84.3472 295.7 93.9329 308.318 93.9329C320.935 93.9329 328.607 84.3472 328.607 70.7694Z" fill="currentColor"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="/campus" aria-label="fomo campus home">
+      <svg aria-hidden="true"><use href="#wordmark"/></svg>
+      <span>/campus</span>
+    </a>
+    <nav class="pages" aria-label="Campus CRM">
+      <p class="nav-label">Content</p>
+      <a href="/campus/submissions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M6 5h12l2 8v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-5l2-8Z"/></svg>Queue</a>
+      <a href="/campus/captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Captions</a>
+      <p class="nav-label">Performance</p>
+      <a href="/campus/analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>Analytics</a>
+      <p class="nav-label">Network</p>
+      <a href="/campus/accounts" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M16 4.5a4 4 0 0 1 0 7M18 14.5a7 7 0 0 1 4 6.5"/></svg>Accounts</a>
+    </nav>
+    <div class="side-foot">
+      <div class="account" id="account" hidden>
+        <span id="account-email"></span>
+        <button type="button" class="text-button" id="sign-out">Sign out</button>
+      </div>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch to dark"><svg class="to-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg><svg class="to-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/></svg></button>
+    </div>
+  </header>
+
+  <main>
+    <!-- signed out: the same emailed sign-in link as the queue -->
+    <section class="signin" id="signin" hidden aria-labelledby="signin-title">
+      <div class="signin-head">
+        <span class="eyebrow">TEAM ONLY</span>
+        <h1 id="signin-title" tabindex="-1">Campus <span>accounts.</span></h1>
+      </div>
+      <div class="signin-body">
+        <form id="link-form" novalidate>
+          <p>Sign in with the team email to see every campus account.</p>
+          <label class="field">Email<input id="link-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="link-send">Email me a sign-in link</button>
+        </form>
+        <form id="finish-form" novalidate hidden>
+          <p>Confirm the email address that got the sign-in link.</p>
+          <label class="field">Email<input id="finish-email" type="email" inputmode="email" autocomplete="email" maxlength="200"></label>
+          <button type="submit" class="primary-action" id="finish-send">Finish signing in</button>
+        </form>
+        <p class="notice" id="signin-notice" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- signed in: the list -->
+    <section id="accounts" hidden aria-labelledby="acc-title">
+      <div class="queue-head">
+        <div>
+          <h1 id="acc-title" tabindex="-1">Accounts</h1>
+          <p id="acc-summary">Loading…</p>
+        </div>
+        <div class="tools">
+          <button type="button" class="primary-action small" id="add-account">Add account</button>
+          <button type="button" class="option icon" id="refresh" aria-label="Refresh"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"/><path d="M21 3v5h-5"/></svg></button>
+        </div>
+      </div>
+      <p class="queue-error" id="acc-error" role="alert" hidden></p>
+      <div class="stats acc-stats" id="acc-stats">
+        <div class="stat hero"><span>On Instagram</span><strong id="s-live">0</strong><small>accounts live</small></div>
+        <div class="stat"><span>We own</span><strong id="s-own">0</strong><small>we hold the login</small></div>
+        <div class="stat"><span>We have</span><strong id="s-have">0</strong><small>no login on file</small></div>
+        <div class="stat"><span>Not linked</span><strong id="s-unlinked">0</strong><small>logins with no page yet</small></div>
+        <div class="stat"><span>Followers</span><strong id="s-followers">0</strong><small>across every account</small></div>
+      </div>
+      <div id="acc-board">
+        <div class="acc-filter">
+          <div class="tabs" id="acc-tabs" role="group" aria-label="Show">
+            <button type="button" data-tab="all" aria-pressed="true">All <b id="n-all">0</b></button>
+            <button type="button" data-tab="own" aria-pressed="false">We own <b id="n-own">0</b></button>
+            <button type="button" data-tab="have" aria-pressed="false">We have <b id="n-have">0</b></button>
+            <button type="button" data-tab="unlinked" aria-pressed="false">Not linked <b id="n-unlinked">0</b></button>
+          </div>
+          <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="search" type="search" placeholder="Search accounts" aria-label="Search accounts" autocomplete="off"></label>
+        </div>
+        <table class="table acc-table" id="acc-table">
+          <thead><tr><th scope="col">Account</th><th scope="col">Status</th><th scope="col" class="num">Followers</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Last post</th><th scope="col">Login</th><th scope="col" class="col-password">Password</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+          <tbody id="acc-rows"></tbody>
+        </table>
+        <div class="empty" id="acc-empty" hidden><strong id="acc-empty-title">No accounts yet.</strong><span id="acc-empty-text"></span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    fomo · <a href="/campus">campus</a> · <a href="/campus/media">Media page</a> · Team only
+  </footer>
+</div>
+
+<dialog id="acc-dialog" aria-labelledby="acc-dialog-title">
+  <form class="dlg" id="acc-form" novalidate>
+    <h2 id="acc-dialog-title">Add an account</h2>
+    <label class="field">Instagram handle or link<input id="a-handle" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="120"></label>
+    <label class="field">School<input id="a-school" type="text" autocomplete="off" maxlength="120"></label>
+    <label class="field">Status<select id="a-status"><option value="own">We own it</option><option value="have">We have it, someone else runs it</option></select></label>
+    <label class="field">Login email<input id="a-email" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="200"></label>
+    <label class="field" id="a-password-field">New password, blank keeps the saved one<input id="a-password" type="password" autocomplete="new-password" maxlength="200"></label>
+    <label class="field">Note<input id="a-note" type="text" autocomplete="off" maxlength="300"></label>
+    <p class="dlg-error" id="a-error" role="alert"></p>
+    <div class="dlg-actions">
+      <button type="button" class="text-button danger" id="a-remove" style="margin-right:auto" hidden>Remove</button>
+      <button type="button" class="option" data-close>Cancel</button>
+      <button type="submit" class="primary-action" id="a-save">Save</button>
+    </div>
+  </form>
+</dialog>
+</body>
+</html>
