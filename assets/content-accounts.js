@@ -262,13 +262,14 @@
   }
 
   // ---------- controls ----------
+  function pickTab(name) {
+    tab = name;
+    document.querySelectorAll('#acc-tabs button').forEach(function (other) { other.setAttribute('aria-pressed', String(other.dataset.tab === name)); });
+  }
   document.querySelectorAll('#acc-tabs button').forEach(function (button) {
-    button.addEventListener('click', function () {
-      tab = button.dataset.tab;
-      document.querySelectorAll('#acc-tabs button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === button)); });
-      render();
-    });
+    button.addEventListener('click', function () { pickTab(button.dataset.tab); render(); });
   });
+  if (document.querySelector('#acc-tabs [data-tab="' + location.hash.slice(1).replace(/[^a-z]/g, '') + '"]')) pickTab(location.hash.slice(1));
   var searchWait = 0;
   $('search').addEventListener('input', function () { clearTimeout(searchWait); searchWait = setTimeout(render, 220); });
   $('refresh').addEventListener('click', load);
