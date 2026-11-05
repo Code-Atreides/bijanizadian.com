@@ -11,7 +11,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-crm.js?v=5"></script>
 <script src="/assets/content-auth.js?v=6" defer></script>
-<script src="/assets/content-accounts.js?v=4" defer></script>
+<script src="/assets/content-accounts.js?v=5" defer></script>
 <!--
   Campus accounts, the network side of the CRM: every Instagram account, whether
   we own it or just have it, and logins not linked to a page yet. The list is in
@@ -206,6 +206,7 @@
   .acc-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .acc-table .sub { display: inline; margin-left: 4px; font-weight: 400; color: var(--muted-2); }
   .acc-table .sub.fall { color: var(--danger); }
+  .acc-table .sub.line { display: block; margin-left: 0; }
   .table .acc-login, .acc-login-head { padding-left: 16px; }
   .pw-value { display: inline-block; min-width: 96px; margin-right: 4px; color: var(--fg-3); font-variant-numeric: tabular-nums; vertical-align: middle; }
   .pw-value.is-shown { color: var(--fg); user-select: all; }
@@ -311,10 +312,13 @@
             <select id="acc-sort" aria-label="Sort accounts">
               <option value="top">Top performers</option>
               <option value="likes">Most likes</option>
+              <option value="perpost">Most likes per post</option>
+              <option value="comments">Most comments per post</option>
               <option value="engagement">Best per follower</option>
               <option value="followers">Most followers</option>
               <option value="growth">Fastest follower growth</option>
               <option value="posts">Most posts</option>
+              <option value="pace">Most posts in 30 days</option>
               <option value="recent">Posted most recently</option>
               <option value="quiet">Quietest first</option>
               <option value="name">School A to Z</option>
@@ -323,7 +327,7 @@
           </div>
         </div>
         <table class="table acc-table" id="acc-table">
-          <thead><tr><th scope="col">Account</th><th scope="col">Status</th><th scope="col" class="num">Followers</th><th scope="col" class="num">Posts</th><th scope="col" class="num" title="All time, with the change in the last 30 days">Likes</th><th scope="col" class="num" title="Likes, comments and shares per post ÷ followers">Per follower</th><th scope="col" class="num">Last post</th><th scope="col" class="acc-login-head">Login</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+          <thead><tr><th scope="col">Account</th><th scope="col">Status</th><th scope="col" class="num">Followers</th><th scope="col" class="num">Posts</th><th scope="col" class="num" title="All time, with the change in the last 30 days">Likes</th><th scope="col" class="num" title="Average likes and comments on the posts we track">Per post</th><th scope="col" class="num" title="Likes, comments and shares per post ÷ followers">Per follower</th><th scope="col" class="num">Last post</th><th scope="col" class="acc-login-head">Login</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
           <tbody id="acc-rows"></tbody>
         </table>
         <div class="empty" id="acc-empty" hidden><strong id="acc-empty-title">No accounts yet.</strong><span id="acc-empty-text"></span></div>

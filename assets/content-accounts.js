@@ -103,9 +103,12 @@
       if (!handle) return;
       var snaps = Object.keys(p.snapshots || {}).map(function (k) { var v = p.snapshots[k] || {}; return { at: num(v.at), likes: v.likes === null || v.likes === undefined ? null : num(v.likes) }; })
         .filter(function (v) { return v.likes !== null; }).sort(function (x, y) { return x.at - y.at; });
-      var posted = num(p.posted_at) || (snaps[0] ? snaps[0].at : 0), latest = p.latest || {}, s = stats[handle] = stats[handle] || { posts: 0, likes: 0, gained: 0, interactions: 0, last: 0 };
+      var posted = num(p.posted_at) || (snaps[0] ? snaps[0].at : 0), latest = p.latest || {}, s = stats[handle] = stats[handle] || { posts: 0, liked: 0, likes: 0, comments: 0, recent: 0, gained: 0, interactions: 0, last: 0 };
       s.posts++;
       s.likes += num(latest.likes);
+      if (latest.likes !== null && latest.likes !== undefined) s.liked++;
+      s.comments += num(latest.comments);
+      if (posted >= start) s.recent++;
       s.gained += likesAt(snaps, posted, now) - likesAt(snaps, posted, start);
       s.interactions += num(latest.likes) + num(latest.comments) + num(latest.shares);
       s.last = Math.max(s.last, posted);
@@ -119,12 +122,14 @@
       followers: f, growth: live ? live.change : null, posts: a.handle && (s || typeof a.posts === 'number') ? posts : null,
       likes: s ? s.likes : null, gained: s ? Math.round(s.gained) : null,
       rate: s && f ? s.interactions / s.posts / f : null,
+      perPost: s && s.liked ? s.likes / s.liked : null, comments: s ? s.comments / s.posts : null, recent: s ? s.recent : null, tracked: s ? s.posts : 0,
       last: a.handle ? Math.max(s ? s.last : 0, num(a.last_post_at)) || null : null
     };
   }
   var BY = {
     top: function (m) { return m.gained; }, likes: function (m) { return m.likes; }, engagement: function (m) { return m.rate; }, followers: function (m) { return m.followers; },
-    growth: function (m) { return m.growth; }, posts: function (m) { return m.posts; }, recent: function (m) { return m.last; }
+    growth: function (m) { return m.growth; }, posts: function (m) { return m.posts; }, recent: function (m) { return m.last; },
+    perpost: function (m) { return m.perPost; }, comments: function (m) { return m.comments; }, pace: function (m) { return m.recent; }
   };
   function nameOf(a) { return String(a.school || a.handle || a.login_email || '').toLowerCase(); }
   function compare(a, b) {
@@ -204,8 +209,13 @@
       td.title = value === null ? 'Not tracked yet' : whole.format(value) + ' ' + unit + (change === null ? '' : ', ' + (change < 0 ? '' : '+') + whole.format(change) + ' in ' + PERIOD + ' days');
     };
     withChange('Followers', m.followers, m.growth, 'followers');
-    cell(tr, 'num', 'Posts', m.posts === null ? '—' : whole.format(m.posts));
+    var postsCell = cell(tr, 'num', 'Posts', m.posts === null ? '—' : whole.format(m.posts));
+    if (m.recent && m.recent < m.posts) postsCell.appendChild(el('span', 'sub', '+' + m.recent));
+    postsCell.title = m.posts === null ? 'Not tracked yet' : whole.format(m.posts) + ' posts' + (m.recent !== null ? ', ' + m.recent + ' in the last ' + PERIOD + ' days' : '');
     withChange('Likes', m.likes, m.gained, 'likes across tracked posts');
+    var per = cell(tr, 'num', 'Per post', m.perPost === null ? '—' : whole.format(Math.round(m.perPost)));
+    if (m.comments !== null) per.appendChild(el('span', 'sub line', (Math.round(m.comments * 10) / 10) + ' comments'));
+    per.title = m.perPost === null ? 'Not tracked yet' : whole.format(Math.round(m.perPost)) + ' likes and ' + (Math.round(m.comments * 10) / 10) + ' comments per post, over the ' + m.tracked + ' posts we track';
     var rate = cell(tr, 'num', 'Per follower', m.rate === null ? '—' : (m.rate * 100).toFixed(1) + '%');
     rate.title = 'Likes, comments and shares per post ÷ followers';
     cell(tr, 'num', 'Last post', m.last ? day(m.last) : a.handle && a.checked_at ? 'None' : '—');

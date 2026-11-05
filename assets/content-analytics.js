@@ -203,10 +203,13 @@
   function render() {
     var now = Date.now(), list = visible(), start = range ? now - range * DAY : -Infinity;
     var label = range ? 'last ' + range + ' days' : 'all time', name = metricName();
-    var total = 0, counted = 0, views = 0, engaged = 0, gained = 0, gainers = 0, postedIn = 0, lastUpdate = 0;
+    var total = 0, counted = 0, views = 0, engaged = 0, viewed = 0, likes = 0, liked = 0, comments = 0, gained = 0, gainers = 0, postedIn = 0, first = 0, lastUpdate = 0;
     list.forEach(function (post) {
       if (has(post)) { total += post.latest[metric]; counted++; }
-      if (has(post, 'views')) { views += post.latest.views; engaged += engagement(post.latest); }
+      if (has(post, 'views')) { views += post.latest.views; engaged += engagement(post.latest); viewed++; }
+      if (has(post, 'likes')) { likes += post.latest.likes; liked++; }
+      comments += post.latest.comments;
+      if (post.posted && (!first || post.posted < first)) first = post.posted;
       post.gained = valueAt(post, now) - (range ? valueAt(post, start) : 0);
       gained += post.gained; if (post.gained > 0) gainers++;
       if (post.posted >= start) postedIn++;
@@ -221,12 +224,9 @@
     var missing = list.length - counted;
     $('k-total-sub').textContent = 'all time' + (missing ? ' · ' + missing + ' without ' + metric : '');
     $('k-total-sub').title = missing ? missingNote() : '';
-    $('k-avg-label').textContent = 'Avg ' + metric + ' per post';
-    $('k-avg-sub').textContent = missing ? 'posts with ' + metric : 'all time';
     $('k-posts').textContent = list.length;
-    $('k-posts-sub').textContent = range ? postedIn + ' posted in ' + range + ' days' : ' ';
-    $('k-avg').textContent = counted ? fmt(total / counted) : list.length ? '—' : '0';
-    $('k-eng').textContent = views ? pct(engaged / views) : '—';
+    $('k-posts-sub').textContent = range ? postedIn + ' posted in ' + range + ' days' : 'all time';
+    renderPerPost(list.length, postedIn, first, now, { likes: likes, liked: liked, comments: comments, views: views, viewed: viewed, engaged: engaged });
     $('an-summary').textContent = posts.length
       ? posts.length + (posts.length === 1 ? ' post' : ' posts') + ' tracked · last update ' + ago(lastUpdate)
       : 'No posts logged yet.';
@@ -239,6 +239,33 @@
     renderLeaders();
     renderPosts(list);
     renderTracked();
+  }
+
+  // the per-post figures: each average is over the posts that have that number, all time
+  function perPost(n) { return n === null ? '—' : n < 10 ? String(Math.round(n * 10) / 10) : fmt(n); }
+  function plural(n, word) { return n + ' ' + word + (n === 1 ? '' : 's'); }
+  function renderPerPost(count, postedIn, first, now, s) {
+    // posting pace over the range, or since the first post when the range is all time
+    var weeks = range ? range / 7 : first ? Math.max(1, (now - first) / (7 * DAY)) : 0;
+    var pace = weeks ? (range ? postedIn : count) / weeks : null;
+    $('k-pace').textContent = count ? perPost(pace) : '—';
+    $('k-pace').title = pace === null ? '' : (range ? postedIn : count) + ' posts over ' + (Math.round(weeks * 10) / 10) + ' weeks';
+    $('k-pace-sub').textContent = range ? 'last ' + range + ' days' : first ? 'since ' + shortDay(first) : ' ';
+
+    $('k-lpp').textContent = s.liked ? perPost(s.likes / s.liked) : '—';
+    $('k-lpp').title = s.liked ? full(s.likes) + ' likes over ' + plural(s.liked, 'post') : '';
+    $('k-lpp-sub').textContent = !count ? ' ' : s.liked === count ? 'across ' + plural(count, 'post') : 'across ' + s.liked + ' of ' + plural(count, 'post');
+    $('k-lpp-sub').title = s.liked < count ? 'Some posts hide their likes, so they are left out of this average.' : '';
+
+    $('k-cpp').textContent = count ? perPost(s.comments / count) : '—';
+    $('k-cpp').title = count ? full(s.comments) + ' comments over ' + plural(count, 'post') : '';
+    $('k-cpp-sub').textContent = s.likes ? '1 comment per ' + perPost(s.likes / Math.max(s.comments, 1)) + ' likes' : ' ';
+    $('k-cpp-sub').title = s.likes ? full(s.comments) + ' comments and ' + full(s.likes) + ' likes' : '';
+
+    $('k-vpp').textContent = s.viewed ? perPost(s.views / s.viewed) : '—';
+    $('k-vpp').title = s.viewed ? full(s.views) + ' views over ' + plural(s.viewed, 'post') : '';
+    $('k-vpp-sub').textContent = s.viewed ? pct(s.engaged / s.views) + ' engage per view' : count ? 'Instagram hides views' : ' ';
+    $('k-vpp-sub').title = s.viewed ? 'Likes, comments and shares ÷ views, for the ' + plural(s.viewed, 'post') + ' with views' : 'Add views from the app with Update numbers.';
   }
 
   // ---------- views over time: one series, so no legend; the title names it ----------
@@ -490,7 +517,7 @@
 
   // ---------- top performers ----------
 
-  var leaderTab = 'posts', leaderAll = false, LEADERS_SHOWN = 5;
+  var leaderTab = 'posts', leaderRank = 'gained', leaderAll = false, LEADERS_SHOWN = 5;
   // followers of a set of tracked accounts, on the platforms in view
   function followersOf(ids, start) {
     var out = { count: 0, change: 0, known: false, grew: false };
@@ -505,22 +532,47 @@
     });
     return out;
   }
+  // what each Rank by choice reads off a row; null means not known, and sorts last
+  var RANKS = {
+    gained: function (e) { return e.known ? e.gained : null; },
+    likes: function (e) { return e.likesPer; },
+    comments: function (e) { return e.commentsPer; },
+    follower: function (e) { return e.rate; },
+    posts: function (e) { return e.posts; }
+  };
+  function blankRow() { return { known: false, counted: 0, total: 0, gained: 0, posts: 0, recent: 0, interactions: 0, likes: 0, liked: 0, comments: 0, newest: 0, ids: {}, people: {} }; }
   function renderLeaders() {
-    var now = Date.now(), start = range ? now - range * DAY : -Infinity, list = visible();
+    var now = Date.now(), start = range ? now - range * DAY : -Infinity, list = visible(), single = leaderTab === 'posts';
     // views when any post has them; Instagram hides views, so otherwise likes
     var by = metric === 'views' && !list.some(function (post) { return has(post, 'views'); }) ? 'likes' : metric;
-    var name = metricName(by), lead = range ? name + ' gained · ' + range + 'd' : name;
-    $('leaders-sub').textContent = (range ? 'Ranked by ' + by + ' gained in the last ' + range + ' days' : 'Ranked by total ' + by)
-      + (by !== metric ? ' · no view counts yet' : '');
+    var name = metricName(by), gainLabel = range ? name + ' gained · ' + range + 'd' : name;
     var gainOf = function (post) { return range ? valueAt(post, now, by) - valueAt(post, start, by) : valueOf(post, by); };
+    // one post is its own average, so the post list has no Most posts
+    var postsOption = $('leader-rank').querySelector('[value="posts"]');
+    postsOption.hidden = postsOption.disabled = single;
+    if (single && leaderRank === 'posts') leaderRank = $('leader-rank').value = 'gained';
+    var LABELS = { gained: gainLabel, likes: single ? 'Likes' : 'Likes per post', comments: single ? 'Comments' : 'Comments per post', follower: 'Per follower', posts: 'Posts' };
+    var lead = LABELS[leaderRank];
+    $('leaders-sub').textContent = leaderRank === 'gained'
+      ? (range ? 'Ranked by ' + by + ' gained in the last ' + range + ' days' : 'Ranked by total ' + by) + (by !== metric ? ' · no view counts yet' : '')
+      : 'Ranked by ' + lead.toLowerCase() + (leaderRank === 'follower' ? ', likes, comments and shares per post ÷ followers' : '') + ' · all time';
 
+    function add(g, post) {
+      g.posts++; g.total += valueOf(post, by); g.gained += gainOf(post); g.interactions += engagement(post.latest);
+      if (has(post, by)) { g.known = true; g.counted++; }
+      if (has(post, 'likes')) { g.likes += post.latest.likes; g.liked++; }
+      g.comments += post.latest.comments;
+      if (post.posted >= start) g.recent++;
+      g.newest = Math.max(g.newest, post.posted);
+    }
     var entries;
-    if (leaderTab === 'posts') {
+    if (single) {
       entries = list.map(function (post) {
-        var tracked = post.data.creator_id && creators[post.data.creator_id];
+        var e = blankRow(), tracked = post.data.creator_id && creators[post.data.creator_id];
         var f = tracked ? followerStats(tracked, post.data.platform, start) : null;
-        return { post: post, known: has(post, by), counted: has(post, by) ? 1 : 0, total: valueOf(post, by), gained: gainOf(post), posts: 1,
-          interactions: engagement(post.latest), followers: f ? f.count : 0, newest: post.posted };
+        add(e, post); e.post = post;
+        e.follow = { known: !!f, count: f ? f.count : 0 }; e.followers = e.follow.count;
+        return e;
       });
     } else {
       var groups = {};
@@ -528,15 +580,13 @@
         var key = leaderTab === 'creators' ? post.creatorKey || '' : post.school.trim().toLowerCase();
         var g = groups[key];
         if (!g) {
-          g = groups[key] = { known: false, counted: 0, total: 0, gained: 0, posts: 0, interactions: 0, ids: {}, people: {}, newest: 0 };
+          g = groups[key] = blankRow();
           if (leaderTab === 'creators') { g.name = post.creator || 'Unattributed'; g.sub = [post.handle, post.school].filter(Boolean).join(' · '); }
           else g.name = post.school || 'No school';
         }
-        g.posts++; g.total += valueOf(post, by); g.gained += gainOf(post); g.interactions += engagement(post.latest);
-        if (has(post, by)) { g.known = true; g.counted++; }
+        add(g, post);
         if (post.data.creator_id && creators[post.data.creator_id]) g.ids[post.data.creator_id] = 1;
         g.people[post.creatorKey || post.creator] = 1;
-        g.newest = Math.max(g.newest, post.posted);
       });
       entries = Object.keys(groups).map(function (key) {
         var g = groups[key];
@@ -546,15 +596,41 @@
         return g;
       });
     }
-    entries.sort(function (a, b) { return (b.known - a.known) || (b.gained - a.gained) || (b.total - a.total) || (b.newest - a.newest); });
+    entries.forEach(function (e) {
+      e.likesPer = e.liked ? e.likes / e.liked : null;
+      e.commentsPer = e.posts ? e.comments / e.posts : null;
+      e.rate = e.followers ? e.interactions / e.posts / e.followers : null;
+    });
+    var read = RANKS[leaderRank] || RANKS.gained;
+    entries.sort(function (a, b) {
+      var va = read(a), vb = read(b);
+      if ((va === null) !== (vb === null)) return va === null ? 1 : -1;
+      return ((vb || 0) - (va || 0)) || (b.known - a.known) || (b.gained - a.gained) || (b.total - a.total) || (b.newest - a.newest);
+    });
 
-    // the columns for this tab
-    var cols = leaderTab === 'posts' ? ['Post', lead].concat(range ? [name] : [], ['Per follower'])
-      : leaderTab === 'creators' ? ['Creator', lead, 'Posts', 'Avg per post', 'Followers', 'Per follower']
-      : ['School', lead, 'Posts', 'Avg per post', 'Followers', 'Per follower'];
+    // the other columns: everything but the one it's ranked on, which is the bar
+    var rateTitle = function (e) {
+      return e.followers ? full(e.interactions) + ' likes, comments and shares over ' + plural(e.posts, 'post') + ' · ' + full(e.followers) + ' followers' : 'No follower count for this account. Track it under Creators we track.';
+    };
+    var gainText = function (e) { return e.known ? (range && e.gained > 0 ? '+' : '') + fmt(e.gained) : '—'; };
+    var gainTitle = function (e) { return e.known ? full(e.gained) + ' ' + by + (range ? ' gained in ' + range + ' days' : '') : missingNote(by); };
+    var COLS = {
+      gained: function (e) { return [gainText(e), gainTitle(e)]; },
+      total: function (e) { return e.known ? [fmt(e.total), full(e.total) + ' ' + by] : ['—', missingNote(by)]; },
+      likes: function (e) { return e.liked ? [perPost(e.likesPer), full(e.likes) + ' likes' + (single ? '' : ' over ' + plural(e.liked, 'post'))] : ['—', missingNote('likes')]; },
+      comments: function (e) { return [perPost(e.commentsPer), full(e.comments) + ' comments' + (single ? '' : ' over ' + plural(e.posts, 'post'))]; },
+      posts: function (e) { return [String(e.posts), plural(e.posts, 'post') + (range ? ', ' + e.recent + ' in the last ' + range + ' days' : '')]; },
+      followers: function (e) { return e.follow.known ? [fmt(e.followers), full(e.followers) + ' followers'] : ['—', 'No tracked account']; },
+      follower: function (e) { return [e.rate === null ? '—' : pct(e.rate), rateTitle(e)]; }
+    };
+    var keys = single ? ['gained'].concat(range && by !== 'likes' ? ['total'] : [], ['likes', 'comments', 'follower'])
+      : ['gained', 'posts', 'likes', 'comments', 'followers', 'follower'];
+    keys = keys.filter(function (k) { return k !== leaderRank; });
+    var colLabel = function (k) { return k === 'total' ? name : k === 'followers' ? 'Followers' : LABELS[k]; };
+
     var head = $('leaders-head');
     head.textContent = '';
-    cols.forEach(function (label, i) {
+    [single ? 'Post' : leaderTab === 'creators' ? 'Creator' : 'School', lead].concat(keys.map(colLabel)).forEach(function (label, i) {
       var th = el('th', i === 0 ? 'who' : i === 1 ? 'lead' : 'num', label); th.scope = 'col';
       if (label === 'Per follower') th.title = 'Likes, comments and shares per post ÷ the account\'s followers';
       head.appendChild(th);
@@ -563,14 +639,15 @@
     var body = $('leader-rows'), more = $('leaders-more');
     body.textContent = '';
     if (!entries.length) {
-      var tr = el('tr'), td = el('td', 'muted', 'Nothing yet.'); td.colSpan = cols.length; tr.appendChild(td); body.appendChild(tr);
+      var tr = el('tr'), td = el('td', 'muted', 'Nothing yet.'); td.colSpan = keys.length + 2; tr.appendChild(td); body.appendChild(tr);
       more.hidden = true; return;
     }
-    var top = Math.max.apply(null, entries.map(function (e) { return e.known ? Math.max(0, e.gained) : 0; })) || 1;
+    var top = Math.max.apply(null, entries.map(function (e) { return Math.max(0, read(e) || 0); })) || 1;
+    var leadCol = COLS[leaderRank === 'gained' ? 'gained' : leaderRank === 'follower' ? 'follower' : leaderRank];
     var shown = leaderAll ? entries : entries.slice(0, LEADERS_SHOWN);
     shown.forEach(function (e, i) {
-      var tr = el('tr'), who = el('td', 'who'), row = el('div', 'leader'), text = el('div');
-      row.appendChild(el('span', 'rank' + (i === 0 && e.known && e.gained > 0 ? ' first' : ''), String(i + 1)));
+      var tr = el('tr'), who = el('td', 'who'), row = el('div', 'leader'), text = el('div'), v = read(e);
+      row.appendChild(el('span', 'rank' + (i === 0 && v !== null && v > 0 ? ' first' : ''), String(i + 1)));
       if (e.post) {
         var post = e.post, url = safeLink(post.data.url), title = el('strong');
         if (url) { var a = el('a', '', post.data.title || 'Untitled'); a.href = url.href; a.target = '_blank'; a.rel = 'noopener noreferrer'; title.appendChild(a); }
@@ -587,27 +664,20 @@
       row.appendChild(text); who.appendChild(row); tr.appendChild(who);
 
       // the measure it's ranked on, as a bar
-      var leadCell = el('td', 'lead'), track = el('span', 'track'), bar = el('span', 'bar');
+      var leadCell = el('td', 'lead'), track = el('span', 'track'), bar = el('span', 'bar'), shownLead = leadCol(e);
       leadCell.dataset.label = lead;
       bar.setAttribute('aria-hidden', 'true');
-      bar.style.width = 'calc((100% - 64px) * ' + (e.known ? Math.max(0, e.gained) / top : 0).toFixed(4) + ')';
-      if (!e.known) bar.style.minWidth = '0';
-      var shownGain = e.known ? (range && e.gained > 0 ? '+' : '') + fmt(e.gained) : '—';
-      var val = el('span', 'val', shownGain);
-      val.title = e.known ? full(e.gained) + ' ' + by + (range ? ' gained in ' + range + ' days' : '') : missingNote(by);
+      bar.style.width = 'calc((100% - 64px) * ' + (v === null ? 0 : Math.max(0, v) / top).toFixed(4) + ')';
+      if (v === null) bar.style.minWidth = '0';
+      var val = el('span', 'val', shownLead[0]);
+      val.title = shownLead[1];
       track.appendChild(bar); track.appendChild(val); leadCell.appendChild(track); tr.appendChild(leadCell);
 
-      var rate = e.followers ? pct(e.interactions / e.posts / e.followers) : '—';
-      var rateTitle = e.followers ? full(e.interactions) + ' likes, comments and shares over ' + e.posts + (e.posts === 1 ? ' post' : ' posts') + ' · ' + full(e.followers) + ' followers' : 'No follower count for this account. Track it under Creators we track.';
-      if (e.post) {
-        if (range) cell(tr, 'num', name, e.known ? fmt(e.total) : '—', e.known ? full(e.total) + ' ' + by : missingNote(by));
-      } else {
-        cell(tr, 'num', 'Posts', String(e.posts));
-        cell(tr, 'num', 'Avg per post', e.counted ? fmt(e.total / e.counted) : '—', e.counted ? full(e.total / e.counted) + ' ' + by + ' per post' : missingNote(by));
-        var fol = cell(tr, 'num', 'Followers', e.follow.known ? fmt(e.followers) : '—', e.follow.known ? full(e.followers) + ' followers' : 'No tracked account');
-        if (e.follow.grew) fol.appendChild(el('span', 'sub', change(e.follow.change)));
-      }
-      cell(tr, 'num', 'Per follower', rate, rateTitle);
+      keys.forEach(function (k) {
+        var c = COLS[k](e), td = cell(tr, 'num', colLabel(k), c[0], c[1]);
+        if (k === 'followers' && e.follow.grew) td.appendChild(el('span', 'sub', change(e.follow.change)));
+        if (k === 'posts' && range && e.recent && e.recent < e.posts) td.appendChild(el('span', 'sub', '+' + e.recent));
+      });
       body.appendChild(tr);
     });
     more.hidden = entries.length <= LEADERS_SHOWN;
@@ -627,6 +697,7 @@
       if (sort === 'engagement') return rate(b) - rate(a);
       if (sort === 'newest') return b.posted - a.posted;
       if (sort === 'likes') return seen(b, 'likes') - seen(a, 'likes');
+      if (sort === 'comments') return b.latest.comments - a.latest.comments;
       return seen(b, 'views') - seen(a, 'views');
     });
     $('posts-table').hidden = !rows.length;
@@ -666,6 +737,7 @@
       if (has(post, m)) cell(tr, 'num', metricName(m), fmt(post.latest[m]), full(post.latest[m]));
       else cell(tr, 'num muted', metricName(m), '—', missingNote(m));
     });
+    cell(tr, 'num', 'Comments', fmt(post.latest.comments), full(post.latest.comments));
     if (has(post)) cell(tr, 'num' + (post.gained > 0 ? ' up' : ''), $('posts-gained-head').textContent, (post.gained > 0 ? '+' : '') + fmt(post.gained), full(post.gained) + ' ' + metric);
     else cell(tr, 'num muted', $('posts-gained-head').textContent, '—', missingNote());
     cell(tr, 'num', 'Engagement', post.latest.views ? pct(engagement(post.latest) / post.latest.views) : '—',
@@ -993,8 +1065,9 @@
       cell(tr, 'num', 'Posts', mine.length);
       ['likes', 'views'].forEach(function (m) {
         var sum = mine.reduce(function (s, p) { return s + valueOf(p, m); }, 0), known = mine.filter(function (p) { return has(p, m); }).length;
-        if (mine.length && !known) cell(tr, 'num muted', metricName(m), '—', missingNote(m));
-        else cell(tr, 'num', metricName(m), fmt(sum), full(sum) + (known < mine.length ? ' · ' + (mine.length - known) + ' posts without ' + m : ''));
+        if (mine.length && !known) { cell(tr, 'num muted', metricName(m), '—', missingNote(m)); return; }
+        var td = cell(tr, 'num', metricName(m), fmt(sum), full(sum) + (known < mine.length ? ' · ' + (mine.length - known) + ' posts without ' + m : ''));
+        if (known) { td.appendChild(el('span', 'sub line', perPost(sum / known) + ' per post')); td.title += ' · ' + perPost(sum / known) + ' ' + m + ' per post'; }
       });
       var status = el('td', 'status'), busy = checking(id);
       status.dataset.label = 'Last checked';
@@ -1160,6 +1233,7 @@
     });
   });
   $('leaders-more').addEventListener('click', function () { leaderAll = !leaderAll; renderLeaders(); });
+  $('leader-rank').addEventListener('change', function () { leaderRank = this.value; leaderAll = false; renderLeaders(); });
   $('search').addEventListener('input', function () { renderPosts(visible()); });
   $('sort').addEventListener('change', function () { renderPosts(visible()); });
   $('log-post').addEventListener('click', function () { openPost(null); });

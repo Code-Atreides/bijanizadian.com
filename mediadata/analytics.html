@@ -13,7 +13,7 @@
 <script src="/assets/content-auth.js?v=6" defer></script>
 <script src="/assets/content-geo.js?v=1" defer></script>
 <script src="/assets/content-schools.js?v=1" defer></script>
-<script src="/assets/content-analytics.js?v=10" defer></script>
+<script src="/assets/content-analytics.js?v=11" defer></script>
 <!--
   Campus media analytics, the performance side of the media CRM: every posted
   video (TikTok, Instagram, YouTube, X) with the numbers the team logs for it.
@@ -120,7 +120,7 @@
   .refetching { opacity: .55; transition: opacity .2s; }
 
   /* ---------- stat tiles ---------- */
-  .kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
   .stat { border: 1px solid var(--tint-line); background: var(--tint); border-radius: 10px; padding: 13px 14px; min-width: 0; }
   .stat span { display: block; font-size: 12.5px; color: var(--muted); }
   .stat strong { display: block; font-size: 28px; font-weight: 500; letter-spacing: -.8px; line-height: 1.15; margin-top: 4px; }
@@ -180,8 +180,8 @@
 
   /* top performers: a leaderboard of posts, creators or schools, ranked by what each gained in the range */
   .leaders .card-head { flex-wrap: wrap; align-items: center; }
-  .leaders-table .who { width: 40%; }
-  .leaders-table .lead { width: 24%; }
+  .leaders-table .who { width: 32%; }
+  .leaders-table .lead { width: 20%; }
   .leader { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
   .leader > div { min-width: 0; }
   .rank { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; color: var(--muted-2); background: var(--tint); }
@@ -189,7 +189,8 @@
   .leaders-table .track { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .leaders-table .bar { height: 12px; min-width: 2px; border-radius: 0 4px 4px 0; background: var(--blue); }
   .leaders-table .val { font-weight: 500; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .leaders-table .sub { display: inline; color: var(--faint); font-weight: 400; margin-left: 4px; }
+  .tracked .sub.line { display: block; margin-left: 0; }
+  .tracked .sub, .leaders-table .sub { display: inline; color: var(--faint); font-weight: 400; margin-left: 4px; }
   .leaders-more { margin-top: 8px; margin-left: -10px; }
   .pill { display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: .3px; color: var(--blue-text); background: var(--lavender); border-radius: 99px; padding: 2px 8px; margin-right: 6px; vertical-align: 1px; }
   .muted { color: var(--faint); }
@@ -259,7 +260,7 @@
 
   @media (max-width: 1050px) {
     .site-shell { padding: 0 24px; }
-    .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    #board .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .row, .row.even { grid-template-columns: 1fr; }
     .map-grid { grid-template-columns: 1fr; }
   }
@@ -282,9 +283,13 @@
     .leaders-table td { width: auto !important; border: 0; padding: 0; text-align: left !important; }
     .leaders-table td.who, .leaders-table td.lead { grid-column: 1 / -1; }
     .leaders-table td[data-label]::before { content: attr(data-label); display: block; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; color: var(--faint); }
+    .leaders-table td.num { white-space: normal; min-width: 0; }
+    .leaders-table td.num::before { overflow-wrap: anywhere; }
     .tracked td:nth-child(3), .tracked td.status { grid-column: 1 / -1; }
     .tracked td.no-account { display: none; }
     .quad { grid-template-columns: 1fr 1fr; }
+    #board .kpis { grid-template-columns: 1fr 1fr; }
+    .leader-tools { flex-wrap: wrap; }
   }
   @media (max-width: 600px) {
     .site-shell { padding: 0 14px; }
@@ -300,7 +305,7 @@
     .queue-head h1 { font-size: 28px; }
     .kpis { grid-template-columns: 1fr 1fr; gap: 8px; }
     #ranges { order: -1; }
-    .kpis .stat:first-child, .kpis .stat:last-child { grid-column: 1 / -1; }
+    .kpis .stat:first-child { grid-column: 1 / -1; }
     .stat strong { font-size: 24px; }
     .card { padding: 14px; }
     .tool-label { display: none; }
@@ -421,10 +426,12 @@
         <div class="kpis" data-in="overview">
           <div class="stat hero"><span id="k-gained-label">Views gained · last 30 days</span><strong id="k-gained">0</strong><small id="k-gained-sub">&nbsp;</small></div>
           <div class="stat"><span id="k-total-label">Total views</span><strong id="k-total">0</strong><small id="k-total-sub">all time</small></div>
-          <div class="stat"><span>Posts tracked</span><strong id="k-posts">0</strong><small id="k-posts-sub">&nbsp;</small></div>
-          <div class="stat"><span id="k-avg-label">Avg views per post</span><strong id="k-avg">0</strong><small id="k-avg-sub">all time</small></div>
-          <div class="stat"><span>Engagement rate</span><strong id="k-eng">—</strong><small title="Likes, comments and shares ÷ views, for posts with views">interactions per view</small></div>
           <div class="stat"><span>Followers</span><strong id="k-followers">—</strong><small id="k-followers-sub">tracked accounts</small></div>
+          <div class="stat"><span>Posts tracked</span><strong id="k-posts">0</strong><small id="k-posts-sub">&nbsp;</small></div>
+          <div class="stat"><span id="k-pace-label">Posts per week</span><strong id="k-pace">—</strong><small id="k-pace-sub">&nbsp;</small></div>
+          <div class="stat"><span>Likes per post</span><strong id="k-lpp">—</strong><small id="k-lpp-sub">&nbsp;</small></div>
+          <div class="stat"><span>Comments per post</span><strong id="k-cpp">—</strong><small id="k-cpp-sub">&nbsp;</small></div>
+          <div class="stat"><span>Views per post</span><strong id="k-vpp">—</strong><small id="k-vpp-sub">&nbsp;</small></div>
         </div>
 
         <section class="card leaders" data-in="performers" aria-labelledby="c-leaders">
@@ -433,10 +440,19 @@
               <h2 id="c-leaders">Top performers</h2>
               <p class="sub" id="leaders-sub">&nbsp;</p>
             </div>
-            <div class="segmented" id="leader-tabs" role="group" aria-label="Rank">
-              <button type="button" data-leader="posts" aria-pressed="true">Posts</button>
-              <button type="button" data-leader="creators" aria-pressed="false">Creators</button>
-              <button type="button" data-leader="schools" aria-pressed="false">Schools</button>
+            <div class="posts-tools leader-tools">
+              <div class="segmented" id="leader-tabs" role="group" aria-label="Rank">
+                <button type="button" data-leader="posts" aria-pressed="true">Posts</button>
+                <button type="button" data-leader="creators" aria-pressed="false">Creators</button>
+                <button type="button" data-leader="schools" aria-pressed="false">Schools</button>
+              </div>
+              <select id="leader-rank" aria-label="Rank by">
+                <option value="gained">Most gained</option>
+                <option value="likes">Likes per post</option>
+                <option value="comments">Comments per post</option>
+                <option value="follower">Per follower</option>
+                <option value="posts">Most posts</option>
+              </select>
             </div>
           </div>
           <table class="table leaders-table" id="leaders-table">
@@ -519,6 +535,7 @@
               <select id="sort" aria-label="Sort posts">
                 <option value="views">Most views</option>
                 <option value="likes">Most likes</option>
+                <option value="comments">Most comments</option>
                 <option value="gained">Most gained</option>
                 <option value="engagement">Best engagement</option>
                 <option value="newest">Newest</option>
@@ -526,7 +543,7 @@
             </div>
           </div>
           <table class="table posts" id="posts-table">
-            <thead><tr><th scope="col">Post</th><th scope="col">Creator</th><th scope="col" class="num">Views</th><th scope="col" class="num">Likes</th><th scope="col" class="num" id="posts-gained-head">Gained</th><th scope="col" class="num">Engagement</th><th scope="col" class="num">Updated</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
+            <thead><tr><th scope="col">Post</th><th scope="col">Creator</th><th scope="col" class="num">Views</th><th scope="col" class="num">Likes</th><th scope="col" class="num">Comments</th><th scope="col" class="num" id="posts-gained-head">Gained</th><th scope="col" class="num">Engagement</th><th scope="col" class="num">Updated</th><th scope="col"><span class="tool-label">Actions</span></th></tr></thead>
             <tbody id="post-rows"></tbody>
           </table>
           <div class="empty" id="posts-empty" hidden>
