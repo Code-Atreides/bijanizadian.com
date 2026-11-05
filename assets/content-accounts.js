@@ -222,7 +222,21 @@
 
     var login = el('td', 'acc-login');
     login.dataset.label = 'Login';
-    login.appendChild(el('span', 'acc-email', a.login_email || '—'));
+    var emailLine = el('div', 'acc-email-line');
+    emailLine.appendChild(el('span', 'acc-email', a.login_email || '—'));
+    if (a.login_email) {
+      // the email is no secret, so copying it needs no admin password
+      var copyEmail = el('button', 'text-button', 'Copy');
+      copyEmail.type = 'button';
+      copyEmail.setAttribute('aria-label', 'Copy the login email for ' + (a.handle || a.login_email));
+      copyEmail.addEventListener('click', async function () {
+        try { await navigator.clipboard.writeText(a.login_email); copyEmail.textContent = 'Copied'; }
+        catch (error) { $('acc-error').textContent = 'The browser blocked copying. Select the email instead.'; $('acc-error').hidden = false; return; }
+        setTimeout(function () { copyEmail.textContent = 'Copy'; }, 1600);
+      });
+      emailLine.appendChild(copyEmail);
+    }
+    login.appendChild(emailLine);
     if (a.login_email) {
       var pw = el('div', 'acc-password'), value = el('span', 'pw-value', '••••••••••');
       var show = el('button', 'text-button', 'Show'), copy = el('button', 'text-button', 'Copy');

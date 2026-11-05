@@ -11,7 +11,7 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Regular.woff2" crossorigin>
 <script src="/assets/content-crm.js?v=5"></script>
 <script src="/assets/content-auth.js?v=6" defer></script>
-<script src="/assets/content-accounts.js?v=5" defer></script>
+<script src="/assets/content-accounts.js?v=6" defer></script>
 <!--
   Campus accounts, the network side of the CRM: every Instagram account, whether
   we own it or just have it, and logins not linked to a page yet. The list is in
@@ -201,7 +201,9 @@
   .acc-who { min-width: 180px; }
   .acc-detail { display: block; font-size: 12px; line-height: 16px; margin-top: 4px; }
   .pill.pill-own { background: var(--lavender); color: var(--blue-text); }
-  .acc-email { display: block; overflow-wrap: anywhere; }
+  .acc-email-line { display: flex; align-items: center; flex-wrap: wrap; }
+  .acc-email { overflow-wrap: anywhere; min-width: 0; }
+  .acc-email-line .text-button { padding: 0 8px; margin-block: 0; }
   .acc-password { display: flex; align-items: center; white-space: nowrap; }
   .acc-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .acc-table .sub { display: inline; margin-left: 4px; font-weight: 400; color: var(--muted-2); }
