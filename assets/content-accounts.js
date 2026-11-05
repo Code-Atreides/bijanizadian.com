@@ -213,8 +213,8 @@
     if (m.recent && m.recent < m.posts) postsCell.appendChild(el('span', 'sub', '+' + m.recent));
     postsCell.title = m.posts === null ? 'Not tracked yet' : whole.format(m.posts) + ' posts' + (m.recent !== null ? ', ' + m.recent + ' in the last ' + PERIOD + ' days' : '');
     withChange('Likes', m.likes, m.gained, 'likes across tracked posts');
-    var per = cell(tr, 'num', 'Per post', m.perPost === null ? '—' : whole.format(Math.round(m.perPost)));
-    if (m.comments !== null) per.appendChild(el('span', 'sub line', (Math.round(m.comments * 10) / 10) + ' comments'));
+    var per = cell(tr, 'num', 'Avg per post', m.perPost === null ? '—' : whole.format(Math.round(m.perPost)) + (Math.round(m.perPost) === 1 ? ' like' : ' likes'));
+    if (m.comments !== null) per.appendChild(el('span', 'sub line', (Math.round(m.comments * 10) / 10) + (Math.round(m.comments * 10) === 10 ? ' comment' : ' comments')));
     per.title = m.perPost === null ? 'Not tracked yet' : whole.format(Math.round(m.perPost)) + ' likes and ' + (Math.round(m.comments * 10) / 10) + ' comments per post, over the ' + m.tracked + ' posts we track';
     var rate = cell(tr, 'num', 'Per follower', m.rate === null ? '—' : (m.rate * 100).toFixed(1) + '%');
     rate.title = 'Likes, comments and shares per post ÷ followers';
