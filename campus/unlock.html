@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0b091f">
-<title>onboard every member. unlock $3,000. · fomo/campus</title>
-<meta name="description" content="The chapter onboarding roadmap: get every member onto fomo and unlock $3,000 in opportunity for your chapter, split across media, sponsored parties, and dinners and events.">
+<title>onboard every member. unlock +$3,000. · fomo/campus</title>
+<meta name="description" content="The chapter onboarding roadmap: get every member onto fomo and unlock +$3,000 in opportunity for your chapter, split across media, sponsored parties, and dinners and events.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="onboard every member. unlock $3,000.">
-<meta property="og:description" content="$3,000 in opportunity for your chapter: media, sponsored parties, and dinners and events.">
+<meta property="og:title" content="onboard every member. unlock +$3,000.">
+<meta property="og:description" content="+$3,000 in opportunity for your chapter: media, sponsored parties, and dinners and events.">
 <meta property="og:url" content="https://bijanizadian.com/campus/unlock">
 <link rel="canonical" href="https://bijanizadian.com/campus/unlock">
 <link rel="icon" type="image/svg+xml" href="/assets/campus-favicon.svg">
@@ -16,14 +16,14 @@
 <link rel="preload" as="font" type="font/woff2" href="/campus/fonts/Aeonik-Medium.woff2" crossorigin>
 <script>document.documentElement.classList.add('js');if(/[?&]film\b/.test(location.search))document.documentElement.classList.add('film');</script>
 <!--
-  fomo/campus/unlock: the chapter onboarding roadmap. Get every member of a
-  chapter onto fomo and the chapter unlocks $3,000 in opportunity, split across
+  /campus/unlock: the chapter onboarding roadmap. Get every member of a
+  chapter onto fomo and the chapter unlocks +$3,000 in opportunity, split across
   media, sponsored parties, and dinners & events.
 
-  Sources: the onboarding steps follow /greekwars/claim and the clan sign-up
-  page (/greekwars/clan/<id>): the head claims the clan and sends one link,
-  members give name, fomo username and email, and the fomo team adds them to
-  the clan in the app. What each lane funds comes from the campus task book
+  Sources: the five stops follow fomocampus.com's "here's the whole thing":
+  register your chapter, send the tracker, send your fomo Rewards link, both
+  done / matched / paid (+$6.25 per matched member; fomo creates the clan and
+  adds them), then every member in unlocks the +$3,000. What each lane funds comes from the campus task book
   (/taskbook): a paid chapter filmer and campus host, party funding the chapter
   directs with a fomo monitor on site, and a creator dinner fomo pays for.
   Look and rules: brand kit Edition 04 (/campus/brandkit).
@@ -32,7 +32,7 @@
   in the markup (search for data-amount).
 
   The hero stage is a ~15 s loop (reel length). "Film mode" (or ?film in the
-  URL) puts just the stage, the fomo/campus/unlock lockup and phase captions on
+  URL) puts just the stage, the fomo/campus lockup and phase captions on
   a full screen for screen recording; Esc leaves it. Reduced motion shows the
   final split as a still.
 -->
@@ -179,7 +179,7 @@
   .stage.merged .ring { opacity: 0; transition: opacity .6s; }
 
   .m {
-    width: 8cqi; height: 8cqi; margin: -4cqi 0 0 -4cqi; border-radius: 50%;
+    width: 6cqi; height: 6cqi; margin: -3cqi 0 0 -3cqi; border-radius: 50%;
     translate: calc(var(--x) * 1cqi) calc(var(--y) * 1cqi);
     border: 1px solid rgba(203,208,235,.2); background: rgba(22,21,34,.75);
     display: grid; place-items: center; color: var(--lavender);
@@ -187,7 +187,7 @@
   }
   .m svg { width: 56%; height: auto; opacity: 0; transition: opacity .3s; }
   .m::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid var(--glow); opacity: 0; }
-  .m.in { background: var(--sphere); border-color: rgba(234,237,255,.32); box-shadow: 0 0 2.2cqi rgba(81,106,246,.6); animation: pop .55s cubic-bezier(.3,1.7,.5,1); }
+  .m.in { background: var(--sphere); border-color: rgba(234,237,255,.32); box-shadow: 0 0 1.8cqi rgba(81,106,246,.6); animation: pop .55s cubic-bezier(.3,1.7,.5,1); }
   .m.in svg { opacity: 1; }
   .m.in::after { animation: ripple .9s ease-out; }
   .m.pulse { animation: pulse .7s ease-in-out; }
@@ -208,7 +208,7 @@
     display: grid; place-content: center; text-align: center; line-height: 1;
     scale: .15; opacity: 0; transition: scale .9s cubic-bezier(.3,1.45,.5,1), opacity .4s;
   }
-  .pot b { font-size: 13.5cqi; font-weight: 700; letter-spacing: -.05em; color: #fff; }
+  .pot b { font-size: 12cqi; font-weight: 700; letter-spacing: -.05em; color: #fff; }
   .pot span { margin-top: 2cqi; font-size: 2.8cqi; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--lavender); }
   .pot.show { scale: 1; opacity: 1; }
   .pot.show::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1.5px solid var(--glow); animation: ripple 1.2s ease-out .15s both; }
@@ -280,8 +280,8 @@
   .js .step { opacity: 0; translate: 0 1rem; transition: opacity .6s ease var(--sd), translate .7s cubic-bezier(.2,.8,.2,1) var(--sd); }
   .js .road.go .step { opacity: 1; translate: 0 0; }
   /* the last stop: the unlock, with its three lanes in orbit */
-  .step--unlock .node { width: 8.2rem; height: 8.2rem; margin-top: -.8rem; background: var(--sphere); border-color: rgba(234,237,255,.35); color: #fff; box-shadow: 0 0 3rem rgba(81,106,246,.6); }
-  .step--unlock .node b { font-size: 1.7rem; font-weight: 700; letter-spacing: -.04em; line-height: 1; }
+  .step--unlock .node { width: 8.2rem; height: 8.2rem; margin-top: -.8rem; margin-bottom: 1.5rem; background: var(--sphere); border-color: rgba(234,237,255,.35); color: #fff; box-shadow: 0 0 3rem rgba(81,106,246,.6); }
+  .step--unlock .node b { font-size: 1.5rem; font-weight: 700; letter-spacing: -.04em; line-height: 1; }
   .orbit { position: absolute; inset: -1.15rem; border-radius: 50%; border: 1px dashed rgba(172,184,249,.3); animation: spin 14s linear infinite; }
   .orbit i { position: absolute; width: 2.1rem; height: 2.1rem; margin: -1.05rem; border-radius: 50%; display: grid; place-items: center; background: var(--ink); border: 1px solid rgba(172,184,249,.5); color: var(--lavender); }
   .orbit i svg { width: 1rem; height: 1rem; animation: spin 14s linear infinite reverse; }
@@ -450,6 +450,8 @@
     <symbol id="i-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
     <symbol id="i-party" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01M22 8h.01M15 2h.01M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/></symbol>
     <symbol id="i-dinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.63l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z"/><path d="m21.85 2.15-10.94 10.94"/></symbol>
     <symbol id="i-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 17H7A5 5 0 0 1 7 7h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></symbol>
     <symbol id="i-user-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></symbol>
     <symbol id="i-users-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></symbol>
@@ -466,7 +468,7 @@
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="site-header" id="site-header">
-  <a class="lockup" href="/campus" aria-label="fomo/campus">
+  <a class="lockup" href="https://fomocampus.com" aria-label="fomo/campus, fomocampus.com">
     <svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg><span class="path" aria-hidden="true"><i>/</i>campus</span>
   </a>
   <div class="stores">
@@ -479,17 +481,17 @@
   <!-- ============ hero + the bubble stage ============ -->
   <section class="section hero" id="top" aria-labelledby="hero-title">
     <span class="lockup film-top" aria-hidden="true">
-      <svg viewBox="0 0 352 113"><use href="#wordmark"/></svg><span class="path"><i>/</i><span class="dim">campus</span><i>/</i>unlock</span>
+      <svg viewBox="0 0 352 113"><use href="#wordmark"/></svg><span class="path"><i>/</i>campus</span>
     </span>
 
     <div class="hero-copy">
-      <p class="lockup" aria-label="fomo/campus/unlock">
-        <svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg><span class="path" aria-hidden="true"><i>/</i><span class="dim">campus</span><i>/</i>unlock</span>
+      <p class="lockup" aria-label="fomo/campus">
+        <svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg><span class="path" aria-hidden="true"><i>/</i>campus</span>
       </p>
-      <h1 id="hero-title"><span>onboard every member.</span><span>unlock <span class="hl" style="display:inline">$3,000.</span></span></h1>
-      <p class="lede">Get your whole chapter on fomo and your chapter unlocks <strong>$3,000 in opportunity</strong>, split across media, sponsored parties, and dinners &amp; events.</p>
+      <h1 id="hero-title"><span>onboard every member.</span><span>unlock <span class="hl" style="display:inline">+$3,000.</span></span></h1>
+      <p class="lede">Get your whole chapter on fomo and your chapter unlocks <strong>+$3,000 in opportunity</strong>, split across media, sponsored parties, and dinners &amp; events.</p>
       <div class="hero-cta">
-        <a class="btn btn--primary" href="/greekwars/claim">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--primary" href="https://fomocampus.com/onboard/">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         <a class="quiet-link" href="#roadmap">See the roadmap</a>
       </div>
     </div>
@@ -504,16 +506,16 @@
           <circle class="fill" id="ring-fill" cx="50" cy="50" r="47.5" pathLength="100"/>
         </svg>
         <div id="members"></div>
-        <div class="abs count" id="count"><b class="count-num"><span id="count-n">0</span><small>/<span id="count-of">36</span></small></b><span class="count-label">members in</span></div>
+        <div class="abs count" id="count"><b class="count-num"><span id="count-n">0</span><small>/<span id="count-of">80</span></small></b><span class="count-label">members in</span></div>
         <svg class="links" id="links" viewBox="-50 -50 100 100"></svg>
-        <div class="abs pot" id="pot"><b id="pot-n">$0</b><span>unlocked</span></div>
+        <div class="abs pot" id="pot"><b id="pot-n">+$0</b><span>unlocked</span></div>
         <div class="abs core" id="core"><img src="/assets/campus-mark.svg" alt="" width="62" height="42"><span>your chapter</span></div>
-        <div class="abs lane" data-lane="0"><div><svg aria-hidden="true"><use href="#i-video"/></svg><b data-amount>$1,000</b><span>media</span></div></div>
-        <div class="abs lane" data-lane="1"><div><svg aria-hidden="true"><use href="#i-party"/></svg><b data-amount>$1,000</b><span>sponsored parties</span></div></div>
-        <div class="abs lane" data-lane="2"><div><svg aria-hidden="true"><use href="#i-dinner"/></svg><b data-amount>$1,000</b><span>dinners &amp; events</span></div></div>
+        <div class="abs lane" data-lane="0"><div><svg aria-hidden="true"><use href="#i-video"/></svg><b data-amount>+$1,000</b><span>media</span></div></div>
+        <div class="abs lane" data-lane="1"><div><svg aria-hidden="true"><use href="#i-party"/></svg><b data-amount>+$1,000</b><span>sponsored parties</span></div></div>
+        <div class="abs lane" data-lane="2"><div><svg aria-hidden="true"><use href="#i-dinner"/></svg><b data-amount>+$1,000</b><span>dinners &amp; events</span></div></div>
       </div>
       <figcaption class="stage-bar">
-        <span class="sr">An animation: a chapter's members join fomo one by one, and once every member is in, they merge into $3,000, which splits three ways: $1,000 for media, $1,000 for sponsored parties, and $1,000 for dinners and events.</span>
+        <span class="sr">An animation: a chapter's members join fomo one by one, and once every member is in, they merge into +$3,000, which splits three ways: +$1,000 for media, +$1,000 for sponsored parties, and +$1,000 for dinners and events.</span>
         <span class="status" id="status" aria-hidden="true">members joining</span>
         <button type="button" class="tool" id="play-toggle" aria-pressed="false"><svg aria-hidden="true"><use href="#i-pause"/></svg><span>Pause</span></button>
         <button type="button" class="tool" id="film-on" title="Full-screen loop for screen recording (F)"><svg aria-hidden="true"><use href="#i-film"/></svg><span>Film mode</span></button>
@@ -530,8 +532,8 @@
   <section class="section" id="roadmap" aria-labelledby="road-title">
     <div class="section-head reveal">
       <span class="eyebrow">The roadmap</span>
-      <h2 id="road-title">five stops to <span class="hl">$3,000.</span></h2>
-      <p>One link out, every member in. The fomo team handles the rest.</p>
+      <h2 id="road-title">five stops to <span class="hl">+$3,000.</span></h2>
+      <p>Set it up, share both links, and get every member in. fomo does the matching and builds your clan.</p>
     </div>
     <div class="road" id="road">
       <svg class="road-svg" id="road-svg" aria-hidden="true">
@@ -544,37 +546,37 @@
       </svg>
       <ol class="steps">
         <li class="step" style="--sd:.1s">
-          <span class="node"><svg aria-hidden="true"><use href="#i-link"/></svg><em>01</em></span>
-          <h3>send one link</h3>
-          <p>Claim your chapter’s clan and get its sign-up page. That’s the only link the group chat needs.</p>
+          <span class="node"><svg aria-hidden="true"><use href="#i-clipboard"/></svg><em>01</em></span>
+          <h3>register your chapter.</h3>
+          <p>Pick your school and chapter on fomocampus.com and get your chapter tracker link.</p>
         </li>
         <li class="step" style="--sd:.55s">
-          <span class="node"><svg aria-hidden="true"><use href="#i-user-plus"/></svg><em>02</em></span>
-          <h3>members sign up</h3>
-          <p>Each member adds their name, fomo username and email. No app yet? They download it from that page.</p>
+          <span class="node"><svg aria-hidden="true"><use href="#i-send"/></svg><em>02</em></span>
+          <h3>send the tracker.</h3>
+          <p>Drop your tracker link in the group chat. Members who join fill it out themselves.</p>
         </li>
         <li class="step" style="--sd:1s">
-          <span class="node"><svg viewBox="9 24 83 52" aria-hidden="true" style="width:2.4rem"><use href="#eyes"/></svg><em>03</em></span>
-          <h3>fomo adds them</h3>
-          <p>The fomo team adds every sign-up to your chapter’s clan in the app.</p>
+          <span class="node"><svg viewBox="0 0 83 52" aria-hidden="true" style="width:2.5rem"><use href="#eyes"/></svg><em>03</em></span>
+          <h3>send your Rewards link.</h3>
+          <p>In fomo, go to Profile → Rewards → share. Send it in the same chat. Members join fomo through it.</p>
         </li>
         <li class="step" style="--sd:1.45s">
           <span class="node"><svg aria-hidden="true"><use href="#i-users-check"/></svg><em>04</em></span>
-          <h3>every member in</h3>
-          <p>When your whole roster is in the clan, your chapter is fully onboarded.</p>
+          <h3>both done. matched. paid.</h3>
+          <p>fomo matches tracker entries to sign-ups from your link, creates your clan and adds them. You get +$6.25 per matched member.</p>
         </li>
         <li class="step step--unlock" style="--sd:1.9s">
           <span class="node">
-            <b>$3,000</b>
+            <b>+$3,000</b>
             <span class="orbit" aria-hidden="true"><i><svg><use href="#i-video"/></svg></i><i><svg><use href="#i-party"/></svg></i><i><svg><use href="#i-dinner"/></svg></i></span>
           </span>
-          <h3>your chapter unlocks</h3>
-          <p>$3,000 in opportunity: media, sponsored parties, and dinners &amp; events.</p>
+          <h3>every member in.</h3>
+          <p>Your chapter unlocks +$3,000 in opportunity: media, sponsored parties, and dinners &amp; events.</p>
         </li>
       </ol>
     </div>
     <div class="road-note reveal">
-      <p><svg aria-hidden="true"><use href="#i-info"/></svg>Already have fomo? Members still sign up on the clan page, so the team knows to add them.</p>
+      <p><svg aria-hidden="true"><use href="#i-info"/></svg>A member counts once they complete both links, your chapter tracker and your fomo Rewards link, with matching details.</p>
     </div>
   </section>
 
@@ -582,7 +584,7 @@
   <section class="section" id="unlocks" aria-labelledby="lanes-title">
     <div class="section-head reveal">
       <span class="eyebrow">What it unlocks</span>
-      <h2 id="lanes-title">$3,000, split three ways.</h2>
+      <h2 id="lanes-title">+$3,000, split three ways.</h2>
       <p>Each lane is real work your chapter runs, backed by fomo.</p>
     </div>
     <div class="lanes-card" id="lanes-card">
@@ -590,7 +592,7 @@
         <article class="lane-col" style="--cd:0s">
           <div class="lane-top">
             <span class="lane-orb"><svg aria-hidden="true"><use href="#i-video"/></svg></span>
-            <span class="lane-amt"><b data-amount>$1,000</b><span>Media</span></span>
+            <span class="lane-amt"><b data-amount>+$1,000</b><span>Media</span></span>
           </div>
           <h3>get your chapter on camera.</h3>
           <p>Pay a filmer from your chapter, put a campus host on camera, and send the best cuts to @fomo.campus.</p>
@@ -603,7 +605,7 @@
         <article class="lane-col" style="--cd:.18s">
           <div class="lane-top">
             <span class="lane-orb"><svg aria-hidden="true"><use href="#i-party"/></svg></span>
-            <span class="lane-amt"><b data-amount>$1,000</b><span>Sponsored parties</span></span>
+            <span class="lane-amt"><b data-amount>+$1,000</b><span>Sponsored parties</span></span>
           </div>
           <h3>fomo backs the night.</h3>
           <p>You direct the party budget. Your filmer shoots it, with a fomo monitor on site.</p>
@@ -616,7 +618,7 @@
         <article class="lane-col" style="--cd:.36s">
           <div class="lane-top">
             <span class="lane-orb"><svg aria-hidden="true"><use href="#i-dinner"/></svg></span>
-            <span class="lane-amt"><b data-amount>$1,000</b><span>Dinners &amp; events</span></span>
+            <span class="lane-amt"><b data-amount>+$1,000</b><span>Dinners &amp; events</span></span>
           </div>
           <h3>dinner’s on fomo.</h3>
           <p>Pick 10 sorority creators and the restaurant, plan the night, and fomo pays. They post the menu or a GRWM.</p>
@@ -629,7 +631,7 @@
       </div>
       <div class="lanes-foot">
         <p><strong>Unlocks when every member is onboarded.</strong> fomo funds the work in each lane for your chapter. It isn’t cash paid to members, and it isn’t a trading return.</p>
-        <a class="btn btn--primary" href="/greekwars/claim">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--primary" href="https://fomocampus.com/onboard/">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
     </div>
   </section>
@@ -646,10 +648,10 @@
       </div>
       <img class="mark" src="/assets/campus-mark.svg" alt="fomo campus" width="102" height="70">
       <h2 id="close-title"><span>your chapter.</span><span>your next move.</span></h2>
-      <p>Claim your clan, send one link, and get every member in.</p>
+      <p>Register your chapter, share both links, and get every member in.</p>
       <div class="closer-cta">
         <svg class="closer-arrow" viewBox="-4 -4 165 112" aria-hidden="true" style="color:#fff"><path d="M157 0C142.5 34.5 97.5 72 0 87M26 65L0 87L30 104" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <a class="btn btn--white" href="/greekwars/claim">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn--white" href="https://fomocampus.com/onboard/">Onboard your chapter<svg width="18" height="18" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
     </div>
   </section>
@@ -658,7 +660,7 @@
 <footer class="site-footer">
   <a class="foot-brand" href="https://fomo.family" target="_blank" rel="noopener" aria-label="fomo home"><svg viewBox="0 0 352 113" aria-hidden="true"><use href="#wordmark"/></svg></a>
   <nav aria-label="More">
-    <a href="/campus">campus</a>
+    <a href="https://fomocampus.com">campus</a>
     <a href="/greekwars">Greek Wars</a>
     <a href="/campus/media">media</a>
     <a href="https://www.instagram.com/fomo.campus/" target="_blank" rel="noopener">@fomo.campus</a>
@@ -686,7 +688,7 @@
   /* ================= the bubble stage ================= */
   // The split lives here and in the three data-amount figures in the markup.
   var TOTAL = 3000, SPLIT = [1000, 1000, 1000];
-  var N = 36;                         // members in the illustrated chapter
+  var N = 80;                         // members in the illustrated chapter
   var LANES = [[0, -27], [26, 18], [-26, 18]]; // lane centres, in cqi from the middle
   var stage = document.getElementById('stage');
   var holder = document.getElementById('members');
@@ -699,12 +701,12 @@
   var statusEl = document.getElementById('status');
   var filmLine = document.getElementById('film-line'), filmCta = document.getElementById('film-cta');
   document.getElementById('count-of').textContent = N;
-  var money = function (n) { return '$' + Math.round(n).toLocaleString('en-US'); };
+  var money = function (n) { return '+$' + Math.round(n).toLocaleString('en-US'); };
   stage.querySelectorAll('.lane [data-amount]').forEach(function (el, i) { el.textContent = money(SPLIT[i]); });
 
   // members on a sunflower spiral, in a ring around the counter
   var members = [];
-  var rMin = 17, rMax = 41, golden = Math.PI * (3 - Math.sqrt(5));
+  var rMin = 16.5, rMax = 43, golden = Math.PI * (3 - Math.sqrt(5));
   for (var i = 0; i < N; i++) {
     var r = Math.sqrt(rMin * rMin + (rMax * rMax - rMin * rMin) * (i + .5) / N);
     var a = i * golden - Math.PI / 2;
@@ -712,7 +714,7 @@
     m.className = 'abs m';
     m.style.setProperty('--x', (r * Math.cos(a)).toFixed(2));
     m.style.setProperty('--y', (r * Math.sin(a)).toFixed(2));
-    m.innerHTML = '<svg viewBox="9 24 83 52"><use href="#eyes"/></svg>';
+    m.innerHTML = '<svg viewBox="0 0 83 52"><use href="#eyes"/></svg>';
     holder.appendChild(m); members.push({ el: m, r: r });
   }
   LANES.forEach(function (p, i) {
@@ -750,7 +752,7 @@
     stage.classList.add('snap');
     stage.classList.remove('merged', 'fade');
     members.forEach(function (m) { m.el.classList.remove('in', 'pulse', 'merge'); m.el.style.removeProperty('--d'); });
-    pot.classList.remove('show', 'gone'); potN.textContent = '$0';
+    pot.classList.remove('show', 'gone'); potN.textContent = '+$0';
     core.classList.remove('show'); links.classList.remove('show');
     lanes.forEach(function (l) { l.classList.remove('out'); });
     setCount(0);
@@ -764,13 +766,13 @@
     potN.textContent = money(TOTAL); pot.classList.add('gone');
     core.classList.add('show'); links.classList.add('show');
     lanes.forEach(function (l) { l.classList.add('out'); });
-    setStatus('$3,000 unlocked · split three ways');
+    setStatus('+$3,000 unlocked · split three ways');
     caption('media. parties. dinners.', true);
   }
 
   function play() {
     clearAll(); reset(); running = true;
-    var t = 500, JOIN = 4600;
+    var t = 500, JOIN = 5400;
     setStatus('0 of ' + N + ' members in'); caption('onboard every member.');
     // members join in a shuffled order, slow at first, then a rush
     var order = members.map(function (_, k) { return k; });
@@ -784,11 +786,11 @@
     t += JOIN + 450;
     later(function () {
       setStatus('every member in'); caption('every member in.');
-      members.forEach(function (m, n) { m.el.classList.remove('in'); void m.el.offsetWidth; m.el.classList.add('in', 'pulse'); m.el.style.animationDelay = (n * 8) + 'ms'; });
+      members.forEach(function (m, n) { m.el.classList.remove('in'); void m.el.offsetWidth; m.el.classList.add('in', 'pulse'); m.el.style.animationDelay = (n * 5) + 'ms'; });
     }, t);
     t += 1100;
     later(function () {
-      setStatus('$3,000 unlocked'); caption('unlock $3,000.');
+      setStatus('+$3,000 unlocked'); caption('unlock +$3,000.');
       stage.classList.add('merged');
       members.forEach(function (m) {
         m.el.style.animationDelay = '';
