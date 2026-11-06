@@ -5,7 +5,7 @@ import path from 'node:path';
 import vm from 'node:vm';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
-const pages = ['campus/landing.html','campus/directory.html','campus/manual.html','campus/ambassadors.html','campus/ambassadors/apply.html','campus/mic.html','campus/submit.html','mediadata/queue.html','campus/media.html','mediadata/analytics.html','mediadata/captions.html','greekwars/invite.html','greekwars/refer.html','greekwars/onboard.html','campus/visit.html','greekwars/claim.html','greekwars/clan.html','claimlinks.html','tasks.html','icybox/creators.html','fomocampustracker/index.html'];
+const pages = ['campus/landing.html','campus/directory.html','campus/manual.html','campus/ambassadors.html','campus/ambassadors/apply.html','campus/mic.html','campus/submit.html','mediadata/queue.html','campus/media.html','campus/unlock.html','mediadata/analytics.html','mediadata/captions.html','greekwars/invite.html','greekwars/refer.html','greekwars/onboard.html','campus/visit.html','greekwars/claim.html','greekwars/clan.html','claimlinks.html','tasks.html','icybox/creators.html','fomocampustracker/index.html'];
 const external = new Set();
 let failures = 0, checked = 0, journeyChecks = 0;
 function fail(message) { failures++; console.error(message); }
