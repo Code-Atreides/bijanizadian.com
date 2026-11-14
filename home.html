@@ -23,6 +23,9 @@
   .paths{margin:.5rem 0 0 2ch}
   .paths ul{margin:0 0 .75rem 2ch}
   .paths .named{margin-left:0}
+  .photos{margin:.5rem 0 .75rem 2ch;columns:3 16rem;column-gap:1rem}
+  .photos a{display:block;margin-bottom:1rem;break-inside:avoid}
+  .photos img{display:block;width:100%;height:auto;background:#f2f2f2}
 </style>
 </head>
 <body>
@@ -36,6 +39,34 @@
       <summary>team</summary><form data-fomo-lock style="display:inline"><input type="password" name="pw" placeholder="password" aria-label="Password" autocomplete="off" required><span class="err" role="alert" hidden></span></form>
     </details>
   </li>
+  <li>
+    <details>
+      <summary>photos</summary>
+      <div class="photos" id="photos">
+        <a href="/assets/photos/dsc00523-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00523.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540018-1-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540018-1.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00358-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00358.webp" width="750" height="1000" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00294-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00294.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00400-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00400.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00101-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00101.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540016-2-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540016-2.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00530-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00530.webp" width="750" height="1000" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540008-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540008.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00124-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00124.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00239-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00239.webp" width="750" height="1000" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00155-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00155.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00176-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00176.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00371-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00371.webp" width="750" height="1000" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540014-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540014.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00253-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00253.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540005-2-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540005-2.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00228-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00228.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/dsc00365-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/dsc00365.webp" width="1000" height="750" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540002-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540002.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+        <a href="/assets/photos/000049540017-1-full.webp" target="_blank" rel="noopener"><img src="/assets/photos/000049540017-1.webp" width="1000" height="663" alt="" loading="lazy" decoding="async"></a>
+      </div>
+    </details>
+  </li>
   <li><a href="/other">other</a></li>
   <li><a href="https://luciensmitharchive.com/" target="_blank" rel="noopener">lucien smith archive</a></li>
 </ul>
@@ -44,6 +75,15 @@
   // The team links (fomo campus, campus tasks and the fomo paths) are encrypted with the unlock password
   // (scripts/encrypt-fomo-paths.mjs writes this line); it decrypts in the browser.
   var FOMO_LOCKED = { salt: 'kJCCgijV+4teO84+/vRz6g==', iv: 'kmd/qdC8h0PAEMEU', data: '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' };
+
+  // Photos come in a new random order on every visit (scripts/build-photos.py writes the list).
+  (function (box) {
+    var items = Array.prototype.slice.call(box.children);
+    for (var i = items.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = items[i]; items[i] = items[j]; items[j] = t;
+    }
+    items.forEach(function (el) { box.appendChild(el); });
+  })(document.getElementById('photos'));
 
   var team = document.getElementById('team');
   team.addEventListener('toggle', function () {
