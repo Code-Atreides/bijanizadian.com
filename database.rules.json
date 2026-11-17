@@ -34,6 +34,13 @@
         ".validate": "newData.hasChildren(['first_name', 'last_name', 'email', 'phone', 'school', 'chapter', 'instagram', 'age_ok', 'submitted_at']) && newData.child('age_ok').val() == true && newData.child('email').val().length < 200 && newData.child('school').val().length < 200 && newData.child('chapter').val().length < 200 && newData.child('instagram').val().length < 80 && (!newData.hasChild('video_link') || newData.child('video_link').val().length < 400)"
       }
     },
+    "pumpfun_onboard": {
+      ".read": false,
+      "$key": {
+        ".write": "!data.exists()",
+        ".validate": "$key.matches(/^[0-9]{13}-[a-z0-9]{1,8}$/) && newData.hasChildren(['kind', 'first_name', 'last_name', 'email', 'pumpfun_username', 'school', 'chapter', 'age_ok', 'submitted_at']) && newData.child('age_ok').val() == true && (newData.child('kind').val() == 'register' || newData.child('kind').val() == 'refer') && newData.child('email').val().length < 200 && newData.child('school').val().length < 200 && newData.child('chapter').val().length < 200 && newData.child('pumpfun_username').val().length <= 60"
+      }
+    },
     "greekwars": {
       ".read": true,
       ".write": false
