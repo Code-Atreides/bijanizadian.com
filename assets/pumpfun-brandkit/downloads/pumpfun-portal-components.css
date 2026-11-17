@@ -1,0 +1,95 @@
+/*
+  pump.fun campus — portal components
+  Scoped under .pf-portal. Wrap a portal page (or one region) in class="pf-portal".
+  Fonts: Geist Sans 400 + 600 (SIL OFL), in fonts/ next to web/ in the kit ZIP. Point the
+  @font-face src paths below at wherever you host them.
+  Status colors and --pf-mint-ink are proposed campus additions.
+*/
+@font-face { font-family: Geist; src: url("../fonts/Geist-Regular.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: Geist; src: url("../fonts/Geist-SemiBold.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+
+.pf-portal {
+  --pf-canvas: #0A0A0B;
+  --pf-panel: #111113;
+  --pf-raised: #1B1B1D;
+  --pf-divider: #2C2C30;
+  --pf-text: #EBEBEB;
+  --pf-meta: #999999;
+  --pf-mint: #86EFAC;
+  --pf-mint-hover: #9FF3BE;
+  --pf-mint-ink: #052E16;
+  --pf-campaign: #00FF95;
+  --pf-review: #60A5FA;
+  --pf-edits: #FF6A43;
+  --pf-approved: #4ADE80;
+  --pf-radius-control: 12px;
+  --pf-radius-card: 16px;
+  --pf-font: Geist, "Geist Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+
+  background: var(--pf-canvas);
+  color: var(--pf-text);
+  font: 400 16px/24px var(--pf-font);
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+.pf-portal *, .pf-portal *::before, .pf-portal *::after { box-sizing: border-box; }
+.pf-portal :focus-visible { outline: 2px solid var(--pf-mint); outline-offset: 2px; }
+.pf-portal a { color: var(--pf-mint); }
+
+/* Type scale */
+.pf-portal .pf-title { margin: 0; font-size: 32px; line-height: 40px; font-weight: 600; letter-spacing: -.015em; }
+.pf-portal .pf-section { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.pf-portal .pf-body { margin: 0; font-size: 16px; line-height: 24px; }
+.pf-portal .pf-label { font-size: 14px; line-height: 20px; font-weight: 600; }
+.pf-portal .pf-meta { font-size: 12px; line-height: 16px; color: var(--pf-meta); }
+.pf-portal .pf-num { font-variant-numeric: tabular-nums; }
+
+/* Header */
+.pf-portal .pf-header { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 16px; border-bottom: 1px solid var(--pf-divider); }
+.pf-portal .pf-header img { width: 28px; height: auto; }
+.pf-portal .pf-header .pf-meta { margin-left: auto; }
+
+/* Surfaces */
+.pf-portal .pf-card { background: var(--pf-panel); border: 1px solid var(--pf-divider); border-radius: var(--pf-radius-card); padding: 20px; }
+.pf-portal .pf-raised { background: var(--pf-raised); border-radius: var(--pf-radius-control); }
+.pf-portal .pf-stat { background: var(--pf-panel); border: 1px solid var(--pf-divider); border-radius: var(--pf-radius-control); padding: 10px 12px; display: grid; }
+.pf-portal .pf-stat b { font-size: 32px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Buttons: one primary per workflow */
+.pf-portal .pf-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: var(--pf-radius-control); border: 1px solid transparent; font: 600 16px/1 var(--pf-font); text-decoration: none; cursor: pointer; }
+.pf-portal .pf-btn-primary { background: var(--pf-mint); color: var(--pf-mint-ink); }
+.pf-portal .pf-btn-primary:hover { background: var(--pf-mint-hover); }
+.pf-portal .pf-btn-secondary { background: var(--pf-raised); color: var(--pf-text); border-color: var(--pf-divider); }
+.pf-portal .pf-btn-secondary:hover { background: #242427; }
+.pf-portal .pf-btn:disabled, .pf-portal .pf-btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+
+/* Tabs / segmented control */
+.pf-portal .pf-tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--pf-canvas); border: 1px solid var(--pf-divider); border-radius: var(--pf-radius-control); }
+.pf-portal .pf-tab { min-height: 40px; padding: 0 16px; border: 0; border-radius: 8px; background: transparent; color: var(--pf-meta); font: 400 14px var(--pf-font); cursor: pointer; }
+.pf-portal .pf-tab[aria-selected="true"] { background: var(--pf-mint); color: var(--pf-mint-ink); font-weight: 600; }
+
+/* Fields */
+.pf-portal .pf-field { display: grid; gap: 6px; }
+.pf-portal .pf-field label { font-size: 14px; line-height: 20px; font-weight: 600; }
+.pf-portal .pf-input { width: 100%; min-height: 44px; padding: 0 12px; border-radius: var(--pf-radius-control); border: 1px solid var(--pf-divider); background: var(--pf-raised); color: var(--pf-text); font: 400 16px var(--pf-font); }
+.pf-portal .pf-input::placeholder { color: var(--pf-meta); }
+.pf-portal .pf-input[aria-invalid="true"] { border-color: var(--pf-edits); }
+.pf-portal .pf-hint { font-size: 14px; line-height: 20px; color: var(--pf-meta); }
+
+/* Status: always pair the color with a label */
+.pf-portal .pf-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; line-height: 16px; white-space: nowrap; }
+.pf-portal .pf-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.pf-portal .pf-status-review { color: var(--pf-review); }
+.pf-portal .pf-status-edits { color: var(--pf-edits); }
+.pf-portal .pf-status-approved { color: var(--pf-approved); }
+
+/* Lists */
+.pf-portal .pf-rows { list-style: none; margin: 0; padding: 0; }
+.pf-portal .pf-rows > li { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 10px 0; border-top: 1px solid var(--pf-divider); font-size: 14px; }
+.pf-portal .pf-empty { padding: 32px 16px; text-align: center; color: var(--pf-meta); border: 1px dashed var(--pf-divider); border-radius: var(--pf-radius-card); }
+
+/* Phone */
+@media (max-width: 560px) {
+  .pf-portal .pf-card { padding: 16px; }
+  .pf-portal form .pf-btn-primary { width: 100%; }
+}

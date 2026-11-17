@@ -18,7 +18,7 @@
     },
     "status": {
       "review": { "value": "#60A5FA", "label": "In review" },
-      "edits": { "value": "#FB923C", "label": "Needs edits" },
+      "edits": { "value": "#FF6A43", "label": "Needs edits" },
       "approved": { "value": "#4ADE80", "label": "Approved" }
     }
   },
@@ -26,11 +26,11 @@
     "family": "Geist Sans",
     "weights": { "regular": 400, "semibold": 600 },
     "scale": {
-      "title": { "size": 32, "lineHeight": 40 },
-      "section": { "size": 20, "lineHeight": 28 },
-      "body": { "size": 16, "lineHeight": 24 },
-      "label": { "size": 14, "lineHeight": 20 },
-      "metadata": { "size": 12, "lineHeight": 16 }
+      "title": { "size": 32, "lineHeight": 40, "weight": 600 },
+      "section": { "size": 20, "lineHeight": 28, "weight": 600 },
+      "body": { "size": 16, "lineHeight": 24, "weight": 400 },
+      "label": { "size": 14, "lineHeight": 20, "weight": 600 },
+      "metadata": { "size": 12, "lineHeight": 16, "weight": 400 }
     },
     "metrics": "tabular-nums"
   },
@@ -46,6 +46,11 @@
   },
   "social": {
     "grid": { "width": 1080, "height": 1350, "margin": 72 },
-    "story": { "width": 1080, "height": 1920, "quietZones": { "sides": 72, "top": 250, "bottom": 340 } }
+    "story": { "width": 1080, "height": 1920, "quietZones": { "sides": 72, "top": 250, "bottom": 340 } },
+    "video": { "width": 1080, "height": 1920, "captionArea": { "left": 72, "right": 180, "top": 270, "bottom": 480 } },
+    "colorways": {
+      "campaignGreen": { "field": "#00FF95", "text": "#0A0A0B", "button": "#0A0A0B", "buttonText": "#86EFAC" },
+      "ink": { "field": "#0A0A0B", "text": "#EBEBEB", "accent": "#86EFAC", "button": "#86EFAC", "buttonText": "#052E16" }
+    }
   }
 }
