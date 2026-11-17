@@ -1,0 +1,51 @@
+{
+  "name": "pump.fun campus",
+  "source": "pump.fun portal design reference, 17 Nov 2026. Status colors and mint text are proposed campus additions.",
+  "color": {
+    "green": {
+      "interfaceMint": { "value": "#86EFAC", "use": "Primary action or selected tab, with dark green text" },
+      "capsule": { "value": "#5FCB88", "use": "Logo only. Never recolor or redraw the capsule" },
+      "campaign": { "value": "#00FF95", "use": "Field behind the capsule on covers and social tiles" },
+      "mintText": { "value": "#052E16", "use": "Text on interface mint (proposed)" }
+    },
+    "surface": {
+      "canvas": { "value": "#0A0A0B", "use": "Behind the page" },
+      "panel": { "value": "#111113", "use": "Groups content" },
+      "raised": { "value": "#1B1B1D", "use": "Nested controls" },
+      "divider": { "value": "#2C2C30", "use": "Lines and outlines" },
+      "text": { "value": "#EBEBEB", "use": "Body text" },
+      "metadata": { "value": "#999999", "use": "Labels, dates, secondary text" }
+    },
+    "status": {
+      "review": { "value": "#60A5FA", "label": "In review" },
+      "edits": { "value": "#FB923C", "label": "Needs edits" },
+      "approved": { "value": "#4ADE80", "label": "Approved" }
+    }
+  },
+  "type": {
+    "family": "Geist Sans",
+    "weights": { "regular": 400, "semibold": 600 },
+    "scale": {
+      "title": { "size": 32, "lineHeight": 40 },
+      "section": { "size": 20, "lineHeight": 28 },
+      "body": { "size": 16, "lineHeight": 24 },
+      "label": { "size": 14, "lineHeight": 20 },
+      "metadata": { "size": 12, "lineHeight": 16 }
+    },
+    "metrics": "tabular-nums"
+  },
+  "mark": {
+    "navSize": "24-32 px",
+    "clearSpace": "half the mark's width on each side",
+    "rules": "Use the original artwork. Keep the white cap, outline, highlight and original tilt."
+  },
+  "controls": {
+    "minHeight": 44,
+    "primaryPerWorkflow": 1,
+    "focusRing": "2px interface mint, 2px offset"
+  },
+  "social": {
+    "grid": { "width": 1080, "height": 1350, "margin": 72 },
+    "story": { "width": 1080, "height": 1920, "quietZones": { "sides": 72, "top": 250, "bottom": 340 } }
+  }
+}
