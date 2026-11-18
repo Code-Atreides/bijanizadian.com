@@ -9,6 +9,9 @@
   // Timing follows the CSS animations (they start at first paint), not page-load time.
   const root = document.documentElement;
   const intro = document.querySelector('.intro');
+  let introFinished = () => {};
+  const introDone = new Promise(resolve => { introFinished = resolve; });
+  if (!(intro && root.classList.contains('intro-on'))) introFinished();
   if (intro && root.classList.contains('intro-on')) {
     root.classList.add('intro-js');
     const lockup = intro.querySelector('.intro-lockup');
@@ -22,6 +25,7 @@
       timers.forEach(clearTimeout);
       intro.remove();
       root.classList.remove('intro-on', 'intro-js');
+      introFinished();
     };
     const land = () => {
       if (!document.contains(intro)) return;
@@ -29,6 +33,7 @@
       brand.style.opacity = '1';
       intro.remove();
       root.classList.remove('intro-js');
+      introFinished();
     };
     const fly = () => {
       if (flown || !document.contains(intro)) return;
@@ -48,6 +53,38 @@
     timers.push(setTimeout(() => root.classList.remove('intro-on'), 6500));
     intro.addEventListener('click', done);
     addEventListener('keydown', function skip() { removeEventListener('keydown', skip); if (document.contains(intro)) done(); });
+  }
+
+  // Skeletons: the first screen resolves once fonts are ready (and the intro has landed);
+  // every other section resolves the first time it scrolls into view.
+  if (root.classList.contains('skel-on')) {
+    root.classList.add('skel-js');
+    const fontsReady = document.fonts ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+    const reveal = (els, delay = 0) => els.forEach((el, i) => setTimeout(() => el.classList.add('skel-done'), delay + i * 55));
+    const groupOf = el => el.closest('section, main.page') || document.body;
+    const groups = new Map();
+    document.querySelectorAll('[data-skel]').forEach(el => {
+      const g = groupOf(el);
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(el);
+    });
+    const first = document.querySelector('.hero, main.page');
+    if (first && groups.has(first)) {
+      const minShow = new Promise(r => setTimeout(r, Math.max(0, 650 - performance.now())));
+      const firstEls = groups.get(first);
+      groups.delete(first);
+      Promise.all([fontsReady, introDone, minShow]).then(() => reveal(firstEls, 60));
+    }
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        io.unobserve(entry.target);
+        fontsReady.then(() => reveal(groups.get(entry.target) || [], 420));
+      }), { threshold: 0.12 });
+      groups.forEach((_, g) => io.observe(g));
+    } else {
+      groups.forEach(els => reveal(els));
+    }
   }
 
   const money = value => {

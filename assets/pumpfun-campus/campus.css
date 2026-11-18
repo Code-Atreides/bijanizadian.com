@@ -305,3 +305,22 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
 .intro-on .calc { animation-delay: 2.3s; }
 @keyframes intro-show { from { opacity: 0; } to { opacity: 1; } }
 @keyframes intro-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* Skeletons: shimmering placeholders that resolve into content.
+   skel-on is set in the page head; campus.js adds skel-js and marks each element skel-done when it's ready.
+   Text gets line-shaped bars, blocks get a rounded box. If campus.js never runs, the head script drops skel-on after 4s. */
+:root { --sk-a: #1A1A1D; --sk-b: #2A2A2F; }
+.calc, .steps li, .link-card, .chat, .refer-table, .card { --sk-a: #1E1E21; --sk-b: #303035; }
+.early-panel { --sk-a: #2FE48F; --sk-b: #7DF5BD; }
+.skel-on [data-skel] { position: relative; transition: color .35s ease; }
+.skel-on [data-skel="text"] { width: fit-content; max-width: 100%; }
+.skel-on [data-skel]:not(.skel-done), .skel-on [data-skel]:not(.skel-done) * { color: transparent; }
+.skel-on [data-skel]::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: 10px; background: linear-gradient(100deg, var(--sk-a) 35%, var(--sk-b) 50%, var(--sk-a) 65%) 0 0 / 300% 100%; animation: skel-shimmer 1.5s ease-in-out infinite; transition: opacity .35s ease; }
+.skel-on :is(.btn, .money, .payoff, .link-card, .steps li, .join-steps li, .refer-table, .bubble)[data-skel]::after { border-radius: inherit; }
+.skel-on [data-skel="text"]::after { border-radius: 6px; -webkit-mask: repeating-linear-gradient(to bottom, #000 0, #000 calc(1lh - .34em), transparent calc(1lh - .34em), transparent 1lh); mask: repeating-linear-gradient(to bottom, #000 0, #000 calc(1lh - .34em), transparent calc(1lh - .34em), transparent 1lh); }
+.skel-on .btn[data-skel]::after { inset: -1px; }
+.skel-on .field[data-skel]::after { border-radius: var(--radius-control); }
+.skel-on details[data-skel]::after { inset: 12px 0; border-radius: 8px; }
+.skel-on [data-skel].skel-done::after { opacity: 0; animation: none; }
+@keyframes skel-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce) { .skel-on [data-skel]::after { animation: none; } }

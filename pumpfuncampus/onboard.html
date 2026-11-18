@@ -10,8 +10,9 @@
   <link rel="icon" href="/assets/pumpfun-brandkit/downloads/pumpfun-mark.png" type="image/png">
   <link rel="preload" href="/assets/pumpfun-brandkit/fonts/Geist-Regular.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/assets/pumpfun-brandkit/fonts/Geist-SemiBold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/assets/pumpfun-campus/campus.css?v=3">
-  <script src="/assets/pumpfun-campus/campus.js?v=3" defer></script>
+  <link rel="stylesheet" href="/assets/pumpfun-campus/campus.css?v=4">
+  <script>try{var d=document.documentElement;d.classList.add('skel-on');setTimeout(function(){if(!d.classList.contains('skel-js'))d.classList.remove('skel-on')},4000)}catch(e){}</script>
+  <script src="/assets/pumpfun-campus/campus.js?v=4" defer></script>
 </head>
 <body>
   <a class="skip" href="#onboard-form">Skip to the form</a>
@@ -26,10 +27,10 @@
     <div class="wrap page-inner">
       <div class="page-copy">
         <p class="referral-banner" data-ref-banner hidden>Referred by <strong data-ref-name></strong></p>
-        <p class="eyebrow">registration</p>
-        <h1>register <span>your chapter.</span></h1>
-        <p class="page-lede">Two minutes. You get your chapter's tracker link to send everyone else, and we take it from there.</p>
-        <p class="page-meta">$6.25 per member · no deposit · start with a batch</p>
+        <p class="eyebrow" data-skel="text">registration</p>
+        <h1 data-skel="text">register <span>your chapter.</span></h1>
+        <p class="page-lede" data-skel="text">Two minutes. You get your chapter's tracker link to send everyone else, and we take it from there.</p>
+        <p class="page-meta" data-skel="text">$6.25 per member · no deposit · start with a batch</p>
         <details class="fine">
           <summary>Rates, eligibility &amp; fine print</summary>
           <ul>
@@ -45,23 +46,23 @@
 
       <form class="card" id="onboard-form" novalidate>
         <div class="field-grid">
-          <div class="field"><label for="f-first">First name</label><input id="f-first" name="first_name" autocomplete="given-name" required maxlength="80"></div>
-          <div class="field"><label for="f-last">Last name</label><input id="f-last" name="last_name" autocomplete="family-name" required maxlength="80"></div>
-          <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="190"></div>
-          <div class="field"><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required maxlength="40" placeholder="your mobile number"></div>
-          <div class="field"><label for="f-ig">Instagram</label><input id="f-ig" name="instagram" required maxlength="60" autocomplete="off" placeholder="@yourhandle"></div>
-          <div class="field"><label for="f-user">pump.fun username</label><input id="f-user" name="pumpfun_username" required maxlength="60" autocomplete="off"></div>
-          <div class="field"><label for="f-school">School</label><input id="f-school" name="school" required maxlength="190"></div>
-          <div class="field span-2"><label for="f-chapter">Chapter or organization</label><input id="f-chapter" name="chapter" required maxlength="190"></div>
-          <div class="field"><label for="f-type">Type</label><select id="f-type" name="org_type" required><option value="">Choose one…</option><option value="fraternity">Fraternity</option><option value="sorority">Sorority</option><option value="professional">Professional fraternity</option><option value="coed">Co-ed / other Greek org</option><option value="club">Student organization / club</option></select></div>
-          <div class="field"><label for="f-role">Your role</label><select id="f-role" name="role" required><option value="">Choose one…</option><option>President</option><option>Vice President</option><option>Treasurer</option><option>Social Chair</option><option>Rush Chair</option><option>Philanthropy Chair</option><option>Member</option></select></div>
-          <div class="field"><label for="f-actives">Active members</label><input id="f-actives" name="actives" type="number" inputmode="numeric" min="1" max="2000" required placeholder="rough number"></div>
+          <div class="field" data-skel><label for="f-first">First name</label><input id="f-first" name="first_name" autocomplete="given-name" required maxlength="80"></div>
+          <div class="field" data-skel><label for="f-last">Last name</label><input id="f-last" name="last_name" autocomplete="family-name" required maxlength="80"></div>
+          <div class="field" data-skel><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required maxlength="190"></div>
+          <div class="field" data-skel><label for="f-phone">Phone</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required maxlength="40" placeholder="your mobile number"></div>
+          <div class="field" data-skel><label for="f-ig">Instagram</label><input id="f-ig" name="instagram" required maxlength="60" autocomplete="off" placeholder="@yourhandle"></div>
+          <div class="field" data-skel><label for="f-user">pump.fun username</label><input id="f-user" name="pumpfun_username" required maxlength="60" autocomplete="off"></div>
+          <div class="field" data-skel><label for="f-school">School</label><input id="f-school" name="school" required maxlength="190"></div>
+          <div class="field span-2" data-skel><label for="f-chapter">Chapter or organization</label><input id="f-chapter" name="chapter" required maxlength="190"></div>
+          <div class="field" data-skel><label for="f-type">Type</label><select id="f-type" name="org_type" required><option value="">Choose one…</option><option value="fraternity">Fraternity</option><option value="sorority">Sorority</option><option value="professional">Professional fraternity</option><option value="coed">Co-ed / other Greek org</option><option value="club">Student organization / club</option></select></div>
+          <div class="field" data-skel><label for="f-role">Your role</label><select id="f-role" name="role" required><option value="">Choose one…</option><option>President</option><option>Vice President</option><option>Treasurer</option><option>Social Chair</option><option>Rush Chair</option><option>Philanthropy Chair</option><option>Member</option></select></div>
+          <div class="field" data-skel><label for="f-actives">Active members</label><input id="f-actives" name="actives" type="number" inputmode="numeric" min="1" max="2000" required placeholder="rough number"></div>
         </div>
         <input type="hidden" name="referred_by" id="f-ref">
         <div class="form-foot">
           <label class="check"><input type="checkbox" name="age_ok" required> I'm 18 or older.</label>
           <p class="privacy">We use these details only to set up your chapter tracker, match members and pay you.</p>
-          <button type="submit" class="btn btn-primary" data-submit>Get my chapter's link ↗</button>
+          <button type="submit" class="btn btn-primary" data-submit data-skel>Get my chapter's link ↗</button>
         </div>
         <p class="form-status" role="status" aria-live="polite" data-status></p>
       </form>
