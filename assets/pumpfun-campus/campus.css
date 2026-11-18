@@ -263,3 +263,45 @@ input[type="range"]::-moz-range-thumb { width: 14px; height: 14px; border-radius
   .bubble { align-self: stretch; max-width: none; }
   .link-card { grid-template-columns: minmax(0, 1fr); gap: var(--s2); }
 }
+
+/* Intro: capsule pops in, pump.fun/campus types out, the lockup flies into the header.
+   Only on the landing, once per session, never with reduced motion (set in the page head).
+   The CSS alone finishes the sequence; campus.js upgrades the exit to the fly-into-header move. */
+.intro { display: none; }
+.intro-on .intro { display: grid; place-items: center; position: fixed; inset: 0; z-index: 200; background: var(--canvas); animation: intro-fade .45s ease 2.05s forwards; cursor: pointer; }
+.intro-on.intro-js .intro { animation: none; }
+/* Same proportions as the header lockup (28px mark, 12px gap, 18px type) so the move lands exactly. */
+.intro-lockup { display: flex; align-items: center; gap: .6667em; font-size: clamp(36px, 4.6vw, 72px); line-height: 1; letter-spacing: -.01em; color: var(--text); will-change: transform; }
+.intro-mark { width: 1.5556em; animation: intro-mark .7s cubic-bezier(.34, 1.56, .64, 1) .1s both; }
+.intro-text { display: grid; }
+.intro-ghost, .intro-typed { grid-area: 1 / 1; white-space: nowrap; }
+.intro-ghost { visibility: hidden; }
+.intro-text i { font-style: normal; color: var(--mint); margin: 0 .2em; }
+.intro-text em { font-style: normal; opacity: .72; }
+.intro-typed > span, .intro-typed i > span, .intro-typed em > span { display: inline-block; max-width: 0; overflow: hidden; vertical-align: bottom; animation: intro-type 1ms linear forwards; animation-delay: calc(.72s + var(--i) * 52ms); }
+.intro-typed i { margin: 0; }
+.intro-typed i > span { animation-name: intro-type-slash; }
+@keyframes intro-type-slash { to { max-width: 1em; margin: 0 .2em; } }
+.intro-caret { display: inline-block; width: .07em; height: .95em; margin-left: .06em; vertical-align: -.1em; background: var(--mint); border-radius: 1px; animation: intro-blink .5s steps(1) infinite; }
+.intro.is-leaving .intro-caret { visibility: hidden; }
+.intro.is-leaving { background: transparent; transition: background-color .5s ease; }
+.intro.is-leaving .intro-lockup { transition: transform .68s cubic-bezier(.65, 0, .35, 1); }
+@keyframes intro-mark { from { opacity: 0; transform: scale(.2) rotate(-140deg); } to { opacity: 1; transform: none; } }
+@keyframes intro-type { to { max-width: 1em; } }
+@keyframes intro-blink { 50% { opacity: 0; } }
+@keyframes intro-fade { to { opacity: 0; visibility: hidden; } }
+/* The page underneath: header brand swaps in as the lockup lands, hero eases up. */
+.intro-on .site-header .brand { animation: intro-show .01s linear 2.45s both; }
+.intro-js .site-header .brand { animation: none; opacity: 0; }
+.intro-on .site-nav { animation: intro-rise .6s cubic-bezier(.2, .7, .2, 1) 2.15s both; }
+.intro-on .hero-copy > *, .intro-on .calc { animation: intro-rise .7s cubic-bezier(.2, .7, .2, 1) both; }
+.intro-on .hero-copy > :nth-child(1) { animation-delay: 2.05s; }
+.intro-on .hero-copy > :nth-child(2) { animation-delay: 2.12s; }
+.intro-on .hero-copy > :nth-child(3) { animation-delay: 2.19s; }
+.intro-on .hero-copy > :nth-child(4) { animation-delay: 2.26s; }
+.intro-on .hero-copy > :nth-child(5) { animation-delay: 2.33s; }
+.intro-on .hero-copy > :nth-child(6) { animation-delay: 2.40s; }
+.intro-on .hero-copy > :nth-child(7) { animation-delay: 2.47s; }
+.intro-on .calc { animation-delay: 2.3s; }
+@keyframes intro-show { from { opacity: 0; } to { opacity: 1; } }
+@keyframes intro-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }

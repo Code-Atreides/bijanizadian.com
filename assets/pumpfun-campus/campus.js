@@ -5,6 +5,51 @@
   const RATES = { fraternity: 6.25, sorority: 6.25, coed: 6.25, professional: 3.125, club: 2.08 };
   const DB = 'https://bijanizadian-84e48-default-rtdb.firebaseio.com/pumpfun_onboard';
 
+  // Intro: when the type-out finishes, fly the lockup into the header brand, then hand over.
+  // Timing follows the CSS animations (they start at first paint), not page-load time.
+  const root = document.documentElement;
+  const intro = document.querySelector('.intro');
+  if (intro && root.classList.contains('intro-on')) {
+    root.classList.add('intro-js');
+    const lockup = intro.querySelector('.intro-lockup');
+    const mark = intro.querySelector('.intro-mark');
+    const lastLetter = intro.querySelector('.intro-typed em > span:last-child');
+    const brand = document.querySelector('.site-header .brand');
+    const lastRise = document.querySelector('.hero-copy > :last-child');
+    const timers = [];
+    let flown = false;
+    const done = () => {
+      timers.forEach(clearTimeout);
+      intro.remove();
+      root.classList.remove('intro-on', 'intro-js');
+    };
+    const land = () => {
+      if (!document.contains(intro)) return;
+      brand.style.animation = 'none';
+      brand.style.opacity = '1';
+      intro.remove();
+      root.classList.remove('intro-js');
+    };
+    const fly = () => {
+      if (flown || !document.contains(intro)) return;
+      flown = true;
+      const a = mark.getBoundingClientRect();
+      const b = brand.querySelector('img').getBoundingClientRect();
+      const l = lockup.getBoundingClientRect();
+      lockup.style.transformOrigin = `${a.left - l.left}px ${a.top - l.top}px`;
+      intro.classList.add('is-leaving');
+      lockup.style.transform = `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width})`;
+      lockup.addEventListener('transitionend', land, { once: true });
+      timers.push(setTimeout(land, 900));
+    };
+    lastLetter.addEventListener('animationend', () => timers.push(setTimeout(fly, 380)), { once: true });
+    timers.push(setTimeout(fly, 4000)); // safety net if the animation event never fires
+    if (lastRise) lastRise.addEventListener('animationend', () => root.classList.remove('intro-on'), { once: true });
+    timers.push(setTimeout(() => root.classList.remove('intro-on'), 6500));
+    intro.addEventListener('click', done);
+    addEventListener('keydown', function skip() { removeEventListener('keydown', skip); if (document.contains(intro)) done(); });
+  }
+
   const money = value => {
     const cents = Math.round(value * 100) / 100;
     return '$' + cents.toLocaleString('en-US', { minimumFractionDigits: cents % 1 ? 2 : 0, maximumFractionDigits: 2 });
